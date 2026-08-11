@@ -17,59 +17,61 @@ amplitude_uv    min 52.19  median 184.17  max 923.15
 snr             min 2.43  median 9.77  max 48.44
 distinct brain_area labels  170
 
-## Caliper: amplitude 50.0-200.0 uV, SNR 5.0-15.0
+## Provisional donor screen: amplitude 50.0-200.0 uV, SNR 5.0-15.0
 rows inside caliper         1149 of 2183
 distinct areas inside       149
 
 ## Areas with at least 10 in-caliper templates
 
-The 'leave-one-out' column is the count remaining after dropping the area's single
-largest contributing source dataset. It is the binding number when the host recording
-comes from a dataset that also contributed donor templates, since reusing the host's
-own dataset as a donor is a leakage path.
+The 'worst-case leave-one-out' column is the count remaining after dropping the
+area's single largest contributing source dataset. The exact count for a chosen host
+depends on which source dataset that host belongs to; this column is the conservative
+minimum, not the count for every host represented in the library.
 
-area              n  datasets  leave-one-out
-CP               70         4             42
-SUB              57         2             18
-AON              39         4              9
-PIR              36         5             19
-VISa5            32         3             17
-ENTl5            31         2             10
-AId5             30         2             14
-ENTl6a           28         2              6
-VISpor5          27         2              4
-LP               26         2              9
-MRN              24         7             14
-VISpor6a         23         3              4
-PL5              22         1              0
-AUDp6a           22         1              0
-SSp-m6a          21         3              8
-ORBvl6a          20         1              0
-MEA              18         1              0
-PAG              17         3              6
-VISC5            17         1              0
-MOs5             16         3              8
-MOp6a            15         1              0
-AIp2/3           14         1              0
-ccb              13         4              3
-PVT              13         1              0
-ACAv5            13         2              5
-ILA5             13         1              0
-ACAd5            13         2              5
-ORBvl2/3         13         1              0
-ENTl3            12         2              5
-CA1              12         4              6
-MOs6a            12         1              0
-SSs5             11         1              0
-MOp5             11         1              0
-VISli4           11         1              0
-BMAp             11         1              0
-SF               10         2              2
-ProS             10         2              2
+area              n  datasets   worst-case LOO
+CP               70         4               42
+SUB              57         2               18
+AON              39         4                9
+PIR              36         5               19
+VISa5            32         3               17
+ENTl5            31         2               10
+AId5             30         2               14
+ENTl6a           28         2                6
+VISpor5          27         2                4
+LP               26         2                9
+MRN              24         7               14
+VISpor6a         23         3                4
+PL5              22         1                0
+AUDp6a           22         1                0
+SSp-m6a          21         3                8
+ORBvl6a          20         1                0
+MEA              18         1                0
+PAG              17         3                6
+VISC5            17         1                0
+MOs5             16         3                8
+MOp6a            15         1                0
+AIp2/3           14         1                0
+ccb              13         4                3
+PVT              13         1                0
+ACAv5            13         2                5
+ILA5             13         1                0
+ACAd5            13         2                5
+ORBvl2/3         13         1                0
+ENTl3            12         2                5
+CA1              12         4                6
+MOs6a            12         1                0
+SSs5             11         1                0
+MOp5             11         1                0
+VISli4           11         1                0
+BMAp             11         1                0
+SF               10         2                2
+ProS             10         2                2
 
-areas viable, host dataset NOT in the library      37
-areas viable, host dataset excluded as a donor     7  (CP, SUB, PIR, VISa5, ENTl5, AId5, MRN)
+areas viable before an exact host-dataset exclusion       37
+areas viable after worst-case source-dataset exclusion     7  (CP, SUB, PIR, VISa5, ENTl5, AId5, MRN)
 
-Read this as a conditional, not a count: if the chosen host recording is not one of
-the library's own source datasets, the first number applies. If it is, the second does.
-Both numbers move with the caliper, which is a declared parameter and not a fact.
+Read these as screening bounds, not a completed feasibility result. If the chosen host
+is outside the donor library, no exact-dataset exclusion is needed. If it is inside,
+exclude that specific source and recompute; the result lies between the two bounds above
+and equals the worst case only when that source is the area's largest contributor.
+Both bounds move with the provisional caliper, and neither tests paired-arm balance.

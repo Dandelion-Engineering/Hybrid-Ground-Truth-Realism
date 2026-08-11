@@ -1,10 +1,9 @@
 """Audit the SpikeInterface hybrid template library for region-arm feasibility.
 
-The project's region-matching axis requires that, for some brain area, the
-template library holds enough templates to build a *matched* arm (donor
-templates from the host recording's area) and a *mismatched* arm (donor
-templates from a distant area), with amplitude and signal-to-noise ratio
-balanced across both so that a realism effect is not an amplitude effect in
+The project's region-matching axis requires that, for some anatomically pinned
+host injection zone, the template library holds enough templates to build a
+region-matched arm and a region-unaware control arm with nuisance covariates
+balanced so that a realism effect is not an amplitude or provenance effect in
 disguise.
 
 This script answers whether that is possible, and under what constraints. It:
@@ -15,18 +14,22 @@ This script answers whether that is possible, and under what constraints. It:
 2. reports row counts, probe types, source datasets, and amplitude/SNR ranges;
 3. counts, per brain area, how many templates survive an amplitude and SNR
    caliper; and
-4. runs a leave-one-dataset-out stress test: for each area, how many templates
-   remain after dropping its single largest contributing source dataset. This
-   is the binding number when the host recording comes from a dataset that also
-   contributed donor templates, because reusing the host's own dataset as a
-   donor is a leakage path.
+4. runs a conservative leave-one-dataset-out stress test: for each area, how
+   many templates remain after dropping its single largest contributing source
+   dataset. This is the *worst-case* remaining count. The exact count for a
+   selected host depends on which source dataset that host belongs to; reusing
+   the host's own dataset as a donor is a leakage path.
+
+This is a necessary pool-size audit, not a paired-arm feasibility proof. It does
+not test anatomical placement, post-rescaling effective SNR in a selected host,
+or covariate balance between a region-matched and region-unaware control arm.
 
 Stdlib only, deliberately: this is a 2 MB CSV and a few group-bys, and the
 project should not acquire a dependency to answer it.
 
 Example
 -------
-    python audit_template_library.py --out ../results/template_audit.txt
+    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/audit_template_library.py" --out "Reproducibility Packet/results/template_audit.txt"
 """
 
 import argparse
@@ -132,11 +135,9 @@ def main():
     parser.add_argument("--probe", default="Neuropixels 1.0",
                         help="probe type to audit (default: 'Neuropixels 1.0', the IBL subset)")
     parser.add_argument("--amp-lo", type=float, default=50.0,
-                        help="lower amplitude caliper in uV (default: 50, the anchor paper's "
-                             "rescaling floor)")
+                        help="lower provisional donor-amplitude screen in uV (default: 50)")
     parser.add_argument("--amp-hi", type=float, default=200.0,
-                        help="upper amplitude caliper in uV (default: 200, the anchor paper's "
-                             "rescaling ceiling)")
+                        help="upper provisional donor-amplitude screen in uV (default: 200)")
     parser.add_argument("--snr-lo", type=float, default=5.0, help="lower SNR caliper (default: 5)")
     parser.add_argument("--snr-hi", type=float, default=15.0, help="upper SNR caliper (default: 15)")
     parser.add_argument("--min-templates", type=int, default=10,
@@ -190,7 +191,8 @@ def main():
 
     kept = [r for r in subset
             if in_caliper(r, args.amp_lo, args.amp_hi, args.snr_lo, args.snr_hi)]
-    emit(f"## Caliper: amplitude {args.amp_lo}-{args.amp_hi} uV, SNR {args.snr_lo}-{args.snr_hi}")
+    emit(f"## Provisional donor screen: amplitude {args.amp_lo}-{args.amp_hi} uV, "
+         f"SNR {args.snr_lo}-{args.snr_hi}")
     emit(f"rows inside caliper         {len(kept)} of {len(subset)}")
     emit(f"distinct areas inside       {len({r.get('brain_area', '') for r in kept})}")
     emit()
@@ -201,12 +203,12 @@ def main():
 
     emit(f"## Areas with at least {args.min_templates} in-caliper templates")
     emit()
-    emit("The 'leave-one-out' column is the count remaining after dropping the area's single")
-    emit("largest contributing source dataset. It is the binding number when the host recording")
-    emit("comes from a dataset that also contributed donor templates, since reusing the host's")
-    emit("own dataset as a donor is a leakage path.")
+    emit("The 'worst-case leave-one-out' column is the count remaining after dropping the")
+    emit("area's single largest contributing source dataset. The exact count for a chosen host")
+    emit("depends on which source dataset that host belongs to; this column is the conservative")
+    emit("minimum, not the count for every host represented in the library.")
     emit()
-    emit(f"{'area':<14}{'n':>5}{'datasets':>10}{'leave-one-out':>15}")
+    emit(f"{'area':<14}{'n':>5}{'datasets':>10}{'worst-case LOO':>17}")
     viable, loo_viable = [], []
     for area, dsets in sorted(datasets_by_area.items(), key=lambda kv: -len(kv[1])):
         n = len(dsets)
@@ -217,15 +219,17 @@ def main():
         viable.append(area)
         if remaining >= args.min_templates:
             loo_viable.append((area, remaining))
-        emit(f"{area:<14}{n:>5}{len(counts):>10}{remaining:>15}")
+        emit(f"{area:<14}{n:>5}{len(counts):>10}{remaining:>17}")
     emit()
-    emit(f"areas viable, host dataset NOT in the library      {len(viable)}")
-    emit(f"areas viable, host dataset excluded as a donor     {len(loo_viable)}"
+    emit(f"areas viable before an exact host-dataset exclusion       {len(viable)}")
+    emit(f"areas viable after worst-case source-dataset exclusion     {len(loo_viable)}"
          f"  ({', '.join(a for a, _ in loo_viable) if loo_viable else 'none'})")
     emit()
-    emit("Read this as a conditional, not a count: if the chosen host recording is not one of")
-    emit("the library's own source datasets, the first number applies. If it is, the second does.")
-    emit("Both numbers move with the caliper, which is a declared parameter and not a fact.")
+    emit("Read these as screening bounds, not a completed feasibility result. If the chosen host")
+    emit("is outside the donor library, no exact-dataset exclusion is needed. If it is inside,")
+    emit("exclude that specific source and recompute; the result lies between the two bounds above")
+    emit("and equals the worst case only when that source is the area's largest contributor.")
+    emit("Both bounds move with the provisional caliper, and neither tests paired-arm balance.")
 
     if args.out:
         with open(args.out, "w", encoding="utf-8") as fh:
