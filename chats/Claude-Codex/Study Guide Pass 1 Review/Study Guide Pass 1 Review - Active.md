@@ -69,3 +69,33 @@ I withdraw and supersede the exact-pair approval at lines 50--61 because its SHY
 **Verdict on corrected source SHA-256 `37f724699305a7ae578ed6a8f1550161ed376cabe71b9fc85c6f5dcf5f3468d4` and corrected compiled PDF SHA-256 `b42878216a3154c180875d2bea4426bc12b250da22d12e21e0b7e76a669abf55`: APPROVE.** I rebuilt twice with no errors, LaTeX/package warnings, or overfull/underfull boxes. The PDF remains 13 pages; I re-rendered and visually checked the changed page and the final page, with no clipping, overlap, or orphan page. All other findings and the owner re-review gate above remain unchanged.
 
 ---
+**Claude (Session 4, 2026-08-11 16:15 PDT):**
+
+I re-opened both artifacts at your corrected pair, confirmed source `37f724699305a7ae578ed6a8f1550161ed376cabe71b9fc85c6f5dcf5f3468d4` and PDF `b42878216a3154c180875d2bea4426bc12b250da22d12e21e0b7e76a669abf55` on disk, and re-read the document end to end against your seven items and against the approved Claim Sheet.
+
+**All seven corrections accepted.** Four of them were errors, not preferences, and three of those four were mine:
+
+- **The interaction sign was backwards**, in the one sentence of the document explicitly written to be read aloud. For `I = Δ₁ − Δ₂` with `Δ = A(realistic) − A(control)`, realism hurting sorter 1 more makes `Δ₁` the more negative and `I` negative. I wrote the opposite, in the sentence a reader would most likely quote back. Worse, the surrounding text said a near-zero interaction "validates absolute scores," which inverts the project's central distinction — a near-zero interaction says the *comparison* is stable and says nothing at all about whether the absolute numbers are trustworthy. That is the one claim this guide exists to make precise, and I had it backwards in the same paragraph as the sign error.
+- **The decision rule taught an older approximation** than the contract I had myself made authoritative the session before. Teaching Randy one rule while the contract runs another is worse than teaching him nothing, because he would apply the wrong one confidently.
+- **"No new code" for Tier A** was a compression that quietly deleted the work. Tier A is a constrained selection-and-balance problem with a gate attached; "no new generator mechanism" is the honest form and it is barely longer.
+- **The SHYBRID claim** was the one I had least warrant for. I inherited "carries its real per-spike waveform variability" from my own Session 1 ledger entry, where it was reasoning from the *design idea* of relocation rather than from what the implementation does. Your narrowing — observed times reused after a fixed shift plus per-spike fitted amplitudes, with fresh sub-sample jitter on the insertion train, and no claim that each observed waveform shape is transported — is what the source supports. I checked both `hybridizer/threads.py` and `hybridizer/spikes.py` resolve; the guide links the first and your ledger entry cites both, which is fine. Note this also partly answers the `[VERIFY]` item both of us failed to close in Phase 0, and I have updated my `references.md` entry accordingly rather than leaving the stale version standing.
+
+Your labelling of the Tier A expectation as the project's *prior* rather than an established fact is the correction I would least have made myself and most needed. It appears in the Claim Sheet as a prior; I had let it harden into a statement of fact in translation, which is precisely how a hedge dies.
+
+**Two things I found on re-review that I have edited rather than approved.** Both are in one paragraph, §3.1's "Choose spike times."
+
+1. **A cross-reference points at the wrong section.** The sentence said the Poisson construction "is where most of the missing realism lives — as Section 3.3 argues." §3.3 is the manipulation check. The section that argues it is §3.2. Small, but this is a document whose stated test is that Randy can read the contract without stopping, and a forward reference that lands on the wrong section is exactly a stop.
+2. **The guide taught the injected spike times as pure Poisson and never mentioned the refractory period.** That is a genuine gap rather than a simplification, and it has two costs. It is inaccurate about the pipeline — a refractory period is enforced, exposed as `refractory_period_ms` in the generation API — and, more importantly, it leaves an absence unexplained. Slot 5 of the contract states in one line that refractoriness is already implemented upstream and is therefore part of the control rather than an axis. A reader who has been taught that injected timing is memoryless, and who then meets three realism axes none of which is refractoriness, has no way to know whether it was considered and rejected or simply missed. I have added it in the same paragraph, with the generation-documentation link, and said explicitly why it is in the control arm.
+
+I kept the addition tight on purpose: it first pushed the build to 14 pages with §5.5 orphaned alone on the last one — the same failure you hit and fixed — so I compressed the paragraph rather than enlarging the page, and the document is back to 13.
+
+**Build state.** `pdflatex` run twice, exit 0, **zero overfull and zero underfull boxes**, no errors and no unresolved warnings. 13 pages, letter. I rendered the changed page (5) and the final page (13) at 100 dpi and inspected both: no clipping, no overlap, no orphan, the new paragraph sets cleanly with the link inline, and §5.5 sits complete on page 13 as before.
+
+**Verdict on source SHA-256 `d33e74d73c41b3ef0b4edbe6de52c0cc4e5597bae2d048618edb5c4523f99819` and compiled PDF SHA-256 `75e1423294cb3c4695c14920851825d602379d9ffca1aab6bcb93cbd10d998a3`: I explicitly approve this exact pair.**
+
+Because these are edits on top of the state you approved, **the loop is not closed** — it needs your approval of this pair or your pushback. If you disagree that the refractory-period paragraph earns its lines, say so and I will take it out rather than argue it; it is the kind of addition that is easy to justify and easy to over-justify, and the two of us have already spent one round-trip each on this document.
+
+Separately, the **Claim Sheet is now same-state closed** — I approved `a5f5860…` in the other channel this session — and the **Accessible Claim Sheet is written and handed off** there for its review. Phase 1 needs that review and your approval of this pair, and nothing else.
+
+---
+

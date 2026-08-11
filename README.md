@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Current phase** | Phase 1 — Sharpening (Claim Sheet in review) |
+| **Current phase** | Phase 1 — Sharpening (contract agreed; its two companion documents in review) |
 | **Public state** | `In Progress` |
 | **Last updated** | 2026-08-11 |
 
@@ -33,6 +33,8 @@ Spike sorting decides which extracellular spikes came from which neuron. Real re
 - **2026-08-11 — Claim Sheet review corrected the feasibility and decision rules before execution.** The earlier 37→7 log entry was too strong: seven is the conservative worst case after removing each area's largest donor source, not the usable count for every represented host, and the audit is a pool-size screen rather than proof that balanced paired arms exist. The reviewed contract now uses an anchor-like region-unaware control, anatomical injection zones instead of a whole-recording region label, a hierarchical paired-block estimand, and a direct interaction/equivalence rule rather than treating “significant in one arm, not significant in the other” as a difference. Codex explicitly approved the revised bytes; the Claim Sheet remains in review until Claude re-opens and approves or revises that same state.
 - **2026-08-11 — The re-review found the experiment's compute budget was missing half the work, and one brain region turned out to satisfy two separate constraints at once.** The design's strongest control generates "pretend" comparisons where nothing was actually changed, to see how much apparent effect the machinery invents on its own. Those have to be *sorted* like everything else, and the pre-declared compute budget had counted only the real comparisons — understating the cost of the primary run by a factor of two, before anything was spent. Separately, the requirement that the burst parameters rest on real biology (which currently means hippocampal CA1) and the requirement that enough donor waveforms survive the anti-leakage rule intersect in exactly one region in the audit: **CA1**, which is now the leading candidate and not yet a decision. The Claim Sheet is still in review; the director-facing Study Guide's first pass is drafted and awaiting review.
 
+- **2026-08-11 — The contract is agreed. Both agents have now approved the same version of the Claim Sheet, after four rounds of review in which each of them blocked the other.** The question, the method, the three realism axes, the stop-or-go gate, and the pre-declared shapes of success, failure and *inconclusive* are now fixed before any measurement exists — which is the whole point of writing them down first. Worth recording what the review actually cost, because it is the case for doing it: seven substantive errors were caught and corrected before execution, four of them by the reviewing agent and three by the writing agent re-reading its own approved text. Three were the kind that quietly decide an answer — a threshold borrowed from another study that was not comparable to anything measured here, a design in which one of the sorters being graded would have supplied the target used to generate its own test data, and a decision rule that treated "significant in one arm, not the other" as evidence the two arms differ. The plain-language companion to the contract is now written and under review, and the director-facing study guide is on its second round.
+
 ---
 
 ## What this repository will contain
@@ -44,11 +46,12 @@ Four artifacts are produced by a completed Dandelion project. None of them exist
 | **Technical Report** — the full account, written for the field | *Pending (Phase 3)* |
 | **Accessible Piece** — the same result for a non-specialist | *Pending (Phase 3)* |
 | **Reproducibility Packet** — self-contained code, data pointers, and a verification artifact you can run yourself | *Pending (Phase 2–3)* |
-| **Study Guide** — director-facing, two passes | *Pass 1 drafted, in review · Pass 2 pending (Phase 3)* |
+| **Study Guide** — director-facing, two passes | *Pass 1 written and on its second review round · Pass 2 pending (Phase 3)* |
 
 In the meantime, the working record is open and readable as it is written:
 
-- `Claim Sheet.md` — the project's contract: the question, the method, the baselines, and the pre-declared shapes of success, failure, and inconclusive. Currently a draft in review between the agents. If you read one file here, read Slots 11–13.
+- `Claim Sheet.md` — the project's contract: the question, the method, the baselines, and the pre-declared shapes of success, failure, and inconclusive. Both agents have now approved the same state of it. If you read one file here, read Slots 11–13.
+- `Accessible Claim Sheet.md` — the same contract in plain language, written for a reader with no background in the field. Same commitments, same numbers, no jargon wall. Currently in review. **If you would rather read one file than two, read this one instead of the sheet above.**
 - `Project Details/Project Details.md` — the project's constitution and the original idea.
 - `Playbooks/` — how each artifact gets built.
 - `agents/<name>/` — each agent's workspace: literature foundations, session reports, references, and the running summary each session leaves for the next.

@@ -216,9 +216,14 @@ the probe, which dataset it came from --- and, crucially for this project, a
 
 \textbf{Choose spike times.} When will each injected neuron fire? The standard pipeline draws
 times from a \emph{Poisson process}: a coin flipped very fast, with a fixed average rate and
-no memory. Each moment is independent of every other. It is the mathematically simplest way
-to generate events in time, and --- as Section 3.3 argues --- it is where most of the
-missing realism lives.
+no memory. One biological correction is layered on top --- a \emph{refractory period}, the brief
+window after firing during which a real neuron cannot fire again
+(\href{https://spikeinterface.readthedocs.io/en/stable/modules/generation.html}{SpikeInterface
+generation documentation}). That explains an absence you will meet in the contract:
+refractoriness is realism the pipeline \emph{already implements}, so it sits in the control arm
+rather than among the three axes this project varies. What is left is the simplest possible
+model of when a neuron fires, and --- as Section 3.2 argues --- where most of the missing
+realism lives.
 
 \textbf{Place and rescale.} The template is positioned at a chosen depth and scaled so its
 amplitude lands in a target range (the anchor used 50--200 $\mu$V), because an injected unit

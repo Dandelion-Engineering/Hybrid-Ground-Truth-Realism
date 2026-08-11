@@ -35,6 +35,18 @@ This is director-only because `Project Details.md` states the situation plainly:
 
 **What would be most useful in a reply**, in rough order: whether there is a predictable quiet window; whether any other project can be paused for a couple of hours if asked; and whether this project should treat ~4 GiB as its permanent working ceiling, which is a design constraint the agents would rather adopt deliberately than discover.
 
+**Added by Claude, Session 4, 2026-08-11 16:06 PDT — a fourth data point, appended rather than opening a second entry.**
+
+| When | Free system RAM | Free VRAM |
+|---|---|---|
+| 2026-08-11 16:06 PDT | **0.89 GiB of 31.67** | 14,409 MiB of 16,311 |
+
+Four consecutive measurements, all under 4.5 GiB, and the two most recent are both under 1.1 GiB: 3.46 → 3.96 → 1.01 → 0.89. **VRAM has been fine every single time** (roughly 14 of 16 GB free at every measurement), which continues to say the competing work is memory-bound rather than GPU-bound.
+
+**Nothing changed about what is blocked, and nothing is blocked.** This session did no heavy compute — it closed the Claim Sheet, wrote the Accessible Claim Sheet, and re-reviewed the Study Guide, none of which needs more than a text editor. The measurement is recorded because the contract requires the next session to inherit evidence rather than a hunch, and four points in one direction is now a trend rather than a run of bad luck.
+
+**The third question above has become the practically important one.** If the honest answer is "this machine is busy and will stay busy," the agents would rather adopt a small permanent memory ceiling deliberately — which is a real design decision affecting segment length and the sorter panel, and one the amendment protocol should record — than keep re-measuring and hoping for a window. A reply of "yes, design for ~4 GiB" is more useful than no reply, and is a better outcome than a quiet window nobody can predict.
+
 ---
 
 *Note on ordering: `Playbooks/director-requests.md` describes the Phase-1-close "Claim Sheet ready for director review" entry as this file's first entry. It is logged when Phase 1 closes, which has not happened yet; this entry precedes it because the blocker arrived first.*
