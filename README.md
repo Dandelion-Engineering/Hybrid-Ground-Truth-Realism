@@ -1,115 +1,65 @@
-# Collaboration Station — Research
+# Hybrid Ground Truth Realism
 
-A plain-language framework for running exploratory scientific research projects with AI agents.
+**Does the realism of hybrid ground truth change measured spike-sorting accuracy?**
 
-Collaboration Station is not software. There is nothing to install, no dependencies, no API to call. It is a folder structure and a set of instructions written in ordinary English. You point one or more AI agents at it, give them an idea to investigate, and they work the project across many sessions — reading where the last session left off, contributing something real, and writing down clearly what they did before they stop.
+| | |
+|---|---|
+| **Current phase** | Phase 0 — Literature Review |
+| **Public state** | `In Progress` |
+| **Last updated** | 2026-08-11 |
 
-The whole framework is readable in an afternoon. That is deliberate. If you cannot read it, you cannot trust what it produces.
-
-## What it is good for
-
-Exploratory research — the stage before you commit real time, money, or a graduate student to an idea.
-
-A lot of promising ideas are worth a week of investigation and not worth a year. The problem is that finding out which is which has historically cost about as much as just doing the work. This framework is aimed squarely at that gap: it lets you run an idea far enough to learn whether it deserves your main research effort, and it makes the answer "no" cheap enough that you can afford to ask often.
-
-Projects can run for days, weeks, or months with minimal supervision. The director checks in, approves the direction, and reads the reports; the agents do the cumulative work in between.
-
-## What it is not
-
-Being clear about this matters more than the pitch:
-
-- **Not a replacement for a scientist.** The framework produces work a domain expert still has to judge. It is built to make that judgment fast and possible, not to remove it.
-- **Not a guarantee of correct results.** It is a structure for doing honest work and showing your reasoning. Honest work is still sometimes wrong.
-- **Not autonomous science.** A human director sets the question, approves the plan, and owns the result. The framework is explicit about where the director is required.
-- **Not benchmarked.** This is a working method, shared because it has been useful, not a validated methodology with published performance claims.
-
-## How it works
-
-The loop is simple and it is the whole idea:
-
-1. **The director writes down an idea** — informally, in a few paragraphs, in `Project Details/Project Details.md`.
-2. **The agents sharpen it into an executable brief** — a Claim Sheet of fifteen numbered slots covering the problem, the claim, the methods and baselines, the evaluation design, and, before any results exist, the predeclared shapes of success, failure, and an inconclusive outcome. A plain-language Accessible Claim Sheet is produced alongside it so the director can hold the contract without reading the technical version.
-3. **The director reviews that brief.** Their review is the first use of the amendment protocol, and it is non-blocking — work does not stall waiting on it. Every later change to the contract runs through the same protocol: appended and dated, never overwritten, so the question cannot quietly drift toward whatever the data happened to support.
-4. **The agents execute across sessions**, reviewing each other's work and reporting to the director on a fixed cadence.
-5. **The project ends with a defined set of deliverables** (below) rather than trailing off.
-
-Continuity between sessions is handled by files, not by model memory. Each agent maintains a summary of exactly what a future session needs to resume, and writes a human-readable report at the end of every session. That is why a project can survive weeks of interruptions.
-
-## Repository layout
-
-```
-AgentPrompt.md              The instructions an agent reads first. Start here.
-Project Details/            Identity, standards, working method, and the project idea.
-Playbooks/                  How each deliverable is built — one file per artifact.
-agents/<name>/              One workspace per agent.
-  README.md                   Guide to that agent's workspace.
-  Summary of Only Necessary Context.md
-                              Rewritten each session; how the next session resumes.
-  Session Summaries/          A human-readable report from every session.
-  Progress Reports/           Director-facing updates on a recurring cadence.
-chats/                      File-based messaging between participants.
-  Claude-Codex/               One folder per participant combination; inside each,
-  Claude-Codex-Human/         one folder per conversation subject.
-  Claude-Human/
-  Codex-Human/
-LICENSE, LICENSE-docs, LICENSING.md, CITATION.cff
-                            Licensing and citation metadata.
-```
-
-The `chats/` folders are the part people tend to find surprising. Agents talk to each other and to the director in Markdown files, appending timestamped messages. It costs nothing, it keeps conversations out of the main context window, and it leaves a complete record of how a decision was actually reached.
-
-## What a finished project leaves behind
-
-- **A Technical Report** — the full account of what was done and found.
-- **An Accessible Piece** — the same result written for a non-specialist.
-- **A Reproducibility Packet** — a self-contained folder of scripts and data pointers. The test it has to pass is that you can copy that folder alone to a clean machine and reproduce the work with no other project file reachable.
-- **A Study Guide** — written for the director, so the person who commissioned the work can actually follow and judge it.
-- **The full reasoning trail** — every chat and every session report, kept as written.
-
-A project released publicly also carries a **Live-Run README** at its repository root: while the work is running it shows a status banner and a lean running log, so a visitor can tell live exploration from a finished claim; when the project concludes it resolves into a landing page that leads with the result and a way to check it.
-
-The reasoning trail is the point. You do not get a result handed to you from a black box; you get the result plus the argument, and you can go back and see where a decision was made and why.
-
-## Getting started
-
-1. Copy this repository to a new folder — one folder per project.
-2. Open `Project Details/Project Details.md` and make it yours. The identity, values, and founder sections describe Dandelion Engineering; replace them with your own, or cut them. Write your idea into **The Idea** section at the bottom.
-3. Replace `CITATION.cff` — as shipped it describes *this framework*, so a project that leaves it unchanged will claim to be Collaboration Station. Swap the title, abstract, URL, date, and author for your project's. Update `LICENSING.md` the same way; both name Dandelion Engineering's director as the citable author.
-4. Rename the folders in `agents/` and `chats/` if you are using different agents. Two agents from different model families is the configuration this was built around — it makes cross-review meaningful rather than an echo — but the structure does not depend on the specific names. If you rename them, also update the default writer/reviewer convention in `Project Details/Project Details.md`, which currently assigns Claude as the default writer and Codex as the required reviewer.
-5. Start a session by giving your agent this instruction: **"Follow the instructions in AgentPrompt.md."** That is the entire launch command.
-
-The framework assumes an agent with filesystem access to the project folder. Nothing else is required.
-
-## A note on honesty
-
-The standards in `Project Details/Project Details.md` exist because the failure mode of AI-assisted research is not incompetence — it is plausible-sounding work that nobody checked. Several of the rules are there specifically to make that harder: predeclaring what failure looks like, requiring one agent to review another's work, keeping a written amendment trail, and holding every deliverable at a bar where a stranger can audit it.
-
-A clean negative result is a successful project. If the framework is working, it should tell you your idea was wrong quickly and cheaply, and leave you a record showing why.
-
-## Citing this work
-
-If you use Collaboration Station, adapt it, or build on it, please cite it. GitHub's **"Cite this repository"** button in the sidebar will generate BibTeX or APA from `CITATION.cff`, or you can use:
-
-> Crespo, R. (2026). *Collaboration Station (Research): a plain-language framework for running exploratory scientific research projects with AI agents.* Dandelion Engineering. https://github.com/Dandelion-Engineering/Collaboration-Station-Research
-
-Attribution is also what CC BY 4.0 asks for on the prose, so a citation covers both the courtesy and the license.
-
-## License
-
-Path-scoped. Code and software-like materials are MIT (`LICENSE`); prose and narrative artifacts are CC BY 4.0 (`LICENSE-docs`). `LICENSING.md` is the authoritative map of which applies where. Datasets are not redistributed and remain under their source licenses.
-
-**A note on GitHub's license badge.** GitHub reads the root `LICENSE` file and labels this repository "MIT" in the sidebar. That label does not describe what is actually here: this repository contains no code, so every file in it is prose under **CC BY 4.0**. Both license files ship anyway, because a project built from this template will contain code as well as prose. Where the badge and `LICENSING.md` disagree, `LICENSING.md` governs.
+Spike sorting decides which extracellular spikes came from which neuron. Real recordings have no answer key, so the field grades sorters against **hybrid recordings** — a real recording with synthetic spikes injected at times that are known by construction. The maintainers who built the standard hybrid pipeline wrote down, in print, that they do not know whether their synthetic spikes are realistic enough for the resulting accuracy numbers to mean what the field treats them as meaning. This project tests it: vary the realism of injected spikes along axes the maintainers themselves named, hold everything else fixed, and measure whether sorter accuracy — and, more importantly, the *ranking between sorters* — moves.
 
 ---
 
-Built and used by Dandelion Engineering. Take it, fork it, personalize it, or use it as a starting point for something that fits your work better.
+## How this project was run
+
+- **This is an automated exploratory research run.** It investigates one question and reports what it found. It is not a confirmatory study, and it is not meant to settle anything.
+- **The work was selected and carried out by AI agents.** Choosing this question, doing the work, and writing it up were all done by AI agents working inside a documented framework.
+- **A human director sets direction and reads summaries. He does not review the work in detail.** Dandelion Engineering is one person working with a team of AI agents; his part is direction and judgement about what is worth doing, not line-by-line verification of what was done.
+- **Negative findings are published as produced.** If the answer comes back no, or comes back inconclusive, that is what gets published — on the same terms as a positive one, and without waiting to see whether it is flattering.
+- **This is not reviewed work.** It has not been peer-reviewed, and it has not been checked in detail by a human. While the status above reads `In Progress` you are reading work in progress rather than a result; once it reads `Concluded` you are reading a finished exploratory run, which is still not a reviewed one. **The way to trust any of it is to check it** — which is what the reproducibility packet is for.
+
+---
+
+## Running log
+
+- **2026-08-11 — Project opened.** Repository created and made public. Phase 0 (literature review) begun.
+- **2026-08-11 — Phase 0: first Literature Foundation written.** Survey of the spike-sorting validation field completed by one of the two agents. Two findings worth flagging early, because they cut against the project's own starting assumptions: the pipeline maintainers named the *firing-statistics* limitation before the brain-region one and proposed a specific fix for it, which may mean the project is aiming at the second-priority axis; and a 2020 benchmark of ~35,000 ground-truth units already reported that synthetic ground truth has a systematically different error signature from real ground truth, attributed to firing statistics. Both make a null result less likely than the project assumed at the outset. Phase 0 does not close until the second agent's independent survey exists and the two have been compared.
+
+---
+
+## What this repository will contain
+
+Four artifacts are produced by a completed Dandelion project. None of them exist yet.
+
+| Artifact | Status |
+|---|---|
+| **Technical Report** — the full account, written for the field | *Pending (Phase 3)* |
+| **Accessible Piece** — the same result for a non-specialist | *Pending (Phase 3)* |
+| **Reproducibility Packet** — self-contained code, data pointers, and a verification artifact you can run yourself | *Pending (Phase 2–3)* |
+| **Study Guide** — director-facing, two passes | *Pending (Phase 1 and Phase 3)* |
+
+In the meantime, the working record is open and readable as it is written:
+
+- `Project Details/Project Details.md` — the project's constitution and the original idea.
+- `Playbooks/` — how each artifact gets built.
+- `agents/<name>/` — each agent's workspace: literature foundations, session reports, references, and the running summary each session leaves for the next.
+- `chats/` — the agents' file-based conversations with each other and with the director, appended and never rewritten.
+
+**A note on how to read work in progress.** Everything above is live. Nothing in it has been checked by a human, nothing in it is a result, and files change between sessions. The running log records phase closes and genuinely noteworthy events — it is not a session-by-session journal, so its silence does not mean nothing happened.
+
+## Licensing and data
+
+Path-scoped: code and software-like materials under `LICENSE` (MIT); prose and narrative artifacts under `LICENSE-docs` (CC BY 4.0). `LICENSING.md` is the authoritative map of which applies where.
+
+**No raw data is redistributed.** The substrate recordings come from [DANDI 000409 — IBL Brain-Wide Map](https://dandiarchive.org/dandiset/000409) (CC-BY-4.0), referenced by identifier and downloaded by the reader. Templates come from [`SpikeInterface/hybrid_template_library`](https://github.com/SpikeInterface/hybrid_template_library) (MIT). [SpikeInterface](https://github.com/SpikeInterface/spikeinterface) is MIT; [Kilosort4](https://github.com/MouseLand/Kilosort) is GPLv3 and is called as an external tool, never vendored or linked into this project's own code. Full per-dataset detail will live in the Reproducibility Packet's `DATA.md`.
 
 ---
 
 ## About Dandelion Engineering
 
 Dandelion Engineering is a research and technology company with a single purpose: to do real research, and to turn what we learn from it into affordable technology that materially improves the lives of everyday people. It is not venture-scale and not built to maximize profit — it is a small, deliberate, long-running collaboration between one human director and a team of AI agents, pointed at problems that matter for ordinary people.
-
 
 - **The essay:** [*What to do when Everything Changes*](https://dandelionengineering.substack.com/p/what-to-do-when-everything-changes)
 
@@ -121,4 +71,3 @@ Dandelion Engineering is run by Randy Crespo. If this work or the way it was mad
 
 - **LinkedIn:** [linkedin.com/in/randy-crespo](https://www.linkedin.com/in/randy-crespo)
 - **Email:** [randy@dandelionengineering.com](mailto:randy@dandelionengineering.com)
-

@@ -1,57 +1,61 @@
-# Canonical citation metadata for the Collaboration Station (Research) framework.
+# Canonical citation metadata for the Hybrid Ground Truth Realism research project.
 # GitHub reads this file to render the "Cite this repository" button.
 #
-# ── IF YOU ARE USING THIS REPOSITORY AS A TEMPLATE FOR YOUR OWN PROJECT ──
-# Replace `title`, `abstract`, `url`, `repository-code`, `date-released`, and
-# `authors` with your project's own values. As shipped, this file describes the
-# framework itself, so a project that leaves it unchanged will claim to be
-# Collaboration Station. Add `version: "x.y.z"` when you cut a release, and omit
-# any release field you cannot yet fill rather than leaving a placeholder —
-# GitHub and other tools parse this file, so it must stay valid when it lands.
-# Set `type` to `dataset` if the primary released output is data rather than
-# software.
+# Release fields (`version`, `date-released`) are deliberately omitted while the
+# project is in progress: this file must stay valid when it lands, and a
+# placeholder release date would be worse than no release date. Add them when the
+# project concludes and a release is cut.
 #
 # Authorship note: the citable author is the human director, with the
 # organization as the affiliation. AI tools are not listed as formal authors
 # under current citation norms (they cannot take responsibility for the work),
 # so the AI collaboration is disclosed in `abstract` instead. This is deliberate
-# and matches Dandelion Engineering's transparency standard.
+# and matches Dandelion Engineering's transparency standard. On this project the
+# disclosure carries additional weight: the research question itself was chosen
+# by the AI agents rather than by the director.
 #
 # License scope is intentionally NOT declared here: this work is path-scoped
 # (MIT for code, CC BY 4.0 for prose, datasets under their source licenses), and
 # CFF treats multiple `license:` values as "either/or," which would misstate that
 # split. `LICENSING.md` is the authoritative license-scope record.
 cff-version: 1.2.0
-message: "If you use Collaboration Station, or adapt it for your own work, please cite it using the metadata below."
-title: "Collaboration Station (Research): a plain-language framework for running exploratory scientific research projects with AI agents"
+message: "If you use this work, or build on it, please cite it using the metadata below."
+title: "Hybrid Ground Truth Realism: does the realism of hybrid ground truth change measured spike-sorting accuracy?"
 type: software
 authors:
   - family-names: Crespo
     given-names: Randy
     affiliation: Dandelion Engineering
 abstract: >-
-  Collaboration Station is a plain-language framework for running exploratory
-  scientific research projects with AI agents. It is not software: it is a folder
-  structure and a set of instructions in ordinary English that let one or more
-  agents carry a research project across many sessions, with continuity handled
-  by files rather than by model memory. Projects are bound by a fifteen-slot
-  Claim Sheet that predeclares what success, failure, and an inconclusive result
-  look like before any results exist; changes to that contract run through an
-  append-only amendment protocol; and a project concludes with a fixed set of
-  deliverables — a technical report, a plain-language piece, a self-contained
-  reproducibility packet, and a director-facing study guide. The framework is
-  aimed at the stage before a researcher commits significant time or funding to
-  an idea, and is designed to make a clean negative result cheap to reach. It was
-  developed by Randy Crespo (Dandelion Engineering) in collaboration with the AI
-  research agents Claude (Anthropic) and Codex (OpenAI); the AI contribution is
-  disclosed here per Dandelion Engineering's transparency standard.
-url: "https://github.com/Dandelion-Engineering/Collaboration-Station-Research"
-repository-code: "https://github.com/Dandelion-Engineering/Collaboration-Station-Research"
-date-released: 2026-07-31
+  Spike sorting assigns extracellular spikes to the neurons that produced them.
+  Real recordings carry no answer key, so the field grades sorting algorithms
+  against hybrid recordings: a real recording with synthetic spikes injected at
+  times that are known by construction. The maintainers of the standard hybrid
+  pipeline have stated in print that it remains untested whether more realistic
+  hybrid recordings would change measured spike-sorting accuracy. This project
+  tests that question directly. It varies the realism of injected spikes along
+  axes the maintainers themselves named — brain-region-matched templates, and
+  bursting and firing-rate non-stationarity — holds everything else fixed, and
+  measures whether sorter accuracy, and more importantly the ranking between
+  sorters, moves. A negative result validates the field's default ground-truth
+  proxy and closes a stated open question; a positive result would mean published
+  accuracy comparisons built on hybrid data have partly been grading the
+  generator rather than the sorter. This is an exploratory research run, not a
+  confirmatory study, and it has not been peer-reviewed. It was carried out by
+  the AI research agents Claude (Anthropic) and Codex (OpenAI) inside a
+  documented framework, under the direction of Randy Crespo (Dandelion
+  Engineering), who sets direction and reads summaries but does not review the
+  work line by line. The research question was selected by the agents rather than
+  by the director; the AI contribution is disclosed here per Dandelion
+  Engineering's transparency standard.
+url: "https://github.com/Dandelion-Engineering/Hybrid-Ground-Truth-Realism"
+repository-code: "https://github.com/Dandelion-Engineering/Hybrid-Ground-Truth-Realism"
 keywords:
-  - AI agents
-  - multi-agent collaboration
-  - exploratory research
-  - research methodology
+  - spike sorting
+  - electrophysiology
+  - Neuropixels
+  - hybrid ground truth
+  - benchmarking
   - reproducibility
+  - neuroscience methods
   - open science

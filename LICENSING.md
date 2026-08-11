@@ -7,9 +7,11 @@ how to cite the work. The licenses themselves are the standard instruments in
 International). Where this record and a license text ever disagree, the license
 text governs.
 
-> Replace `<YEAR>`, `<Project Title>`, `<URL>`, and version/date placeholders
-> when a project is set up. The two licenses and the structure below are the same
-> for every Dandelion Engineering research project.
+This record applies to **Hybrid Ground Truth Realism**
+(<https://github.com/Dandelion-Engineering/Hybrid-Ground-Truth-Realism>). The two
+licenses and the structure below are the same for every Dandelion Engineering
+research project. Version numbers are omitted while the project is in progress
+and added when a release is cut.
 
 ## The two licenses
 
@@ -60,8 +62,10 @@ dataset source the result came from.
 
 CC BY 4.0 requires attribution. A reuser of the prose satisfies it with:
 
-> "<Project Title>" by Dandelion Engineering, licensed under CC BY 4.0. Source:
-> <URL>. Changes, if any, noted.
+> "Hybrid Ground Truth Realism" by Dandelion Engineering, licensed under
+> CC BY 4.0. Source:
+> <https://github.com/Dandelion-Engineering/Hybrid-Ground-Truth-Realism>.
+> Changes, if any, noted.
 
 ## How to cite this work
 
@@ -79,20 +83,26 @@ source GitHub uses for its "Cite this repository" button. Human-readable forms:
 
 **Plain / APA-style**
 
-> Crespo, R. (<YEAR>). *<Project Title>* (Version <x.y>) [Software/Report/Data
-> set]. Dandelion Engineering. <URL>. Produced in collaboration with the AI
-> research agents Claude (Anthropic) and Codex (OpenAI).
+> Crespo, R. (2026). *Hybrid Ground Truth Realism: does the realism of hybrid
+> ground truth change measured spike-sorting accuracy?* Dandelion Engineering.
+> <https://github.com/Dandelion-Engineering/Hybrid-Ground-Truth-Realism>.
+> Produced in collaboration with the AI research agents Claude (Anthropic) and
+> Codex (OpenAI); the research question was selected by the agents rather than by
+> the director.
 
 **BibTeX**
 
 ```bibtex
-@misc{dandelion_<projectkey>_<year>,
+@misc{dandelion_hybridgroundtruth_2026,
   author       = {Crespo, Randy},
-  title        = {<Project Title>},
-  year         = {<YEAR>},
+  title        = {Hybrid Ground Truth Realism: does the realism of hybrid
+                  ground truth change measured spike-sorting accuracy?},
+  year         = {2026},
   howpublished = {Dandelion Engineering},
-  url          = {<URL>},
-  note         = {Version <x.y>. Produced by Randy Crespo in collaboration with
-                  the AI research agents Claude (Anthropic) and Codex (OpenAI).}
+  url          = {https://github.com/Dandelion-Engineering/Hybrid-Ground-Truth-Realism},
+  note         = {Produced by Randy Crespo in collaboration with the AI research
+                  agents Claude (Anthropic) and Codex (OpenAI); the research
+                  question was selected by the agents rather than by the
+                  director. Exploratory research run; not peer-reviewed.}
 }
 ```
