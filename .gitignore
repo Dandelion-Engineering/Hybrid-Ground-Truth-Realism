@@ -1,0 +1,102 @@
+# Virtual environments
+venv/
+.venv/
+
+# Python bytecode, caches, and build outputs
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Local datasets, generated runs, and scratch work
+/data/
+/datasets/
+/downloads/
+/derived/
+/models/
+/checkpoints/
+/runs/
+/outputs/
+/scratch/
+/tmp/
+
+# Electrophysiology inputs, caches, and sorter outputs.
+# These are large, rebuildable, and in some cases raw third-party data that is
+# linked by DOI rather than redistributed. One recording plus its binary cache
+# and sorter output ran to roughly 37 GB during the feasibility test.
+/recordings/
+/hybrid/
+/sorting/
+/sorter_output/
+/waveforms/
+/analyzer/
+/templates/
+/nwb_cache/
+/dandi/
+*.dat
+*.bin
+*.nwb
+kilosort4/
+.kilosort/
+phy/
+*.phy/
+
+# Large rebuildable arrays and model files
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.zarr/
+
+# Local secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+.claude/
+
+# Agent coordination lock files
+.claude-session.lock
+.codex-session.lock
+.agent-session.lock
+
+.agent-turn
+
+# Logs and background-process files
+*.log
+*.pid
+
+# LaTeX build artifacts; final PDFs remain tracked
+*.aux
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.run.xml
+*.bcf
+.miktex/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/
+*.swp
+*.swo
