@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Current phase** | Phase 0 — Literature Review |
+| **Current phase** | Phase 1 — Sharpening (Claim Sheet in review) |
 | **Public state** | `In Progress` |
 | **Last updated** | 2026-08-11 |
 
@@ -27,6 +27,9 @@ Spike sorting decides which extracellular spikes came from which neuron. Real re
 - **2026-08-11 — Project opened.** Repository created and made public. Phase 0 (literature review) begun.
 - **2026-08-11 — Phase 0: first Literature Foundation written.** Survey of the spike-sorting validation field completed by one of the two agents. Two findings worth flagging early, because they cut against the project's own starting assumptions: the pipeline maintainers named the *firing-statistics* limitation before the brain-region one and proposed a specific fix for it, which may mean the project is aiming at the second-priority axis; and a 2020 benchmark of ~35,000 ground-truth units already reported that synthetic ground truth has a systematically different error signature from real ground truth, attributed to firing statistics. Both make a null result less likely than the project assumed at the outset. Phase 0 does not close until the second agent's independent survey exists and the two have been compared.
 - **2026-08-11 — Phase 0: second independent Literature Foundation written.** A live audit found that the template library is substantially larger and more region-diverse than the tutorial snapshot, reducing the broad feasibility concern while leaving host-specific matching unresolved. The two agents are comparing interpretations; Phase 0 remains open pending agreement on the decision threshold and how the updated metadata propagates forward.
+- **2026-08-11 — Phase 0 closed. Both corrections accepted; one of them was a bad success bar caught before it reached the contract.** The second agent blocked the first agent's synthesis on two points and both were upheld: a stale template-library figure taken from a tutorial snapshot rather than the live data, and — the more consequential one — a proposal to use another paper's standardized effect sizes as the threshold for whether a result matters here. Those are scaled over a different sample and are not commensurable with a raw accuracy change; the decision threshold is now measured inside this experiment instead. A success bar written wrong quietly determines the answer, so it is worth recording that this one was caught in review rather than after results.
+- **2026-08-11 — A feasibility check reversed a design decision before it was made.** Enforcing the rule that donor waveforms may not come from the host recording's own source dataset — otherwise the test is partly rigged — cuts the usable brain regions from 37 to **7**, with 13 of the 37 collapsing to zero because a single dataset had supplied all their templates. So the templates constrain which recording can be used, not the other way round, which is the reverse of the assumed order. The audit script is already in the reproducibility packet and the filter is a command-line argument, so the numbers can be re-derived at other thresholds. Both agents reached the same measurement of the live metadata independently, matching to the byte.
+- **2026-08-11 — Phase 1 opened: the Claim Sheet is drafted and in review.** The contract now names three realism axes tested one at a time, a stop-or-go gate requiring the manipulation to be demonstrably real before any sorter time is spent, and pre-declared shapes for success, failure, and *inconclusive*. Two of those pre-declarations are deliberately uncomfortable: a null result with a wide interval will not be reported as evidence that realism does not matter, and the cheapest axis — the only one needing no new code — cannot conclude the project on its own, because it is the least likely of the three to move the thing the project is actually asking about.
 
 ---
 
@@ -43,6 +46,7 @@ Four artifacts are produced by a completed Dandelion project. None of them exist
 
 In the meantime, the working record is open and readable as it is written:
 
+- `Claim Sheet.md` — the project's contract: the question, the method, the baselines, and the pre-declared shapes of success, failure, and inconclusive. Currently a draft in review between the agents. If you read one file here, read Slots 11–13.
 - `Project Details/Project Details.md` — the project's constitution and the original idea.
 - `Playbooks/` — how each artifact gets built.
 - `agents/<name>/` — each agent's workspace: literature foundations, session reports, references, and the running summary each session leaves for the next.

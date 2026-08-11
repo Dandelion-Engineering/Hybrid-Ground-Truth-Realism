@@ -1,97 +1,89 @@
 # Summary of Only Necessary Context — Claude
 
-**Rewritten at the end of Claude Session 1 · 2026-08-11 10:23 PDT**
-**Next session will be Claude Session 2.**
+**Rewritten at the end of Claude Session 2 · 2026-08-11 12:26 PDT**
+**Next session will be Claude Session 3.**
 
-You are starting with no memory of the last session. This file exists to restore everything you need and nothing you don't. It deliberately omits anything already in `Project Details/Project Details.md`, the `Playbooks/`, or `AgentPrompt.md` — you re-read those at session start anyway.
+You are starting with no memory of the last session. This file restores everything you need and nothing you don't. It omits anything already in `Project Details/Project Details.md`, the `Playbooks/`, or `AgentPrompt.md` — you re-read those at session start anyway.
+
+**Read `Claim Sheet.md` before doing any work.** It is the contract now, it did not exist before Session 2, and it is where every design decision listed below actually lives. This file is the *state*; the Claim Sheet is the *commitments*.
 
 ---
 
 ## 1. Where the project is
 
-**Phase 0 — Literature Review. Not closed.**
+**Phase 1 — Sharpening. Phase 0 closed in Session 2.**
 
-Phase 0 closes when *both* agents have written their Literature Foundation and the comparison chat is done. Mine is written. **As of the end of Session 1, Codex had not run a session at all** — no session summaries, no literature foundation, empty workspace. So the first thing to check next session is whether that has changed.
+The Claim Sheet is written and is **in review with Codex**. Phase 1 closes when: (a) both agents explicitly approve the *same state* of the Claim Sheet, (b) the Accessible Claim Sheet exists and is agreed, and (c) the division of labor is agreed. None of the three is done.
 
-Nothing is blocked on the director. `director_requests.md` does not exist yet and did not need to.
+Nothing is blocked on the director. **`director_requests.md` still does not exist** and has not needed to.
 
-## 2. What I produced in Session 1
+## 2. The very first thing to do next session
+
+**Check `chats/Claude-Codex/Claim Sheet Review/` for Codex's review.**
+
+- **If Codex has reviewed and edited:** re-open `Claim Sheet.md` and *genuinely* re-review both its feedback and its edits — do not wave them through. Read `Playbooks/review-cycle.md` first. The loop closes only when both agents have explicitly approved the *same* state; approval is never inferred from an edit, a handoff, or silence. **Owning an artifact includes coming back to it** — this is the named failure mode for the position I am now in.
+- **If Codex has not yet replied:** do not idle. Do the work in §6 that does not depend on the review.
+
+## 3. What I produced in Session 2
 
 | File | What it is |
 |---|---|
-| `agents/Claude/Literature Foundation.md` | The Phase 0 survey. Six sections, 16 ledger-quality sources, all link/DOI-verified by live search. **Frozen** — corrections go forward, not back into it. |
-| `agents/Claude/references.md` | The **living** citation ledger. Where it and the Literature Foundation disagree, this governs. Has a *Pending* section of unverified sources that are **not citable**. |
-| `agents/Claude/README.md` | Workspace guide. |
-| `README.md` (repo root) | The Live-Run README, State A, per `Playbooks/live-run-readme.md`. Replaced the Collaboration Station template README. Run-provenance block **required and present** — this is an agent-selected run. |
-| `CITATION.cff`, `LICENSING.md` | Rewritten to describe this project; they were still describing the framework template. |
-| `chats/Claude-Codex/Phase 0 Literature Comparison/…Active.md` | Opened by me. Awaiting Codex's first message. |
-| `agents/Claude/Session Summaries/HumanReport1.md` | Session report. |
+| `Claim Sheet.md` | **The contract.** Orientation header, contract-at-a-glance, fifteen slots. Draft under review — not yet an agreed state. |
+| `Reproducibility Packet/scripts/audit_template_library.py` | Stdlib-only template feasibility audit with the leave-one-dataset-out stress test. Packet-ready as written. |
+| `Reproducibility Packet/results/template_audit_2026-08-11.txt` | Its output, pinned to the metadata snapshot hash. |
+| `agents/Claude/Progress Reports/Progress Report Phase 0 Close.md` | Phase-transition report for the director. |
+| `chats/…/Phase 0 Literature Comparison/…Concluded.md` + `Summary.md` | Phase 0 chat closed. The `Summary.md` is the fast way back into what was settled. |
+| `chats/…/Claim Sheet Review/…Active.md` | Review channel opened; sheet handed off with my explicit approval. |
+| `agents/Claude/references.md` | Corrections log added at top; template-library entry rewritten; two `[VERIFY]` cleared; Cohen's *d* use `[SUPERSEDED]`. |
+| `README.md` (root) | Banner → Phase 1; three log entries; Claim Sheet listed. |
+| `agents/Claude/Session Summaries/HumanReport2.md` | Session report. |
 
-## 3. The findings that should shape Phase 1
+## 4. What was settled with Codex — do not relitigate
 
-These are the reason the Literature Foundation was worth writing. Do not re-derive them.
+- **Axis ladder, one axis at a time, never varied together.** Tier A region-matched templates (configuration only) → Tier B local population-rate coupling (the anchor authors' own proposed fix; modest code) → Tier C bursting with spike-history-dependent amplitude attenuation (the genuinely missing mechanism). Combined arm only after component effects are known.
+- **Primary comparative estimand is the paired difference in differences** — realism effect for sorter A minus realism effect for sorter B — with thresholds pre-declared in **raw paired accuracy units**, standardized effects secondary and never as thresholds.
+- **The manipulation check is a hard stop-or-go gate** with axis-specific criteria. If the injected data does not demonstrably carry the intended property at realistic magnitude, **no sorter run starts.** Otherwise a null is a statement about our implementation, not the field's method, and nothing afterwards can tell the two apart.
+- **Refractoriness is already implemented upstream** and is part of the control, not an axis.
+- **The sorter panel must span mechanisms.** Kilosort4 plus at least one CPU internal sorter (SpyKING CIRCUS 2, TriDesClous 2, or Lupin — all MIT via SpikeInterface). A Kilosort-only panel is biased toward the null.
+- **Two corrections Codex raised and I accepted** (details in the Phase 0 `Summary.md`): the stale 601-template premise, and Cohen's *d* as a flip threshold. Both are propagated; my Literature Foundation stays frozen with the errors in it and the ledger governs.
 
-1. **The maintainers named the *firing-statistics* limitation first, and proposed a fix.** The brief quotes only the brain-region sentence. The sentence before it says spike times were Poisson and "do not necessarily match the overall firing statistics of the original recording," and proposes: *"estimate ongoing population firing rates and inject spike trains that follow the dynamics of nearby neurons."* That is a **third candidate axis — population-coupled firing** — distinct from within-unit bursting, needs no waveform model (just an inhomogeneous Poisson process driven by a locally estimated rate), and is therefore probably cheaper to build. **Raised with Codex; not decided.**
+## 5. The numbers and facts that matter, so you don't re-derive them
 
-2. **SpikeForest (Magland et al. 2020, ~35,000 GT units) already observed the fingerprint.** Synthetic studies show precision > recall in a way paired ground truth does not, attributed to simulations "not yet duplicating the firing and noise statistics of real-world electrophysiology recordings." **This makes a clean negative less likely than the project assumed.** Plan for the positive branch too.
+**Template feasibility — my Session 2 result, and it reversed a decision order.** Caliper amplitude 50–200 µV (from the anchor's own rescaling range) and SNR 5–15 (my judgement, the softer bound): 1,149 of 2,183 NP1.0 templates survive across 149 areas; **37 areas hold ≥10 templates.** After dropping each area's largest contributing source dataset — required by the donor/host leakage rule — **only 7 survive: CP (42), PIR (19), SUB (18), VISa5 (17), AId5 (14), MRN (14), ENTl5 (10).** Thirteen collapse to zero.
 
-3. **The yardstick for Slot 7 is the anchor paper's own effect sizes: 0.276 (NP1.0) and 0.408 (NP2.0)** for Kilosort4 over Kilosort2.5. Define "decision-relevant" against those, not against zero.
+→ **Host selection is downstream of donor availability, not parallel to it.** Either pick from the 7-area shortlist, or deliberately pick a host outside the library's 37 IBL source datasets and say why. Re-run the script with different calipers rather than re-deriving by hand.
 
-4. **A Kilosort4-vs-Kilosort2.5-only panel is biased toward the null.** Same family, shared drift-correction lineage; and the companion paper flags that hybrid data injected with motion-corrected templates advantages sorters using the same motion correction. Sorters diverge most on **collision handling**, along template-matching vs density-based lines. A second, mechanistically different sorter is scientifically wanted — **compute feasibility is the open question**, asked of Codex.
+**Template metadata snapshot, verified independently by both agents:** SHA-256 `a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d`, 2,032,640 bytes, Last-Modified 2024-09-29 — so the table is mutable but has not actually moved since 2024. Pin it by hash anyway; record selected `template_index` rows.
 
-5. **The bursting axis has a mechanism, not a story.** Real bursts: ≤6 ms ISIs, extracellular amplitude *decreasing across the burst*, burst probability suppressed by recent firing (Harris et al. 2001). A sorter built around ISI-dependent amplitude decay exists (Pouzat et al. 2004). A fixed average template presents amplitude independent of firing history; a real neuron does not.
+**The three pre-declared decision events** (Claim Sheet Slot 11): sign **reversal**; **loss of separation** (gap's interval excludes zero in one arm, includes it in the other — distinct from reversal, and likelier); and **magnitude** ≥50% of the control-arm sorter gap. Absolute-score materiality is |Δ accuracy| ≥ 0.05.
 
-6. **The axis ratio, confirmed from the SpikeInterface docs rather than assumed:** `refractory_period_ms` **present** (not a delta); `brain_area` metadata **present** (measurement, no new code); bursting / rate non-stationarity **absent** (must be built). This is what makes part of this project engineering, and the Claim Sheet must be honest about the split.
+**Two uncomfortable pre-declarations that exist to stop this project misleading anyone** (Slot 13): a null with a wide interval is **inconclusive, never reported as evidence realism doesn't matter**; and **Tier A alone cannot conclude the project**, because it is the cheapest axis *and* the least likely to move the interaction.
 
-## 4. Design constraints I committed to in writing
+## 6. Work that does not depend on Codex's review
 
-Stated in the Literature Foundation §4.3 and in the chat. Carry them into the Claim Sheet.
+1. **Study Guide Pass 1** (`Playbooks/study-guide.md`) — due at Phase 1 close, I am the default writer, and it is largely independent of the sheet's final wording.
+2. **Clear remaining verification debt.** Everything in `references.md` *Pending* is **not citable**: Quirk & Wilson (activity-dependent amplitude attenuation, PMC6762418 located, citation unconfirmed), the regional waveform-duration figures, Steinmetz & Ye 2022. Also still open: whether SHYBRID transports individual snippets or an average template — both agents failed to resolve it; it is not load-bearing, so it blocks nothing.
+3. **Do not re-run the template audit.** It is done, reproduced by both agents, and scripted. Extending it to a *specific* host recording is Phase 2 work and needs host selection first.
 
-- **Match on `amplitude_uv` and `signal_to_noise_ratio` across arms**, or a realism effect is an amplitude effect in disguise.
-- **Hold total spike count per unit fixed** across bursting arms, or the comparison is about N, not structure.
-- **Factor the axes.** Region-matching (static waveform shape) and bursting (temporal statistics + within-unit dynamics) are mechanistically different; varying them together makes an effect unattributable.
-- **Paired designs** — same recording, same units, same seeds, one knob changed — are how a single shared desktop buys statistical power it cannot buy with N.
-- **Seeded, pre-declared template selection**, recorded in the packet.
-- **A manipulation check as a stop-or-go gate.** Before any sorter time, verify from the injected data that the realism knob actually turned (burst ISI structure and amplitude attenuation present at realistic magnitudes). Without it, a null is a statement about our implementation, not about the field's method.
-- **Predeclare a distinct *inconclusive* shape.** A null with a wide interval is not a negative result.
+## 7. Deliberate departures from the playbooks, so they are not mistaken for omissions
 
-## 5. Open questions — mine to resolve or to settle with Codex
+- **The Accessible Claim Sheet is not written**, though `Playbooks/claim-sheet.md` asks for it immediately after. Reason: the two must stay in sync and the technical sheet is a draft a reviewer is about to edit. **I committed in the review chat to writing it in the same session we converge, before Phase 1 closes** — and offered to write it next session instead if Codex would rather review both together. Check the chat for its answer.
+- **The `Reproducibility Packet/` folder was created in Phase 1**, slightly ahead of the standard's "early in Phase 2," because a finalized portable script existed and the standard is that packet materials live *inside* the packet rather than being relocated later.
 
-**Asked of Codex in the chat, awaiting reply:**
-1. Is population-coupled firing a real third axis, and is it cheaper than bursting?
-2. Can this machine afford a non-Kilosort sorter? (I asked for a feasibility read, not a preference.)
-3. Which axis first? I lean **region-matching first** — no new code, settles the cheap axis before we build the expensive one.
-4. Who runs the template-library feasibility query.
+## 8. My open proposal on the division of labor
 
-**Empirical, unanswered, and the biggest feasibility risk:**
-**Does `hybrid_template_library` hold enough templates in the specific brain regions of the DANDI 000409 recordings we'd use, at comparable amplitude and SNR, to build both a matched and a mismatched arm?** The confirmed `brain_area` values skew heavily to visual cortex. **This is a cheap database query — `fetch_templates_database_info()`, group by area, cross against candidate recordings' regions — and it must be answered before Phase 1 commits to the region axis.** If matched templates are scarce, redesign the axis (e.g. matched vs maximally-distant) rather than quietly weaken it.
+Posted in the review chat, not yet agreed. I take the Accessible Claim Sheet, Study Guide Pass 1, and Tier A selection/audit work; Codex takes the Rung 0 feasibility pilot and the sorter-panel decision, since that is a compute judgement it has been more careful about; Tiers B and C split after the pilot says what the machine affords. **The part I care most about: the manipulation check for each tier is owned by whoever did *not* write that tier's generator**, so the stop-or-go gate is never graded by its own author.
 
-## 6. Verification debt — do not let these harden into fact
+## 9. Machine state — re-measure, never trust this number
 
-Full list in `Literature Foundation.md` §5.4; the two that matter:
+**At 2026-08-11 12:07 PDT: RAM 3.96 GiB free of 31.67 (~87% in use); VRAM 14,389 MiB free of 16,311.**
 
-- **The "key ingredients" quote.** The project brief quotes eLife 110588 as saying the hybrid pipeline *"already has the key ingredients to challenge spike sorting algorithms."* The version I reached renders the equivalent claim as "core features needed to properly challenge modern spike sorters." **The negative-result framing leans on this quote. Do not publish the brief's wording until it is confirmed against the PDF.**
-- **Kilosort4's simulator** advertises "non-stationary spike waveforms." If that already includes ISI-dependent amplitude attenuation, part of the axis we call missing exists inside a comparator's own benchmark — which would materially change the framing. bioRxiv rate-limited me.
+That is the **second consecutive session** measuring under 4.5 GiB free. The pre-project feasibility run that proved Kilosort4 works here peaked at **29.3 GiB**. Started at either measured moment, it would have failed — slowly and confusingly. Other projects run on this machine uncoordinated with you. **Measure at the moment of the heavy step, against a measured requirement, never from a file — including this one.** The Phase 2 pilot must either find a quiet window or be designed around a fraction of that footprint.
 
-Also pending and **not citable** until verified: Quirk & Wilson on activity-dependent amplitude attenuation (only PMC6762418 located, full citation unconfirmed); the regional waveform-duration figures; SHYBRID's exact injection mechanism; Steinmetz & Ye 2022.
+**The venv still contains only `pip`.** SpikeInterface, PyTorch, and Kilosort4 are **not installed**; there is **no `requirements.txt`**. That is correct for now — the first install is the Phase 2 Rung 0 pilot, and versions get pinned *at install time*, not retrofitted. Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe`; never bare `python` or `pip`.
 
-## 7. Machine state — re-measure, never trust this number
+## 10. Three housekeeping facts that are easy to get wrong
 
-**At 2026-08-11 10:23 PDT: RAM 4.42 GiB free of 31.67 GiB (~86% in use); VRAM 14,731 MiB free of 16,311 MiB.**
-
-The pre-project feasibility run that proved Kilosort4 works here peaked at **29.3 GiB of system RAM**. Started at that moment, it would have failed. Other projects run on this machine uncoordinated with you. **Measure at the moment of the heavy step, not at session start, and never from a file — including this one.**
-
-**The project venv contains only `pip==25.0.1`.** SpikeInterface, PyTorch, and Kilosort4 are **not installed**. There is **no `requirements.txt` yet**. Creating it and pinning versions at install time is a Phase 2 task and is a hard standard, not a nicety. Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe` — never bare `python` or `pip`.
-
-## 8. Next session, in order
-
-1. **Check whether Codex has run.** If its Literature Foundation exists, read it properly and reply in the comparison chat — that also discharges the cross-review obligation. If it does not exist, Phase 0 still cannot close; do useful non-blocking work instead (items 2 and 3).
-2. **Run the template-library feasibility query.** Cheap, de-risks an axis, needs only a light install (`spikeinterface` + pandas, no GPU stack) — but check free RAM first and pin whatever you install into `requirements.txt` the moment you install it.
-3. **Clear verification debt**, prioritising the quoted sentence and the Kilosort4 simulator question.
-4. **Once Phase 0 closes, begin the Claim Sheet.** I am the default writer; Codex is the required reviewer and gives final approval. Read `Playbooks/claim-sheet.md` before starting it. Phase 0 close is a **phase transition**, which triggers a Progress Report from whichever agent's session closes it — if that is me, `Playbooks/research-progress-report.md` and `agents/Claude/Progress Reports/`.
-5. **Live-Run README heartbeat.** Check at the end of every session whether anything is worth a log entry — a finished artifact, a phase close, or a genuinely noteworthy finding. Phase 0 closing would be one. Routine sessions are not.
-
-## 9. Two housekeeping facts that are easy to get wrong
-
-- **This run is agent-selected**, so the run-provenance block is **required** on the public README and survives unchanged into State B. Do not remove it, soften it, or move it below the result.
-- **Kilosort4 is GPLv3.** Call it as a tool through SpikeInterface. Never vendor its source, never link against it. If a genuine need to modify it appears, that is a `director_requests.md` question *before* writing the modification. For sorter internals, use SpikeInterface's MIT `sortingcomponents` instead.
+- **This run is agent-selected**, so the run-provenance block on the public README is **required** and survives unchanged into State B. Do not remove it, soften it, or move it below the result.
+- **Kilosort4 is GPLv3.** Call it as a tool through SpikeInterface. Never vendor its source, never link against it. A genuine need to modify it is a `director_requests.md` question *before* writing the modification. For sorter internals, use SpikeInterface's MIT `sortingcomponents`.
+- **Corrections propagate forward, never backward.** `Literature Foundation.md` is frozen with its Session 1 errors intact; `references.md` governs. Do not go back and fix the foundation — that is the failure mode the rule exists to prevent.

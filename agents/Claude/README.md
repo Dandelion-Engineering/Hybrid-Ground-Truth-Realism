@@ -13,9 +13,10 @@ agents/Claude/
 ├─ Literature Foundation.md               Phase 0 field survey. Dated artifact, frozen.
 ├─ references.md                          Running source ledger. Living document.
 ├─ Session Summaries/                     One human-readable report per session.
-│  └─ HumanReport1.md
+│  ├─ HumanReport1.md
+│  └─ HumanReport2.md
 └─ Progress Reports/                      Director-facing reports, every 8th session
-                                          and at phase transitions. Empty so far.
+   └─ Progress Report Phase 0 Close.md    and at phase transitions.
 ```
 
 ---
@@ -26,7 +27,7 @@ agents/Claude/
 
 **`Literature Foundation.md`** — The Phase 0 survey of the spike-sorting validation field: methods landscape, benchmark ranges, datasets and licenses, failure modes, open questions, references. Its job is to make sure the Claim Sheet's method choices and success bars are informed by what the field has established rather than invented on the spot. **It is a dated artifact and is frozen as written** — corrections to it propagate forward into `references.md` and into later work, not backward into the document.
 
-**`references.md`** — The running ledger of every source that informed my work: what it covers, how it shaped a decision, a verified link, and a citation ready to transfer into the Technical Report's bibliography. **This is the living document.** Where it and the Literature Foundation disagree, this file governs. It also carries a *Pending* section for sources located but not yet verified, which are not citable until they move up.
+**`references.md`** — The running ledger of every source that informed my work: what it covers, how it shaped a decision, a verified link, and a citation ready to transfer into the Technical Report's bibliography. **This is the living document.** Where it and the Literature Foundation disagree, this file governs. It also carries a *Pending* section for sources located but not yet verified, which are not citable until they move up, and a **corrections log** at the top recording every claim later evidence overturned — kept visible rather than deleted, so the trail stays auditable. Entries are tagged `[ANCHOR]`, `[VERIFY]` (unconfirmed claim), `[CLEARED]` (formerly unconfirmed, now verified, with who verified it), and `[SUPERSEDED]` (wrong, with the correction alongside).
 
 **`Session Summaries/HumanReport<N>.md`** — What happened in session N, written for the director: what was done, what was decided and why, what was hard, what files moved, and what comes next. Sequential and append-only as a set; earlier reports are never edited.
 
@@ -54,16 +55,18 @@ The Phase 1 division of labor has not been decided yet, so this reflects the fra
 
 | Path | My relationship to it |
 |---|---|
+| `Claim Sheet.md` | **Written by me (Session 2), in review with Codex.** I am the default writer; Codex is the required reviewer and gives final approval. Not yet an agreed state — see the review chat. |
 | `README.md` (repository root — the Live-Run README) | **Created and currently maintained by me.** Ownership is open to the Phase 1 labor split. Built per `Playbooks/live-run-readme.md`. |
 | `CITATION.cff`, `LICENSING.md` | Updated by me in Session 1 to describe this project rather than the framework template. Shared. |
-| `chats/Claude-Codex/Phase 0 Literature Comparison/` | Opened by me. Shared channel — append only, never rewrite. |
-| `Claim Sheet.md` (not yet created) | **Default writer** — Codex is the required reviewer and gives final approval. |
-| `Accessible Claim Sheet.md` (not yet created) | **Default writer**, Codex reviews. |
+| `Reproducibility Packet/scripts/audit_template_library.py` | Written by me (Session 2). The packet is **co-owned** with Codex; this script is mine and is packet-ready as written. |
+| `chats/Claude-Codex/Phase 0 Literature Comparison/` | Opened by me. **Concluded** — see its `Summary.md`. |
+| `chats/Claude-Codex/Claim Sheet Review/` | Opened by me. Active. Shared channel — append only, never rewrite. |
+| `Accessible Claim Sheet.md` (not yet created) | **Default writer**, Codex reviews. Deliberately deferred until the Claim Sheet converges, so the two do not drift apart while one is being edited. |
 | `Technical Report/` (not yet created) | **Default writer**, Codex reviews. |
 | `Accessible Piece/` (not yet created) | **Default writer**, Codex reviews. |
 | `Study Guide/` (not yet created, two passes) | **Default writer**, Codex reviews. |
-| `Reproducibility Packet/` (not yet created) | **Co-owned** with Codex — its contents come out of both agents' execution. |
-| `director_requests.md` (not yet created) | Shared, append-only. Either agent appends when it hits director-only work. |
+| `Reproducibility Packet/` | **Co-owned** with Codex — its contents come out of both agents' execution. Created Session 2, early, per the packet-ready-as-you-go standard. |
+| `director_requests.md` (not yet created) | Shared, append-only. Either agent appends when it hits director-only work. Nothing has needed it yet. |
 
 ---
 

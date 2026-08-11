@@ -1,0 +1,75 @@
+# Template library audit
+
+url             https://spikeinterface-template-database.s3.amazonaws.com/templates.csv
+bytes           2032640
+sha256          a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d
+matches pinned  True  (pinned = a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d)
+etag            "a5f37c65cd175fa8b75178c5195b20a1"
+last-modified   Sun, 29 Sep 2024 08:56:05 GMT
+
+total rows      7877
+columns         amplitude_uv, best_channel_index, brain_area, dataset, dataset_path, depth_along_probe, noise_level_uv, probe, probe_manufacturer, signal_to_noise_ratio, spikes_per_unit, template_index
+  probe 'Neuropixels 1.0': 2183 rows across 37 source datasets
+  probe 'Neuropixels Ultra': 5694 rows across 57 source datasets
+
+## Subset: probe = 'Neuropixels 1.0'  (2183 rows)
+amplitude_uv    min 52.19  median 184.17  max 923.15
+snr             min 2.43  median 9.77  max 48.44
+distinct brain_area labels  170
+
+## Caliper: amplitude 50.0-200.0 uV, SNR 5.0-15.0
+rows inside caliper         1149 of 2183
+distinct areas inside       149
+
+## Areas with at least 10 in-caliper templates
+
+The 'leave-one-out' column is the count remaining after dropping the area's single
+largest contributing source dataset. It is the binding number when the host recording
+comes from a dataset that also contributed donor templates, since reusing the host's
+own dataset as a donor is a leakage path.
+
+area              n  datasets  leave-one-out
+CP               70         4             42
+SUB              57         2             18
+AON              39         4              9
+PIR              36         5             19
+VISa5            32         3             17
+ENTl5            31         2             10
+AId5             30         2             14
+ENTl6a           28         2              6
+VISpor5          27         2              4
+LP               26         2              9
+MRN              24         7             14
+VISpor6a         23         3              4
+PL5              22         1              0
+AUDp6a           22         1              0
+SSp-m6a          21         3              8
+ORBvl6a          20         1              0
+MEA              18         1              0
+PAG              17         3              6
+VISC5            17         1              0
+MOs5             16         3              8
+MOp6a            15         1              0
+AIp2/3           14         1              0
+ccb              13         4              3
+PVT              13         1              0
+ACAv5            13         2              5
+ILA5             13         1              0
+ACAd5            13         2              5
+ORBvl2/3         13         1              0
+ENTl3            12         2              5
+CA1              12         4              6
+MOs6a            12         1              0
+SSs5             11         1              0
+MOp5             11         1              0
+VISli4           11         1              0
+BMAp             11         1              0
+SF               10         2              2
+ProS             10         2              2
+
+areas viable, host dataset NOT in the library      37
+areas viable, host dataset excluded as a donor     7  (CP, SUB, PIR, VISa5, ENTl5, AId5, MRN)
+
+Read this as a conditional, not a count: if the chosen host recording is not one of
+the library's own source datasets, the first number applies. If it is, the second does.
+Both numbers move with the caliper, which is a declared parameter and not a fact.
