@@ -102,6 +102,16 @@ Multi-channel extracellular waveforms show distinct spatiotemporal profiles acro
 KlustaKwik/phy for dense arrays, validated on data from cortex, hippocampus and thalamus in rat, mouse, macaque and marmoset, with error rates as low as 5%.
 *How it informed the work:* The origin point of the hybrid-validation paradigm this project examines, and a cross-region performance band for calibrating expected accuracy.
 
+**Jun JJ, Steinmetz NA, Siegle JH, Denman DJ, Bauza M, Barbarits B, Lee AK, Anastassiou CA, Andrei A, Aydın Ç, et al. (2017). Fully integrated silicon probes for high-density recording of neural activity.** *Nature* 551(7679):232–236. [doi:10.1038/nature24636](https://doi.org/10.1038/nature24636) · PMID 29120427
+*Added: Session 3 (2026-08-11).*
+The Neuropixels probe: a single integrated silicon shank with hundreds of densely spaced recording sites, yielding well-isolated spiking from hundreds of neurons per probe; more than 700 well-isolated single neurons recorded simultaneously from five brain structures in an awake mouse using two probes.
+*How it informed the work:* Cited in Study Guide Pass 1 as the origin of the data regime this project operates in. It is the reason a neuron is heard on several neighbouring sites at once, which is what makes a *multichannel template* — the object this project injects and whose realism Tier A manipulates — meaningful at all. Also the reason the region-matching axis is testable: single-channel waveforms would not carry enough spatial structure for regional differences to be a manipulable property.
+
+**Efron B (1979). Bootstrap methods: another look at the jackknife.** *The Annals of Statistics* 7(1):1–26. [doi:10.1214/aos/1176344552](https://doi.org/10.1214/aos/1176344552)
+*Added: Session 3 (2026-08-11).*
+Introduces the bootstrap: estimate the sampling distribution of a statistic by resampling the observed data rather than assuming a parametric form, and shows the jackknife to be a linear approximation to it.
+*How it informed the work:* The methodological citation for the Claim Sheet's uncertainty machinery (Slot 7) and its plain-language explanation in Study Guide Pass 1. Its relevance here is specifically that it replaces a distributional assumption with computation — which matters because this project's estimand is a difference of paired differences with an estimated threshold (`G0`, `T`, `D`) carried through the same resampling, a quantity with no clean closed-form interval. **The load-bearing choice is not the bootstrap itself but the resampling unit:** randomization blocks, not injected units, because units inside one run share a recording, a noise environment, and a seed. Codex raised this in the Session 2 Claim Sheet review; the hierarchical scheme is the result.
+
 **Buccino AP, Hurwitz CL, Garcia S, Magland J, Siegle JH, Hurwitz R, Hennig MH (2020). SpikeInterface, a unified framework for spike sorting.** *eLife* 9:e61834. [doi:10.7554/eLife.61834](https://doi.org/10.7554/eLife.61834)
 *Added: Session 1 (2026-08-11).*
 The unified Python API: >30 file formats, ≥10 sorters, preprocessing, postprocessing, curation, comparison, visualization.

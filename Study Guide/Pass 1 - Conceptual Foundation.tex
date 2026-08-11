@@ -1,0 +1,605 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage{lmodern}
+\usepackage{booktabs}
+
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue, citecolor=blue}
+
+\title{Hybrid Ground Truth Realism \\ Pass 1 --- Conceptual Foundation}
+\author{Dandelion Engineering}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+This project asks whether a measuring instrument the field of neuroscience relies on is
+actually measuring what everyone assumes it measures. That is the whole of it, and the
+rest of this document exists so that you can hold that sentence with real content behind
+each word.
+
+The instrument is a \emph{benchmark}. Neuroscientists have an algorithmic step they cannot
+easily check --- deciding which electrical spike in a recording came from which neuron ---
+and they check it by building recordings where they secretly know the answer. They take a
+real recording and inject synthetic spikes into it at times of their own choosing. Then
+they run the algorithm and count how many of the planted spikes it found. The planted
+spikes are the answer key.
+
+The maintainers who built the field's standard version of that answer key wrote, in print,
+that they do not know whether their synthetic spikes are realistic enough for the resulting
+scores to mean what everyone treats them as meaning. This project takes that sentence
+literally and tests it.
+
+What follows is not a summary of the project. It is the conceptual territory the project
+crosses. By the end you should be able to read the Claim Sheet --- the contract, and the
+densest document in the repository --- without stopping to look anything up, and to follow
+Phase 2 as a participant rather than a spectator. Where a concept connects to a specific
+commitment in that contract, I say so at the point the concept arrives, rather than
+collecting the connections at the end.
+
+Section 2 builds the domain: what these recordings are, why sorting them is hard, and why
+the field ended up in a position where it has to manufacture its own answer key. Section 3
+takes the methods one at a time --- hybrid generation, the three realism axes this project
+manipulates, and the gate that decides whether a manipulation counted. Section 4 covers
+evaluation: how accuracy is measured here, and the statistical spine that turns a pile of
+numbers into a decision. Section 5 assembles the pieces into a system and names the
+assumptions holding it up, because those are the places where the project could be wrong.
+
+\section{Domain Background}
+
+\subsection{What the probe actually hears}
+
+A neuron fires by moving charged particles across its membrane, and that movement makes a
+small, brief voltage disturbance in the salty fluid around it. Put a metal contact nearby
+and you can record that disturbance without touching the cell. This is \emph{extracellular}
+recording, and its great virtue is that it is survivable: the neuron goes on living and
+firing, and you can listen for hours.
+
+Its great vice is that the fluid does not sort your mail. A contact hears every neuron
+close enough to be heard, all at once, summed into one wiggling voltage trace. It also
+hears the electrical hum of everything further away, which is the noise floor.
+
+For most of the history of the field this was tolerable because electrodes were few. Then
+the probes changed. A Neuropixels probe is a single silicon shank carrying hundreds of
+recording sites spaced tens of micrometres apart, dense enough that one neuron is heard on
+several sites at once
+(\href{https://doi.org/10.1038/nature24636}{Jun et al., 2017, \emph{Nature}} --- worth
+skimming for the images alone; it is the engineering paper that created the data regime
+everything downstream now assumes).
+
+That density is the good news and the reason the problem got hard. Because a neuron is
+heard on several neighbouring sites at different strengths, the \emph{pattern} across sites
+is a spatial fingerprint --- a signature of where the cell sits relative to the probe. That
+fingerprint, averaged over many of a neuron's spikes, is called its \textbf{template}.
+Templates are the central object of this project: they are what gets injected, and their
+realism is what Tier A of the experiment manipulates.
+
+\subsection{Spike sorting, and why it is genuinely hard}
+
+\emph{Spike sorting} is the step that turns the summed voltage trace into a list of the form
+``neuron 17 fired at 12.483 seconds.'' Nearly everything downstream in systems neuroscience
+--- what a brain area encodes, how cells coordinate, what changes with learning --- is
+computed on top of that list. If the list is wrong, so is everything computed from it, and
+usually silently.
+
+Four things make it hard, and each one shows up later as a design constraint.
+
+\textbf{Overlap.} Two nearby neurons can fire within a millisecond of each other, and their
+voltage signatures add together into a shape belonging to neither. These are
+\emph{collisions}. How well an algorithm untangles them is not a minor implementation
+detail --- it is the property on which whole families of sorters visibly diverge
+(\href{https://doi.org/10.1523/ENEURO.0105-22.2022}{Garcia, Buccino \& Yger, 2022,
+\emph{eNeuro}} --- measures this directly, and reports that template-matching sorters
+recover collided spikes far better than density-based ones, with reconstruction errors above
+50\% at short lags for the latter). Hold onto this: it is the single most important reason
+the project insists on comparing mechanistically different sorters rather than two versions
+of one.
+
+\textbf{Drift.} Brains move --- breathing, heartbeat, the slow settling of tissue around an
+implant. The probe stays put, so a neuron slides along it, and its fingerprint changes as it
+goes. A benchmark that crossed 12 drift scenarios found that even with the best available
+correction applied, the number of well-recovered neurons fell from 165 to as low as 107
+(\href{https://doi.org/10.1523/ENEURO.0229-23.2023}{Garcia et al., 2024, \emph{eNeuro}} ---
+useful for calibrating scale: it tells you how large an effect has to be before it competes
+with a problem the field already treats as serious).
+
+\textbf{Variability within one neuron.} A neuron's spikes are not identical copies. In
+particular, when a cell fires several spikes in quick succession --- a \emph{burst} --- the
+recorded amplitude of each successive spike \emph{shrinks}. This matters enormously later,
+so hold it: a real neuron's waveform depends on what that neuron just did.
+
+\textbf{No answer key.} There is no independent record of which neuron actually fired in a
+real recording. This is not a gap in the tooling; it is the structure of the situation. And
+it is where the project lives.
+
+\subsection{Three ways to manufacture an answer key}
+
+Since nature does not supply ground truth, the field manufactures it, and there are exactly
+three strategies. The review that lays them out side by side is
+\href{https://doi.org/10.1088/2516-1091/ac6b96}{Buccino, Garcia \& Yger, 2022,
+\emph{Progress in Biomedical Engineering}} (the best single orientation to modern spike
+sorting if you want one source beyond this guide).
+
+\textbf{Paired recordings} put a second electrode inside a single neuron while the probe
+listens outside. The inside electrode is unambiguous, so you know that cell's spike times
+exactly. This is the gold standard and it is nearly useless at scale: you typically get
+\emph{one} verified neuron per recording, and only from the large, sturdy cells that
+tolerate being impaled. Real, but rare and biased.
+
+\textbf{Fully synthetic recordings} simulate everything --- neurons, tissue, noise. You get
+every neuron's truth for free. The cost is that if the simulation is unrealistic in some
+respect, every unit in the dataset is unrealistic in that same respect, all at once, and
+nothing in the data will tell you.
+
+\textbf{Hybrid recordings} are the compromise the field actually grades on, and the subject
+here. Take a genuine recording --- with its real noise, real drift, real firing neurons,
+real artifacts --- and inject a handful of synthetic neurons on top. The injected ones come
+with a known answer key by construction; the surrounding reality is not simulated because it
+was never synthetic to begin with.
+
+That compromise is why hybrid data won, and it is also exactly where the vulnerability sits.
+Only the injected units are graded, so the grade describes how findable \emph{the injected
+units} were. If they are systematically easier to find than real neurons, every sorter
+scores too high. Worse --- and this is the real target --- if they are easier for one
+\emph{kind} of algorithm than another, then the comparison between algorithms is partly
+measuring the generator that made the fake spikes rather than the algorithms.
+
+There is already published reason to think this is not paranoia. A benchmark spanning
+roughly 35,000 ground-truth units found that synthetic ground truth produces a
+systematically different error signature from real paired ground truth, and its authors
+attributed this to simulations not yet reproducing the firing and noise statistics of real
+recordings (\href{https://doi.org/10.7554/eLife.55167}{Magland et al., 2020, \emph{eLife}}
+--- also the source of the accuracy metric used in Section 4, so it is worth a look). The
+same worry appears in a 2018 toolbox paper, whose authors wrote plainly that it was not
+clear whether their simulated data reproduced the conditions of actual recordings
+(\href{https://doi.org/10.7554/eLife.34518}{Yger et al., 2018, \emph{eLife}}).
+
+So the concern is roughly a decade old and has been stated repeatedly by the people building
+the tools. What nobody has done is the controlled version: hold everything else fixed, change
+exactly one realism property, and measure what moves. That sentence is this project.
+
+\subsection{The specific sentence being tested}
+
+The anchor is \href{https://doi.org/10.7554/eLife.110170.3}{Buccino et al., 2026,
+\emph{eLife}} --- the paper describing the pipelines this project puts under test, and the
+one whose configuration the control arm reproduces. In its Limitations section its authors
+wrote:
+
+\begin{quote}
+``It remains to be tested whether generating more realistic hybrid recordings will have any
+effect on spike sorting accuracy.''
+\end{quote}
+
+And immediately before it, naming a specific deficit:
+
+\begin{quote}
+``although we used different templates for each probe type, we did not choose templates to
+match the brain region of the original recording.''
+\end{quote}
+
+Two things about this are worth internalising, because they shape the project's posture.
+
+First, this is a limitation the authors identified in their own work, voluntarily, in print.
+The project is therefore not a critique. It is taking up an invitation. The Claim Sheet
+commits to writing the result as ``we tested the limitation you named, and here is what we
+found,'' never as ``you were wrong'' --- and that holds regardless of which way the result
+comes out.
+
+Second, \textbf{both possible answers are worth publishing}, which is a genuinely unusual
+and comfortable position. If realism does not move the comparison between sorters, the
+field's default answer key is validated and a stated open question closes. If it does move
+it, then published sorter comparisons built on hybrid data have been partly grading the
+generator, and every benchmark that used one inherits that. There is no result here that is
+a disappointment --- only a result that is too imprecise to be either, which Section 4
+addresses head-on.
+
+\section{Core Methods}
+
+\subsection{How a hybrid recording is actually built}
+
+To manipulate realism you need to know where the seams are. Building one hybrid recording
+takes four steps.
+
+\textbf{Choose donor templates.} You need spatial fingerprints to inject. Rather than invent
+them, the pipeline draws from a published library of templates extracted from real
+recordings. Each carries metadata: its amplitude, its signal-to-noise ratio, its depth along
+the probe, which dataset it came from --- and, crucially for this project, a
+\texttt{brain\_area} label.
+
+\textbf{Choose spike times.} When will each injected neuron fire? The standard pipeline draws
+times from a \emph{Poisson process}: a coin flipped very fast, with a fixed average rate and
+no memory. Each moment is independent of every other. It is the mathematically simplest way
+to generate events in time, and --- as Section 3.3 argues --- it is where most of the
+missing realism lives.
+
+\textbf{Place and rescale.} The template is positioned at a chosen depth and scaled so its
+amplitude lands in a target range (the anchor used 50--200 $\mu$V), because an injected unit
+that is far louder or fainter than the surrounding real cells would be trivially findable or
+invisible.
+
+\textbf{Add.} The scaled template is summed into the real voltage trace at each chosen time.
+The recording is now a hybrid: real everywhere, plus a handful of neurons whose every spike
+time you wrote down.
+
+A useful contrast makes the design choice visible. A different tool, SHYBRID, builds hybrid
+data by \emph{relocating a real unit} --- moving an actual neuron's actual spikes to a new
+position on the probe
+(\href{https://doi.org/10.1007/s12021-020-09474-8}{Wouters, Kloosterman \& Bertrand, 2021,
+\emph{Neuroinformatics}}). That approach carries the real spike train and the real
+spike-to-spike variability along with it. The average-template-plus-Poisson approach does
+not. \emph{The field has already implicitly disagreed with itself about whether this
+matters}, which is a decent sign that the question is worth an experiment.
+
+\subsection{Choosing what to make more realistic}
+
+``More realistic'' is not a single dial, so the project picks three specific properties,
+tests them one at a time, and never varies two at once --- because if you move two things and
+the score changes, you have learned nothing about which one did it. In the Claim Sheet these
+are Tiers A, B, and C, and they are ordered by how much has to be built before they can be
+measured.
+
+\textbf{Tier A --- region-matched templates.} Injected templates currently come from whatever
+brain region the library happens to offer, not the region the host recording came from. Is
+that a real mismatch or a cosmetic one? It is real: waveform shapes differ enough between
+brain regions that a neuron's region can be partly \emph{classified} from its multi-channel
+waveform (\href{https://doi.org/10.1152/jn.00680.2018}{Jia et al., 2019, \emph{Journal of
+Neurophysiology}} --- the empirical warrant for this axis; it also introduces the
+regular-spiking/fast-spiking distinction that shows up whenever waveform shape is discussed).
+Because the library already carries a region label, fixing this requires \emph{no new code}
+--- it is a change to which rows you select. Tier A is pure measurement, and it is first
+because it is cheapest.
+
+\textbf{Tier B --- population-coupled firing.} Real neurons do not fire independently of
+their surroundings; population activity rises and falls together, and individual rates ride
+those waves. Poisson spike times are, by construction, deaf to this. The fix is to estimate
+how busy the local population is over time and make injected rates follow it. This is the
+anchor authors' \emph{own} proposed remedy, and there is prior art --- Kilosort4's hybrid
+benchmark already modulates intervals by local population rate in 100 ms bins. Modest new
+code.
+
+\textbf{Tier C --- bursting with history-dependent waveform shrinkage.} Recall from Section
+2.2 that a real neuron's spikes shrink across a burst. A fixed average template presents
+precisely the same shape no matter what the neuron just did --- which is not a small
+idealisation but the removal of a well-documented mechanism. In hippocampal CA1 pyramidal
+cells, complex-spike bursts occur at intervals of 6 ms or less with amplitude decreasing
+across the burst, and bursts are suppressed following recent activity
+(\href{https://doi.org/10.1016/S0896-6273(01)00447-0}{Harris et al., 2001, \emph{Neuron}} ---
+supplies the actual numbers Tier C has to hit). That this matters for \emph{sorting}
+specifically is not a guess: a sorter built two decades ago improved its results by
+explicitly modelling burst-dependent amplitude attenuation
+(\href{https://doi.org/10.1152/jn.00227.2003}{Pouzat et al., 2004, \emph{Journal of
+Neurophysiology}}). This mechanism is genuinely absent from the pipeline under test, and it
+has to be built before it can be measured.
+
+Two honesties are written into the contract about this list, and they are worth knowing
+because they are the kind of thing a project can quietly slide away from.
+
+The first is the \textbf{measurement/engineering split}. Tier A is measurement. Tiers B and C
+are engineering in the service of measurement. That is still research, but the Claim Sheet
+says so plainly rather than presenting the whole thing as pure measurement.
+
+The second is sharper. \textbf{Tier A is the axis most likely to move absolute scores and
+least likely to move the comparison between sorters.} Changing static waveform shape changes
+what every sorter's front end sees, in broadly similar ways. The temporal tiers hit collision
+handling --- where, per Section 2.2, sorter families actually diverge. Since Tier A runs first
+and is cheapest, there is a live risk of appearing to have answered the headline question
+when the project has answered its easiest version. The contract therefore states that
+\emph{the project may not conclude on Tier A alone}. That commitment exists to stop a
+convenient early stopping point from becoming the result.
+
+\subsection{The manipulation check: the gate before the experiment}
+
+Here is a failure mode that would quietly ruin the whole project.
+
+Suppose Tier C is implemented, run, and the sorters' scores do not move. Two explanations
+fit: realism genuinely does not matter, or the bursts that were injected were feeble,
+biologically implausible, or subtly broken. Those two conclusions are opposite in meaning and
+identical in appearance. Nothing measured \emph{after} the sorters run can separate them.
+
+So the project inserts a gate. Before any sorter time is spent on a tier, the generated data
+must be inspected and shown to carry the intended property at a realistic magnitude ---
+the injected inter-spike intervals really do reach the biological range, the amplitude really
+does attenuate with recent firing, and the quantities that were supposed to stay fixed really
+did stay fixed. Only then does sorting begin. \textbf{If the check fails, no sorter runs at
+all}; the failure is diagnosed and published as a finding about the generator.
+
+This is the most important structural idea in the design, and it is worth seeing why it is
+not merely good hygiene. It is what makes a \emph{negative} result mean anything. Without the
+gate, ``realism did not matter'' is indistinguishable from ``we implemented realism badly'' ---
+and since a negative result is the likelier and arguably more useful outcome here, the gate is
+what keeps the project's most probable finding from being worthless.
+
+The same logic drives the \textbf{covariate balance} requirement. If the region-matched
+templates happened to be louder on average than the region-unaware ones, then any measured
+effect could be an amplitude effect wearing a region label. So amplitude, signal-to-noise,
+probe geometry, placement, and even how many different source datasets each arm's templates
+came from are all balanced across arms and checked. In the contract this is called a gate
+rather than a hope, which is the right register: it is verified, not assumed.
+
+\subsection{Why the comparison is paired}
+
+The anchor study estimated roughly 870 and 846 single-workstation hours for its two sorter
+comparisons. This project runs on one shared desktop that other projects are using at the
+same time. It cannot buy confidence with volume.
+
+It buys it with \emph{pairing} instead. If you want to know whether a change matters, the
+statistically expensive way is to run a large group with and a large group without and
+compare averages, absorbing all the variation between individuals. The cheap way is to test
+the \emph{same} individuals under both conditions and look at each one's change. Most of the
+noise --- the fact that some injected units are intrinsically easier to find than others ---
+cancels, because it is present identically on both sides of the subtraction.
+
+Concretely: the same host recording, the same placements, the same amplitude targets, the same
+unit count, the same total spike counts, with exactly one property changed. For Tiers B and C
+it is literally the same donor template in both arms.
+
+Tier A cannot do this, and the reason is instructive. Changing donor \emph{region}
+necessarily changes donor \emph{identity} --- a region-matched template and a region-unaware
+one are different templates by definition. So Tier A pairs \emph{matched slots} rather than
+identical units: two donors deliberately selected to resemble each other on every measured
+nuisance property, injected with the same spike train at the same place with the same
+rescaled amplitude. The pairing claim is about the matched slot, not about a fictitiously
+unchanged unit. This distinction was caught during review of the Claim Sheet, and it is a
+good example of what the review cycle between the two agents is for.
+
+\section{Evaluation Approach}
+
+\subsection{Scoring one sorter on one recording}
+
+After a sorter runs, its output is compared against the known injected spike times. For each
+injected unit, three counts fall out: \emph{matches} (found correctly), \emph{misses} (real
+spikes the sorter never reported), and \emph{false positives} (spikes the sorter reported
+that were not there). The field's standard accuracy metric combines all three:
+
+\[
+\text{accuracy} \;=\; \frac{n_{\text{match}}}{n_{\text{match}} + n_{\text{miss}} + n_{\text{fp}}}
+\]
+
+In words: of everything that either happened or was claimed to happen, what fraction did the
+sorter get right? It ranges from 0 to 1, and it is deliberately unforgiving --- inventing
+spikes is penalised just as missing them is. The convention comes from
+\href{https://doi.org/10.7554/eLife.55167}{Magland et al., 2020}, which also established the
+practice of reporting the \emph{count of units scoring above 0.8} alongside the average.
+
+That second convention matters more than it looks. An average can hide the difference between
+a manipulation that nudged every unit slightly and one that pushed a few units across a line
+that a researcher actually acts on. This project reports both, and it also breaks results out
+by signal-to-noise ratio --- because an effect concentrated in the faint, hard units could
+leave the average almost untouched and still change every practical conclusion.
+
+\subsection{The quantity the project actually cares about}
+
+Now the conceptual centre of the whole design, and the one place where notation earns its
+keep.
+
+Take one sorter. For each paired unit, subtract its accuracy in the control arm from its
+accuracy in the realistic arm. Call that sorter's \textbf{realism effect}:
+
+\[
+\Delta_s \;=\; A(\text{realistic}) - A(\text{control})
+\]
+
+where $A$ is accuracy and $s$ names the sorter. If $\Delta_s$ is negative, that sorter did
+worse when the injected spikes were made more realistic --- which is the expected direction,
+since realism should make the planted spikes harder to find.
+
+But $\Delta_s$ alone is the \emph{absolute-score} question. If every sorter drops by the same
+amount, published accuracy numbers are too optimistic --- yet every ranking, every ``sorter A
+beat sorter B,'' survives untouched. Since hybrid benchmarks are used mostly to \emph{choose
+between} sorters, that would be a real but limited finding.
+
+The question that threatens the field's actual practice is whether realism affects sorters
+\emph{differently}. So the primary quantity is the difference between two sorters' realism
+effects --- a \textbf{difference in differences}, also called an \textbf{interaction}:
+
+\[
+I(s_1, s_2) \;=\; \Delta_{s_1} - \Delta_{s_2}
+\]
+
+Read it aloud: \emph{how much more did realism hurt sorter 1 than sorter 2?} If $I$ is near
+zero, realism moved both sorters together and the comparison between them is stable --- the
+benchmark is doing its job. If $I$ is large, the gap between the two sorters depends on how
+realistic the fake spikes were, which means the benchmark has been partly grading the
+generator.
+
+That is the project's target. Both the individual $\Delta_s$ values and the interaction $I$
+are reported separately, because they answer different questions and a project that reported
+only one of them would be hiding half of what it found.
+
+\subsection{How much is enough to matter}
+
+A number without a threshold is not yet a decision. Two thresholds are fixed \emph{before any
+result is seen}, which is the entire point --- a threshold chosen after seeing the data is not
+a threshold, it is a rationalisation.
+
+For \textbf{absolute scores}, a change of 0.05 accuracy (five points) is called material. The
+reasoning is concrete rather than conventional: the field counts units above 0.8, so a shift
+of that size near the threshold moves units across it and changes a reported number.
+
+For the \textbf{comparison}, the margin is measured against the sorter gap actually observed
+in this experiment. Let $G_0$ be the average gap between the two sorters in the control arm.
+The margin is
+
+\[
+T \;=\; \max(0.05,\; 0.5 \times |G_0|)
+\]
+
+Two ideas are packed in there. The half-gap term asks whether realism moved a meaningful
+\emph{fraction} of the comparison that actually exists --- moving half the gap between two
+sorters is enough to turn a difference a reader would call decisive into one they would call
+marginal. The five-point floor prevents an absurdity: if two sorters were nearly tied in the
+control arm, $0.5 \times |G_0|$ would be almost zero, and a trivial wobble would qualify as
+decision-relevant.
+
+\subsection{Confidence, and the honest third answer}
+
+Every number here is an estimate from a finite experiment, so each needs an interval around it
+rather than a bare point. The tool is the \textbf{bootstrap}: rather than assume a formula for
+how much a measurement would wobble if the experiment were repeated, you simulate the
+repetition by resampling your own data many times and watching how much the answer moves
+(\href{https://doi.org/10.1214/aos/1176344552}{Efron, 1979, \emph{Annals of Statistics}} ---
+the original; its appeal is that it replaces a distributional assumption with computation).
+
+The detail that matters is \emph{what gets resampled}. Ten injected units inside a single run
+are not ten independent experiments --- they share a recording, a noise environment, a random
+seed. Treating them as independent would produce an interval far too narrow and a confidence
+far too high. So this project resamples at the level of \emph{randomization blocks}, and it
+carries $G_0$, $T$, and the final margin through every resample, so that uncertainty in the
+threshold is honestly included rather than treated as if the threshold were known exactly.
+
+Which produces three possible verdicts, not two:
+
+\begin{itemize}
+\item \textbf{Bounded positive} --- the interaction is confidently larger than the margin.
+Realism changes the comparison between sorters.
+\item \textbf{Bounded negative} --- the interaction is confidently smaller than the margin.
+Realism does not change the comparison, within the tested boundaries. \emph{This is a success,
+published on the same terms as a positive.}
+\item \textbf{Inconclusive} --- the interval is too wide to say which. The honest report is
+``not resolved at this precision,'' with the achieved bound stated.
+\end{itemize}
+
+The third one deserves emphasis, because it is where a project like this is most likely to
+mislead people without meaning to. A wide interval that happens to be centred near zero
+\emph{looks} like ``realism does not matter.'' It is not. It is ``we could not tell.'' The
+Claim Sheet states in advance that a null with a wide interval will never be reported as
+evidence that realism does not matter --- a commitment made now precisely because it would be
+much harder to honour later, when a tidy conclusion is within reach and the compute budget is
+spent.
+
+\subsection{The negative control}
+
+One more guard, and it answers a question a sceptical reader would ask immediately: how much
+apparent interaction would this design produce \emph{if nothing were manipulated at all}?
+
+The answer is measured rather than argued. Pairs of arms are generated under the \emph{same}
+nominal condition --- same settings, different random draws of which templates were selected,
+which spike times were rolled, where things landed --- and put through the identical
+comparison. Any interaction they show is pure noise from selection and seeds, because no
+realism property differed between them. That spread becomes a reference band drawn behind the
+real result.
+
+Its role is precise, and reviewing the Claim Sheet tightened it. The band is a
+\emph{diagnostic} --- it shows whether the machinery can manufacture an effect of the observed
+size out of nothing --- and it is emphatically not a second significance test. The decision is
+made by the interval and the pre-declared margin. A shaded band that quietly becomes a truth
+threshold is a way of testing the same data twice, and the contract now says so explicitly.
+
+These pseudo-arms have a cost that is easy to overlook: they must be \emph{sorted}, not merely
+generated, which doubles the sorter time the primary run needs. That is now written into the
+compute budget rather than discovered mid-experiment.
+
+\section{How It All Fits Together}
+
+\subsection{The pipeline as a system}
+
+Read end to end, the machine has six stages, each handing something specific to the next.
+
+\textbf{A real recording} enters, supplying genuine noise, genuine drift, and genuinely
+firing neurons. \textbf{Donor templates} are selected from the library --- region-matched or
+region-unaware, balanced on every nuisance property. \textbf{Spike times} are generated ---
+Poisson for the control, population-coupled or bursty for the realism arms. \textbf{Injection}
+sums scaled templates into the trace, producing a hybrid recording with a known answer key.
+\textbf{Sorters} run on it, blind to which arm they are in, on pinned default parameters that
+are never tuned per condition --- because tuning on a condition leaks the condition into the
+result. \textbf{Comparison} scores the output against the answer key, and the scores flow into
+the paired differences, the interaction, and the bootstrap interval.
+
+Two of those stages are gates rather than steps. The manipulation check sits between generation
+and sorting, and can stop everything. The covariate balance check sits inside donor selection
+and can reject a host recording entirely.
+
+\subsection{Where the leverage is}
+
+If you want to know which choices actually determine the outcome, they are these.
+
+\textbf{The sorter panel.} Kilosort4 plus at least one mechanistically \emph{different} CPU
+sorter. Comparing two versions of Kilosort would share a family and a drift-correction lineage
+--- the pairing least likely to show a difference, which would make a null result look
+designed-for. Since collision handling is where families diverge, the panel has to span
+families for the temporal tiers to have anything to reveal.
+
+\textbf{The host recording and where on the probe the injections go.} A probe passes through
+several brain areas, so the project cannot label a whole recording with one region; it pins an
+anatomical injection zone and matches donors to the local label there. This session added a
+consequence that had been left implicit: the same host should be used across all three tiers,
+because the project compares tiers to each other, and a host that changes between tiers turns
+every cross-tier statement into a comparison across recordings as well as across axes.
+
+\textbf{Compute, which is the binding constraint.} The machine is shared with other Dandelion
+projects that are not coordinated with this one. Free memory is a measurement that changes
+underneath the work rather than a budget allocated to it --- at two separate moments during
+early sessions the machine had under 4.5 GiB free, against a known-good Kilosort4 run that
+peaked at 29.3 GiB. Started at either moment, that run would have failed slowly and
+confusingly. Hence the rule that every heavy step measures free memory immediately beforehand
+and does not start what does not fit.
+
+\subsection{The load-bearing assumptions}
+
+These are the places where the project could be wrong in ways that would matter, listed so
+you can hold it to them.
+
+\textbf{That the manipulation check can actually be passed.} Everything downstream assumes
+that bursting and population coupling can be implemented at genuinely biological magnitudes.
+If they cannot, the project reports a generator failure --- which is a real finding, but not
+the one it set out for.
+
+\textbf{That the biological numbers transfer.} Tier C's burst parameters come from
+hippocampal CA1 pyramidal cells. They are not generic brain-wide biology. Using them elsewhere
+without fresh evidence would make Tier C a synthetic stress test rather than a
+biological-realism test, and the contract requires it to be labelled as such if that happens.
+This constraint is what makes CA1 the leading candidate host zone --- it is the one place where
+Tier C's biological prior and Tier A's donor-availability requirement currently overlap.
+
+\textbf{That one host does not generalise.} A result from one recording, one injection zone,
+one probe type is a result about that configuration. Widening is a rung on the ladder, and
+absent it the claim carries the boundary explicitly.
+
+\textbf{That Tier B cannot fully attribute its own result.} Kilosort4's own benchmark already
+uses population-rate coupling. Adding it to the SpikeInterface pipeline therefore moves the
+test data toward Kilosort4's home turf. If Kilosort4 gains under Tier B, ``more robust to
+realistic firing'' and ``developed against data that already had this property'' cannot be
+separated by this design. That is declared in advance as inconclusive-on-attribution rather
+than discovered afterwards and argued about.
+
+\subsection{What to watch for as Phase 2 runs}
+
+Four things will tell you whether the project is on its rails.
+
+Does the \textbf{manipulation check} pass, and at what magnitude? A weak pass is not a pass ---
+it bounds every conclusion that follows.
+
+Does the \textbf{pilot} admit a second and third sorter within its declared budget? If only two
+fit, the panel narrows and the project has pre-committed to reporting that as a limitation
+rather than quietly proceeding.
+
+Is the \textbf{interval} narrow enough to decide anything? This is where the compute constraint
+becomes a scientific constraint, and where ``inconclusive'' is a live and honourable outcome.
+
+Does the \textbf{negative control band} stay small? If shuffling seeds produces interactions as
+large as the realism manipulation does, the design cannot resolve the question at this scale,
+and the honest move is more replication rather than a conclusion.
+
+\subsection{Reading the Claim Sheet from here}
+
+You now have what the contract assumes. Its fifteen slots run from what the project works with
+through to how it could be wrong. If you read only part of it, read Slots 11, 12, and 13 --- the
+pre-declared shapes of success, failure, and inconclusiveness. Everything in Sections 4.3 and
+4.4 above is the vocabulary those three slots are written in, and they are the reason the rest
+of the document had to be written before the work started rather than after it.
+
+One closing note on posture. Almost every safeguard described here --- the gate before sorting,
+the negative control, the thresholds fixed in advance, the refusal to conclude on the cheapest
+axis, the commitment to call a wide interval inconclusive --- exists to make it harder for this
+project to produce a tidy answer. That is deliberate. The question is only worth asking if the
+answer can be trusted afterwards, and the ways a study like this goes wrong are mostly ways it
+goes wrong \emph{convincingly}.
+
+\end{document}

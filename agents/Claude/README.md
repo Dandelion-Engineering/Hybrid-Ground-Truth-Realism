@@ -14,7 +14,8 @@ agents/Claude/
 ├─ references.md                          Running source ledger. Living document.
 ├─ Session Summaries/                     One human-readable report per session.
 │  ├─ HumanReport1.md
-│  └─ HumanReport2.md
+│  ├─ HumanReport2.md
+│  └─ HumanReport3.md
 └─ Progress Reports/                      Director-facing reports, every 8th session
    └─ Progress Report Phase 0 Close.md    and at phase transitions.
 ```
@@ -51,22 +52,24 @@ There is no scratch area in this workspace yet. If one becomes necessary, it wil
 
 ## Files I own or co-own outside this folder
 
-The Phase 1 division of labor has not been decided yet, so this reflects the framework's default writer convention plus what I have actually created.
+**The Phase 1 division of labor is agreed by both agents as of Session 3** (proposed by me in the Claim Sheet review chat, extended and accepted by Codex, explicitly accepted by me). My share: the **Accessible Claim Sheet**, **Study Guide Pass 1**, and **Tier A host/injection-zone selection**. Codex's share: the **Rung 0 feasibility pilot**, the **sorter-panel decision**, the **inference and negative-control harness**, and **Tier A's balance/manipulation gate** — the last one deliberately, so the agent choosing the templates is not the agent grading whether the choice was balanced. Tiers B and C are assigned after Rung 0, and for each one the manipulation check is owned by whoever did *not* write that tier's generator.
 
 | Path | My relationship to it |
 |---|---|
-| `Claim Sheet.md` | **Written by me (Session 2), in review with Codex.** I am the default writer; Codex is the required reviewer and gives final approval. Not yet an agreed state — see the review chat. |
+| `Claim Sheet.md` | **Written by me (Session 2), reviewed and edited by Codex (Session 2), re-reviewed and further edited by me (Session 3).** I am the default writer; Codex is the required reviewer and gives final approval. **Still not an agreed state** — my Session 3 edits sit on top of the state Codex approved and need its approval or pushback. See the review chat. |
 | `README.md` (repository root — the Live-Run README) | **Created and currently maintained by me.** Ownership is open to the Phase 1 labor split. Built per `Playbooks/live-run-readme.md`. |
 | `CITATION.cff`, `LICENSING.md` | Updated by me in Session 1 to describe this project rather than the framework template. Shared. |
 | `Reproducibility Packet/scripts/audit_template_library.py` | Written by me (Session 2). The packet is **co-owned** with Codex; this script is mine and is packet-ready as written. |
 | `chats/Claude-Codex/Phase 0 Literature Comparison/` | Opened by me. **Concluded** — see its `Summary.md`. |
 | `chats/Claude-Codex/Claim Sheet Review/` | Opened by me. Active. Shared channel — append only, never rewrite. |
-| `Accessible Claim Sheet.md` (not yet created) | **Default writer**, Codex reviews. Deliberately deferred until the Claim Sheet converges, so the two do not drift apart while one is being edited. |
+| `chats/Claude-Codex/Study Guide Pass 1 Review/` | Opened by me (Session 3). Active. Pass 1 handed off for Codex's required review. |
+| `Study Guide/Pass 1 - Conceptual Foundation.tex` | **Written by me (Session 3), in review with Codex.** Mine under the agreed labor split. Builds clean at 13 pages, zero overfull boxes. Not complete until Codex explicitly approves. |
+| `Accessible Claim Sheet.md` (not yet created) | **Mine under the agreed labor split.** Codex reviews. Deliberately deferred until the Claim Sheet converges, so the two do not drift apart while one is being edited. **First thing I write once the sheet converges.** |
 | `Technical Report/` (not yet created) | **Default writer**, Codex reviews. |
 | `Accessible Piece/` (not yet created) | **Default writer**, Codex reviews. |
-| `Study Guide/` (not yet created, two passes) | **Default writer**, Codex reviews. |
+| `Study Guide/Pass 2 - Concept Delta.tex` (not yet created) | **Default writer**, Codex reviews. Phase 3, under the no-spoiler rule. |
 | `Reproducibility Packet/` | **Co-owned** with Codex — its contents come out of both agents' execution. Created Session 2, early, per the packet-ready-as-you-go standard. |
-| `director_requests.md` (not yet created) | Shared, append-only. Either agent appends when it hits director-only work. Nothing has needed it yet. |
+| `director_requests.md` | **Created by me (Session 3).** Shared, append-only. Carries one open entry: shared-machine RAM contention, with a fallback, non-blocking. |
 
 ---
 
