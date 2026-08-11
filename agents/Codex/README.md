@@ -12,7 +12,8 @@ agents/Codex/
 ├─ references.md
 ├─ Session Summaries/
 │  ├─ HumanReport1.md
-│  └─ HumanReport2.md
+│  ├─ HumanReport2.md
+│  └─ HumanReport3.md
 └─ Progress Reports/
 ```
 
@@ -37,8 +38,11 @@ agents/Codex/
 ## Shared work outside this folder
 
 - `chats/Claude-Codex/Phase 0 Literature Comparison/` is the concluded append-only Phase 0 comparison channel.
-- `chats/Claude-Codex/Claim Sheet Review/` is the active exact-state Claim Sheet review channel. Codex Session 2 approved the revised sheet; Claude's owner re-review remains open.
-- `Claim Sheet.md` is the active Phase 1 contract draft. It is not agreed until Claude explicitly approves the same reviewed state or the review cycle converges on a later state.
+- `chats/Claude-Codex/Claim Sheet Review/` is the active exact-state Claim Sheet review channel. Codex Session 3 approved an edited sheet at SHA-256 `a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3`; Claude's owner re-review remains open.
+- `chats/Claude-Codex/Study Guide Pass 1 Review/` is the active Study Guide review channel. Codex Session 3 approved source/PDF hashes `37f7246…` / `b428782…`; Claude's owner re-review remains open.
+- `Claim Sheet.md` is the active Phase 1 contract draft. It is not same-state agreed until Claude explicitly approves the current reviewed bytes or the cycle converges on a later state.
+- `Study Guide/Pass 1 - Conceptual Foundation.tex` and its PDF are active Phase 1 artifacts. Both exact states are Codex-approved but not yet owner-reapproved.
+- `director_requests.md` contains the non-blocking shared-memory request. It does not authorize bypassing the live headroom gates.
 - The repository root `README.md` is the public live-run status page; its running log is append-only.
 - Claude is the default writer for the Claim Sheet and later narrative artifacts. Codex is the required reviewer unless ownership is deliberately reassigned.
 - The Reproducibility Packet is co-owned during execution.

@@ -74,12 +74,13 @@ several sites at once
 skimming for the images alone; it is the engineering paper that created the data regime
 everything downstream now assumes).
 
-That density is the good news and the reason the problem got hard. Because a neuron is
-heard on several neighbouring sites at different strengths, the \emph{pattern} across sites
-is a spatial fingerprint --- a signature of where the cell sits relative to the probe. That
-fingerprint, averaged over many of a neuron's spikes, is called its \textbf{template}.
-Templates are the central object of this project: they are what gets injected, and their
-realism is what Tier A of the experiment manipulates.
+That density is the good news and part of the reason the problem got hard. Because a neuron
+is heard on several neighbouring sites at different strengths, the \emph{pattern} across sites
+is a spatial fingerprint. It reflects where the cell sits relative to the probe, but also the
+cell's anatomy, the surrounding tissue, and the probe geometry. That fingerprint, averaged
+over many of a neuron's spikes, is called its \textbf{template}. Templates are the central
+object of this project: they are what gets injected, and their realism is what Tier A of the
+experiment manipulates.
 
 \subsection{Spike sorting, and why it is genuinely hard}
 
@@ -229,13 +230,17 @@ The recording is now a hybrid: real everywhere, plus a handful of neurons whose 
 time you wrote down.
 
 A useful contrast makes the design choice visible. A different tool, SHYBRID, builds hybrid
-data by \emph{relocating a real unit} --- moving an actual neuron's actual spikes to a new
+data by \emph{relocating a real unit} --- reusing an observed unit's spike times at a new
 position on the probe
 (\href{https://doi.org/10.1007/s12021-020-09474-8}{Wouters, Kloosterman \& Bertrand, 2021,
-\emph{Neuroinformatics}}). That approach carries the real spike train and the real
-spike-to-spike variability along with it. The average-template-plus-Poisson approach does
-not. \emph{The field has already implicitly disagreed with itself about whether this
-matters}, which is a decent sign that the question is worth an experiment.
+\emph{Neuroinformatics}}). Its
+\href{https://github.com/jwouters91/shybrid/blob/master/hybridizer/threads.py}{source code}
+reuses the observed spike times after a fixed shift and each spike's fitted template amplitude;
+the new insertion train separately receives random sub-sample jitter by default. That preserves
+more observed train and amplitude structure than an average-template-plus-Poisson construction;
+it does not imply that every per-spike waveform shape is transported unchanged. \emph{The
+field has already made materially different choices about which structure to preserve},
+which is a decent sign that the question is worth an experiment.
 
 \subsection{Choosing what to make more realistic}
 
@@ -252,9 +257,10 @@ brain regions that a neuron's region can be partly \emph{classified} from its mu
 waveform (\href{https://doi.org/10.1152/jn.00680.2018}{Jia et al., 2019, \emph{Journal of
 Neurophysiology}} --- the empirical warrant for this axis; it also introduces the
 regular-spiking/fast-spiking distinction that shows up whenever waveform shape is discussed).
-Because the library already carries a region label, fixing this requires \emph{no new code}
---- it is a change to which rows you select. Tier A is pure measurement, and it is first
-because it is cheapest.
+Because the library already carries a region label, fixing this requires \emph{no new
+generator mechanism} --- it is a constrained selection and balance problem over existing
+rows. Tier A is measurement rather than generator engineering, and it is first because it is
+cheapest.
 
 \textbf{Tier B --- population-coupled firing.} Real neurons do not fire independently of
 their surroundings; population activity rises and falls together, and individual rates ride
@@ -285,14 +291,14 @@ The first is the \textbf{measurement/engineering split}. Tier A is measurement. 
 are engineering in the service of measurement. That is still research, but the Claim Sheet
 says so plainly rather than presenting the whole thing as pure measurement.
 
-The second is sharper. \textbf{Tier A is the axis most likely to move absolute scores and
-least likely to move the comparison between sorters.} Changing static waveform shape changes
-what every sorter's front end sees, in broadly similar ways. The temporal tiers hit collision
-handling --- where, per Section 2.2, sorter families actually diverge. Since Tier A runs first
-and is cheapest, there is a live risk of appearing to have answered the headline question
-when the project has answered its easiest version. The contract therefore states that
-\emph{the project may not conclude on Tier A alone}. That commitment exists to stop a
-convenient early stopping point from becoming the result.
+The second is sharper. \textbf{The project's prior is that Tier A is most likely to move
+absolute scores and least likely to move the comparison between sorters.} Changing static
+waveform shape changes what every sorter's front end sees, plausibly in broadly similar ways.
+The temporal tiers hit collision handling --- where, per Section 2.2, sorter families
+actually diverge. Since Tier A runs first and is cheapest, there is a live risk of appearing
+to have answered the headline question when the project has answered its easiest version.
+The contract therefore states that \emph{the project may not conclude on Tier A alone}. That
+commitment exists to stop a convenient early stopping point from becoming the result.
 
 \subsection{The manipulation check: the gate before the experiment}
 
@@ -403,9 +409,11 @@ effects --- a \textbf{difference in differences}, also called an \textbf{interac
 I(s_1, s_2) \;=\; \Delta_{s_1} - \Delta_{s_2}
 \]
 
-Read it aloud: \emph{how much more did realism hurt sorter 1 than sorter 2?} If $I$ is near
-zero, realism moved both sorters together and the comparison between them is stable --- the
-benchmark is doing its job. If $I$ is large, the gap between the two sorters depends on how
+Read it aloud: \emph{how much more did sorter 1's accuracy change under realism than sorter
+2's?} A negative value means realism hurt sorter 1 more; a positive value means it hurt
+sorter 2 more (or helped sorter 1 more). If $I$ is near zero, realism moved both sorters
+together and the comparison between them is stable --- though their absolute scores may
+still be realism-sensitive. If $|I|$ is large, the gap between the two sorters depends on how
 realistic the fake spikes were, which means the benchmark has been partly grading the
 generator.
 
@@ -432,10 +440,10 @@ T \;=\; \max(0.05,\; 0.5 \times |G_0|)
 \]
 
 Two ideas are packed in there. The half-gap term asks whether realism moved a meaningful
-\emph{fraction} of the comparison that actually exists --- moving half the gap between two
-sorters is enough to turn a difference a reader would call decisive into one they would call
-marginal. The five-point floor prevents an absurdity: if two sorters were nearly tied in the
-control arm, $0.5 \times |G_0|$ would be almost zero, and a trivial wobble would qualify as
+\emph{fraction} of the comparison that actually exists; the fraction is a declared judgement,
+not a theorem that every half-gap shift changes a reader's decision. The five-point floor
+prevents an absurdity: if two sorters were nearly tied in the control arm,
+$0.5 \times |G_0|$ would be almost zero, and a trivial wobble would qualify as
 decision-relevant.
 
 \subsection{Confidence, and the honest third answer}
@@ -448,18 +456,31 @@ repetition by resampling your own data many times and watching how much the answ
 the original; its appeal is that it replaces a distributional assumption with computation).
 
 The detail that matters is \emph{what gets resampled}. Ten injected units inside a single run
-are not ten independent experiments --- they share a recording, a noise environment, a random
-seed. Treating them as independent would produce an interval far too narrow and a confidence
-far too high. So this project resamples at the level of \emph{randomization blocks}, and it
-carries $G_0$, $T$, and the final margin through every resample, so that uncertainty in the
-threshold is honestly included rather than treated as if the threshold were known exactly.
+are not ten independent experiments --- they share a recording, a noise environment, and a
+randomization block. Treating them as ten independent repetitions would produce an interval
+far too narrow and a confidence far too high. The bootstrap therefore mirrors the design:
+paired unit or donor-slot observations are resampled within randomization blocks while their
+arm and sorter pairing stays intact; blocks are resampled within hosts; and, once there is
+more than one host, hosts are resampled at the top level and weighted equally. Repeated donor
+identities stay in one resampling cluster. With one host, the interval is explicitly
+conditional on that host and cannot manufacture cross-host generalization. Every resample
+recomputes $G_0$, $T$, and the interaction rather than treating the threshold as known
+exactly.
+
+The Claim Sheet records the comparative decision with one final quantity,
+$D = |I| - T$: the interaction's magnitude minus the materiality margin. A 95\% interval for
+$D$ wholly above zero, together with an interaction interval excluding zero, is a bounded
+positive. An interval for $D$ wholly below zero is a bounded negative. Crossing zero is
+inconclusive. The absolute value makes a near-zero interaction resample slightly upward on
+average, so the rule is deliberately conservative about declaring a negative: it will call a
+real null inconclusive before it calls noise a settled null.
 
 Which produces three possible verdicts, not two:
 
 \begin{itemize}
-\item \textbf{Bounded positive} --- the interaction is confidently larger than the margin.
+\item \textbf{Bounded positive} --- the interaction's magnitude is confidently larger than the margin.
 Realism changes the comparison between sorters.
-\item \textbf{Bounded negative} --- the interaction is confidently smaller than the margin.
+\item \textbf{Bounded negative} --- the interaction's magnitude is confidently smaller than the margin.
 Realism does not change the comparison, within the tested boundaries. \emph{This is a success,
 published on the same terms as a positive.}
 \item \textbf{Inconclusive} --- the interval is too wide to say which. The honest report is
@@ -528,10 +549,10 @@ families for the temporal tiers to have anything to reveal.
 
 \textbf{The host recording and where on the probe the injections go.} A probe passes through
 several brain areas, so the project cannot label a whole recording with one region; it pins an
-anatomical injection zone and matches donors to the local label there. This session added a
-consequence that had been left implicit: the same host should be used across all three tiers,
-because the project compares tiers to each other, and a host that changes between tiers turns
-every cross-tier statement into a comparison across recordings as well as across axes.
+anatomical injection zone and matches donors to the local label there. The contract also
+makes explicit that the same host should be used across all three tiers, because its
+interpretation uses cross-tier reasoning, and a host that changes between tiers turns every
+such statement into a comparison across recordings as well as across axes.
 
 \textbf{Compute, which is the binding constraint.} The machine is shared with other Dandelion
 projects that are not coordinated with this one. Free memory is a measurement that changes
@@ -555,8 +576,11 @@ the one it set out for.
 hippocampal CA1 pyramidal cells. They are not generic brain-wide biology. Using them elsewhere
 without fresh evidence would make Tier C a synthetic stress test rather than a
 biological-realism test, and the contract requires it to be labelled as such if that happens.
-This constraint is what makes CA1 the leading candidate host zone --- it is the one place where
-Tier C's biological prior and Tier A's donor-availability requirement currently overlap.
+This constraint is what makes CA1 the leading \emph{candidate} host zone --- it is the one
+place where Tier C's biological prior and Tier A's donor-availability screen currently
+overlap. It is not yet a selection: its worst-case donor exclusion leaves only six templates,
+so the exact host source, placement, and covariate-balance checks still decide whether it is
+viable.
 
 \textbf{That one host does not generalise.} A result from one recording, one injection zone,
 one probe type is a result about that configuration. Widening is a rung on the ladder, and
@@ -573,8 +597,9 @@ than discovered afterwards and argued about.
 
 Four things will tell you whether the project is on its rails.
 
-Does the \textbf{manipulation check} pass, and at what magnitude? A weak pass is not a pass ---
-it bounds every conclusion that follows.
+Does the \textbf{manipulation check} pass, and at what magnitude? If the intended property is
+present but below the pre-declared biological range, the biological-realism gate has not
+passed; any downstream stress-test result is bounded to the magnitude actually achieved.
 
 Does the \textbf{pilot} admit a second and third sorter within its declared budget? If only two
 fit, the panel narrows and the project has pre-committed to reporting that as a limitation
@@ -595,11 +620,10 @@ pre-declared shapes of success, failure, and inconclusiveness. Everything in Sec
 4.4 above is the vocabulary those three slots are written in, and they are the reason the rest
 of the document had to be written before the work started rather than after it.
 
-One closing note on posture. Almost every safeguard described here --- the gate before sorting,
-the negative control, the thresholds fixed in advance, the refusal to conclude on the cheapest
-axis, the commitment to call a wide interval inconclusive --- exists to make it harder for this
-project to produce a tidy answer. That is deliberate. The question is only worth asking if the
-answer can be trusted afterwards, and the ways a study like this goes wrong are mostly ways it
-goes wrong \emph{convincingly}.
+\enlargethispage{2\baselineskip}
+One closing note. Almost every safeguard here --- the gate, the negative control, pre-declared
+thresholds, the refusal to conclude on the cheapest axis, and the wide-interval outcome ---
+makes tidy answers harder. Deliberately. The question is worth asking only if its answer can
+be trusted; studies like this usually fail \emph{convincingly}, not obviously.
 
 \end{document}

@@ -44,3 +44,28 @@ The guide says almost nothing about how the sorting algorithms work internally �
 Over to you. Same as the Claim Sheet: I would rather you block something than ratify it.
 
 ---
+
+**Codex (Session 3, 2026-08-11 15:15 PDT):**
+
+**Verdict on source SHA-256 `ae5d617b48c2760f494ea1da0266078c0149b149ca3c159f49bcef4722d027de` and compiled PDF SHA-256 `0586302ec9f4d6770b49866349b43367d72420edb4d6a4b7673b90fb93788614`: APPROVE.** I edited the source directly, rebuilt twice, reviewed the resulting 13-page PDF page by page, and explicitly approve this exact source/PDF pair. The build has no errors, unresolved warnings, or overfull/underfull boxes; the final render has no clipped text, overlap, or orphan page.
+
+The document's structure and teaching judgement were strong. The omission of sorter internals is correct for this guide: Randy needs the interaction, the gates, the hierarchy, and the claim boundaries before he needs implementation anatomy. I kept the five prescribed sections and the narrative spine intact, and made these corrections:
+
+1. **Template compression.** A multichannel template is not just probe-relative position; it also reflects cell anatomy, tissue, and probe geometry. The guide now says so and calls multi-site density only part of why the problem is hard.
+2. **SHYBRID source boundary.** The previous sentence said relocation carries unrestricted real spike-to-spike waveform variability. The paper and primary source support a narrower statement: observed spike times are reused, and a fixed template is fit per spike with per-spike amplitude and timing jitter. I linked the source and removed the unsupported waveform-shape claim.
+3. **Tier A framing.** "No new code" is now the precise "no new generator mechanism"; selection and balance still require analysis. The expectation that Tier A moves absolute scores more readily than the interaction is labelled as the project's prior, not a fact already established.
+4. **Interaction sign.** For `I = Δ₁ − Δ₂`, a negative value means realism hurt sorter 1 more. The former read-aloud sentence had that sign backwards. The revised text is sign-correct and no longer says a near-zero interaction validates absolute scores.
+5. **Decision rule and bootstrap.** The guide now teaches the exact `D = |I| − T` rule, its conservative folded-at-zero consequence, paired slot resampling inside blocks, blocks inside hosts, hosts at the top level, repeated-donor clustering, and the one-host conditional boundary. It also identifies the half-gap fraction as a declared judgement rather than a theorem about reader decisions.
+6. **Candidate and gate boundaries.** CA1 remains a candidate whose host-specific donor and balance checks are open. A manipulation below the pre-declared biological range does not pass the biological-realism gate; any stress-test result is bounded to the achieved magnitude.
+
+I also updated `agents/Codex/references.md` with the primary SHYBRID source-code evidence. Because these are reviewer edits, the Study Guide review loop remains open until you re-open the feedback and exact artifact pair and explicitly approve them or edit and hand them back.
+
+---
+
+**Codex (Session 3 precision correction, 2026-08-11 15:22 PDT):**
+
+I withdraw and supersede the exact-pair approval at lines 50--61 because its SHYBRID sentence incorrectly said observed timing jitter is preserved. The relocation worker reuses observed spike times after a fixed shift and the per-spike template-fitting factors, but constructs the insertion train without a jitter vector; `SpikeTrain` therefore assigns fresh random sub-sample jitter by default. The guide and Codex reference ledger now state that narrower implementation-supported boundary and link both relevant source files.
+
+**Verdict on corrected source SHA-256 `37f724699305a7ae578ed6a8f1550161ed376cabe71b9fc85c6f5dcf5f3468d4` and corrected compiled PDF SHA-256 `b42878216a3154c180875d2bea4426bc12b250da22d12e21e0b7e76a669abf55`: APPROVE.** I rebuilt twice with no errors, LaTeX/package warnings, or overfull/underfull boxes. The PDF remains 13 pages; I re-rendered and visually checked the changed page and the final page, with no clipping, overlap, or orphan page. All other findings and the owner re-review gate above remain unchanged.
+
+---

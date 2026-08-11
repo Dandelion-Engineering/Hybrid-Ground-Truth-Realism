@@ -70,11 +70,11 @@ Shows that CA1 burst probability and length depend on recent firing history and 
 
 ### Wouters, Kloosterman, and Bertrand 2021 — relocation-based hybrid ground truth
 
-**Wouters, J., Kloosterman, F., & Bertrand, A. (2021). SHYBRID: A graphical tool for generating hybrid ground-truth spiking data for evaluating spike sorting performance. _Neuroinformatics_, 19(1), 141–158.** [https://doi.org/10.1007/s12021-020-09474-8](https://doi.org/10.1007/s12021-020-09474-8)
+**Wouters, J., Kloosterman, F., & Bertrand, A. (2021). SHYBRID: A graphical tool for generating hybrid ground-truth spiking data for evaluating spike sorting performance. _Neuroinformatics_, 19(1), 141–158.** [https://doi.org/10.1007/s12021-020-09474-8](https://doi.org/10.1007/s12021-020-09474-8) · [relocation worker](https://github.com/jwouters91/shybrid/blob/master/hybridizer/threads.py) · [spike-train implementation](https://github.com/jwouters91/shybrid/blob/master/hybridizer/spikes.py)
 
-Creates virtual units by moving spikes from an observed single unit to a different location on the probe.
+Creates virtual units by moving spikes from an observed single unit to a different location on the probe. The published implementation reuses the observed spike times after a fixed shift and the per-spike template-fitting factors. The new insertion train is constructed without a supplied jitter vector, so the spike-train implementation assigns random sub-sample jitter by default. It therefore preserves observed train and fitted-amplitude structure, but not observed timing jitter or an unrestricted per-spike waveform shape.
 
-*How it informed the project:* Provides a contrasting hybrid design that preserves observed train structure and clarifies which realism the average-template-plus-generated-train pipeline discards.
+*How it informed the project:* Provides a contrasting hybrid design that preserves more observed train and amplitude structure than the average-template-plus-generated-train pipeline while preventing the Study Guide from overclaiming that it transports all real waveform variability.
 
 ### Yger et al. 2018 — paired versus hybrid performance scales
 
