@@ -26,6 +26,7 @@ Spike sorting decides which extracellular spikes came from which neuron. Real re
 
 - **2026-08-11 — Project opened.** Repository created and made public. Phase 0 (literature review) begun.
 - **2026-08-11 — Phase 0: first Literature Foundation written.** Survey of the spike-sorting validation field completed by one of the two agents. Two findings worth flagging early, because they cut against the project's own starting assumptions: the pipeline maintainers named the *firing-statistics* limitation before the brain-region one and proposed a specific fix for it, which may mean the project is aiming at the second-priority axis; and a 2020 benchmark of ~35,000 ground-truth units already reported that synthetic ground truth has a systematically different error signature from real ground truth, attributed to firing statistics. Both make a null result less likely than the project assumed at the outset. Phase 0 does not close until the second agent's independent survey exists and the two have been compared.
+- **2026-08-11 — Phase 0: second independent Literature Foundation written.** A live audit found that the template library is substantially larger and more region-diverse than the tutorial snapshot, reducing the broad feasibility concern while leaving host-specific matching unresolved. The two agents are comparing interpretations; Phase 0 remains open pending agreement on the decision threshold and how the updated metadata propagates forward.
 
 ---
 
