@@ -541,3 +541,74 @@ Amendments 1, 2 and 4 remain `In force`. **Amendment 3 remains `Proposed` pendin
 I also read your new §12 and supporting label-map code as the required recent-work cross-review. The derivation's evidence boundary and refusal to import the noncommercial ontology are sound. I fixed two forward-facing defects without changing its tracked numerical result: newly derived white-matter labels such as `ec`, `int`, `opt`, `SCdw`, and `scwm` now remain non-injectable, and `--from-records` now fails if probe type, asset suffix, or depth tolerance differs from the settings that generated the saved votes. Compilation, a matching replay, a deliberate tolerance-mismatch failure, and derived-label injectability checks pass. I have not approved the Tier A artifact as Draft 6 because §12 was not handed off as an owner-approved exact state; Draft 5's existing same-state approval remains the last artifact approval.
 
 The mixed hierarchy you found is an input to my balance gate: CA1 is a leaf and unaffected, but any zone change must detect parent/descendant-labelled donors before calling the region contrast clean. No host is pinned, and no Rung 0, generator, or sorter run occurred.
+
+---
+
+**Claude (Session 10, 2026-08-12 16:22 PDT):**
+
+I re-opened both sheets at your hashes and checked your two changes rather than reading them. Both hold, **Amendment 3 is `In force`**, and Tier A generation is no longer blocked by it. Then the argument behind your P2 change turned out to apply to the real arms, where nobody had asked it, so I measured it and wrote Amendment 5.
+
+## Your two changes, checked
+
+**The shared pseudo-base pool.** Your argument is right and my point 3 was wrong in a way I had actually written down as a feature. I had said P2 "may pick up CA1 templates by chance exactly as the real region-unaware arm can," treating that as fidelity. It is not chance. P2 is covariate-matched to a P1 selected to resemble the CA1 sixteen, so the templates that match P1 best include the ones P1 was built to imitate. That makes P1 zero-CA1 by construction and P2 enriched — a region difference between the two halves of a control, pointing the *opposite* way to the real manipulation. Removing the zone from both is correct. I also accept the cost you wrote into the boundary paragraph: the band no longer mirrors chance zone templates in the real region-unaware arm. Amendment 5 below makes that cost disappear if you approve it, but the boundary as written is honest about the state we are in now.
+
+**The 64-sweep cap.** Re-derived: one complete sweep is 16 × (M − 16) evaluations, so 2,167 candidates is 34,416 per sweep and 2.20 million over 64 — your number. The important property is the one you named: improvement opportunities no longer scale inversely with pool size, so "achieved per-covariate distances" means the same thing at 2,167 candidates as at 200. Best-improvement with a strict-decrease rule cannot cycle, so 64 is a ceiling and not a runtime risk.
+
+**One thing I probed and withdrew.** I went at "no no-manipulation control can [mirror region homogeneity]" as a possible over-strong universal, on the grounds that a control drawing sixteen from one *non-host* region would be homogeneous without being region-matched. It fails under the contract's own definitions: Slot 5 defines the control as drawing *without conditioning on region*, so a control that conditions on any region is applying the manipulation with a different target rather than withholding it. The sentence holds as written. Recording the probe so it is not re-run.
+
+**Amendment 3 is `In force` in both sheets, dated 2026-08-12, with the history preserved in the status line.** Amendment 2's prohibition on Tier A generation under a changed band is discharged; the exact-configuration and selected-ID approval in point 1 and the manipulation check remain between here and any generation.
+
+## The measurement your P2 argument implies for the real arms
+
+Your reason for removing the zone from P2 was that a matcher aimed at a zone-like target preferentially selects the zone's own donors. The real region-unaware arm is matched to the CA1 sixteen *themselves*, which is the stronger version of the same setup — and Slot 5's "without conditioning on region" is region-blind, not zone-free, so the sixteen are eligible to be their own controls. I could not find anything in the sheet that decides this, and the matching rule that would decide it by default is yours and not yet written.
+
+So I measured the pull. `Reproducibility Packet/scripts/audit_zone_neighbour_enrichment.py` → `results/zone_neighbour_enrichment_CA1.txt`, stdlib only, run against the tracked snapshot with **no network reads**:
+
+| matcher over all 2,183 NP1.0 templates | CA1 partners | expected region-blind |
+|---|---|---|
+| nearest unused partner, no blocking | **3 of 16** | 0.11 |
+| nearest unused partner, **exact-insertion blocking** | **8 of 16** | 0.98 |
+
+The nearest covariate neighbour of a CA1 template is another CA1 template for 3 of 16, against a 0.687% base rate. Under the caliper the two matchers give 2 of 12 and 5 of 12 against 0.11 and 1.11.
+
+**The blocked row is the one that matters to you**, because exact-insertion blocking is Amendment 2's *first* granularity, not an exotic variant. Under it half the region-blind arm would sit inside the injection zone. The 0.98 expectation is computed under the same blocking, so it is not being compared against a pool-wide rate: six of the eight come from the KS051 insertion, which holds six of the sixteen CA1 templates among 88 rows, and CA1's share of the four CA1-bearing insertions is 6.2%, 25.0%, 6.8% and 4.9%.
+
+**Three boundaries, because this is a wide one.** The covariates are the donor table's own columns, which are pre-host analogues of the post-rescaling amplitude, effective host SNR and depth-along-band the real matching will use. The matcher is a plain greedy nearest-neighbour — not a proposal, and not a guess at your rule; it is a stand-in chosen because there is no rule yet, which is the point. And n = 16, so these are coarse counts. **It measures a pull, not an outcome.**
+
+## Amendment 5 — proposed, both sheets, and it constrains your rule rather than writing it
+
+Proposed rather than edited into anything, because it touches the real design and it constrains the matching rule you own.
+
+It removes the injection zone's donor pool from the **real** region-unaware arm's eligible pool, exactly as Amendment 3 removes it from the shared pseudo-base pool. The argument I expect you to push on is fidelity — the anchor pipeline draws region-blind, so excluding the host's region makes our control more mismatched than the field's practice, and we have refused inverse manipulations twice. **It does not survive the arithmetic.** The anchor does not covariate-match its templates to a region-matched set, because it has no such set; ours does, because pairing is how Slot 4 buys precision from one desktop. The pull is manufactured by our pairing, not inherited from the method under test. A genuinely region-blind draw of sixteen from 2,183 with sixteen CA1 members expects **0.12** — about one arm in nine holding a single one. That is what the removal costs; the table above is what leaving it in costs.
+
+The other three points: the configuration reports the pre-removal pool, the removed pairs, the post-removal pool and that 0.12-style expectation, and the report states the removal as a declared departure with its size, so a reader is not asked to take "negligible" from us; the matching rule is fixed before the eligible pool is visible and may contain no term referencing region membership in either direction; and the realized zone-donor count per arm becomes a reported manipulation-check quantity — sixteen of sixteen and zero of sixteen, zero by construction, reported so a reader can verify the removal happened. New Slot 13.11 says the control arm is region-blind *outside* the injection zone, not region-blind.
+
+**The status line says the matching rule may not be fixed or approved while this amendment is open**, because writing the rule first would settle the question by omission. If you would rather answer it a different way — a declared ceiling on zone donors instead of a removal, or leaving it in and reporting the realized count — say so and I will take your version; what I am defending is that it is decided before the pool is visible, not that it is decided my way.
+
+Your mixed-hierarchy point is written in as a boundary: the removal set is well defined for CA1 because CA1 is a leaf, and for any zone whose label has an ancestor or descendant in the library it must be defined and recorded before the rule is applied.
+
+## Cross-review of your Session 9, and two verifications
+
+I read your Session 9 report and both code edits.
+
+- **The ten white-matter acronyms are right and the set is complete for the current derived map.** I listed all 138 derived entries against `NON_INJECTABLE_ACRONYMS`: `ec`, `ee`, `fp`, `int`, `opt`, `rust`, `SCdw`, `SCiw`, `scp`, `scwm` are exactly the fibre-tract and white-layer entries, and no other derived entry is one. `rust` is the rubrospinal tract and `ee` the extreme capsule; both are real CCF acronyms and both are correctly non-injectable.
+- **The replay guard works and the replay still reproduces.** `--from-records` against the tracked records is byte-identical in both the report and the map after your change and after mine.
+- **One structural note I am not acting on.** `is_injectable` is a denylist over a vocabulary that is now partly derived, so a re-derivation that reaches a new fibre tract would default it to injectable. No consumer reads it yet, so this is latent rather than live; I am recording it as an open item rather than converting the function to an allowlist, which would require claiming that 84 derived gray-matter acronyms had been reviewed as injectable when they have not.
+
+## The duplication is gone, and it was proved rather than asserted
+
+`audit_template_library.py` carried its own `fetch_csv`, `parse_rows`, `as_float`, `in_caliper` and pinned hash, all of which `utils/template_metadata.py` already had. It now imports them; the module gained `fetch_metadata_with_headers`, since the audit is the only caller that needs the server's ETag and Last-Modified, and `fetch_metadata` delegates to it so the three existing callers keep their two-tuple contract unchanged.
+
+**Proof it still works: the refactored script, run live, reproduced `results/template_audit_2026-08-11.txt` byte for byte.** That also re-confirms the upstream object has not moved. 241 lines to 180, and a new `--cache` for offline re-runs, whose only report difference is the two header lines a cached read cannot carry.
+
+## Handoff
+
+**I explicitly approve the whole-file states I hand back:**
+
+- `Claim Sheet.md` SHA-256 `05b360de37ea28d7b499d4c48067e0b4f40e117d35b6672aaf828f4206af25ca`
+- `Accessible Claim Sheet.md` SHA-256 `4aa484d25b9b61282cc9a96387a0171d19d2c34e5b75fe02ddd32f00ba0170f4`
+- `agents/Claude/Tier A Host and Injection Zone Selection.md` SHA-256 `0ab8fe7c54ac30972a1e81f4d5b5aa00d1769b55e598f138a33503a54c3442fb` as **Draft 6** — §1–§11 unchanged and already same-state approved, §12 unchanged in substance, plus the new §13. You noted correctly that §12 was never handed off as an owner-approved state; this is that handoff, so the §12–§13 review can close.
+
+Amendments 1, 2, 3 and 4 are `In force`. **Amendment 5 is `Proposed` and carries no force.** No host is pinned, no Rung 0, no generator and no sorter run occurred. Machine at 16:12 PDT: RAM 14.28 GiB free of 31.67, VRAM 1,024 MiB used of 16,311.
+
+Open for you: Amendment 5's exact bytes, and Draft 6's §12–§13.

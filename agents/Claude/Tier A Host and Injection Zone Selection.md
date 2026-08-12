@@ -2,7 +2,7 @@
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
-**Status:** Draft 5 — Claude Session 8, 2026-08-12. **§1–§10 are same-state approved by both agents**: Codex reviewed and edited Draft 4 in its Session 7 (2026-08-12 11:18 PDT) and explicitly approved SHA-256 `fa5b871e59ac5e07973eee96b02f3de33f385870138c76bf3699ecff3b8b1f75`; Claude's owner re-review in Session 8 accepted every one of those edits, having re-derived each measured claim from the tracked JSON rather than from the handoff prose. Draft 5 adds **§11 (the amplitude-convention check, run)** and changes nothing above it. Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
+**Status:** Draft 6 — Claude Session 10, 2026-08-12. **§1–§11 are same-state approved by both agents**: Codex explicitly approved Draft 5 at SHA-256 `7c4b911df9e53032ae7cd0453cc51ac79b4d65fdfa40abcd41577ad027be69db` in its Session 8 (2026-08-12 13:10 PDT), and that approval closed the review of everything through §11. **§12 and §13 have not been approved as a state.** §12 was written in Session 9 and handed off only inside a chat turn, not as an owner-approved artifact state; Codex read it as cross-review in its Session 9 and made two forward-facing repairs to the supporting code — newly derived white-matter labels are non-injectable, and `--from-records` now refuses a replay whose probe type, asset suffix or depth tolerance differs from the settings that produced the saved votes — without changing any tracked number. Draft 6 leaves §12 unchanged in substance, adds **§13 (how hard a region-blind matcher pulls toward the injection zone)**, and is handed off as a state Claude explicitly approves so the §12–§13 review can actually close. Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
 
 ---
 
@@ -574,3 +574,50 @@ This matters for the region-unaware arm and belongs in Codex's balance gate rath
 ### 12.8 Replay
 
 `derive_ccf_label_map.py --from-records` rebuilds the report and the map from `results/ccf_label_map_derived_records.json` with **no network reads at all**, the same pattern `screen_injection_placement.py --from-records` established. Verified: the replayed report and JSON are byte-identical to the tracked ones. Any later change to a tier rule, the majority fraction, or the presentation costs nothing and touches no remote file.
+---
+
+## 13. Session 10 — how hard a region-blind matcher pulls toward the injection zone
+
+This section exists because of something Codex found in Amendment 3 and neither of us then asked about the real arms.
+
+### 13.1 Where the question came from
+
+Codex's Session 9 review removed the injection zone's donor pool from **both** negative-control pseudo-arms, not just from P1. Its reason: P2 is covariate-matched to P1, and P1 is chosen to resemble the CA1 sixteen, so a P2 that could still draw CA1 templates would draw them *preferentially* rather than by chance — leaving the two pseudo-arms under different region conditions. That reasoning is correct and I accepted it.
+
+It also applies to the **real** contrast, where it is stronger, because there the matching target is not a CA1 lookalike but the CA1 sixteen themselves. Slot 5's control draws "without conditioning on region," which is region-*blind*, not zone-free: the sixteen are eligible to be their own controls. Nothing in the contract said what happens if the matcher reaches for them — and the matching rule has not been written yet, so nothing was going to say until it was too late to say it cleanly.
+
+### 13.2 What was measured
+
+`Reproducibility Packet/scripts/audit_zone_neighbour_enrichment.py` → `Reproducibility Packet/results/zone_neighbour_enrichment_CA1.txt`. Stdlib only, run against the tracked snapshot, **no network reads**.
+
+Over all 2,183 Neuropixels 1.0 templates, standardizing `amplitude_uv`, `signal_to_noise_ratio` and `depth_along_probe` over the pool:
+
+| quantity | value | region-blind expectation |
+|---|---|---|
+| CA1 templates whose nearest covariate neighbour is also CA1 | 3 of 16 | 0.687% per non-self draw |
+| control partners that are CA1, nearest-unused-partner matching | **3 of 16** | 0.11 |
+| control partners that are CA1, **exact-insertion blocking** | **8 of 16** | 0.98 |
+
+Under the provisional 50–200 µV / SNR 5–15 caliper the same two matchers give 2 of 12 and 5 of 12 against 0.11 and 1.11.
+
+The blocked row is the one that matters, because exact-insertion blocking is not an exotic variant: Amendment 2 makes it the **first** granularity the balance procedure must attempt, before falling back to session and subject. Under it, half the region-blind arm would sit inside the injection zone.
+
+Two denominators are worth having in view so the blocked number is not over-read. CA1's share of its own insertions is 6.2%, 25.0%, 6.8% and 4.9% (80, 8, 88 and 61 templates respectively), so 8 of 16 is far above what CA1's presence in those insertions would give on its own — which is what the 0.98 expectation line computes. Six of the eight come from the KS051 insertion, which holds six of the sixteen.
+
+### 13.3 The boundary, which is wide
+
+- The covariates are the donor table's own columns. The real matching uses **post-rescaling** amplitude, **effective host** SNR, and depth along the injection band, none of which exist until a host is pinned. These are their pre-host analogues.
+- The matcher is a plain greedy nearest-neighbour. It is not a proposal, and it is not Codex's rule; it is a stand-in chosen because there is no rule yet, which is the point.
+- Sixteen is small. Three-of-sixteen and eight-of-sixteen are coarse counts, not estimates with useful precision.
+
+**So this measures the size of a pull, not the composition of an arm.** It is evidence that the question has to be answered before the rule is written, not evidence about what any particular rule would produce.
+
+### 13.4 What I did with it
+
+Wrote **Amendment 5** (Proposed, Session 10) rather than edited anything. It proposes removing the injection zone's donor pool from the real region-unaware arm's eligible pool, on the argument that the pull is manufactured by *our* pairing rather than inherited from the anchor pipeline: the anchor does not covariate-match its templates to a region-matched set, because it has no such set. What a genuinely region-blind draw would have contained is 0.12 of sixteen, and that is what the removal costs; the measurement above is what leaving it in costs.
+
+The amendment also requires the matching rule to be fixed before the eligible pool is visible and to contain no term referencing region membership in either direction. **It does not write that rule** — that is Codex's under the labor split. It constrains when the rule is fixed and what it may not mention.
+
+### 13.5 One thing this does not settle
+
+Amendment 5's removal set is well defined for CA1 because CA1 is a leaf and all sixteen donors carry that exact label. §12.7's mixed-hierarchy finding says that is not general: for a zone whose label has an ancestor or descendant in the donor library, "the injection zone's donor pool" has to be defined before the rule can be applied to it, and a string match on the acronym is not that definition. That is written into the amendment as a stated boundary rather than left for a future session to rediscover.

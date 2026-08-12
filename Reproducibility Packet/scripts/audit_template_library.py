@@ -27,111 +27,42 @@ or covariate balance between a region-matched and region-unaware control arm.
 Stdlib only, deliberately: this is a 2 MB CSV and a few group-bys, and the
 project should not acquire a dependency to answer it.
 
+Fetching, hashing, parsing and the caliper test live in ``utils.template_metadata``
+and are imported rather than repeated here; this script owns only the group-bys
+and the report. It was written before that module existed and carried its own
+copies until Session 10, when they were removed and the refactored script was
+shown to reproduce the tracked report byte for byte from a live fetch.
+
 Example
 -------
     ./venv/Scripts/python.exe "Reproducibility Packet/scripts/audit_template_library.py" --out "Reproducibility Packet/results/template_audit.txt"
+
+Pass ``--cache`` to re-run the group-bys against a saved snapshot without a
+network request. The ETag and Last-Modified lines are then empty, because only a
+live response carries them.
 """
 
 import argparse
-import csv
-import hashlib
-import io
+import os
 import statistics
 import sys
-import urllib.error
-import urllib.request
 from collections import Counter, defaultdict
 
-DEFAULT_CSV_URL = "https://spikeinterface-template-database.s3.amazonaws.com/templates.csv"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Snapshot observed on 2026-08-11 by both agents independently. A mismatch does
-# not mean the script is wrong; it means the upstream table moved and every
-# downstream selection must be re-derived against the new snapshot.
-KNOWN_SHA256 = "a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d"
-
-
-def fetch_csv(url):
-    """Download the metadata CSV.
-
-    Args:
-        url: HTTP(S) location of the templates metadata CSV.
-
-    Returns:
-        A tuple of (payload_bytes, sha256_hex, response_headers_dict).
-
-    Raises:
-        SystemExit: if the URL cannot be retrieved, with the underlying reason.
-    """
-    print(f"[fetch] {url}", flush=True)
-    try:
-        with urllib.request.urlopen(url, timeout=180) as resp:
-            headers = dict(resp.headers)
-            payload = resp.read()
-    except (urllib.error.URLError, urllib.error.HTTPError) as exc:
-        sys.exit(f"[fatal] could not retrieve {url}: {exc}")
-    digest = hashlib.sha256(payload).hexdigest()
-    print(f"[fetch] {len(payload)} bytes", flush=True)
-    return payload, digest, headers
-
-
-def parse_rows(payload):
-    """Parse CSV bytes into a list of row dicts.
-
-    Args:
-        payload: raw CSV bytes.
-
-    Returns:
-        List of dicts, one per data row, keyed by column name.
-    """
-    rows = list(csv.DictReader(io.StringIO(payload.decode("utf-8"))))
-    if not rows:
-        sys.exit("[fatal] metadata CSV parsed to zero rows")
-    return rows
-
-
-def as_float(row, key):
-    """Read a numeric cell tolerantly.
-
-    Args:
-        row: a CSV row dict.
-        key: column name to read.
-
-    Returns:
-        The cell as a float, or None if blank or unparseable.
-    """
-    raw = (row.get(key) or "").strip()
-    if not raw:
-        return None
-    try:
-        return float(raw)
-    except ValueError:
-        return None
-
-
-def in_caliper(row, amp_lo, amp_hi, snr_lo, snr_hi):
-    """Test whether a template falls inside the amplitude and SNR caliper.
-
-    Args:
-        row: a CSV row dict.
-        amp_lo, amp_hi: inclusive amplitude bounds in microvolts.
-        snr_lo, snr_hi: inclusive signal-to-noise-ratio bounds.
-
-    Returns:
-        True if both covariates are present and inside their bounds.
-    """
-    amp = as_float(row, "amplitude_uv")
-    snr = as_float(row, "signal_to_noise_ratio")
-    if amp is None or snr is None:
-        return False
-    return amp_lo <= amp <= amp_hi and snr_lo <= snr <= snr_hi
+from utils import template_metadata as tm  # noqa: E402
 
 
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--url", default=DEFAULT_CSV_URL,
+    parser.add_argument("--url", default=tm.DEFAULT_CSV_URL,
                         help="template metadata CSV URL (default: the first-party S3 object)")
+    parser.add_argument("--cache", default=None,
+                        help="read/write the snapshot here; point at the tracked snapshot to "
+                             "re-run the group-bys offline, at the cost of the ETag and "
+                             "Last-Modified lines, which only a live request carries")
     parser.add_argument("--probe", default="Neuropixels 1.0",
                         help="probe type to audit (default: 'Neuropixels 1.0', the IBL subset)")
     parser.add_argument("--amp-lo", type=float, default=50.0,
@@ -150,7 +81,11 @@ def main():
     if args.amp_lo >= args.amp_hi or args.snr_lo >= args.snr_hi:
         sys.exit("[fatal] caliper bounds must be strictly increasing")
 
-    payload, digest, headers = fetch_csv(args.url)
+    try:
+        payload, digest, headers = tm.fetch_metadata_with_headers(
+            args.url, cache_path=args.cache)
+    except OSError as exc:
+        sys.exit(f"[fatal] {exc}")
     report = []
 
     def emit(line=""):
@@ -162,12 +97,15 @@ def main():
     emit(f"url             {args.url}")
     emit(f"bytes           {len(payload)}")
     emit(f"sha256          {digest}")
-    emit(f"matches pinned  {digest == KNOWN_SHA256}  (pinned = {KNOWN_SHA256})")
+    emit(f"matches pinned  {digest == tm.PINNED_SHA256}  (pinned = {tm.PINNED_SHA256})")
     emit(f"etag            {headers.get('ETag')}")
     emit(f"last-modified   {headers.get('Last-Modified')}")
     emit()
 
-    rows = parse_rows(payload)
+    try:
+        rows = tm.parse_rows(payload)
+    except ValueError as exc:
+        sys.exit(f"[fatal] {exc}")
     emit(f"total rows      {len(rows)}")
     emit(f"columns         {', '.join(sorted(rows[0].keys()))}")
     for probe, count in sorted(Counter(r.get('probe', '') for r in rows).items()):
@@ -180,8 +118,9 @@ def main():
         sys.exit(f"[fatal] no rows for probe '{args.probe}'; "
                  f"available: {sorted({r.get('probe', '') for r in rows})}")
     emit(f"## Subset: probe = '{args.probe}'  ({len(subset)} rows)")
-    amps = [a for a in (as_float(r, "amplitude_uv") for r in subset) if a is not None]
-    snrs = [s for s in (as_float(r, "signal_to_noise_ratio") for r in subset) if s is not None]
+    amps = [a for a in (tm.as_float(r, "amplitude_uv") for r in subset) if a is not None]
+    snrs = [s for s in (tm.as_float(r, "signal_to_noise_ratio") for r in subset)
+            if s is not None]
     emit(f"amplitude_uv    min {min(amps):.2f}  median {statistics.median(amps):.2f}  "
          f"max {max(amps):.2f}")
     emit(f"snr             min {min(snrs):.2f}  median {statistics.median(snrs):.2f}  "
@@ -190,7 +129,7 @@ def main():
     emit()
 
     kept = [r for r in subset
-            if in_caliper(r, args.amp_lo, args.amp_hi, args.snr_lo, args.snr_hi)]
+            if tm.in_caliper(r, args.amp_lo, args.amp_hi, args.snr_lo, args.snr_hi)]
     emit(f"## Provisional donor screen: amplitude {args.amp_lo}-{args.amp_hi} uV, "
          f"SNR {args.snr_lo}-{args.snr_hi}")
     emit(f"rows inside caliper         {len(kept)} of {len(subset)}")

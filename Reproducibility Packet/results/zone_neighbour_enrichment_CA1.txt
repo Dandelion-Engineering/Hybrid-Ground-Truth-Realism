@@ -1,0 +1,129 @@
+# Injection-zone neighbour enrichment
+
+snapshot sha256   a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d
+matches pinned    True
+probe             Neuropixels 1.0
+injection zone    CA1
+covariates        amplitude_uv, signal_to_noise_ratio, depth_along_probe
+
+The real matching uses post-rescaling amplitude, effective host SNR, and depth along
+the injection band. Those do not exist before a host is pinned; the covariates above
+are their pre-host analogues. This measures whether a region-blind covariate matcher
+would be pulled toward injection-zone donors at all, not what the real arm will hold.
+
+## Pool: full probe subset
+rows with all covariates      2183 of 2183
+CA1 templates in pool  16
+base rate for a non-self draw  0.687%
+
+   k   zone hits      of    observed   enrichment
+   1           3      16      18.75%        27.3x
+   5           6      80       7.50%        10.9x
+  16          23     256       8.98%        13.1x
+
+Nearest-unused-partner matching, one partner per zone template:
+  slots with any candidate                 16 of 16
+  partners that are themselves CA1         3 of 16
+  expected under a region-blind draw       0.11
+  partner distance  min 0.044  median 0.099  max 0.615
+
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   51  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   33  d=0.092
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   52  ->  000409_sub-KS043_ses-9468fa93-21ae-4984-955c   38  d=0.124
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   53  ->  000409_sub-KS043_ses-e5c75b62-6871-4135-b3d0    9  d=0.274
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   54  ->  000409_sub-KS042_ses-8c552ddc-813e-4035-81cc   64  d=0.615
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   55  ->  000409_sub-KS046_ses-dfbe628d-365b-461c-a07f  111  d=0.221
+  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    2  ->  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d  173  d=0.056
+  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    3  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   49  d=0.106  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   49  ->  000409_sub-KS086_ses-e45481fa-be22-4365-972c   55  d=0.044
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   50  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   54  d=0.071  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   51  ->  000409_sub-KS046_ses-dfbe628d-365b-461c-a07f  118  d=0.114
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   52  ->  000409_sub-KS052_ses-ac7d3064-7f09-48a3-88d2   18  d=0.112
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   53  ->  000409_sub-KS094_ses-752456f3-9f47-4fbf-bd44    8  d=0.063
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   54  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   50  d=0.071  <- zone
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   31  ->  000409_sub-KS046_ses-aa3432cd-62bd-40bc-bc1c   82  d=0.076
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   32  ->  000409_sub-KS046_ses-dfbe628d-365b-461c-a07f   35  d=0.309
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   33  ->  000409_sub-KS055_ses-872ce8ff-9fb3-485c-be00  111  d=0.072
+
+The same matching with exact-insertion blocking (Amendment 2's first granularity):
+  slots with any candidate                 16 of 16
+  partners that are themselves CA1         8 of 16
+  expected under a region-blind draw       0.98
+  partner distance  min 0.071  median 0.417  max 0.908
+
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   51  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   50  d=0.545
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   52  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   76  d=0.550
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   53  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   54  d=0.908  <- zone
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   54  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   48  d=0.691
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   55  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   67  d=0.735
+  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    2  ->  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    3  d=0.779  <- zone
+  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    3  ->  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    4  d=0.471
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   49  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   53  d=0.252  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   50  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   54  d=0.071  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   51  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   50  d=0.244  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   52  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   49  d=0.362  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   53  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   52  d=0.218  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   54  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   51  d=0.181  <- zone
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   31  ->  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   34  d=0.426
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   32  ->  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   41  d=0.390
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   33  ->  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   40  d=0.408
+
+## Pool: provisional caliper amp 50.0-200.0 uV, SNR 5.0-15.0
+rows with all covariates      1149 of 1149
+CA1 templates in pool  12
+base rate for a non-self draw  0.958%
+
+   k   zone hits      of    observed   enrichment
+   1           1      12       8.33%         8.7x
+   5           6      60      10.00%        10.4x
+  16          15     192       7.81%         8.2x
+
+Nearest-unused-partner matching, one partner per zone template:
+  slots with any candidate                 12 of 12
+  partners that are themselves CA1         2 of 12
+  expected under a region-blind draw       0.11
+  partner distance  min 0.076  median 0.160  max 0.343
+
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   51  ->  000409_sub-KS046_ses-69c9a415-f7fa-4208-887b   58  d=0.128
+  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    2  ->  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d  173  d=0.175
+  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    3  ->  000409_sub-KS046_ses-aa3432cd-62bd-40bc-bc1c   82  d=0.173
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   49  ->  000409_sub-KS046_ses-69c9a415-f7fa-4208-887b   16  d=0.076
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   50  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   54  d=0.177  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   51  ->  000409_sub-KS042_ses-8c552ddc-813e-4035-81cc   95  d=0.244
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   52  ->  000409_sub-KS046_ses-dfbe628d-365b-461c-a07f  120  d=0.147
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   53  ->  000409_sub-KS046_ses-aa3432cd-62bd-40bc-bc1c   80  d=0.115
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   54  ->  000409_sub-KS042_ses-8c552ddc-813e-4035-81cc   63  d=0.092
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   31  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   49  d=0.188  <- zone
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   32  ->  000409_sub-KS042_ses-8c552ddc-813e-4035-81cc   73  d=0.343
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   33  ->  000409_sub-KS055_ses-872ce8ff-9fb3-485c-be00  111  d=0.142
+
+The same matching with exact-insertion blocking (Amendment 2's first granularity):
+  slots with any candidate                 12 of 12
+  partners that are themselves CA1         5 of 12
+  expected under a region-blind draw       1.11
+  partner distance  min 0.177  median 0.532  max 0.862
+
+  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   51  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   62  d=0.752
+  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    2  ->  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    3  d=0.862  <- zone
+  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    3  ->  000409_sub-KS046_ses-0ac8d013-b91e-4732-bc7b    4  d=0.745
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   49  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   53  d=0.343  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   50  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   54  d=0.177  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   51  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   58  d=0.636
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   52  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   65  d=0.849
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   53  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   49  d=0.343  <- zone
+  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   54  ->  000409_sub-KS051_ses-0a018f12-ee06-4b11-97aa   50  d=0.177  <- zone
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   31  ->  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   37  d=0.514
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   32  ->  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   41  d=0.441
+  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   33  ->  000409_sub-KS055_ses-b22f694e-4a34-4142-ab9d   40  d=0.550
+
+Compare the two matchings on the realized count, not on the ratio. Blocking raises
+the number of zone partners because it shrinks each candidate set to a neighbourhood
+the zone's own members already occupy; part of that rise is what a region-blind draw
+under the same blocking would give anyway, which is what the expectation line is for.
+The ratio to expectation can fall while the realized contamination rises, and it is
+the realized count that dilutes the manipulation.
+
+Read this as a statement about the pull, not about the outcome. A matcher that is
+blind to region is not thereby neutral about it: if zone donors sit at the centre of
+the covariate neighbourhood the matcher is searching, the control arm inherits them
+unless a rule says otherwise. Whether that rule should exclude them, cap them, or
+merely report them is a contract question, not a measurement one.

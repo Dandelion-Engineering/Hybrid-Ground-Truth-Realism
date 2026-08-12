@@ -53,7 +53,34 @@ def fetch_metadata(url=DEFAULT_CSV_URL, cache_path=None, timeout=180, verbose=Tr
     Raises:
         OSError: if the CSV cannot be retrieved, naming the URL and the reason.
     """
+    payload, digest, _ = fetch_metadata_with_headers(url, cache_path, timeout, verbose)
+    return payload, digest
+
+
+def fetch_metadata_with_headers(url=DEFAULT_CSV_URL, cache_path=None, timeout=180,
+                                verbose=True):
+    """Fetch the donor metadata CSV and keep the server's response headers.
+
+    The object is hosted mutably, so a report that pins the snapshot may also
+    want the server's own version markers -- ``ETag`` and ``Last-Modified`` --
+    alongside the hash. They are only available from a live request; a cache
+    hit returns an empty mapping rather than inventing them.
+
+    Args:
+        url: HTTP(S) location of the metadata CSV.
+        cache_path: optional file to read from and write to.
+        timeout: request timeout in seconds.
+        verbose: print progress to stdout.
+
+    Returns:
+        A tuple of (payload_bytes, sha256_hex, headers_dict). ``headers_dict``
+        is empty when the payload came from the cache.
+
+    Raises:
+        OSError: if the CSV cannot be retrieved, naming the URL and the reason.
+    """
     payload = None
+    headers = {}
     if cache_path:
         try:
             with open(cache_path, "rb") as handle:
@@ -67,6 +94,7 @@ def fetch_metadata(url=DEFAULT_CSV_URL, cache_path=None, timeout=180, verbose=Tr
             print(f"[templates] fetching {url}", flush=True)
         try:
             with urllib.request.urlopen(url, timeout=timeout) as response:
+                headers = dict(response.headers)
                 payload = response.read()
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
             raise OSError(f"could not retrieve {url}: {exc}") from exc
@@ -77,7 +105,7 @@ def fetch_metadata(url=DEFAULT_CSV_URL, cache_path=None, timeout=180, verbose=Tr
     if verbose:
         print(f"[templates] {len(payload)} bytes, sha256 {digest}", flush=True)
         print(f"[templates] matches pinned snapshot: {digest == PINNED_SHA256}", flush=True)
-    return payload, digest
+    return payload, digest, headers
 
 
 def parse_rows(payload, probe=None):
