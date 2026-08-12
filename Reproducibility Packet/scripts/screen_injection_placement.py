@@ -16,8 +16,10 @@ It measures four things per candidate band, all from file metadata:
    must sit far enough inside the band for its footprint to land in labelled
    target tissue. Capacity is reported as a sweep over edge margin and minimum
    peak separation rather than at one invented number, because neither value is
-   measured yet -- measuring the donor templates' real footprint needs the
-   template arrays, which this screen does not download.
+   measured yet. Measuring the donor templates' real footprint needs the
+   template arrays, which this screen does not download, and calibrates the
+   edge margin. Minimum peak separation still needs its own basis from native
+   peak-depth spacing and the generator's relocation constraints.
 3. **Native unit density.** The processed NWB carries IBL's own spike sorting.
    Counting its units inside the same band says what ten injected units do to
    the local density -- which is what "overcrowding" has to be judged against,
@@ -155,6 +157,8 @@ def read_native_units(url, size, block_bytes):
 
     Raises:
         KeyError: if the file carries no units table or no electrodes table.
+        ValueError: if a unit's peak-electrode index is invalid or belongs to a
+            different probe than the unit names.
     """
     from utils import ccf_labels
     remote = RemoteFile(url, size, block=block_bytes)
@@ -188,10 +192,18 @@ def read_native_units(url, size, block_bytes):
         units = []
         for index, probe in enumerate(probe_names):
             electrode = max_electrode[index]
+            if not 0 <= electrode < len(groups):
+                raise ValueError(
+                    f"{url} unit {index} has out-of-range max_electrode {electrode} "
+                    f"for an electrode table with {len(groups)} rows")
+            if groups[electrode] != probe:
+                raise ValueError(
+                    f"{url} unit {index} says probe {probe!r}, but max_electrode "
+                    f"{electrode} belongs to {groups[electrode]!r}")
             unit = {
                 "probe": probe,
-                "electrode_probe": groups[electrode] if 0 <= electrode < len(groups) else None,
-                "depth_um": rel_y[electrode] if 0 <= electrode < len(rel_y) else None,
+                "electrode_probe": groups[electrode],
+                "depth_um": rel_y[electrode],
                 "tip_distance_um": tip_distance[index],
                 "label": labels[index],
             }
@@ -385,9 +397,9 @@ def write_report(path, results, args, skipped):
 
     lines.append("## Verdict at the declared parameters")
     lines.append("")
-    lines.append(f"{'subject':<10} {'probe':<9} {'span':>6} {'chan':>5} {'purity':>7} "
+    lines.append(f"{'subject':<10} {'session':<8} {'probe':<9} {'span':>6} {'chan':>5} {'purity':>7} "
                  f"{'sites':>6} {'native':>7} {'good':>5} {'vs all':>8} {'vs good':>8}  verdict")
-    lines.append("-" * 104)
+    lines.append("-" * 113)
     for result in results:
         for probe in result["probes"]:
             band = probe["band"]
@@ -400,8 +412,9 @@ def write_report(path, results, args, skipped):
                       if native.get("n_units") else "-")
             vs_good = (f"+{100.0 * args.n_units / native['n_good']:.0f}%"
                        if native.get("n_good") else "-")
-            lines.append("{:<10} {:<9} {:>6.0f} {:>5d} {:>6.1f}% {:>6} {:>7} {:>5} {:>8} {:>8}  {}".format(
-                result["subject"], probe["probe"], band["span_um"], band["n_channels"],
+            lines.append("{:<10} {:<8} {:<9} {:>6.0f} {:>5d} {:>6.1f}% {:>6} {:>7} {:>5} {:>8} {:>8}  {}".format(
+                result["subject"], result["session"][:8], probe["probe"],
+                band["span_um"], band["n_channels"],
                 100.0 * probe["profile"]["purity"],
                 capacity.get("max_sites", "-"),
                 native.get("n_units", "-"), native.get("n_good", "-"),
@@ -423,11 +436,12 @@ def write_report(path, results, args, skipped):
     lines.append("## Capacity sweep — maximum placeable sites")
     lines.append("")
     lines.append("The edge margin and the minimum separation are declared parameters, not")
-    lines.append("measurements: the donor templates' real multichannel footprint has not been")
-    lines.append("measured yet. The sweep is here so the verdict can be re-read at any value")
-    lines.append("without re-running the screen.")
+    lines.append("measurements. Donor-template footprint can calibrate the edge margin; it")
+    lines.append("does not by itself justify the minimum peak separation, which needs a")
+    lines.append("separate basis from native peak depths and generator relocation constraints.")
+    lines.append("The sweep is here so the verdict can be re-read without another network run.")
     lines.append("")
-    header = f"{'subject':<10} {'probe':<9} {'span':>6}"
+    header = f"{'subject':<10} {'session':<8} {'probe':<9} {'span':>6}"
     for margin in args.edge_margins:
         for separation in args.separations:
             header += f"  m{int(margin)}/s{int(separation)}"
@@ -437,8 +451,9 @@ def write_report(path, results, args, skipped):
         for probe in result["probes"]:
             if not probe["band"]:
                 continue
-            row = "{:<10} {:<9} {:>6.0f}".format(
-                result["subject"], probe["probe"], probe["band"]["span_um"])
+            row = "{:<10} {:<8} {:<9} {:>6.0f}".format(
+                result["subject"], result["session"][:8], probe["probe"],
+                probe["band"]["span_um"])
             for margin in args.edge_margins:
                 for separation in args.separations:
                     capacity = probe["capacity"][f"margin{int(margin)}_sep{int(separation)}"]
@@ -455,7 +470,8 @@ def write_report(path, results, args, skipped):
             if not band:
                 continue
             lines.append(f"### {result['subject']} {probe['probe']} "
-                         f"({band['depth_lo_um']:.0f}-{band['depth_hi_um']:.0f} um)")
+                         f"(session {result['session'][:8]}; "
+                         f"{band['depth_lo_um']:.0f}-{band['depth_hi_um']:.0f} um)")
             lines.append("")
             lines.append(f"  contacts in range        {profile['n_contacts_in_range']} "
                          f"({profile['n_on_target']} labelled {args.target})")
@@ -490,8 +506,8 @@ def write_report(path, results, args, skipped):
     lines.append("")
     lines.append("- The native unit counts are IBL's own Kilosort 2.5 output as published in")
     lines.append("  the processed NWB, not this project's sorting. They are the right density")
-    lines.append("  reference precisely because they are what the field already accepts about")
-    lines.append("  this recording, and they are not a ground truth.")
+    lines.append("  available first-party density reference for this recording; they are not")
+    lines.append("  ground truth and do not become a host-admission threshold by themselves.")
     lines.append("- The amplitude column is the units table's median spike amplitude in")
     lines.append("  microvolts, computed by IBL on their own preprocessed data. Whether its")
     lines.append("  convention matches the donor library's amplitude_uv column has not been")
@@ -587,7 +603,12 @@ def main(argv=None):
     processed_by_session = {}
     for asset in assets:
         if asset["path"].endswith(dandi.PROCESSED_SUFFIX):
-            processed_by_session[dandi.session_of(asset)] = asset
+            session = dandi.session_of(asset)
+            if session in processed_by_session:
+                raise SystemExit(
+                    f"[fatal] multiple processed assets found for session {session}: "
+                    f"{processed_by_session[session]['path']} and {asset['path']}")
+            processed_by_session[session] = asset
 
     block_bytes = args.block_kb * 1024
     results = []
@@ -609,9 +630,9 @@ def main(argv=None):
             continue
         results.append(result)
         for probe in result["probes"]:
-            print("[placement] {:<10} {:<9} span={:>5.0f} purity={:>5.1f}% "
+            print("[placement] {:<10} {:<8} {:<9} span={:>5.0f} purity={:>5.1f}% "
                   "native={:<5} verdict={}".format(
-                      result["subject"], probe["probe"],
+                      result["subject"], result["session"][:8], probe["probe"],
                       probe["band"]["span_um"] if probe["band"] else -1,
                       100.0 * probe["profile"]["purity"] if probe["profile"] else -1,
                       (probe["native"] or {}).get("n_units", "-"),

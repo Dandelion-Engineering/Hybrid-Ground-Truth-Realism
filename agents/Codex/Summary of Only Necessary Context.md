@@ -1,34 +1,43 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 6 · 2026-08-11 22:13 PDT**
+**Rewritten at the end of Codex Session 7 · 2026-08-12 11:21 PDT**
 
-**Next Codex session will be Session 7.** Session 8 is the next count-based progress-report trigger. A separate amendment-triggered report was written this session because Codex approved Amendment 1.
+**Next Codex session will be Session 8.** Complete normal session work first, then write the required count-based director progress report. Amendment-triggered reports do not reset this cadence.
 
-## Current phase and result boundary
+## Current phase and execution boundary
 
-**Phase 2 — Execution is open. No scientific result exists and no sorter has run.** No generator run, raw-recording download, dependency installation, or heavy compute occurred in Session 6.
+**Phase 2 — Execution is open. No scientific result exists.** No host is pinned. No template-array pull, generator run, sorter run, raw-recording download, dependency installation, or Rung 0 execution occurred in Session 7.
 
-The Phase 1 base contract remains intact above the appended amendment section. Read both Claim Sheets, including amendment statuses, before execution.
+The public state remains `In Progress`. Do not interpret a review handoff, a provisional placement pass, or a low-yield candidate as a result.
 
-## Current contract states
+## Claim Sheet states
 
-- `Claim Sheet.md`: SHA-256 `8d06e5887e61b84a3ac7de71e6dcdd2eff9cbea070482faa066df109982dbfc7`
-- `Accessible Claim Sheet.md`: SHA-256 `9bb0478f39711404730efbb96e6a7b6fdc711c4dc69a6d217438d032657a8c1a`
+Current synchronized Codex reviewer states:
 
-Inside those synchronized whole-file states:
+- `Claim Sheet.md`: SHA-256 `37dcd0f8b20fcee6dc471e1eb396a0f01890a222c5807c70c03fae527a70959a`
+- `Accessible Claim Sheet.md`: SHA-256 `696b76e47ad5b4c42038abdeac18426652db8fb1d462804735d26da28d46c267`
 
-- **Amendment 1 — compute schedule/corrected memory story: `In force`.** Both agents explicitly approved it on 2026-08-11. The compute chat is concluded.
-- **Amendment 2 — Tier A provenance and finite CA1 pool: `Proposed`.** Codex approves the substance and the exact whole-file states above after removing unsupported shared-rig/shared-strain claims. Claude's genuine owner re-review is open.
-- **Amendment 3 — Tier A no-manipulation pseudo control: required but not yet written.** No Tier A generation may use the new construction before synchronized technical/Accessible text receives same-state approval.
+Inside those whole-file states:
 
-The original Phase 1 exact hashes remain historical approved-base identifiers:
+- **Amendment 1 — compute schedule/corrected memory story: `In force`.**
+- **Amendment 2 — Tier A provenance and finite CA1 pool: `In force`.** Claude explicitly approved Codex's Session 6 wording before flipping the status.
+- **Amendment 3 — Tier A asymmetric-pool negative control: `Proposed`.** Codex directly edited and explicitly approves the hashes above. Claude's genuine owner re-review is open.
+- **Amendment 4 — acquisition-laboratory provenance/non-transfer: `Proposed`.** Codex directly edited and explicitly approves the same hashes. Claude's genuine owner re-review is open.
 
-- technical Claim Sheet `a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3`;
-- Accessible Claim Sheet `73bff8f81dc2e31b47d4abbe1f61c8106a34dccb8ea6457051c3dba84a589760`;
-- source `d33e74d73c41b3ef0b4edbe6de52c0cc4e5597bae2d048618edb5c4523f99819`;
-- PDF `75e1423294cb3c4695c14920851825d602379d9ffca1aab6bcb93cbd10d998a3`.
+Do not mark Amendments 3/4 `In force` until Claude approves these exact states or returns a new synchronized state.
 
-## Tier A selection review
+### Amendment 3's separate executable gate
+
+Amendment 3 approval does **not** authorize pseudo-arm generation by itself.
+
+- P1 and P2 use the **final eligible region-unaware pool** after host-specific post-rescaling eligibility, not the provisional 1,149-template metadata screen.
+- The random seed is fixed before host/subset inspection at **`711362139`**, derived from the first eight hex digits `2a66865b` of SHA-256 over `Hybrid Ground Truth Realism|Tier A|pseudo pool|v1`.
+- After a host exists, a tracked selector configuration must pin the eligible-pool digest/filter, covariate scaling, scalar objective, search budget, deterministic tie-break, sixteen selected `template_index` IDs, and achieved spread.
+- Both agents must explicitly approve that exact configuration/selected-ID state before any pseudo-arm generation.
+
+This preserves separate construction and executable-configuration approvals.
+
+## Tier A selection artifact
 
 Active chat:
 
@@ -38,100 +47,122 @@ Artifact:
 
 `agents/Claude/Tier A Host and Injection Zone Selection.md`
 
-Current SHA-256:
+Current Codex-approved Draft 4 reviewer state:
 
-`3ae39913986a1961d674d2ed7b4714f89293fa6f0e8c02f039ebca3c186696cf`
+`fa5b871e59ac5e07973eee96b02f3de33f385870138c76bf3699ecff3b8b1f75`
 
-**Both agents explicitly approve these bytes as a host-selection strategy, CA1 injection-zone recommendation, and discharged duration gate.** The approval does not pin a host. The chat remains active because host pinning and Amendments 2/3 are open.
+Claude owner re-review is open. Draft 3 hash `3ae39913986a1961d674d2ed7b4714f89293fa6f0e8c02f039ebca3c186696cf` remains the last state both agents explicitly approved.
 
-### Settled selection rules
+The current Draft 4 approval is bounded to:
 
-- Choose a host from one of the 127 DANDI 000409 subjects absent from the donor library's twelve; subject separation is not provenance independence.
-- Attempt donor-pair source blocking at insertion, then session, then subject granularity before falling back to source counts; report each relaxation.
-- Use all sixteen CA1 donors on a seeded exposure-balanced rota: fifty matched-arm slots mean each donor appears three or four times. Cluster repeated identities in inference.
-- Tier A's donor-population statement is conditional on the complete sixteen-template CA1 library even if the interval is narrow. More blocks add seed/placement precision, not donor diversity.
-- CA1 is first; do not commission SUB evidence unless CA1 fails an actual gate.
-- Gate current candidates sequentially and pin the first fully admissible host. Resume the wider anatomy survey only if the current set fails. Call the host admissible, never best.
-- Reducing below ten injected units is not a casual fallback; it changes anchor comparability/collision load and needs a scientific amendment.
+- the host-selection strategy and CA1 recommendation;
+- measured acquisition provenance;
+- discharged anatomy, duration, and label-ambiguity gates;
+- native-yield and amplitude context with their evidence limits; and
+- a **parameterized**, not decided, placement screen.
 
-### Accepted no-manipulation control — Amendment 3 owed
+It is not a pinned-host approval.
 
-Codex withdrew the replicate-stability proposal and accepted Claude's counter-proposal:
+## Provenance evidence and Amendment 4 boundaries
 
-- P1 is a fixed, randomly seeded sixteen-template subset of the eligible region-unaware pool, chosen once to approximate the CA1 covariate spread and reused on the same exposure-balanced rota.
-- P2 draws from the full eligible region-unaware pool and is matched to P1 using the same covariate procedure as the real control arm.
-- Neither arm conditions on region, so the band remains a no-manipulation safety check.
-- It mirrors finite-versus-large pool size, reuse, matching, clustering, and seed structure at the existing two-pseudo-arm sorter cost.
-- It cannot mirror region homogeneity, because that is the real manipulation; state that boundary.
+Tracked replay:
 
-This is **not merely an implementation note** because current Slot 5 says pseudo-arms use the same selection procedure and P1/P2 intentionally do not. Amendment 3 must pin the subset seed/objective, selected template IDs, rota, matching procedure, no-region-conditioning rule, unchanged budget, and boundary.
+- 21/21 subjects;
+- 88,650,017 metadata bytes in 91 requests;
+- zero failures;
+- donor lab set `{cortexlab}`;
+- host lab set `{angelakilab, churchlandlab}`; and
+- shared protocol exactly `_iblrig_tasks_ephysChoiceWorld6.4.2`.
 
-## Host timing and remaining gates
+Claims allowed by the tracked NWBs:
 
-Tracked timing index reproduces:
+- donor and candidate-host subjects read differ by laboratory and institution;
+- different institutions necessarily exclude one shared physical acquisition rig;
+- rig hardware and rig design are **not** identified and remain unverified;
+- protocol-version sets partly overlap rather than cleanly separating;
+- `genotype`, `strain`, and `description` are absent from every NWB read; and
+- every donor recording represented was acquired from cortexlab subjects.
 
-- 11 assets, 21 AP series;
-- 54.1527–87.0831 min;
-- 29,999.9969–30,000.2984 Hz;
-- 384 channels for every series;
-- 317,309,738 metadata bytes; and
-- zero non-monotonic head/tail edge windows.
+Do not attribute downstream IBL sorting or template-library extraction/curation to cortexlab. The Tier A non-transfer statement is conditional on the acquisition laboratory, the downstream shared processing path, and the finite sixteen-template CA1 population.
 
-Duration passes for every current candidate and separates none. This proves a regular usable time base, not an absence of dropped samples.
+## Placement evidence and open calibration
 
-**No host is pinned.** Remaining gates: drift, noise, post-rescaling effective SNR, ten-placement feasibility, and covariate balance. Codex owns the balance/manipulation gate.
+Tracked placement replay:
 
-## Anatomy-index provenance guard
+- 13 bands across 11 recordings;
+- 170,215,252 metadata bytes in 169 requests;
+- zero failures;
+- all unit peak-electrode indices valid and on the named probe;
+- 13/13 bands CA1-pure;
+- 13/13 band/index and raw/processed electrode-table agreement; and
+- unchanged provisional 9-pass / 4-fail split at 60 µm edge margin and 40 µm minimum peak separation.
 
-Session 6 found that `survey_host_anatomy.py` and `screen_host_timing.py` could reuse a stored `target_band` while printing a different caller-supplied `--target`. That silent cross-target resume hazard is fixed:
+The report now includes session identifiers, so repeated subject/probe rows are auditable. `--from-records` reproduces it byte-for-byte without network reads.
 
-- new anatomy records embed target and maximum gap;
-- shared validator: `Reproducibility Packet/scripts/utils/anatomy_index.py`;
-- the existing append-only index is legacy and must be asserted with `--legacy-index-target CA1 --legacy-index-max-gap-um 40`;
-- a CA1 index replay requested as SUB now fails loudly; and
-- compilation and a zero-new-read timing replay passed.
+### Placement remains parameterized
 
-Do not rewrite the tracked append-only indexes to add metadata. The explicit legacy assertion is the provenance bridge.
+The two placement parameters require different evidence:
 
-## Injection/preprocessing order for Rung 0
+1. **Edge margin:** calibrate from the real multichannel spatial support of the sixteen CA1 donor templates.
+2. **Minimum peak separation:** predeclare a basis from the host's native peak-depth spacing and the generator's relocation constraints.
 
-Verified against SpikeInterface tag `0.104.8`, commit `76c41846f88de3cc9dc5858d5c7f97dd6cb1955f`:
+Codex owns this two-part calibration during Rung 0 preparation. Template footprint alone does not decide the gate.
 
-- `generate_hybrid_recording()` passes the caller's recording directly to the injection extractor; it performs no preprocessing.
-- The IBL donor builder extracts templates after float conversion → `phase_shift` → 1 Hz high-pass → common reference.
-- The official hybrid tutorial injects into a preprocessed host.
+### Native yield is not a hidden gate
 
-**Rung 0 must build and pin the host injection substrate before injection.** Do not phase-shift the combined raw-host-plus-injected recording; that would transform already-phase-shifted donor spikes twice and real host spikes once. Record the exact chain and any later sorter-facing transforms.
+No overcrowding percentage was predeclared. Session 7 therefore declined to turn the observed table into a post-hoc pass/fail rule.
 
-SpikeInterface, PyTorch, and Kilosort4 are still not installed in the project venv. Current root pins remain `h5py==3.16.0` and `numpy==2.5.2`; resolve any numpy compatibility deliberately when Rung 0 installs, and re-run the metadata scripts after a pin change.
+- NYU-39 Probe00 (`22` units, `1` good) is high-risk and deprioritized.
+- It is not formally disqualified before the noise/effective-SNR and remaining gates.
+- The amplitude table prompts a convention check; it does not validate the 50–200 µV target until IBL `median_spike_amplitude_uV` and donor-library `amplitude_uv` are shown commensurate.
 
-## Compute environment
+## Current candidate order and remaining host gates
 
-Amendment 1 governs:
+Recommended order for spending the remaining work:
 
-- target heavy work in the daytime; the other project targets overnight;
-- the schedule is a convention, not a reservation;
-- the earlier 3.46 → 3.96 → 1.01 → 0.89 GiB series came from leaked finished processes, not competing work;
-- the process-leak fix was in progress, not confirmed landed;
-- never reason from the shape of that old series.
+1. CSHL047 Probe01, session `b52182e7`;
+2. NYU-12 Probe01, session `a8a8af78`;
+3. CSHL047 Probe00, session `b52182e7`.
 
-Live guards are unchanged: measure RAM/VRAM immediately before every heavy step; use no more than 75% of then-free RAM/VRAM; preserve at least 4 GiB system RAM and 2 GiB VRAM; stop if crossed; never inherit a prior measurement.
+This is an order, not a selection.
 
-## Director and public state
+- Discharged gates: anatomy, duration, label ambiguity.
+- Checked non-gating property: donor-lab separation.
+- Parameterized: placement capacity.
+- Open: drift, noise, post-rescaling effective SNR, and Codex's covariate-balance/manipulation gate.
 
-- Shared-memory director request: resolved and retired.
-- Phase 1 contract review: open and non-blocking.
-- No director action is needed for Amendments 2/3; those are agent review work unless a real disagreement recurs.
-- `agents/Codex/Progress Reports/Progress Report Amendment Compute Schedule.md` is the required Amendment 1 director update.
-- The root README's latest append-only entry corrects the unsupported rig/strain claim, records the accepted pseudo-control pending amendment, pins the injection-order decision, and states no result exists.
+Use first-admissible logic. Do not finish a census to claim “best,” and do not pin a host until every gate passes.
+
+## Rung 0 preparation boundary
+
+Rung 0 remains unrun. It must:
+
+- construct and pin the pre-injection host substrate;
+- avoid phase-shifting injected templates twice;
+- pin the exact approximately 60-second segment;
+- include the two-part placement calibration above;
+- resolve dependencies deliberately in the project venv;
+- measure live RAM and VRAM immediately before any heavy step;
+- obey the 75%-of-free cap plus 4 GiB RAM / 2 GiB VRAM floors; and
+- run only in the daytime convention if those fresh guards pass.
+
+The existing venv still pins only `h5py==3.16.0` and `numpy==2.5.2`. Re-run the metadata scripts after any dependency-pin change.
+
+## Public and director state
+
+- Root `README.md` remains State A / `In Progress`.
+- Its latest append-only entry forward-corrects the prior rig, NYU-39, and placement-parameter overclaims. The earlier entry was preserved.
+- The Phase 1 director contract-review request remains open and non-blocking.
+- The shared-memory request is resolved and retired.
+- No director action is needed for Amendments 3/4 unless a real agent disagreement emerges.
 
 ## What Codex should do next
 
-1. Read Claude's next owner response before acting. Amendment 2 closes only on explicit approval of whole-file hashes `8d06e588…` / `9bb0478f…` or a new synchronized handoff.
-2. Review Amendment 3 exact bytes separately; do not infer approval from the accepted intent.
-3. Keep the Tier A chat active until the first fully admissible host is pinned and Amendments 2/3 converge.
-4. Prepare Rung 0 without launching: pin the SpikeInterface 0.104.8 source/version decision, construct the pre-injection host substrate, choose the exact ~60 s segment, and write candidate sorter commands/monitoring.
-5. Run Rung 0 only in the daytime window after fresh RAM/VRAM measurements pass all guards. Record runtime, peak RAM/VRAM, failures, per-tier 200-recording-minute projection, and whole-panel projection.
-6. Keep surviving code inside `Reproducibility Packet/` with argparse, docstrings, no hard-coded paths, loud failures, and dependencies pinned at install.
+1. Read Claude's owner response first. Same-state closure requires explicit approval of `37dcd0f8…`, `696b76e4…`, and `fa5b871e…` or a new handoff.
+2. If those states converge, preserve Amendment 3 approval and the later selector-config approval as distinct gates.
+3. Prepare, but do not launch, the two-part placement calibration and Rung 0 substrate/configuration.
+4. Continue the first candidate's drift, noise, effective-SNR, and balance gates without silently adding native-yield thresholds.
+5. Run Rung 0 only after fresh daytime RAM/VRAM admission measurements pass.
+6. Because the next Codex session is Session 8, write the count-based director progress report after completing normal session work.
 
-`agents/Codex/Session Summaries/HumanReport6.md` contains the full evidence, decisions, file list, and reasoning.
+`agents/Codex/Session Summaries/HumanReport7.md` contains the full evidence, exact hashes, reasoning, file list, and validation record.

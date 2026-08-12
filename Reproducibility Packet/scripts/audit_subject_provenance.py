@@ -8,9 +8,9 @@ sentence depends on *which* provenance dimensions were actually checked.
 This script checks the ones the substrate can answer. Every 000409 raw NWB
 carries ``/general/lab``, ``/general/institution``, ``/general/protocol``,
 ``/general/subject`` and ``/general/ibl_metadata``. IBL is a multi-laboratory
-consortium, so two subjects sharing a dandiset need not share a laboratory, a
-rig, or an institution -- and whether they do is a measurement rather than an
-assumption.
+consortium, so two subjects sharing a dandiset need not share a laboratory or
+institution. These fields do not identify rig hardware or rig design, so those
+remain separate questions rather than being inferred from the lab label.
 
 It also establishes a negative that matters as much as the positives: **these
 files carry no genotype or strain field.** Any statement about mouse strain is
@@ -147,6 +147,7 @@ def write_report(path, donor_records, host_records, missing, absent_fields, args
     """
     lab = lambda r: r["general"].get("lab")  # noqa: E731
     inst = lambda r: r["general"].get("institution")  # noqa: E731
+    protocol = lambda r: r["general"].get("protocol")  # noqa: E731
     lines = []
     lines.append("# Subject acquisition provenance")
     lines.append("")
@@ -192,6 +193,7 @@ def write_report(path, donor_records, host_records, missing, absent_fields, args
         lines.append("")
         lines.append(f"labs: {json.dumps(_group_counts(records, lab))}")
         lines.append(f"institutions: {json.dumps(_group_counts(records, inst))}")
+        lines.append(f"protocols: {json.dumps(_group_counts(records, protocol))}")
         lines.append("")
 
     donor_labs = {lab(r) for r in donor_records}
@@ -204,10 +206,29 @@ def write_report(path, donor_records, host_records, missing, absent_fields, args
     lines.append(f"host labs free of donors  {sorted(x for x in host_labs - donor_labs if x)}")
     lines.append("")
     lines.append("A host subject from a laboratory that contributed no donor templates")
-    lines.append("separates host and donor at the laboratory and rig level as well as at")
-    lines.append("the animal level. That is a stronger separation than subject exclusion")
-    lines.append("alone, and it is still not source independence: both sides remain one")
-    lines.append("dandiset, one consortium, one acquisition program and one probe type.")
+    lines.append("separates host and donor at the laboratory and institution level as well")
+    lines.append("as at the animal level. Different institutions necessarily exclude one")
+    lines.append("shared physical acquisition rig, but these fields do not identify rig")
+    lines.append("hardware or establish whether the laboratories used the same rig design.")
+    lines.append("This is still not source independence: both sides remain one dandiset,")
+    lines.append("one consortium, one acquisition program and one probe type.")
+    lines.append("")
+
+    donor_protocols = {protocol(r) for r in donor_records if protocol(r)}
+    host_protocols = {protocol(r) for r in host_records if protocol(r)}
+    lines.append("## Donor/host task-protocol overlap")
+    lines.append("")
+    lines.append(f"donor protocols            {sorted(donor_protocols)}")
+    lines.append(f"host-candidate protocols   {sorted(host_protocols)}")
+    lines.append(f"shared protocols           {sorted(donor_protocols & host_protocols)}")
+    lines.append("")
+    if donor_protocols == host_protocols:
+        lines.append("The protocol sets are identical in the tracked records.")
+    elif donor_protocols & host_protocols:
+        lines.append("The protocol sets partly overlap in the tracked records; they are")
+        lines.append("neither identical nor disjoint.")
+    else:
+        lines.append("The protocol sets are disjoint in the tracked records.")
     lines.append("")
 
     with open(path, "w", encoding="utf-8", newline="\n") as handle:

@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Current phase** | Phase 2 — Execution (contract and Phase 1 companions agreed; feasibility pilot next) |
+| **Current phase** | Phase 2 — Execution (host and placement gates in review before the feasibility pilot) |
 | **Public state** | `In Progress` |
 | **Last updated** | 2026-08-12 |
 
@@ -43,6 +43,8 @@ Spike sorting decides which extracellular spikes came from which neuron. Real re
 
 - **2026-08-12 — Going to check an unverified sentence, rather than just deleting it, found something in both directions.** A limitation in the contract claimed the donated spike shapes and the host recordings share a rig design and a mouse strain. Neither had been audited, so both were cut in review — and then read from the recordings themselves rather than argued about. **Mouse strain turns out to be uncheckable**: these files carry no strain or genotype field at all, so the project now states that once, plainly, instead of leaving a silence a reader could read either way. **The separation is also wider than claimed** — every donated shape comes from one laboratory in London, and every candidate host recording comes from labs in New York or Cold Spring Harbor, so picking a host from a non-donating animal separates the two by laboratory and rig, not only by animal. **And it is narrower than claimed in the other direction:** the entire donor library for this probe is one lab's work, which bounds what the result can generalize to and is now written into the contract as a limitation. Also this round, a long-open feasibility question was answered: **can ten synthetic neurons actually fit inside the target brain region?** All thirteen candidate zones are 100% anatomically pure, nine of thirteen hold ten neurons at plausible spacing, and the answer depends on a spread-of-signal number nobody has measured yet — so it is reported as a range rather than a verdict, and measuring it is the next job. One candidate was disqualified by evidence that arrived sideways: the field's own sorting recovers a single well-isolated neuron in its target zone. **Still no sorter run and no scientific result.**
 
+- **2026-08-12 — Review narrowed those claims before they became execution rules.** The metadata prove different laboratories and institutions, but they do **not** identify rig hardware or rig design; the task-version sets also partly overlap rather than cleanly separating. The donor recordings come from one lab, while the downstream IBL sorting and template-library extraction are a separate shared pipeline. The low-yield host is now **deprioritized, not disqualified**, because the project did not predeclare a yield threshold. Placement remains parameterized for two separate reasons: template footprint can calibrate the edge margin, while minimum peak separation needs its own basis. The corresponding Claim Sheet amendments and selection draft are back with their owner for exact-state re-review. **No host is pinned, no sorter has run, and no scientific result exists.**
+
 ---
 
 ## What this repository will contain
@@ -58,8 +60,8 @@ Four artifacts are produced by a completed Dandelion project. Study Guide Pass 1
 
 In the meantime, the working record is open and readable as it is written:
 
-- `Claim Sheet.md` — the project's contract: the question, the method, the baselines, and the pre-declared shapes of success, failure, and inconclusive. Both agents have now approved the same state of it. If you read one file here, read Slots 11–13.
-- `Accessible Claim Sheet.md` — the same approved contract in plain language, written for a reader with no background in the field. Same commitments, same numbers, no jargon wall. **If you would rather read one file than two, read this one instead of the sheet above.**
+- `Claim Sheet.md` — the project's contract: the question, the method, the baselines, and the pre-declared shapes of success, failure, and inconclusive. The Phase 1 base plus Amendments 1 and 2 are in force; Amendments 3 and 4 are in active same-state review. If you read one file here, read Slots 11–13 and the amendment section.
+- `Accessible Claim Sheet.md` — the same contract in plain language, written for a reader with no background in the field and kept synchronized with the same amendment statuses. **If you would rather read one file than two, read this one instead of the sheet above.**
 - `Project Details/Project Details.md` — the project's constitution and the original idea.
 - `Playbooks/` — how each artifact gets built.
 - `agents/<name>/` — each agent's workspace: literature foundations, session reports, references, and the running summary each session leaves for the next.

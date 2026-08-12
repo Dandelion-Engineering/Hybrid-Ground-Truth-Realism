@@ -15,21 +15,21 @@ no sorter was run, and nothing here measures drift, noise, or effective SNR.
 
 ## Verdict at the declared parameters
 
-subject    probe       span  chan  purity  sites  native  good   vs all  vs good  verdict
---------------------------------------------------------------------------------------------------------
-CSHL047    Probe00      560    58  100.0%     12     182    35    +5.5%     +29%  PASS
-CSHL047    Probe01      700    72  100.0%     15     174    32    +5.7%     +31%  PASS
-NYU-12     Probe00      440    46  100.0%      9      73    22   +13.7%     +45%  FAIL
-NYU-12     Probe01      640    66  100.0%     14     267    60    +3.7%     +17%  PASS
-NYU-37     Probe00      580    60  100.0%     12      86    12   +11.6%     +83%  PASS
-NYU-65     Probe00      580    60  100.0%     12     123    27    +8.1%     +37%  PASS
-NYU-45     Probe00      540    56  100.0%     11      90    20   +11.1%     +50%  PASS
-CSHL045    Probe00      540    56  100.0%     11     108    10    +9.3%    +100%  PASS
-NYU-39     Probe00      500    52  100.0%     10      22     1   +45.5%   +1000%  PASS
-CSHL047    Probe00      500    52  100.0%     10      74    22   +13.5%     +45%  PASS
-CSHL049    Probe00      460    48  100.0%      9     107    13    +9.3%     +77%  FAIL
-CSHL049    Probe00      440    46  100.0%      9      89    12   +11.2%     +83%  FAIL
-NYU-48     Probe00      420    44  100.0%      8      66     8   +15.2%    +125%  FAIL
+subject    session  probe       span  chan  purity  sites  native  good   vs all  vs good  verdict
+-----------------------------------------------------------------------------------------------------------------
+CSHL047    b52182e7 Probe00      560    58  100.0%     12     182    35    +5.5%     +29%  PASS
+CSHL047    b52182e7 Probe01      700    72  100.0%     15     174    32    +5.7%     +31%  PASS
+NYU-12     a8a8af78 Probe00      440    46  100.0%      9      73    22   +13.7%     +45%  FAIL
+NYU-12     a8a8af78 Probe01      640    66  100.0%     14     267    60    +3.7%     +17%  PASS
+NYU-37     7af49c00 Probe00      580    60  100.0%     12      86    12   +11.6%     +83%  PASS
+NYU-65     a2ec6341 Probe00      580    60  100.0%     12     123    27    +8.1%     +37%  PASS
+NYU-45     51e53aff Probe00      540    56  100.0%     11      90    20   +11.1%     +50%  PASS
+CSHL045    034e726f Probe00      540    56  100.0%     11     108    10    +9.3%    +100%  PASS
+NYU-39     6ed57216 Probe00      500    52  100.0%     10      22     1   +45.5%   +1000%  PASS
+CSHL047    2d5f6d81 Probe00      500    52  100.0%     10      74    22   +13.5%     +45%  PASS
+CSHL049    4b7fbad4 Probe00      460    48  100.0%      9     107    13    +9.3%     +77%  FAIL
+CSHL049    c99d53e6 Probe00      440    46  100.0%      9      89    12   +11.2%     +83%  FAIL
+NYU-48     3d59aa1a Probe00      420    44  100.0%      8      66     8   +15.2%    +125%  FAIL
 
 9 of 13 band(s) pass the placement and purity gate.
 
@@ -45,29 +45,30 @@ call to make.
 ## Capacity sweep — maximum placeable sites
 
 The edge margin and the minimum separation are declared parameters, not
-measurements: the donor templates' real multichannel footprint has not been
-measured yet. The sweep is here so the verdict can be re-read at any value
-without re-running the screen.
+measurements. Donor-template footprint can calibrate the edge margin; it
+does not by itself justify the minimum peak separation, which needs a
+separate basis from native peak depths and generator relocation constraints.
+The sweep is here so the verdict can be re-read without another network run.
 
-subject    probe       span  m20/s20  m20/s40  m20/s80  m60/s20  m60/s40  m60/s80  m100/s20  m100/s40  m100/s80  m140/s20  m140/s40  m140/s80
----------------------------------------------------------------------------------------------------------------------------------------------
-CSHL047    Probe00      560       27       14        7       23       12        6        19        10         5        15         8         4
-CSHL047    Probe01      700       34       17        9       30       15        8        26        13         7        22        11         6
-NYU-12     Probe00      440       21       11        6       17        9        5        13         7         4         9         5         3
-NYU-12     Probe01      640       31       16        8       27       14        7        23        12         6        19        10         5
-NYU-37     Probe00      580       28       14        7       24       12        6        20        10         5        16         8         4
-NYU-65     Probe00      580       28       14        7       24       12        6        20        10         5        16         8         4
-NYU-45     Probe00      540       26       13        7       22       11        6        18         9         5        14         7         4
-CSHL045    Probe00      540       26       13        7       22       11        6        18         9         5        14         7         4
-NYU-39     Probe00      500       24       12        6       20       10        5        16         8         4        12         6         3
-CSHL047    Probe00      500       24       12        6       20       10        5        16         8         4        12         6         3
-CSHL049    Probe00      460       22       11        6       18        9        5        14         7         4        10         5         3
-CSHL049    Probe00      440       21       11        6       17        9        5        13         7         4         9         5         3
-NYU-48     Probe00      420       20       10        5       16        8        4        12         6         3         8         4         2
+subject    session  probe       span  m20/s20  m20/s40  m20/s80  m60/s20  m60/s40  m60/s80  m100/s20  m100/s40  m100/s80  m140/s20  m140/s40  m140/s80
+------------------------------------------------------------------------------------------------------------------------------------------------------
+CSHL047    b52182e7 Probe00      560       27       14        7       23       12        6        19        10         5        15         8         4
+CSHL047    b52182e7 Probe01      700       34       17        9       30       15        8        26        13         7        22        11         6
+NYU-12     a8a8af78 Probe00      440       21       11        6       17        9        5        13         7         4         9         5         3
+NYU-12     a8a8af78 Probe01      640       31       16        8       27       14        7        23        12         6        19        10         5
+NYU-37     7af49c00 Probe00      580       28       14        7       24       12        6        20        10         5        16         8         4
+NYU-65     a2ec6341 Probe00      580       28       14        7       24       12        6        20        10         5        16         8         4
+NYU-45     51e53aff Probe00      540       26       13        7       22       11        6        18         9         5        14         7         4
+CSHL045    034e726f Probe00      540       26       13        7       22       11        6        18         9         5        14         7         4
+NYU-39     6ed57216 Probe00      500       24       12        6       20       10        5        16         8         4        12         6         3
+CSHL047    2d5f6d81 Probe00      500       24       12        6       20       10        5        16         8         4        12         6         3
+CSHL049    4b7fbad4 Probe00      460       22       11        6       18        9        5        14         7         4        10         5         3
+CSHL049    c99d53e6 Probe00      440       21       11        6       17        9        5        13         7         4         9         5         3
+NYU-48     3d59aa1a Probe00      420       20       10        5       16        8        4        12         6         3         8         4         2
 
 ## What sits inside and beside each band
 
-### CSHL047 Probe00 (2180-2740 um)
+### CSHL047 Probe00 (session b52182e7; 2180-2740 um)
 
   contacts in range        58 (58 labelled CA1)
   non-target inside band   none
@@ -79,7 +80,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        108.5 uV (p10 46.5, p90 205.3)
   their firing rates       4.63 Hz (p10 0.11, p90 12.44)
 
-### CSHL047 Probe01 (320-1020 um)
+### CSHL047 Probe01 (session b52182e7; 320-1020 um)
 
   contacts in range        72 (72 labelled CA1)
   non-target inside band   none
@@ -91,7 +92,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        110.5 uV (p10 55.2, p90 220.8)
   their firing rates       4.31 Hz (p10 0.15, p90 7.65)
 
-### NYU-12 Probe00 (2720-3160 um)
+### NYU-12 Probe00 (session a8a8af78; 2720-3160 um)
 
   contacts in range        46 (46 labelled CA1)
   non-target inside band   none
@@ -103,7 +104,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        94.4 uV (p10 55.1, p90 195.0)
   their firing rates       2.93 Hz (p10 0.13, p90 16.24)
 
-### NYU-12 Probe01 (3180-3820 um)
+### NYU-12 Probe01 (session a8a8af78; 3180-3820 um)
 
   contacts in range        66 (66 labelled CA1)
   non-target inside band   none
@@ -115,7 +116,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        107.8 uV (p10 48.7, p90 257.7)
   their firing rates       3.36 Hz (p10 0.15, p90 7.68)
 
-### NYU-37 Probe00 (3200-3780 um)
+### NYU-37 Probe00 (session 7af49c00; 3200-3780 um)
 
   contacts in range        60 (60 labelled CA1)
   non-target inside band   none
@@ -127,7 +128,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        60.9 uV (p10 37.4, p90 86.0)
   their firing rates       13.11 Hz (p10 0.93, p90 16.52)
 
-### NYU-65 Probe00 (2720-3300 um)
+### NYU-65 Probe00 (session a2ec6341; 2720-3300 um)
 
   contacts in range        60 (60 labelled CA1)
   non-target inside band   none
@@ -139,7 +140,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        71.1 uV (p10 23.7, p90 119.9)
   their firing rates       4.58 Hz (p10 0.10, p90 16.69)
 
-### NYU-45 Probe00 (2420-2960 um)
+### NYU-45 Probe00 (session 51e53aff; 2420-2960 um)
 
   contacts in range        56 (56 labelled CA1)
   non-target inside band   none
@@ -151,7 +152,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        82.9 uV (p10 50.6, p90 208.5)
   their firing rates       6.75 Hz (p10 0.09, p90 25.11)
 
-### CSHL045 Probe00 (1880-2420 um)
+### CSHL045 Probe00 (session 034e726f; 1880-2420 um)
 
   contacts in range        56 (56 labelled CA1)
   non-target inside band   none
@@ -163,7 +164,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        72.5 uV (p10 19.2, p90 158.3)
   their firing rates       7.73 Hz (p10 0.09, p90 14.91)
 
-### NYU-39 Probe00 (2360-2860 um)
+### NYU-39 Probe00 (session 6ed57216; 2360-2860 um)
 
   contacts in range        52 (52 labelled CA1)
   non-target inside band   none
@@ -175,7 +176,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        51.3 uV (p10 51.3, p90 51.3)
   their firing rates       8.07 Hz (p10 0.78, p90 13.34)
 
-### CSHL047 Probe00 (1960-2460 um)
+### CSHL047 Probe00 (session 2d5f6d81; 1960-2460 um)
 
   contacts in range        52 (52 labelled CA1)
   non-target inside band   none
@@ -187,7 +188,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        83.3 uV (p10 37.6, p90 139.2)
   their firing rates       8.93 Hz (p10 0.03, p90 25.32)
 
-### CSHL049 Probe00 (2600-3060 um)
+### CSHL049 Probe00 (session 4b7fbad4; 2600-3060 um)
 
   contacts in range        48 (48 labelled CA1)
   non-target inside band   none
@@ -199,7 +200,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        76.8 uV (p10 48.2, p90 98.8)
   their firing rates       6.63 Hz (p10 0.15, p90 14.01)
 
-### CSHL049 Probe00 (2520-2960 um)
+### CSHL049 Probe00 (session c99d53e6; 2520-2960 um)
 
   contacts in range        46 (46 labelled CA1)
   non-target inside band   none
@@ -211,7 +212,7 @@ NYU-48     Probe00      420       20       10        5       16        8        
   'good' units only        84.2 uV (p10 61.5, p90 190.2)
   their firing rates       6.26 Hz (p10 0.07, p90 15.98)
 
-### NYU-48 Probe00 (1860-2280 um)
+### NYU-48 Probe00 (session 3d59aa1a; 1860-2280 um)
 
   contacts in range        44 (44 labelled CA1)
   non-target inside band   none
@@ -227,8 +228,8 @@ NYU-48     Probe00      420       20       10        5       16        8        
 
 - The native unit counts are IBL's own Kilosort 2.5 output as published in
   the processed NWB, not this project's sorting. They are the right density
-  reference precisely because they are what the field already accepts about
-  this recording, and they are not a ground truth.
+  available first-party density reference for this recording; they are not
+  ground truth and do not become a host-admission threshold by themselves.
 - The amplitude column is the units table's median spike amplitude in
   microvolts, computed by IBL on their own preprocessed data. Whether its
   convention matches the donor library's amplitude_uv column has not been

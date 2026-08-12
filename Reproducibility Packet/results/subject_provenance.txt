@@ -36,6 +36,7 @@ KS096      cortexlab        University College London                    M    _i
 
 labs: {"cortexlab": 12}
 institutions: {"University College London": 12}
+protocols: {"_iblrig_tasks_ephysChoiceWorld6.4.2": 7, "_iblrig_tasks_ephysChoiceWorld6.5.3": 4, "_iblrig_tasks_ephysChoiceWorld": 1}
 
 ## Candidate host subjects
 
@@ -53,6 +54,7 @@ NYU-65     angelakilab      New York University / Center for Neural Scie M    _i
 
 labs: {"angelakilab": 6, "churchlandlab": 3}
 institutions: {"New York University / Center for Neural Science": 6, "Cold Spring Harbor Laboratory": 3}
+protocols: {"_iblrig_tasks_ephysChoiceWorld6.2.5": 4, "_iblrig_tasks_ephysChoiceWorld6.4.2": 4, "_iblrig_tasks_ephysChoiceWorld6.6.4": 1}
 
 ## Donor/host laboratory overlap
 
@@ -62,8 +64,19 @@ shared labs               []
 host labs free of donors  ['angelakilab', 'churchlandlab']
 
 A host subject from a laboratory that contributed no donor templates
-separates host and donor at the laboratory and rig level as well as at
-the animal level. That is a stronger separation than subject exclusion
-alone, and it is still not source independence: both sides remain one
-dandiset, one consortium, one acquisition program and one probe type.
+separates host and donor at the laboratory and institution level as well
+as at the animal level. Different institutions necessarily exclude one
+shared physical acquisition rig, but these fields do not identify rig
+hardware or establish whether the laboratories used the same rig design.
+This is still not source independence: both sides remain one dandiset,
+one consortium, one acquisition program and one probe type.
+
+## Donor/host task-protocol overlap
+
+donor protocols            ['_iblrig_tasks_ephysChoiceWorld', '_iblrig_tasks_ephysChoiceWorld6.4.2', '_iblrig_tasks_ephysChoiceWorld6.5.3']
+host-candidate protocols   ['_iblrig_tasks_ephysChoiceWorld6.2.5', '_iblrig_tasks_ephysChoiceWorld6.4.2', '_iblrig_tasks_ephysChoiceWorld6.6.4']
+shared protocols           ['_iblrig_tasks_ephysChoiceWorld6.4.2']
+
+The protocol sets partly overlap in the tracked records; they are
+neither identical nor disjoint.
 
