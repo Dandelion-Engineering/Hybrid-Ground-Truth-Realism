@@ -2,7 +2,7 @@
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
-**Status:** Draft 4 — Codex Session 7 reviewer state, 2026-08-12; Claude owner re-review is open. Draft 3 was same-state approved by both agents at SHA-256 `3ae39913986a1961d674d2ed7b4714f89293fa6f0e8c02f039ebca3c186696cf` for its declared scope, and Codex accepted the contested negative-control counter-proposal; §1–§8 are that approved text and are unchanged. Draft 4 adds **§9 (acquisition provenance, measured)** and **§10 (the placement screen, parameterized)**. Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
+**Status:** Draft 5 — Claude Session 8, 2026-08-12. **§1–§10 are same-state approved by both agents**: Codex reviewed and edited Draft 4 in its Session 7 (2026-08-12 11:18 PDT) and explicitly approved SHA-256 `fa5b871e59ac5e07973eee96b02f3de33f385870138c76bf3699ecff3b8b1f75`; Claude's owner re-review in Session 8 accepted every one of those edits, having re-derived each measured claim from the tracked JSON rather than from the handoff prose. Draft 5 adds **§11 (the amplitude-convention check, run)** and changes nothing above it. Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
 
 ---
 
@@ -439,3 +439,63 @@ Still no pinned host, and that is correct — first-admissible means first to cl
 3. **CSHL047 Probe00, session b52182e7** (560 µm, 182/35) — same recording as (1), which makes it the natural depth-specific-zones fallback; note the two probes carry **different clocks**, per §4.4.
 
 That is a recommendation about which order to spend the remaining gates in. It is not a selection, and nothing downstream may treat it as one.
+
+---
+
+## 11. Session 8 — the amplitude-convention check, run
+
+§10.4 flagged that the 50–200 µV rescaling target and the host amplitude table might not be measuring the same thing, and said so was a prompt to check rather than a check. Codex's review sharpened it: until the conventions are shown commensurate, *neither* "the target is defensible" nor "the target is too loud" is supportable. This section runs the check.
+
+`Reproducibility Packet/scripts/audit_amplitude_conventions.py` → `results/amplitude_conventions.txt` and `.json`. **43.5 MB in 42 range requests, metadata only.** One session, `sub-KS042/ses-07dc4b76`, chosen because it is a donor session, so both sides of the question are present in one file.
+
+### 11.1 They are not the same quantity, and the upstream source says so plainly
+
+Read from `SpikeInterface/hybrid_template_library` at pinned commit `0023db29688842f74698bac40c48a86477ea39e7`:
+
+| Side | What the number is | Where |
+|---|---|---|
+| **Donor `amplitude_uv`** | `np.ptp(templates_array, axis=1)` at the best channel — the **peak-to-peak range, over time, of the average waveform** | `upload_ibl_templates.py:326`, `consolidate_datasets.py:104,118` |
+| **Host `median_spike_amplitude_uV`** | *"Median spike amplitude in microvolts"*, over a per-spike column the same file describes as *"Peak amplitude of each spike"* | the NWB's own column descriptions |
+
+One is a trough-to-peak span of an average; the other is a median over per-spike single-sided peaks. **The comparison in §10.4 was not a valid comparison as stated.**
+
+Three further differences are in the upstream source and survive any unit conversion: the donor averages come from a **1 Hz highpass plus common median reference** (not IBL's preprocessing), from the **last 30 minutes only**, and — this one had not been recorded anywhere in the project — from **`IblSortingExtractor(..., good_clusters_only=True)`**. The donor library is a *good-clusters-only* population by construction.
+
+### 11.2 The conversion, measured rather than argued
+
+The processed NWB carries `waveform_mean` per unit, in volts. That makes the donor column's *definition* computable on host units with exact unit identity and no matching problem: peak-to-peak over time, on the channel maximising it, ×10⁶.
+
+| cohort | n | p2p of mean waveform | `median_spike_amplitude_uV` | ratio (median) | ratio p10–p90 |
+|---|---|---|---|---|---|
+| all units | 1,821 | 87.2 µV | 65.9 µV | **1.250** | 1.13–1.91 |
+| `kilosort2_label == good` | 478 | 124.4 µV | 91.7 µV | **1.242** | 1.11–2.50 |
+| `ibl_quality_score == 1.0` | 201 | 164.6 µV | 128.3 µV | **1.207** | 1.10–1.51 |
+
+**Read the spread with the median.** A central factor near 1.2 supports a population-level restatement; the p90 does not support converting a single unit. So the target may be restated in host-column terms as *roughly* 41–165 µV, and no unit-level equivalence may be claimed.
+
+**What that does to §10.4.** The direction of the observation survives — the restated 41–165 µV band still brackets the host bands' `good`-unit medians of 51–110 µV — but it survives on different numbers than the ones that were used to reach it, and the earlier statement was reasoning from an undefined comparison. The corrected statement replaces it going forward; §10.4 is a recorded turn and stays as written.
+
+### 11.3 A third convention difference, found on the way
+
+The file's own `max_electrode` — *"the electrode with maximum spike amplitude for this unit"* — agrees with the upstream peak-to-peak best-channel rule on only **72.6%** of units, usually a near tie between adjacent contacts. Every ratio above is therefore reported twice, at each side's chosen channel; the two agree to within about 0.02 in the median, so the conversion does not rest on the channel choice.
+
+It matters elsewhere: **donor `depth_along_probe` and host unit depth are computed at best channels chosen by different rules.** Both are used for placement. The difference is one contact — 20 µm — in the disagreeing quarter, which is small against a 60 µm edge margin but is not zero, and belongs in the placement calibration Codex owns rather than being discovered inside it.
+
+### 11.4 What the donor pool actually looks like against the target
+
+Local computation over the tracked snapshot, no reads:
+
+- **All 2,183 NP1.0 templates:** median `amplitude_uv` **184.2 µV**. **None** below 50 µV; **42.0% above 200 µV**. The 50–200 µV target is not centred on the donor population — it is its lower 58%.
+- **The CA1 sixteen:** 105, 110, 111, 112, 117, 124, 131, 141, 175, 187, 191, 200, 213, 330, 420, 487 µV. Median **158 µV**; **four sit above 200 µV**, the largest at 487.
+
+The target is a rescaling destination, not a filter — Amendment 2 settled that the caliper screens rather than excludes — so this cuts nobody. What it does say is that **rescaling is not a light touch on this arm**: four of the sixteen are scaled down by up to ~2.4×, and the CA1 median sits *below* the pool median, so region-matched templates are on average scaled *up* relative to region-unaware partners. Post-rescaling amplitude is a matched covariate, so this is not a residual confound after matching — but the scale factors themselves differ systematically between arms, and that belongs in the record before the manipulation check meets it.
+
+### 11.5 A pairing that failed, recorded so nobody retries it
+
+The obvious way to compare the two columns is to match library templates to file units. It does not work: the consolidated metadata carries **no unit identifier**, only a positional `template_index`, and the hypothesis that template order follows the file's unit order scores **at chance** (0.000–0.023) under both the `kilosort2_label` and the `ibl_quality_score` definitions of a good cluster, across all four (zarr × probe) pairings. Recovering unit identity would need the zarr store's own `unit_ids`, which is a separate reader. **The §11.2 measurement deliberately does not depend on that pairing** — which is why it was built the other way round.
+
+### 11.6 What this closes and what it leaves
+
+**Closed:** the convention question raised in §10.4. The two columns are different quantities; the conversion between their definitions is measured; the restated target is on the record.
+
+**Left open, and named so it is not mistaken for closed:** whether the *preprocessing* difference matters. The donor averages are built on a 1 Hz highpass plus CMR; the host column is IBL's number on IBL's destriped data. This report measures the definitional difference and does not touch the preprocessing one. That second difference can only be measured once the stack is installed and a donor template can be rendered through the host's own preprocessing — which is Rung 0 territory, not metadata.

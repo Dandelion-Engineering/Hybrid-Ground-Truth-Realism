@@ -20,9 +20,14 @@ agents/Claude/
 │  ├─ HumanReport3.md
 │  ├─ HumanReport4.md
 │  ├─ HumanReport5.md
-│  └─ HumanReport6.md
-└─ Progress Reports/                      Director-facing reports, every 8th session
-   └─ Progress Report Phase 0 Close.md    and at phase transitions.
+│  ├─ HumanReport6.md
+│  ├─ HumanReport7.md
+│  └─ HumanReport8.md
+└─ Progress Reports/                      Director-facing reports, every 8th session,
+   ├─ Progress Report Phase 0 Close.md    at phase transitions, and at approved
+   ├─ Progress Report Amendment           Claim Sheet amendments.
+   │  Provenance and Finite Donor Pool.md
+   └─ Progress Report Session 8.md
 ```
 
 ---
@@ -39,7 +44,7 @@ agents/Claude/
 
 **`Progress Reports/`** — Director-facing reports written at every eighth session I run, and additionally at any phase transition or approved Claim Sheet amendment. Written at the bar of the Accessible Piece: clear, honest, jargon-free.
 
-**`Tier A Host and Injection Zone Selection.md`** — The Phase 2 analysis behind my share of the labor split: which host recording and which anatomical injection zone Tier A should use, what the donor pool for that zone actually is, and what the choice costs. It is a **host-selection strategy and zone recommendation under active review**, not a completed selection — no host asset is pinned. Codex owns Tier A's independent balance and manipulation gate precisely so the agent proposing the selection is not the agent approving it. Draft 4 carries Codex's Session 5 reviewer edits and rulings (§7), my Session 6 owner re-review (§8, which accepts two rulings, contests one, and applies the duration gate in §4.4), and Session 7's §9 (acquisition provenance, measured) and §10 (the placement and label-ambiguity gate, applied). §1–§8 are the state both agents same-state approved and are unchanged. It states what it has not tested as prominently as what it has.
+**`Tier A Host and Injection Zone Selection.md`** — The Phase 2 analysis behind my share of the labor split: which host recording and which anatomical injection zone Tier A should use, what the donor pool for that zone actually is, and what the choice costs. It is a **host-selection strategy and zone recommendation under active review**, not a completed selection — no host asset is pinned. Codex owns Tier A's independent balance and manipulation gate precisely so the agent proposing the selection is not the agent approving it. Draft 5 carries Codex's Session 5 reviewer edits and rulings (§7), my Session 6 owner re-review (§8), Session 7's §9 (acquisition provenance, measured) and §10 (the placement screen, parameterized) as Codex reviewed and edited them, and Session 8's §11 (the amplitude-convention check, run). **§1–§10 are same-state approved by both agents** and are unchanged. It states what it has not tested as prominently as what it has.
 
 ---
 
@@ -64,7 +69,7 @@ There is no scratch area in this workspace yet. If one becomes necessary, it wil
 
 | Path | My relationship to it |
 |---|---|
-| `Claim Sheet.md` | **Written by me (Session 2); reviewed and edited by Codex (Sessions 2 and 3); re-reviewed and edited by me (Session 3); re-reviewed and explicitly approved by me (Session 4).** **Same-state closed** at SHA-256 `a5f5860…` — both agents approved identical bytes and no disagreement survived. Changes from here go through the amendment protocol, not the review cycle. **Session 6 added an `## Amendments` section.** As of Session 7, Amendments 1 and 2 are `In force` and Amendments 3 (Tier A's negative-control band) and 4 (measured acquisition provenance) are `Proposed`, awaiting Codex's exact-state approval. The approved text above that section is untouched and still governs. |
+| `Claim Sheet.md` | **Written by me (Session 2); reviewed and edited by Codex (Sessions 2 and 3); re-reviewed and edited by me (Session 3); re-reviewed and explicitly approved by me (Session 4).** **Same-state closed** at SHA-256 `a5f5860…` — both agents approved identical bytes and no disagreement survived. Changes from here go through the amendment protocol, not the review cycle. **Session 6 added an `## Amendments` section.** As of Session 8, Amendments 1, 2 and 4 are `In force`; Amendment 3 (Tier A's negative-control band) is `Proposed` at a Claude-edited state awaiting Codex, and it blocks all Tier A generation until it is in force. The approved text above that section is untouched and still governs. |
 | `README.md` (repository root — the Live-Run README) | **Created and currently maintained by me.** Ownership is open to the Phase 1 labor split. Built per `Playbooks/live-run-readme.md`. |
 | `CITATION.cff`, `LICENSING.md` | Updated by me in Session 1 to describe this project rather than the framework template. Shared. |
 | `Reproducibility Packet/scripts/audit_template_library.py` | Written by me (Session 2). The packet is **co-owned** with Codex; this script is mine and is packet-ready as written. **Known duplication:** its CSV fetch and caliper logic now also live in `utils/template_metadata.py`; it should be refactored onto the shared module before the packet is assembled. Recorded rather than left silent. |
@@ -72,12 +77,13 @@ There is no scratch area in this workspace yet. If one becomes necessary, it wil
 | `Reproducibility Packet/scripts/audit_donor_provenance.py` · `survey_host_anatomy.py` · `validate_ccf_label_map.py` | Written by me (Session 5) for Tier A selection. Packet-ready as written. |
 | `Reproducibility Packet/scripts/screen_host_timing.py` | Written by me (Session 6), hardened by Codex (Session 6). Applies the duration gate by measuring each candidate's real rate and duration from its own `timestamps` dataset. Packet-ready as written; resumable via `host_timing_index.jsonl`. |
 | `Reproducibility Packet/scripts/audit_subject_provenance.py` | Written by me (Session 7). Reads each subject's laboratory, institution and protocol from its own NWB header, and records which subject fields the substrate does not carry at all. Packet-ready as written. |
+| `Reproducibility Packet/scripts/audit_amplitude_conventions.py` | Written by me (Session 8). Settles whether the donor library's `amplitude_uv` and the host files' `median_spike_amplitude_uV` are the same quantity — they are not — by reading both definitions from primary sources and then measuring the conversion on host units via the files' own `waveform_mean`. Packet-ready as written. |
 | `Reproducibility Packet/scripts/screen_injection_placement.py` | Written by me (Session 7). Applies Slot 7's placement and label-ambiguity gate, reports the capacity sweep, and measures the host's own unit density and amplitude distribution inside each candidate zone. Has a `--from-records` mode that rebuilds its report with no network reads. Packet-ready as written. |
 | `requirements.txt` | **Created by me (Session 5)** at the project's first dependency install (`h5py`, `numpy`). Shared and append-as-you-install: whoever installs a package pins it here in the same session. |
 | `chats/Claude-Codex/Phase 0 Literature Comparison/` | Opened by me. **Concluded** — see its `Summary.md`. |
 | `chats/Claude-Codex/Claim Sheet Review/` | Opened by me. **Concluded** (Codex, Session 4) — see its `Summary.md`. |
 | `chats/Claude-Codex/Study Guide Pass 1 Review/` | Opened by me (Session 3). **Concluded** (Codex, Session 4) — see its `Summary.md`. |
-| `chats/Claude-Codex/Tier A Selection Review/` | Opened by me (Session 5). **Active, and the live one.** Codex reviewed, edited and ruled (Session 5); I re-reviewed and contested one ruling (Session 6); Codex accepted the counter-proposal and asked for it in the contract (Session 6); I closed Amendment 2, wrote Amendments 3 and 4, and applied the placement gate (Session 7). Open on: exact-state review of Amendments 3 and 4, who measures the donor template footprint, and whether to set an overcrowding threshold. |
+| `chats/Claude-Codex/Tier A Selection Review/` | Opened by me (Session 5). **Active, and the live one.** Codex reviewed, edited and ruled (Session 5); I re-reviewed and contested one ruling (Session 6); Codex accepted the counter-proposal and asked for it in the contract (Session 6); I closed Amendment 2, wrote Amendments 3 and 4, and applied the placement gate (Session 7). Codex reviewed and edited both amendments and Draft 4 (Session 7); I re-reviewed, approved Amendment 4 into force, and edited Amendment 3 (Session 8). Open on: Amendment 3's edited point 1, and whether arm-asymmetric rescaling factors belong in Codex's balance gate. Codex owns the footprint/placement calibration; both agents declined to set an overcrowding threshold. |
 | `chats/Claude-Codex/Compute Environment Update/` | Opened by me (Session 5 addendum). **Concluded** (Codex, Session 6) — see its `Summary.md`. Amendment 1 is `In force`. |
 | `Study Guide/Pass 1 - Conceptual Foundation.tex` | **Written by me (Session 3); reviewed and edited by Codex (Session 3); re-reviewed by me (Session 4); explicitly approved by Codex (Session 4) at the same source/PDF state.** Same-state closed at source `d33e74d…` / PDF `75e1423…`. 13 pages. Changes from here go through the amendment protocol. |
 | `Accessible Claim Sheet.md` | **Written by me (Session 4) against the exact approved Claim Sheet state; explicitly approved by Codex (Session 4) without edits.** Same-state closed at SHA-256 `73bff8f…`. Mine under the agreed labor split. **It must be kept in sync with the technical sheet forever; drift between them is a defect, not a backlog item** — every amendment so far has gone into both sheets in the same session, which is the standard. |

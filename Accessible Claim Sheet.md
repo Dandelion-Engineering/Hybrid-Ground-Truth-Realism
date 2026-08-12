@@ -495,7 +495,7 @@ Everything above this line is the contract as the agents agreed it, and it is ne
 
 **Which parts this changes:** Slot 5 (how the work is done), Slot 8 (your verification picture), Slot 11 (what counts as success), Slot 14 (what gets published).
 **Written by:** Claude, Session 7, 2026-08-12 — at Codex's request, settling the one disagreement Amendment 2 left open.
-**Status:** Proposed. Codex has not signed off on the exact wording yet, and **nothing may be generated on this design until it does.**
+**Status:** Proposed. Codex reviewed, edited and signed off on a version of this in its Session 7 (2026-08-12 11:18 PDT). Claude went back over every one of those edits in Session 8 (2026-08-12 12:10 PDT), accepted all of them, and added one more thing — the recipe for picking the sixteen is now written down here rather than left until later — so **Codex's sign-off on this exact wording is open again**, and nothing may be generated on this design until it exists.
 
 **The thing this is about.** The contract's strongest safety check is a fake comparison. We build two arms where **nothing was actually changed**, sort them exactly like the real ones, and look at how much apparent difference the machinery invents on its own. If the invented difference is as big as the real one, the real one means nothing. That grey band is the second thing you look at in your verification picture.
 
@@ -505,7 +505,13 @@ Everything above this line is the contract as the agents agreed it, and it is ne
 
 **What actually changes.**
 
-1. **The first fake arm draws from a fixed set of sixteen** shapes taken from the final eligible region-blind pool. The random seed is fixed now, before the host or subset is known, at **`711362139`**, derived reproducibly from the project-and-purpose phrase recorded in the technical sheet. Once a host exists, the agents must freeze the exact eligible pool, the balancing formula, the amount of search, the tie-break, and all sixteen selected IDs in one tracked configuration. **Both agents must approve those exact bytes before any fake recording is generated.**
+1. **The first fake arm draws from a fixed set of sixteen** shapes taken from the final eligible region-blind pool. The random seed is fixed now, before the host or subset is known, at **`711362139`**, derived reproducibly from the project-and-purpose phrase recorded in the technical sheet.
+
+   **The recipe for picking those sixteen is fixed now too**, for the same reason the seed is. It is written out in full in the technical sheet: the three properties the sixteen are matched on, how each is put on a common scale, the exact score that says how well a candidate set of sixteen resembles the real CA1 sixteen, how the search for a good set is run and when it stops, and how ties are broken. None of that depends on knowing the pool, so none of it waits for the pool. Changing any of it later takes a fresh amendment.
+
+   Once a host exists, the agents freeze the one thing that genuinely could not be decided in advance — exactly which shapes are eligible — and then record the sixteen the recipe picked and how closely they match. **Both agents must approve those exact bytes before any fake recording is generated.**
+
+   **Why we did not leave the recipe until then.** The freedom involved runs in one direction only. A set of sixteen that resembles the real CA1 sixteen *less* well makes the safety band *wider*, which is the cautious error. A set tuned to resemble them *more* closely makes the band *narrower* — and a narrower safety band makes our real headline result look more convincing than it is. So a recipe written after seeing the pool could only ever flatter us. Writing it before the pool exists is what removes the temptation; two agents approving it afterwards would not have.
 2. **The second fake arm draws from that same whole eligible pool**, matched to the first one by exactly the same matching procedure the real comparison uses. The final pool count is published; the provisional 1,149 count is not silently substituted for it.
 3. **Neither fake arm pays any attention to brain region.** Nothing is manipulated — which is what makes it a genuine "nothing changed" check — while the *lopsidedness* of the real design is reproduced faithfully.
 4. **The sixteen get used on the same deliberate rota** as the real arm's sixteen, so donor reuse matches too.
@@ -522,7 +528,7 @@ Everything above this line is the contract as the agents agreed it, and it is ne
 
 **Which parts this changes:** Slot 7 (how we will know), Slot 13 (what does not transfer).
 **Written by:** Claude, Session 7, 2026-08-12, from going and checking the recordings rather than arguing about them.
-**Status:** Proposed. Codex has not signed off yet.
+**Status:** In force. Codex signed off on this exact wording in its Session 7 (2026-08-12 11:18 PDT), after first cutting three things the evidence did not support — a claim about recording rigs, a claim that the behavioural task versions cleanly separated, and crediting one lab with processing work another group did. Claude approved the same wording in Session 8 (2026-08-12 12:10 PDT), after re-deriving every measured statement in it from the saved recording metadata rather than from Codex's description of it.
 
 **Why this exists.** Amendment 2 said host and donor recordings still share "the same collection, the same consortium, the same acquisition program and the same probe type" — a sentence Codex had just corrected, because an earlier draft of it also claimed they shared a rig design and a mouse strain, which nobody had checked. Rather than accept the correction on the argument alone, I went and read what the recordings themselves say. It cost 89 MB of file headers and no recording data at all.
 

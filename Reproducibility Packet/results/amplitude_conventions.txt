@@ -1,0 +1,126 @@
+Amplitude-convention audit: donor `amplitude_uv` vs IBL `median_spike_amplitude_uV`
+==============================================================================
+generated: 2026-08-12 12:23 Pacific Daylight Time
+session:   07dc4b76-5b93-4a03-82a0-b3d9cc73f412  (subject KS042)
+asset:     sub-KS042/sub-KS042_ses-07dc4b76-5b93-4a03-82a0-b3d9cc73f412_desc-processed_behavior+ecephys.nwb
+upstream:  SpikeInterface/hybrid_template_library @ 0023db29688842f74698bac40c48a86477ea39e7
+io:        43,456,129 bytes in 42 range requests, metadata only
+
+1. The donor column, from the pinned upstream source
+------------------------------------------------------------------------------
+  python/upload_ibl_templates.py:326
+      peak_to_peak = np.ptp(templates_extension_data.templates_array, axis=1)
+  python/upload_ibl_templates.py:44-59
+      best channel = argmax over channels of the same peak-to-peak
+  python/consolidate_datasets.py:104,118
+      'amplitude_uv' = peak_to_peak[template_index, best_channel_index]
+
+  `amplitude_uv` is the PEAK-TO-PEAK range, over time, of the AVERAGE
+  waveform on the unit's best channel: trough to peak, one number per unit,
+  taken from an averaged waveform.
+
+  Differences that survive any unit conversion, same source:
+    upload_ibl_templates.py:219-220
+        common_reference(highpass_filter(phase_shift(astype(rec,'float32')), freq_min=1.0))
+    upload_ibl_templates.py:225-226
+        random_spikes method='all' -- the average uses every spike in the window
+    upload_ibl_templates.py:71
+        minutes_by_the_end = 30 -- only the last 30 minutes of each recording
+    upload_ibl_templates.py:162
+        IblSortingExtractor(..., good_clusters_only=True) -- donors are good clusters only
+
+2. The host column, in the file's own words
+------------------------------------------------------------------------------
+  median_spike_amplitude_uV:
+      Median spike amplitude in microvolts. IBL uses 50 uV threshold for quality filtering.
+  max_spike_amplitude_uV:
+      Maximum spike amplitude in microvolts.
+  min_spike_amplitude_uV:
+      Minimum spike amplitude in microvolts.
+  spike_amplitudes_uV:
+      Peak amplitude of each spike for each unit in microvolts.
+  waveform_mean:
+      the spike waveform mean for each spike unit
+  max_electrode:
+      Index into the electrodes table for the electrode with maximum spike amplitude for this unit.
+  kilosort2_label:
+      Original Kilosort2 classification: 'good', 'mua', or 'noise'.
+  ibl_quality_score:
+      Proportion of IBL quality metrics passed (0.0, 0.33, 0.67, or 1.0). 1.0 = all three passed.
+  spike_count:
+      Total number of spikes assigned to this unit. Integer type; -1 indicates missing data.
+
+  units columns present (32):
+      cluster_uuid, cumulative_drift_um_per_hour, distance_from_probe_tip_um, electrodes, electrodes_index, firing_rate, ibl_quality_score, id, isi_violations_ratio, kilosort2_label, max_electrode, max_spike_amplitude_uV, median_spike_amplitude_uV, min_spike_amplitude_uV, missed_spikes_estimate, noise_cutoff, peak_to_trough_duration_ms, presence_ratio, presence_ratio_std, probe_name, rp_violation, sliding_rp_violation, spike_amplitude_std_dB, spike_amplitudes_uV, spike_amplitudes_uV_index, spike_count, spike_distances_from_probe_tip_um, spike_distances_from_probe_tip_um_index, spike_times, spike_times_index, unit_name, waveform_mean
+
+  So the host column is the MEDIAN over spikes of a PER-SPIKE PEAK
+  amplitude. The donor column is a PEAK-TO-PEAK range of an AVERAGE.
+  Those are different measurements of different objects, and the rest of
+  this report measures how different.
+
+3. The conversion, measured on the same units
+------------------------------------------------------------------------------
+  For every unit in this file: nan-aware peak-to-peak of `waveform_mean`
+  over time, on the channel maximising it, converted volts -> microvolts.
+  That is the donor column's definition evaluated on host units. Each
+  unit's value is then divided by its own `median_spike_amplitude_uV`.
+
+  A third convention difference showed up here and is reported rather than
+  smoothed over. The file's `max_electrode` is chosen by IBL's own rule,
+  not by peak-to-peak of this mean waveform, and the two agree on only
+  72.6% of units -- usually a near tie between adjacent
+  contacts. Every ratio below is therefore given twice: on the channel the
+  upstream rule picks, and on the electrode the file itself names. They
+  agree closely, so the conversion does not rest on the channel choice.
+
+  cohort all  (n = 1821)
+    p2p of mean waveform (uV):   median    87.2   p10    35.1   p90   222.7
+    median_spike_amplitude_uV:   median    65.9   p10    28.7   p90   133.4
+    ratio (p2p / median):        median   1.250   p10   1.129   p90   1.910
+                                 min   0.001   max  15.725
+    same, at the file's electrode: median   1.229   p10   1.053   p90   1.711
+
+  cohort kilosort_good  (n = 478)
+    p2p of mean waveform (uV):   median   124.4   p10    71.7   p90   292.8
+    median_spike_amplitude_uV:   median    91.7   p10    53.5   p90   178.7
+    ratio (p2p / median):        median   1.242   p10   1.107   p90   2.497
+                                 min   0.701   max   8.838
+    same, at the file's electrode: median   1.225   p10   1.046   p90   2.407
+
+  cohort ibl_quality_1  (n = 201)
+    p2p of mean waveform (uV):   median   164.6   p10    98.5   p90   334.9
+    median_spike_amplitude_uV:   median   128.3   p10    80.8   p90   230.2
+    ratio (p2p / median):        median   1.207   p10   1.097   p90   1.514
+                                 min   0.701   max   7.466
+    same, at the file's electrode: median   1.194   p10   1.058   p90   1.498
+
+4. The donor templates from this same session, for scale
+------------------------------------------------------------------------------
+  pid 530f1670-9412-44ac-afdb-935d46bcaad3  n = 42
+    amplitude_uv (uV):           median   203.3   p10   112.0   p90   474.0
+  pid 97207d87-3fcd-4ebb-b0c7-087bdbf8a95c  n = 44
+    amplitude_uv (uV):           median   197.3   p10   121.0   p90   344.7
+
+  Unit-level pairing between these templates and the file's units was
+  attempted and FAILED: the library records no unit id in the
+  consolidated metadata, and the hypothesis that template order follows
+  the file's unit order scored at chance under both the `kilosort2_label`
+  and the `ibl_quality_score` definitions of a good cluster. Do not
+  retry order-based pairing; it would need the zarr store's `unit_ids`.
+  The measurement in section 3 does not depend on that pairing.
+
+5. What this establishes, and what it does not
+------------------------------------------------------------------------------
+  Establishes: the two columns are NOT the same quantity, and the
+  conversion between their definitions is measured above on real units.
+  Any comparison of the 50-200 uV donor target against host amplitudes
+  must apply that conversion first.
+
+  Does not establish: that the converted numbers are directly comparable.
+  The donor averages are built on a 1 Hz highpass plus common median
+  reference over the last 30 minutes of good clusters only, while the host
+  column is IBL's own number on IBL's own preprocessing over the whole
+  recording. Preprocessing is a second difference this report does not
+  measure and does not claim to have removed.
+
+  One session. It fixes the convention, not the population.

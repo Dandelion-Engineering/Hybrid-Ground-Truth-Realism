@@ -28,6 +28,7 @@ Corrections propagate forward, not backward. `Literature Foundation.md` is a fro
 | 2 | `hybrid_template_library` holds ~601 templates skewed toward visual cortex | Live first-party CSV holds **7,877 rows** — 2,183 Neuropixels 1.0 across 37 source datasets and 170 area labels. The tutorial's rendered table is a stale snapshot. | Codex Session 1; independently reproduced by Claude Session 2 |
 | 2 | The anchor's Cohen's *d* (0.276 / 0.408) can serve as the ranking-flip threshold | It cannot: the two quantities are standardized over different denominators and sampling structures. The *d* values are **contextual calibration** — they establish that sorter-versus-sorter differences here are small-to-moderate. The decision threshold is the paired sorter gap measured **inside this experiment**, in raw accuracy units. | Codex Session 1; accepted by Claude Session 2 |
 | 4 | SHYBRID relocation "carries its real spike train and per-spike waveform variability with it" | Overstated, and reasoned from the design idea rather than from the source. The implementation reuses observed spike times after a fixed shift and each spike's **fitted template amplitude**, but assigns **fresh random sub-sample jitter** to the insertion train and does not transport observed waveform shape. | Codex Session 3 from the public implementation; accepted by Claude Session 4 |
+| 8 | The 50–200 µV rescaling target "brackets the `good` units" and is "too loud" for the MUA population | Reasoning from an undefined comparison. Donor `amplitude_uv` is the **peak-to-peak of an average waveform**; host `median_spike_amplitude_uV` is a **median over per-spike single-sided peaks**. Measured conversion: ratio median **1.207** on `ibl_quality_score == 1.0` units (p10 1.10, p90 1.51). Restated, the target is roughly **41–165 µV** in host-column terms, population-level only — never unit-level. The direction of the original observation survives; its numbers do not. | Flagged by Claude Session 7, sharpened by Codex Session 7, measured by Claude Session 8 |
 
 ---
 
@@ -215,6 +216,32 @@ Two parts of these files the project had not opened before this session.
 3. **A negative that matters.** `cumulative_drift_um_per_hour` reaches ~6.5 × 10⁶ on these files, so whatever it accumulates it is not net probe drift at that magnitude. It is **not** used, and drift remains an open gate needing a real measurement. This is recorded so a later session does not rediscover the column and treat its name as its definition.
 
 *Boundary:* the units table is IBL's Kilosort 2.5 output as published, not this project's sorting and not ground truth. Its `median_spike_amplitude_uV` is computed by IBL on IBL's preprocessed data, and whether that convention matches the donor library's `amplitude_uv` column is **unverified** — so the observation that the 50–200 µV rescaling target brackets the `good` units' 51–110 µV medians is a flag for that check, not a validation of the target.
+
+### `hybrid_template_library` — the upstream construction scripts, read at a pinned commit
+
+**What it covers.** The Python that builds and consolidates the donor template database this project draws both Tier A arms from. Repository `SpikeInterface/hybrid_template_library`, **pinned commit `0023db29688842f74698bac40c48a86477ea39e7`** (2024-09-29, head of `main` when read on 2026-08-12 — the library has not moved since 2024). MIT.
+
+**How it informed the project.** It settles what the `amplitude_uv` column in the consolidated metadata actually is, which the Claim Sheet's 50–200 µV rescaling target is stated in and which Session 7 compared against host numbers without knowing:
+
+- `upload_ibl_templates.py:326` — `peak_to_peak = np.ptp(templates_extension_data.templates_array, axis=1)`; `consolidate_datasets.py:104,118` take that at the best channel and name it `amplitude_uv`. So it is the **peak-to-peak range over time of the average waveform**, not a per-spike amplitude.
+- `upload_ibl_templates.py:44-59` — the best channel is the argmax of that same peak-to-peak, which is a *different* rule from IBL's `max_electrode`.
+- `upload_ibl_templates.py:219-220` — templates are averaged on `common_reference(highpass_filter(..., freq_min=1.0))`, not IBL's preprocessing.
+- `upload_ibl_templates.py:71` — only the **last 30 minutes** of each recording.
+- `upload_ibl_templates.py:162` — `IblSortingExtractor(..., good_clusters_only=True)`. **The donor library is a good-clusters-only population by construction**, which nothing in the project had recorded.
+- `upload_ibl_templates.py:154-156` — the zarr dataset name is `f"{dandiset_id}_{dandi_name}_{sorting_pid}.zarr"`, which is how a `dataset` cell in the snapshot resolves to a session and an IBL probe-insertion id.
+
+*Link:* <https://github.com/SpikeInterface/hybrid_template_library/tree/0023db29688842f74698bac40c48a86477ea39e7>
+*Citation:* SpikeInterface contributors. *hybrid_template_library*. GitHub, commit `0023db29`, 2024. MIT licence.
+
+*Boundary:* read as source, not run. Nothing here has been executed, and the claim is about what the code computes, not about whether the templates in the bucket were produced by exactly this revision.
+
+### The amplitude-convention measurement (this project's own result)
+
+**What it covers.** Whether the donor library's `amplitude_uv` and DANDI 000409's `median_spike_amplitude_uV` are commensurate. `Reproducibility Packet/scripts/audit_amplitude_conventions.py` → `results/amplitude_conventions.txt`, on `sub-KS042/ses-07dc4b76`, 43.5 MB of metadata in 42 range requests.
+
+**How it informed the project.** They are **not** the same quantity — a peak-to-peak span of an average versus a median over per-spike single-sided peaks. Evaluating the donor definition on host units via the file's own `waveform_mean` gives a ratio with median **1.207** on `ibl_quality_score == 1.0` units (p10 1.10, p90 1.51) and 1.250 over all units. That supports restating the 50–200 µV target as roughly **41–165 µV** in host-column terms at the population level, and does **not** support converting any single unit. It supersedes the flagged comparison in the entry above: the direction of that observation survives the correction, the numbers it was reached on do not.
+
+*Boundary:* one session, and definitional only. The preprocessing difference between the donor pipeline and IBL's is untouched and unmeasured.
 
 ---
 
