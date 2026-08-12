@@ -1,0 +1,82 @@
+
+# Host anatomy survey
+
+dandiset            000409 (draft)
+asset suffix        _desc-raw_ecephys.nwb
+subjects excluded   KS042, KS043, KS044, KS046, KS051, KS052, KS055, KS084, KS086, KS091, KS094, KS096
+candidates          429
+indexed             46
+failed this run     0
+target structure    CA1
+max band gap        40.0 um
+
+## Unmapped CCF labels (296 distinct)
+
+These host structure names have no entry in utils/ccf_labels.py, so no donor can
+be matched to them. They are listed rather than dropped.
+
+     16 recording(s)  arbor vitae
+     15 recording(s)  Midbrain
+     14 recording(s)  Medulla
+     13 recording(s)  supra-callosal cerebral white matter
+      8 recording(s)  Pallidum
+      8 recording(s)  Striatum
+      8 recording(s)  Thalamus
+      7 recording(s)  Reticular nucleus of the thalamus
+      7 recording(s)  cingulum bundle
+      7 recording(s)  choroid plexus
+      7 recording(s)  Crus 1
+      7 recording(s)  Crus 2
+      6 recording(s)  Pons
+      6 recording(s)  Primary motor area Layer 6b
+      6 recording(s)  internal capsule
+      6 recording(s)  lateral ventricle
+      6 recording(s)  Olfactory areas
+      6 recording(s)  brachium of the superior colliculus
+      6 recording(s)  corpus callosum posterior forceps
+      5 recording(s)  Anterior area layer 4
+      5 recording(s)  Anterior area layer 6a
+      5 recording(s)  Anterior area layer 6b
+      5 recording(s)  fimbria
+      5 recording(s)  Paramedian lobule
+      5 recording(s)  spinal tract of the trigeminal nerve
+      5 recording(s)  lateral recess
+      4 recording(s)  Ethmoid nucleus of the thalamus
+      4 recording(s)  Posterior complex of the thalamus
+      4 recording(s)  Substantia innominata
+      4 recording(s)  external capsule
+      4 recording(s)  Bed nuclei of the stria terminalis
+      4 recording(s)  Hypothalamus
+      4 recording(s)  external medullary lamina of the thalamus
+      4 recording(s)  Superior colliculus motor related deep gray layer
+      4 recording(s)  Endopiriform nucleus dorsal part
+      4 recording(s)  Primary somatosensory area mouth layer 5
+      4 recording(s)  Posterior triangular thalamic nucleus
+      4 recording(s)  medial lemniscus
+      4 recording(s)  Lobules IV-V
+      4 recording(s)  fourth ventricle
+  ... and 256 more
+
+## Recordings with a contiguous CA1 band of at least 20 channels
+
+  ch  rows  depth_lo  depth_hi     probe         subject  session / path
+----------------------------------------------------------------------------------------------------
+  72    36       320      1020   Probe01         CSHL047  b52182e7  sub-CSHL047/sub-CSHL047_ses-b52182e7-39f6-4914-9717-136db589706e_desc-raw_ecephys.nwb
+  66    33      3180      3820   Probe01          NYU-12  a8a8af78  sub-NYU-12/sub-NYU-12_ses-a8a8af78-16de-4841-ab07-fde4b5281a03_desc-raw_ecephys.nwb
+  60    30      3200      3780   Probe00          NYU-37  7af49c00  sub-NYU-37/sub-NYU-37_ses-7af49c00-63dd-4fed-b2e0-1b3bd945b20b_desc-raw_ecephys.nwb
+  60    30      2720      3300   Probe00          NYU-65  a2ec6341  sub-NYU-65/sub-NYU-65_ses-a2ec6341-c55f-48a0-a23b-0ef2f5b1d71e_desc-raw_ecephys.nwb
+  58    29      2180      2740   Probe00         CSHL047  b52182e7  sub-CSHL047/sub-CSHL047_ses-b52182e7-39f6-4914-9717-136db589706e_desc-raw_ecephys.nwb
+  56    28      2420      2960   Probe00          NYU-45  51e53aff  sub-NYU-45/sub-NYU-45_ses-51e53aff-1d5d-4182-a684-aba783d50ae5_desc-raw_ecephys.nwb
+  56    28      1880      2420   Probe00         CSHL045  034e726f  sub-CSHL045/sub-CSHL045_ses-034e726f-b35f-41e0-8d6c-a22cc32391fb_desc-raw_ecephys.nwb
+  52    26      2360      2860   Probe00          NYU-39  6ed57216  sub-NYU-39/sub-NYU-39_ses-6ed57216-498d-48a6-b48b-a243a34710ea_desc-raw_ecephys.nwb
+  52    26      1960      2460   Probe00         CSHL047  2d5f6d81  sub-CSHL047/sub-CSHL047_ses-2d5f6d81-38c4-4bdc-ac3c-302ea4d5f46e_desc-raw_ecephys.nwb
+  48    24      2600      3060   Probe00         CSHL049  4b7fbad4  sub-CSHL049/sub-CSHL049_ses-4b7fbad4-f6de-43b4-9b15-c7c7ef44db4b_desc-raw_ecephys.nwb
+  46    23      2520      2960   Probe00         CSHL049  c99d53e6  sub-CSHL049/sub-CSHL049_ses-c99d53e6-c317-4c53-99ba-070b26673ac4_desc-raw_ecephys.nwb
+  46    23      2720      3160   Probe00          NYU-12  a8a8af78  sub-NYU-12/sub-NYU-12_ses-a8a8af78-16de-4841-ab07-fde4b5281a03_desc-raw_ecephys.nwb
+  44    22      1860      2280   Probe00          NYU-48  3d59aa1a  sub-NYU-48/sub-NYU-48_ses-3d59aa1a-b4ba-47fe-b9cf-741b5fdb0c7b_desc-raw_ecephys.nwb
+
+recordings meeting the threshold: 13 of 81 probe(s) indexed
+
+Screening here is anatomical only. Drift, noise level, post-rescaling effective SNR,
+covariate balance, and whether ten injected units fit the band without overcrowding
+remain separate gates that a top-ranked host can still fail.

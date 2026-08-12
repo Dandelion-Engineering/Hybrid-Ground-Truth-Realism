@@ -1,131 +1,136 @@
 # Summary of Only Necessary Context — Claude
 
-**Rewritten at the end of Claude Session 4 · 2026-08-11 16:15 PDT**
-**Next session will be Claude Session 5.**
+**Rewritten at the end of Claude Session 5 · 2026-08-11 19:11 PDT**
+**Next session will be Claude Session 6.**
 
 You start with no memory of the last session. This file restores the state and nothing else. It omits anything already in `Project Details/Project Details.md`, the `Playbooks/`, or `AgentPrompt.md` — you re-read those anyway.
 
-**Read `Claim Sheet.md` before doing any work.** It is the contract and it is now agreed by both agents. This file is the *state*; the sheet is the *commitments*. `Accessible Claim Sheet.md` is the same content in plain language and is faster to re-load if you need the shape rather than the exact wording — but the technical sheet governs.
+**Read `Claim Sheet.md` before doing any work.** It is the contract, it is same-state approved by both agents, and changes to it now go through the **amendment protocol**, never the review cycle. `Accessible Claim Sheet.md` is the same content in plain language and is faster to re-load if you need the shape rather than the exact wording — but the technical sheet governs, and the two must stay in sync in the same session as any change.
 
 ---
 
 ## 1. Where the project is
 
-**Phase 1 — Sharpening, one step from closing.**
+**Phase 2 — Execution.** Phase 1 closed in Codex's Session 4. Both Claim Sheets and Study Guide Pass 1 are same-state approved; both review chats are concluded with summaries. **No scientific result exists yet, and no sorter has been run.**
 
-| Requirement | Status |
+| Approved artifact | SHA-256 at approval |
 |---|---|
-| Both agents approve the **same state** of `Claim Sheet.md` | **DONE (Session 4).** SHA-256 `a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3`. Loop closed, no disagreement survived. |
-| The **Accessible Claim Sheet** exists and is agreed | **Written (Session 4), in review.** Awaiting Codex. |
-| The **division of labor** is agreed | **DONE (Session 3).** |
-| Study Guide Pass 1 agreed (also due at Phase 1 close) | **In review, handed back to Codex (Session 4)** with two of my edits on top of its approved state. |
+| `Claim Sheet.md` | `a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3` |
+| `Accessible Claim Sheet.md` | `73bff8f81dc2e31b47d4abbe1f61c8106a34dccb8ea6457051c3dba84a589760` |
+| `Study Guide/Pass 1….tex` / `.pdf` | `d33e74d7…` / `75e14232…` |
 
-**Phase 1 closes when Codex approves the Accessible Claim Sheet and the Study Guide pair.** The agent whose session closes it writes the **phase-transition progress report** and logs the *Claim Sheet ready for director review* entry in `director_requests.md`. If that is you, both are required — the progress report is in addition to normal session work, at the Accessible-Piece bar, per `Playbooks/research-progress-report.md`.
-
-**Note on your own progress-report counter:** Session 8 is your next count-based trigger. A phase transition triggers one regardless and does not reset the count.
+**Your progress-report counter: Session 8 is your next count-based trigger.** Codex wrote the Phase-1-close transition report, so you owe nothing extra unless your session closes a phase transition or an approved amendment.
 
 ## 2. The first thing to do next session
 
-**Check both chats in `chats/Claude-Codex/` for Codex's responses.**
+**Open `chats/Claude-Codex/Tier A Selection Review/`.** Session 5's whole output is a proposal sitting there for Codex's gate. The state I approved and handed over is `agents/Claude/Tier A Host and Injection Zone Selection.md` at SHA-256 `98a168100f8c315eaf0ba47266e0a3026efbe10ac3ed1751c2b0bef509ffd586` — the chat carries an earlier superseded hash above it, left in place per the append-only rule. **Three rulings are asked of Codex:** exclusion granularity, whether the 16-donor pool changes the block scheme, and CA1 versus taking the `SUB` fallback now. If Codex has replied, the review-cycle discipline applies: genuinely re-review, do not wave edits through, and if a disagreement has not converged in about two round-trips, escalate to the director rather than looping.
 
-- **`Claim Sheet Review/`** — it holds the Accessible Claim Sheet handoff. If Codex edited the Accessible sheet, genuinely re-review per `Playbooks/review-cycle.md` — do not wave edits through. The failure mode to hunt for in your own document is **a bound that got softer in translation**, not an awkward sentence.
-- **`Study Guide Pass 1 Review/`** — same discipline. If Codex disagrees that the refractory-period paragraph earns its lines, **take it out rather than argue**; I offered that explicitly in the handoff and the point is not worth a third round-trip.
+**Then read `agents/Claude/Tier A Host and Injection Zone Selection.md`.** It is the live artifact for your share of the labor split, and §5 of it is the list of things it deliberately did not do.
 
-**If both come back approved, Phase 1 closes in your session.** Do the closing work (progress report + director request) before starting Phase 2 work.
+## 3. What Session 5 established, and why it matters
 
-**Then start your Phase 2 job: Tier A host and injection-zone selection.** See §6.
+### 3.1 The headline finding — the leakage constraint is avoidable, not a matter of degree
 
-## 3. What I did in Session 4
+**Every Neuropixels 1.0 donor template in the library comes from DANDI 000409 — the same dandiset the hosts come from.** The 37 "source datasets" are 37 probe insertions across **24 sessions and 12 subjects** (`KS042, KS043, KS044, KS046, KS051, KS052, KS055, KS084, KS086, KS091, KS094, KS096`). There is no second source collection for this probe type.
 
-| File | What changed |
+Two consequences, and they are the substance of the session:
+
+1. **"Exclude the host's source dataset" is three exclusions, not one** — insertion, session, subject — and of the 37 areas at ≥10 in-caliper templates, the worst-case survivors are **7 / 6 / 4** respectively. `SUB` (57) and `ENTl5` (31) look healthy at insertion granularity and go to **zero** at subject granularity. **The project has never declared which granularity it uses.**
+2. **DANDI 000409 has 139 subjects and only 12 are in the library, so 429 of its 459 raw recordings incur no exclusion at all.** Choosing the host from one of those makes every granularity vacuous simultaneously and each area keeps its **full** pool. **The 37→7 shortlist that has shaped this project since Session 2 only binds if the host is a library recording, and nothing requires that.**
+
+**What it does not fix, and what goes in the limitations:** host and donor still share one consortium, rig design, probe type, acquisition and preprocessing chain, and strain. No available choice fixes that. Do not let a later session present subject-level separation as independence.
+
+### 3.2 The uncomfortable number — CA1's pool has a hard ceiling of 16
+
+| Caliper | CA1 templates |
 |---|---|
-| `Claim Sheet.md` | **Re-reviewed and explicitly approved** at `a5f5860…`. No edits — Codex's two coherence fixes were correct and I found nothing to add. |
-| `Accessible Claim Sheet.md` | **New.** All fifteen slots in plain language, every number with its caveat attached. Handed off; SHA-256 at handoff `73bff8f81dc2e31b47d4abbe1f61c8106a34dccb8ea6457051c3dba84a589760`. |
-| `Study Guide/…Pass 1….tex` + `.pdf` | Two edits (see §5). Rebuilt: 13 pages, zero overfull/underfull, changed and final pages visually inspected. Handed back at source `d33e74d7…` / PDF `75e14232…`. |
-| `agents/Claude/references.md` | SHYBRID entry **superseded** with the source-verified narrower statement; `[VERIFY]` partly closed and retired; Session 4 row in the corrections log. |
-| `director_requests.md` | Fourth memory measurement appended under the existing entry. |
-| root `README.md`, `agents/Claude/README.md` | Banner, one lean log entry, ownership table. |
+| 50–200 µV, SNR 5–15 *(provisional)* | 12 |
+| unscreened | **16** |
 
-## 4. The one finding worth carrying forward: review catches errors, not absences
+**Sixteen is the entire CA1 Neuropixels 1.0 population of the library.** No caliper produces more. The four outside the provisional caliper are all KS044 `781b35fd` at 2,800 µm with amplitudes 213–488 µV and SNR 10–23 — **high quality, not marginal**, and Slot 7 already says the 50–200 µV figure is a rescaling *target* rather than a donor requirement, so treating them as eligible is contract-compliant. All 16 come from four subjects; 15 sit inside one 280 µm depth band.
 
-The Study Guide had been written by me and reviewed page-by-page by Codex against primary sources. Across both reviews, **nine corrections were made and every single one was to a sentence that existed.** Neither agent caught the one real problem, which was that a sentence was *missing* — the guide taught injected spike timing as memoryless and never mentioned that the pipeline already enforces a refractory period, leaving the contract's "refractoriness is part of the control, not an axis" line unexplained and unverifiable by the reader.
+**Working pool 16 for a 10-unit arm: six spares.** The second-order consequence, flagged to Codex and not yet resolved: with 5 blocks × 10 slots the **region-matched arm has almost no donor-draw variability across blocks** while the region-unaware arm draws from 1,149. That asymmetry is most likely to surface in the negative-control replicate band, which Codex owns.
 
-**Carry this into Phase 3.** When the artifact under review is the Technical Report, the absent sentence is a limitation nobody wrote down, and the same asymmetry applies. Reviewing against a *checklist of what must be present* catches this; reviewing by reading catches errors but not gaps.
+### 3.3 The anatomical mapping the Claim Sheet demands already exists
 
-## 5. My two Session 4 Study Guide edits, so you can defend or withdraw them
+Every 000409 NWB carries `/general/extracellular_ephys/electrodes` with an Allen CCF **long name** per electrode plus `rel_y` (depth along probe), `rel_x`, CCF `x/y/z`, and `group_name` (probe). Raw and processed files for a session carry **identical** tables. **This is Slot 7's pinned channel/trajectory mapping, already published** — do not build one.
 
-1. **A forward reference pointed at §3.3 (the manipulation check) when the argument is in §3.2.** Not contestable, just wrong.
-2. **Added the refractory period to §3.1**, with the SpikeInterface generation-docs link, and stated why it belongs to the control arm rather than to a realism axis. This is the contestable one. If Codex pushes back, remove it — do not defend it into a third round.
+**It reads for ~5–10 MB per recording, not 18–197 GB**, via `utils/remote_hdf5.RemoteFile` (HTTP range requests handed to h5py). That is the technique that makes host screening affordable; reuse it rather than reinventing it.
 
-The addition first pushed the build to 14 pages with §5.5 orphaned; I compressed my own paragraph rather than enlarging the page. **If you edit this document again, check the page count and render the last page** — this failure has now happened to both agents.
+### 3.4 The two vocabularies, and the check that validated the bridge
 
-## 6. Your Phase 2 job, in the state I left it
+Host = Allen long names (`Field CA1`); donors = acronyms (`CA1`). `utils/ccf_labels.py` bridges them and `validate_ccf_label_map.py` checks it against the donor library's own (session, depth, acronym) records — which validates the label map **and** that `depth_along_probe` and `rel_y` are the same coordinate, something nothing else had checked.
 
-**Tier A host and injection-zone selection**, mine under the labor split. It needs only the ~2 MB metadata file and no heavy compute, so machine contention does not block it.
+Of **1,403 testable comparisons — donor acronyms the table actually defines — 1,401 agree, 1 disagrees, 1 is unmapped.** 44 acronyms confirmed with **zero** disagreements, **`CA1` at 16/16**, plus every large-pool alternative: `CP` 107/107, `SUB` 168/168, `PIR` 94/94, `MRN` 59/59, `AON` 53/53, `ENTl5` 53/53, `VISa5` 49/49, `LP` 47/47. One mixed (`ACAd5` 33/34, a boundary effect). **Zero contradicted.** A further 650 rows carry acronyms the table does not define — that is coverage, not correctness.
 
-**Run it against both constraints at once**, which is the thing Session 3 established and the reason it is not two separate searches:
+**Two corrections were needed to reach those numbers, both in the pessimistic direction.** The first classification condemned an entry on a single disagreement; the second counted *undefined* donor acronyms as disagreements, inventing 49 "contradicted" structures and reporting 92% agreement instead of 99.9%. **A validator can be wrong toward pessimism, and that is no more publishable than optimism.** If you re-run it, check that `undefined` and `disagree` are still kept apart.
 
-- **Tier A needs** a zone whose donor pool survives excluding the *exact* host's source dataset — not the worst-case shortlist, the actual host-specific query, which **nobody has run yet.**
-- **Tier C needs** a zone whose burst bounds rest on primary evidence, and the current evidence is CA1 (Harris et al. 2001).
+## 4. My proposed selection, which is a proposal and not a decision
 
-**CA1 is the only zone satisfying both on its face**: 12 in-caliper NP1.0 templates across 4 source datasets before host-specific exclusion. **It is a candidate, not a decision** — its worst-case leave-largest count is 6, under the ten-unit budget, so viability turns entirely on which source dataset the chosen host belongs to.
+**Zone: CA1. Host: a 000409 raw recording from a subject absent from the donor library, carrying a contiguous `Field CA1` band.** Rationale: it is the only zone satisfying Tier A and Tier C at once, which Session 3 established as a joint constraint. Moving to `CP` (70) or `SUB` (57) buys Tier A headroom but relocates the work to an unsecured Tier C literature task and risks the exact failure Session 3 named.
 
-The failure mode this ordering forecloses is cheap to fall into: satisfy Tier A, then discover Tier C cannot use the host Tier A picked, leaving Tier C as a labelled synthetic stress test rather than a biological-realism test.
+Fallbacks, in order, if a gate kills more than six donors: (1) fewer than ten injected units, recorded as a deviation; (2) move to `SUB` and commission Tier C subiculum evidence — **named on pool size and anatomical proximity only; nothing in `references.md` supports subiculum burst parameters yet**, so it is a research task, not a substitution; (3) depth-specific zones — permitted by Slot 7 but weakens the cross-tier comparison, so an amendment rather than a config change; (4) drop Tier A, which Slot 12.3 already pre-declares as a clean publishable failure.
 
-**You are the wrong agent to grade this.** Codex owns Tier A's balance/manipulation gate precisely so the agent proposing the selection is not the agent approving it. Propose; do not grade.
+**You are the wrong agent to grade this.** Codex owns Tier A's balance/manipulation gate deliberately. Propose; do not approve.
 
-Also remember: **a Neuropixels penetration crosses anatomy.** The deliverable is a pinned channel/trajectory mapping plus a declared injection zone at a target depth — never a whole-recording region label. If ten feasible placements cannot be supported, the host fails the Tier A gate.
+## 5. What Session 5 did not do — do not let a later session assume otherwise
 
-## 7. The agreed division of labor — do not relitigate
+1. **The host survey is partial.** Coverage is stated in §4 of the selection document and in `host_anatomy_CA1.txt`. The index is append-only and **resumable with the identical command**. Roughly one recording in six carries a usable CA1 band, so it is a **search, not a census** — but a host must not be pinned off a partial ranking without someone explicitly deciding "good enough" beats "best available".
+2. **The CCF label map is materially incomplete, and its incompleteness is far larger than its error rate** — the 46 screened recordings produced **296 distinct host structure names with no table entry**. Irrelevant to a CA1-targeted search; **blocking for the region-unaware arm's placement**, whose donors are drawn without conditioning on region. Completing it needs an Allen ontology, and **that carries a licensing question** — Allen Institute terms versus permissively licensed redistributors (`iblatlas` MIT, `brainglobe-atlasapi` BSD-3). Resolve before importing, not after. **This is agent work first, not a director request**: reading the licences is ours to do, and it becomes director-only only if the answer requires a named exception. Session 5 deliberately did not log it in `director_requests.md`, because filing an unscoped question would be handing him our homework.
+3. **No non-anatomical host gate has been applied**: drift, noise, duration, post-rescaling effective SNR. All untested.
+4. **Ten feasible placements have not been demonstrated**, only made plausible by band width. Slot 7 makes this a gate.
+5. **No covariate balance has been evaluated.** Codex's gate, and the one that decides whether Tier A runs.
+6. **`audit_template_library.py` duplicates `utils/template_metadata.py`.** Left as-is deliberately rather than refactored mid-flight; recorded in the selection document §5.6 and in `agents/Claude/README.md`. Resolve before packet assembly.
+7. **The packet still owes three of its own files.** `Playbooks/reproducibility-packet.md` requires the packet folder to carry its **own** `requirements.txt`, its **own** `.gitignore`, and a runbook `README.md`, because the self-containment test is copying that folder alone to a clean machine. Session 5 created only the **project-root** `requirements.txt` — correct for the venv, not sufficient for the packet. Scripts are already written into `Reproducibility Packet/scripts/` per the write-it-there-first rule, so this is Phase-3 curation rather than relocation, but it is owed and it is not done.
+
+## 6. The agreed division of labor — do not relitigate
 
 - **Claude:** Accessible Claim Sheet · Study Guide Pass 1 · **Tier A host/injection-zone selection**
 - **Codex:** Rung 0 feasibility pilot · sorter-panel decision · inference and negative-control harness · **Tier A's balance/manipulation gate**
 - **Tiers B and C:** assigned after Rung 0. For each, the manipulation check is owned by whoever did *not* write that tier's generator.
 - Default writer/reviewer convention governs the final narrative artifacts; the Reproducibility Packet is co-owned.
 
-## 8. Settled — do not reopen
+## 7. Settled — do not reopen
 
-- **Axis ladder, one axis at a time, never varied together.** Tier A region-matched templates (configuration/selection only) → Tier B population-rate coupling driven by a **sorter-independent** host proxy → Tier C bursting with history-dependent amplitude attenuation. Combined arm only after component effects are known.
+- **Axis ladder, one axis at a time, never varied together.** Tier A region-matched templates → Tier B population-rate coupling from a **sorter-independent** host proxy → Tier C bursting with history-dependent amplitude attenuation. Combined arm only after component effects are known.
 - **Primary estimand: the paired difference in differences** (sorter × realism interaction), thresholds in raw paired accuracy units. Standardized effect sizes are secondary and never thresholds.
-- **`D = |I| − T` with `T = max(0.05, 0.5×|G0|)` is the authoritative and only comparative rule.** The `[−T, T]` phrasing is declared shorthand for it, never a second test. Declared consequence: `|I|` is folded at zero, so **bounded-negative is the harder verdict** — conservative in the right direction, but it costs us the outcome we think is likelier.
-- **The manipulation check is a hard stop-or-go gate.** If the injected data does not demonstrably carry the property at realistic magnitude, **no sorter run starts.**
+- **`D = |I| − T` with `T = max(0.05, 0.5×|G0|)` is the authoritative and only comparative rule.** `[−T, T]` is declared shorthand for it, never a second test. Declared consequence: `|I|` is folded at zero, so **bounded-negative is the harder verdict**.
+- **The manipulation check is a hard stop-or-go gate.** If injected data does not demonstrably carry the property at realistic magnitude, **no sorter run starts.**
 - **One host and injection zone across all tiers by default.** Deviation = recorded limitation and the cross-tier comparison is dropped rather than made across hosts.
 - **Refractoriness is already implemented upstream** — part of the control, not an axis.
 - **The sorter panel must span mechanisms.** Kilosort4 plus ≥1 CPU internal sorter (SpyKING CIRCUS 2, TriDesClous 2, or Lupin — MIT via SpikeInterface). Kilosort-only is biased toward the null.
-- **Equal block counts give equal *nominal replication basis*, not equal precision.** Both achieved interval widths get reported. (Codex's Session 3 fix to my Session 3 claim.)
-- **The 48-sorter-hour ceiling stayed at 48 when the tranche doubled to 200 recording-minutes**, and Codex's reason is the one to reuse: discovering an underestimate is not an argument for approving twice the budget.
-- **Errors of mine already corrected and accepted — do not re-argue them:** the false "hold everything fixed" claim for Tier A; Tier B's circular sorter-dependent rate driver; "significant in one arm, not the other" as a decision event; the 50–200 µV rescaling target misused as a donor filter; the interaction sign backwards in the Study Guide; "no new code" for Tier A; the overstated SHYBRID variability claim. **`Literature Foundation.md` stays frozen with its Session 1 errors; `references.md` governs.**
+- **Equal block counts give equal *nominal replication basis*, not equal precision.** Both achieved interval widths get reported.
+- **The 48-sorter-hour ceiling stayed at 48 when the tranche doubled to 200 recording-minutes.**
+- **Errors of mine already corrected and accepted — do not re-argue:** the false "hold everything fixed" claim for Tier A; Tier B's circular sorter-dependent rate driver; "significant in one arm, not the other" as a decision event; the 50–200 µV rescaling target misused as a donor filter; the interaction sign backwards in the Study Guide; "no new code" for Tier A; the overstated SHYBRID variability claim. **`Literature Foundation.md` stays frozen with its Session 1 errors; `references.md` governs.**
 
-## 9. Numbers you should not re-derive
+## 8. Two findings about *how to work* worth carrying
 
-**Template audit (Session 2, corrected by Codex).** Under provisional screens amplitude 50–200 µV and SNR 5–15: 1,149 of 2,183 NP1.0 templates survive across 149 areas; **37 areas hold ≥10**. After dropping each area's largest contributing dataset — the **worst case**, not the binding number — **7 survive:** CP (42), PIR (19), SUB (18), VISa5 (17), AId5 (14), MRN (14), ENTl5 (10). CA1 is not in that seven: 12 pre-exclusion, 6 worst case.
+1. **Review catches errors, not absences** (Session 4). Nine corrections across two Study Guide reviews, every one to a sentence that existed; the real defect was a missing sentence, and neither agent caught it. **Carry this into Phase 3:** for the Technical Report, the absent sentence is a limitation nobody wrote down. Review against a *checklist of what must be present*, not by reading.
+2. **Read the column, do not count it** (Session 5). Session 2's audit was correct code answering a question one level too shallow, and the number it produced was carried into the Claim Sheet, the Study Guide, and the public log before anyone opened a cell. When a field is treated as an opaque token, check what is actually in it before building on the count.
+3. **A check can be wrong pessimistically, and that is not the safe direction** (Session 5). The label-map validator reported 49 broken structures and 92% agreement when the truth was zero and 99.9%, twice in a row, because it conflated *undefined* with *wrong*. We are both calibrated to watch for overstated successes; an overstated failure misleads a reader exactly as much, and it is harder to notice because it feels like rigour. **When a self-check reports a problem, verify the problem before acting on it** — the same standard applied to a favourable result.
 
-**Read the caveat with the numbers:** conservative pool-size screen, **not** paired-arm feasibility. Does not test covariate balance, anatomical placement, or the control pool. The 50–200 µV range is an injection *rescaling target*, not evidence donors must already sit there — final balance is on post-rescaling amplitude and effective SNR in the selected host. Re-run `Reproducibility Packet/scripts/audit_template_library.py` with different arguments rather than re-deriving by hand.
+## 9. Machine state — re-measure, never trust this number
 
-**Template metadata snapshot**, verified independently by both agents: SHA-256 `a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d`, 2,032,640 bytes, Last-Modified 2024-09-29. Mutable host, unmoved since 2024. Pin by hash; record selected `template_index` rows.
+**2026-08-11 18:14 PDT: RAM 15.27 GiB free of 31.67, VRAM 14,416 of 16,311 MiB.**
+**2026-08-11 18:45 PDT: RAM 14.39 GiB free, VRAM 14,405 MiB.**
 
-**Two pre-declarations that exist to stop this project misleading anyone:** a null with a wide interval is **inconclusive, never evidence realism does not matter**; and **Tier A alone cannot conclude the project**, because it is the cheapest axis *and* the least likely to move the interaction.
+**The four-session downward trend broke.** The series is now 3.46 → 3.96 → 1.01 → 0.89 → **15.27 → 14.39**. Something released ~28 GiB between 16:06 and 18:14. **VRAM has been flat at ~14 of 16 GB free at every measurement**, so the competing work is memory-bound, not GPU-bound. Logged in `director_requests.md` as a data point, explicitly not as an answer.
 
-## 10. Machine state — re-measure, never trust this number
+**Venv state changed this session.** It now holds `h5py==3.16.0` and `numpy==2.5.2` (both BSD-3-Clause), pinned in a **new `requirements.txt`**. SpikeInterface, PyTorch, and Kilosort4 are **still not installed** — that is Codex's Rung 0, and the requirements file carries a note that the numpy pin may have to move when they are. Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe`; never bare `python` or `pip`.
 
-**At 2026-08-11 16:06 PDT: RAM 0.89 GiB free of 31.67. VRAM 14,409 MiB free of 16,311.**
+## 10. Housekeeping that is easy to get wrong
 
-**Fourth consecutive session under 4.5 GiB: 3.46 → 3.96 → 1.01 → 0.89.** The feasibility run that proved Kilosort4 works here peaked at **29.3 GiB**. **VRAM has been fine every time (~14 of 16 GB free); the contention is entirely system RAM.**
-
-Logged in `director_requests.md` with fallbacks; **not blocking**. Measure at the moment of the heavy step, against a measured requirement, never from a file — including this one.
-
-**The venv still contains only `pip`.** SpikeInterface, PyTorch, and Kilosort4 are **not installed**; there is **no `requirements.txt`**. Correct for now — the first install is Codex's Rung 0 pilot, and versions get pinned *at install time*. Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe`; never bare `python` or `pip`.
-
-## 11. Housekeeping that is easy to get wrong
-
-- **`Accessible Claim Sheet.md` must stay in sync with `Claim Sheet.md` forever.** Any amendment to one updates the other **in the same session**. The playbook names drift as the single most common failure of this artifact, and it is a defect rather than a backlog item.
-- **This run is agent-selected**, so the run-provenance block on the public README is **required** and survives unchanged into State B. Do not remove it, soften it, or move it below the result.
+- **`Accessible Claim Sheet.md` must stay in sync with `Claim Sheet.md` forever.** Any amendment updates both **in the same session**. Drift is a defect, not a backlog item.
+- **This run is agent-selected**, so the run-provenance block on the public README is **required** and survives unchanged into State B. Do not remove, soften, or move it below the result.
 - **Kilosort4 is GPLv3.** Call it as a tool through SpikeInterface. Never vendor, never link. A genuine need to modify it is a `director_requests.md` question *before* writing the modification. For sorter internals, use SpikeInterface's MIT `sortingcomponents`.
 - **Corrections propagate forward, never backward.** The review cycle is the *only* exception, and only for artifacts in active review.
 - **`pdflatex` is at `/c/Users/cresp/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex`; `pdftoppm` and `pdftotext` are also available.** Build twice, check the log for overfull/underfull, and render the changed and final pages before approving any PDF.
+- **Two concurrent network jobs roughly halve each other.** Run the anatomy survey alone, or add parallel workers, if you want it to finish.
+- **Do not leave a background job running past the end of a session.** Stop it, regenerate its report from whatever it produced, and state the coverage.
+- **`RemoteFile` now retries a failed range request four times with backoff** (added Session 5, after one transient S3 disconnect discarded a whole recording's result). At hundreds of sequential requests per run, a dropped connection is routine — if you write another screening loop, use `RemoteFile` rather than rolling your own reader.
 
-## 12. Still-open verification debt
+## 11. Still-open verification debt
 
 Nothing in `references.md` *Pending* is citable: the regional waveform-duration figures, Steinmetz & Ye 2022, and **Quirk & Wilson** (activity-dependent amplitude attenuation, PMC6762418 located, citation unconfirmed). If Quirk & Wilson ever clears, it is the natural citation for burst amplitude attenuation in Study Guide §2.2 and §3.2, which currently carry that load on Harris et al. 2001 and Pouzat et al. 2004.
 
-The SHYBRID snippet-versus-template question is **retired**, not open: the source audit answered the operative half (a fixed template is fit per spike, so it is not raw-snippet transport), and the remainder is not load-bearing.
+**New debt from Session 5:** if the injection zone moves off CA1, Tier C needs primary burst and amplitude-attenuation evidence for the new region and cell class, or it is labelled a synthetic stress test per Slot 13.7. For `SUB` that means subiculum bursting pyramidal cells; nothing on it is in `references.md` yet.

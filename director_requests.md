@@ -47,6 +47,19 @@ Four consecutive measurements, all under 4.5 GiB, and the two most recent are bo
 
 **The third question above has become the practically important one.** If the honest answer is "this machine is busy and will stay busy," the agents would rather adopt a small permanent memory ceiling deliberately — which is a real design decision affecting segment length and the sorter panel, and one the amendment protocol should record — than keep re-measuring and hoping for a window. A reply of "yes, design for ~4 GiB" is more useful than no reply, and is a better outcome than a quiet window nobody can predict.
 
+**Added by Claude, Session 5, 2026-08-11 18:45 PDT — the trend broke, and that is worth recording as carefully as the trend was.**
+
+| When | Free system RAM | Free VRAM |
+|---|---|---|
+| 2026-08-11 18:14 PDT | **15.27 GiB of 31.67** | 14,416 MiB of 16,311 |
+| 2026-08-11 18:45 PDT | **14.39 GiB of 31.67** | 14,405 MiB of 16,311 |
+
+Five and six consecutive measurements now read 3.46 → 3.96 → 1.01 → 0.89 → **15.27 → 14.39**. Whatever was consuming roughly 28 GiB through the afternoon released it some time between 16:06 and 18:14. **VRAM has been flat at ~14 of 16 GB free at every single measurement**, which continues to say the competing work is memory-bound rather than GPU-bound.
+
+**Read this as a data point, not as an answer.** It tells us the machine is *not* permanently at 1 GiB free, which is the more optimistic of the two hypotheses in the original request and argues against adopting a hard ~4 GiB design ceiling on the evidence available. It does **not** tell us the contention is over, when it returns, or whether a window is predictable — six measurements taken opportunistically in one day cannot support that, and the contract's rule stands unchanged either way: measure immediately before the heavy step, against a measured requirement, and do not start what does not fit.
+
+**Nothing was blocked and nothing changed.** This session's work was metadata-only — a 2 MB table and HTTP range reads of NWB headers, a few megabytes per recording — and never approached the memory floor. **The most useful reply is still the third question**, and this measurement slightly changes what would be useful about it: not "how little should we design for" but "is there a pattern to when this machine frees up."
+
 ---
 
 *Note on ordering: `Playbooks/director-requests.md` describes the Phase-1-close "Claim Sheet ready for director review" entry as this file's first entry. It is logged when Phase 1 closes, which has not happened yet; this entry precedes it because the blocker arrived first.*

@@ -1,0 +1,245 @@
+# CCF label-map validation
+
+donor snapshot sha256   a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d
+matches pinned          True
+probe type              Neuropixels 1.0
+donor insertions        37 (validating 37)
+depth tolerance         20.0 um
+electrode table source  _desc-processed_behavior+ecephys.nwb
+
+## Per-structure agreement
+
+Only donor acronyms the table actually defines can be tested. For those, 'agree' means
+the donor's acronym is among the acronyms the host annotation maps to at the same depth,
+'disagree' means the host names a different structure there, and 'unmapped' means the
+host's label has no table entry so nothing could be concluded. 'undefined' rows are
+donor acronyms absent from the table entirely -- they measure its coverage, not its
+correctness, and are excluded from the rate.
+
+acronym        agree  disagree  unmapped  undefined     rate
+------------------------------------------------------------
+ACAd5             33         1         0          0    97.1%
+ACAd6a             0         0         0          6        -
+ACAv2/3            0         0         0          9        -
+ACAv5             25         0         0          0   100.0%
+ACAv6a             0         0         0          1        -
+AId5              40         0         0          0   100.0%
+AId6a              0         0         0         10        -
+AIp1               0         0         0          1        -
+AIp2/3            21         0         0          0   100.0%
+AIp5               0         0         0          8        -
+AIp6a              0         0         0          9        -
+AIp6b              0         0         0          1        -
+AIv2/3             0         0         0          2        -
+AIv5               0         0         0         16        -
+AOBgl              0         0         0          1        -
+AON               53         0         0          0   100.0%
+APN                0         0         0         15        -
+AUDp6a            26         0         0          0   100.0%
+AUDv6a             0         0         0         11        -
+BMAp              14         0         0          0   100.0%
+CA1               16         0         0          0   100.0%
+CA3                8         0         0          0   100.0%
+CLA                0         0         0          6        -
+COApl              0         0         0         13        -
+COApm              0         0         0          5        -
+CP               107         0         0          0   100.0%
+CTXsp              0         0         0          1        -
+DG-mo              2         0         0          0   100.0%
+DG-po              5         0         0          0   100.0%
+DG-sg             15         0         0          0   100.0%
+ECT5               0         0         0          8        -
+ENTl2              0         0         0         11        -
+ENTl3             34         0         0          0   100.0%
+ENTl5             53         0         0          0   100.0%
+ENTl6a            51         0         0          0   100.0%
+ENTm5              0         0         0          8        -
+ENTm6              0         0         0         14        -
+EPd                0         0         0         22        -
+EW                 0         0         0          1        -
+FRP2/3             0         0         0          3        -
+FRP6a              0         0         0          6        -
+ILA1               0         0         0          1        -
+ILA2/3             0         0         0          4        -
+ILA5              17         0         0          0   100.0%
+IVn                0         0         0          1        -
+LGd-sh             0         0         0          1        -
+LGv                0         0         0          2        -
+LP                47         0         0          0   100.0%
+LSc                0         0         0          9        -
+LSr                0         0         0          8        -
+MB                 0         0         0         17        -
+MEA               22         0         0          0   100.0%
+MGm                0         0         0          5        -
+MOp5              14         0         0          0   100.0%
+MOp6a             24         0         0          0   100.0%
+MOs2/3             0         0         0          6        -
+MOs5              20         0         0          0   100.0%
+MOs6a             23         0         0          0   100.0%
+MRN               59         0         0          0   100.0%
+OLF                0         0         0         21        -
+ORBl1              0         0         0          5        -
+ORBl2/3            0         0         0          6        -
+ORBvl2/3          23         0         0          0   100.0%
+ORBvl5             0         0         0         30        -
+ORBvl6a           31         0         0          0   100.0%
+P                  0         0         0          2        -
+PA                 0         0         0          4        -
+PAG               25         0         0          0   100.0%
+PERI2/3            0         0         0          1        -
+PERI5              0         0         0          3        -
+PIR               94         0         0          0   100.0%
+PL5               30         0         0          0   100.0%
+PL6a               0         0         0         11        -
+PRNc               0         0         0          1        -
+PRNr               0         0         0          3        -
+PVT               16         0         0          0   100.0%
+Pa4                0         0         0          1        -
+PoT                0         0         0         23        -
+ProS              15         0         0          0   100.0%
+RN                 0         0         0         18        -
+RSPagl5            0         0         0          1        -
+RSPagl6a           0         0         0          2        -
+RSPd2/3            0         0         0          1        -
+RSPd5              0         0         0          9        -
+RSPd6a             0         0         0          7        -
+RSPv1              0         0         0          4        -
+RSPv2/3            0         0         0          5        -
+RSPv5              0         0         0          8        -
+SCdg               0         0         0         22        -
+SCdw               0         0         0          3        -
+SCig               0         0         0          8        -
+SCiw               0         0         0         22        -
+SCsg               0         0         0          4        -
+SF                13         0         0          0   100.0%
+SGN                0         0         0         13        -
+SPFp               0         0         0          5        -
+SSp-m4             0         0         0          1        -
+SSp-m5             0         0         0          9        -
+SSp-m6a           56         0         0          0   100.0%
+SSp-m6b            0         0         0          9        -
+SSp-n5             0         0         0         12        -
+SSp-n6a            0         0         0          1        -
+SSp-ul4            0         0         0          1        -
+SSs5              14         0         0          0   100.0%
+SSs6a              0         0         0          8        -
+SSs6b              0         0         0          3        -
+SUB              168         0         0          0   100.0%
+TEa5               0         0         0          3        -
+TEa6a              0         0         0          4        -
+TRS                0         0         0          7        -
+VISC5             20         0         0          0   100.0%
+VISa2/3            4         0         0          0   100.0%
+VISa4              0         0         0          3        -
+VISa5             49         0         1          0   100.0%
+VISa6a             0         0         0         13        -
+VISa6b             0         0         0          2        -
+VISl2/3            0         0         0          1        -
+VISl5              0         0         0          8        -
+VISl6a             0         0         0          1        -
+VISli2/3           0         0         0          3        -
+VISli4            14         0         0          0   100.0%
+VISli5             0         0         0         13        -
+VISli6a            0         0         0          5        -
+VISp5              0         0         0          2        -
+VISpm5             0         0         0          1        -
+VISpm6a            0         0         0          6        -
+VISpor5           44         0         0          0   100.0%
+VISpor6a          35         0         0          0   100.0%
+VISpor6b           0         0         0          3        -
+VISrl6b            0         0         0          3        -
+VPL                0         0         0         15        -
+VPM                0         0         0          9        -
+alv                1         0         0          0   100.0%
+ccb               17         0         0          0   100.0%
+ccs                1         0         0          0   100.0%
+ec                 0         0         0          3        -
+ee                 0         0         0          1        -
+fiber tracts       2         0         0          0   100.0%
+fp                 0         0         0          2        -
+int                0         0         0          2        -
+opt                0         0         0          2        -
+rust               0         0         0          4        -
+scp                0         0         0          1        -
+scwm               0         0         0          4        -
+
+donor rows placed        2053
+testable (acronym defined in the table)  1403
+  agree                  1401
+  disagree               1
+  host label unmapped    1
+not testable (donor acronym undefined)   650
+
+## Verdicts
+
+CONFIRMED, no disagreement (44): ACAv5, AId5, AIp2/3, AON, AUDp6a, BMAp, CA1, CA3, CP, DG-mo, DG-po, DG-sg, ENTl3, ENTl5, ENTl6a, ILA5, LP, MEA, MOp5, MOp6a, MOs5, MOs6a, MRN, ORBvl2/3, ORBvl6a, PAG, PIR, PL5, PVT, ProS, SF, SSp-m6a, SSs5, SUB, VISC5, VISa2/3, VISa5, VISli4, VISpor5, VISpor6a, alv, ccb, ccs, fiber tracts
+
+MIXED, mostly agreeing (1): ACAd5 (33/34)
+
+CONTRADICTED, defined but never agreed (0): none
+
+UNDEFINED, donor acronym not in the table (99): ACAd6a (6), ACAv2/3 (9), ACAv6a (1), AId6a (10), AIp1 (1), AIp5 (8), AIp6a (9), AIp6b (1), AIv2/3 (2), AIv5 (16), AOBgl (1), APN (15), AUDv6a (11), CLA (6), COApl (13), COApm (5), CTXsp (1), ECT5 (8), ENTl2 (11), ENTm5 (8), ENTm6 (14), EPd (22), EW (1), FRP2/3 (3), FRP6a (6), ILA1 (1), ILA2/3 (4), IVn (1), LGd-sh (1), LGv (2), LSc (9), LSr (8), MB (17), MGm (5), MOs2/3 (6), OLF (21), ORBl1 (5), ORBl2/3 (6), ORBvl5 (30), P (2), PA (4), PERI2/3 (1), PERI5 (3), PL6a (11), PRNc (1), PRNr (3), Pa4 (1), PoT (23), RN (18), RSPagl5 (1), RSPagl6a (2), RSPd2/3 (1), RSPd5 (9), RSPd6a (7), RSPv1 (4), RSPv2/3 (5), RSPv5 (8), SCdg (22), SCdw (3), SCig (8), SCiw (22), SCsg (4), SGN (13), SPFp (5), SSp-m4 (1), SSp-m5 (9), SSp-m6b (9), SSp-n5 (12), SSp-n6a (1), SSp-ul4 (1), SSs6a (8), SSs6b (3), TEa5 (3), TEa6a (4), TRS (7), VISa4 (3), VISa6a (13), VISa6b (2), VISl2/3 (1), VISl5 (8), VISl6a (1), VISli2/3 (3), VISli5 (13), VISli6a (5), VISp5 (2), VISpm5 (1), VISpm6a (6), VISpor6b (3), VISrl6b (3), VPL (15), VPM (9), ec (3), ee (1), fp (2), int (2), opt (2), rust (4), scp (1), scwm (4)
+
+Read the four lists differently, and note which two are about correctness. A CONFIRMED
+entry is safe to use as an injection zone label. A MIXED entry is most likely correct
+with a boundary effect: the depth tolerance admits neighbouring contacts, so a donor at
+a structure border can be compared against its neighbour's label. A CONTRADICTED entry
+is the one that means the table is wrong -- it defines the acronym and never once
+matched -- and must be diagnosed before use. An UNDEFINED entry says nothing about
+correctness at all: the table never claimed to define that acronym, so no host
+annotation could have agreed with it. Those measure coverage, and the number to read
+them against is the count of structures the table would need for a region-unaware arm.
+
+in the table but never tested here (9): CA2, POST, VISrl2/3, VISrl4, VISrl5, VISrl6a, or, root, void
+
+## Probe assignment per donor insertion
+
+The donor 'dataset' string names an insertion UUID that the NWB does not carry, so
+the probe with the highest agreement was assigned. A session with one probe is
+unambiguous; a two-probe session where agreement is high is strong evidence the
+assignment is right.
+
+   session     probe   agree  compared  probes
+  07dc4b76   Probe00      13        13       2
+  07dc4b76   Probe01      20        20       2
+  0a018f12   Probe00      53        54       1
+  0ac8d013   Probe01       4         4       2
+  0ac8d013   Probe00      55        55       2
+  196a2adf   Probe01      45        46       2
+  1b9e349e   Probe01       7         7       2
+  69c9a415   Probe00      67        67       2
+  69c9a415   Probe01      13        13       2
+  6b0b5d24   Probe01      11        11       2
+  752456f3   Probe01       6         6       2
+  781b35fd   Probe00      23        23       2
+  781b35fd   Probe01      48        48       2
+  78b4fff5   Probe00      21        21       2
+  872ce8ff   Probe00      81        81       2
+  872ce8ff   Probe01     125       125       2
+  8c552ddc   Probe01      20        20       2
+  8c552ddc   Probe00      56        56       2
+  9468fa93   Probe01      41        41       2
+  a6fe44a8   Probe01      11        11       2
+  aa3432cd   Probe00      67        67       2
+  aa3432cd   Probe01      14        14       2
+  ac7d3064   Probe00      31        31       2
+  ac7d3064   Probe01      28        28       2
+  b22f694e   Probe00      44        44       2
+  b22f694e   Probe01     175       175       2
+  dfbe628d   Probe00      57        57       2
+  dfbe628d   Probe01     115       115       2
+  e45481fa   Probe00      87        87       2
+  e5c75b62   Probe00       7         7       2
+  f819d499   Probe01       5         5       2
+  ffef0311   Probe00      51        51       1
+
+## Failures (5)
+
+  1b715600-0cbc-442c-bd00-5b0ac2865de1: no testable comparison: no depth overlap, or every donor acronym in this insertion is undefined in the table
+  7082d8ff-255a-47d7-a839-bf093483ec30: no testable comparison: no depth overlap, or every donor acronym in this insertion is undefined in the table
+  9468fa93-21ae-4984-955c-e8402e280c83: no testable comparison: no depth overlap, or every donor acronym in this insertion is undefined in the table
+  a6fe44a8-07ab-49b8-81f9-e18575aa85cc: no testable comparison: no depth overlap, or every donor acronym in this insertion is undefined in the table
+  e5c75b62-6871-4135-b3d0-f6464c2d90c0: no testable comparison: no depth overlap, or every donor acronym in this insertion is undefined in the table
+
+This validates the label map and the depth-coordinate correspondence. It does not
+validate the atlas registration itself, which is IBL's and is inherited as given.

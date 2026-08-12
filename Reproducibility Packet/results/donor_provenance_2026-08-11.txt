@@ -1,0 +1,150 @@
+# Donor provenance and host-specific exclusion audit
+
+url             https://spikeinterface-template-database.s3.amazonaws.com/templates.csv
+bytes           2032640
+sha256          a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d
+matches pinned  True  (pinned = a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d)
+probe           Neuropixels 1.0  (2183 rows)
+caliper         amplitude 50.0-200.0 uV, SNR 5.0-15.0
+
+## What the 'dataset' column actually contains
+
+distinct insertions (raw 'dataset' values)   37
+distinct sessions                            24
+distinct subjects                            12
+rows whose provenance could not be parsed    0
+dandiset prefixes present                    000409
+subjects                                     KS042, KS043, KS044, KS046, KS051, KS052, KS055, KS084, KS086, KS091, KS094, KS096
+
+Every donor template for this probe type comes from DANDI 000409 -- the same
+dandiset the project's candidate hosts come from. Host and donor provenance are
+therefore not independent by default, and the exclusion granularity below is a
+design choice that has to be declared rather than inherited.
+
+rows inside caliper   1149 of 2183
+distinct areas inside 149
+
+## Areas with at least 10 in-caliper templates
+
+'worst-case' columns drop the area's single largest contributor at that granularity.
+They are the conservative floor, reached only when the chosen host happens to be that
+contributor. A host from a subject absent from the library incurs no exclusion at all,
+and the area keeps its full 'n'.
+
+area           n  ins  ses  sub  worst_ins  worst_ses  worst_sub
+----------------------------------------------------------------
+CP            70    4    4    3         42         42         30
+SUB           57    2    1    1         18          0          0
+AON           39    4    4    3          9          9          9
+PIR           36    5    5    4         19         19         19
+VISa5         32    3    3    3         17         17         17
+ENTl5         31    2    2    1         10         10          0
+AId5          30    2    2    2         14         14         14
+ENTl6a        28    2    2    1          6          6          0
+VISpor5       27    2    2    1          4          4          0
+LP            26    2    2    2          9          9          9
+MRN           24    7    6    5         14         10          8
+VISpor6a      23    3    2    1          4          4          0
+PL5           22    1    1    1          0          0          0
+AUDp6a        22    1    1    1          0          0          0
+SSp-m6a       21    3    3    2          8          8          8
+ORBvl6a       20    1    1    1          0          0          0
+MEA           18    1    1    1          0          0          0
+PAG           17    3    3    2          6          6          6
+VISC5         17    1    1    1          0          0          0
+MOs5          16    3    3    3          8          8          8
+MOp6a         15    1    1    1          0          0          0
+AIp2/3        14    1    1    1          0          0          0
+ccb           13    4    4    3          3          3          3
+PVT           13    1    1    1          0          0          0
+ACAv5         13    2    2    2          5          5          5
+ILA5          13    1    1    1          0          0          0
+ACAd5         13    2    2    2          5          5          5
+ORBvl2/3      13    1    1    1          0          0          0
+ENTl3         12    2    2    2          5          5          5
+CA1           12    4    4    4          6          6          6
+MOs6a         12    1    1    1          0          0          0
+SSs5          11    1    1    1          0          0          0
+MOp5          11    1    1    1          0          0          0
+VISli4        11    1    1    1          0          0          0
+BMAp          11    1    1    1          0          0          0
+SF            10    2    2    2          2          2          2
+ProS          10    2    2    1          2          2          0
+
+areas at >= 10 before any exclusion            37
+areas surviving worst-case insertion exclusion    7  (CP, SUB, PIR, VISa5, ENTl5, AId5, MRN)
+areas surviving worst-case session   exclusion    6  (CP, PIR, VISa5, ENTl5, AId5, MRN)
+areas surviving worst-case subject   exclusion    4  (CP, PIR, VISa5, AId5)
+
+## Host-specific exclusion
+
+host subject    NYU-11
+host session    (not given)
+host insertion  (not given)
+
+Subject NYU-11 does not appear in the donor library. No donor shares
+this host's animal, session, or insertion, so every exclusion granularity is
+vacuous and each area below keeps its full in-caliper pool.
+
+area           n  excl_ins  excl_ses  excl_sub  passes at >= 10
+-------------------------------------------------------------
+CP            70        70        70        70  ins, ses, sub
+SUB           57        57        57        57  ins, ses, sub
+AON           39        39        39        39  ins, ses, sub
+PIR           36        36        36        36  ins, ses, sub
+VISa5         32        32        32        32  ins, ses, sub
+ENTl5         31        31        31        31  ins, ses, sub
+AId5          30        30        30        30  ins, ses, sub
+ENTl6a        28        28        28        28  ins, ses, sub
+VISpor5       27        27        27        27  ins, ses, sub
+LP            26        26        26        26  ins, ses, sub
+MRN           24        24        24        24  ins, ses, sub
+VISpor6a      23        23        23        23  ins, ses, sub
+PL5           22        22        22        22  ins, ses, sub
+AUDp6a        22        22        22        22  ins, ses, sub
+SSp-m6a       21        21        21        21  ins, ses, sub
+ORBvl6a       20        20        20        20  ins, ses, sub
+MEA           18        18        18        18  ins, ses, sub
+PAG           17        17        17        17  ins, ses, sub
+VISC5         17        17        17        17  ins, ses, sub
+MOs5          16        16        16        16  ins, ses, sub
+MOp6a         15        15        15        15  ins, ses, sub
+AIp2/3        14        14        14        14  ins, ses, sub
+ccb           13        13        13        13  ins, ses, sub
+PVT           13        13        13        13  ins, ses, sub
+ACAv5         13        13        13        13  ins, ses, sub
+ILA5          13        13        13        13  ins, ses, sub
+ACAd5         13        13        13        13  ins, ses, sub
+ORBvl2/3      13        13        13        13  ins, ses, sub
+ENTl3         12        12        12        12  ins, ses, sub
+CA1           12        12        12        12  ins, ses, sub
+MOs6a         12        12        12        12  ins, ses, sub
+SSs5          11        11        11        11  ins, ses, sub
+MOp5          11        11        11        11  ins, ses, sub
+VISli4        11        11        11        11  ins, ses, sub
+BMAp          11        11        11        11  ins, ses, sub
+SF            10        10        10        10  ins, ses, sub
+ProS          10        10        10        10  ins, ses, sub
+
+## Surviving donors in CA1 (in-caliper, before host exclusion)
+
+ template_index   subject     session   amp_uv    snr  depth_um  noise_uv   spikes
+              2     KS046    0ac8d013    112.2   5.38    1860.0     20.85    28047
+             49     KS051    0a018f12    111.3   6.40    2640.0     17.37     4375
+              3     KS046    0ac8d013    105.2   6.05    2700.0     17.37    11266
+             51     KS044    781b35fd    123.8   5.94    2720.0     20.85     4686
+             31     KS055    b22f694e    110.2   6.34    2840.0     17.37      775
+             50     KS051    0a018f12    191.4  11.01    2860.0     17.37     1415
+             52     KS051    0a018f12    131.5   7.57    2860.0     17.37     7208
+             51     KS051    0a018f12    175.2  10.09    2900.0     17.37     7909
+             53     KS051    0a018f12    117.0   6.74    2900.0     17.37    17385
+             54     KS051    0a018f12    187.3  10.78    2900.0     17.37     8248
+             33     KS055    b22f694e    140.8  10.13    2900.0     13.90     7812
+             32     KS055    b22f694e    199.6  14.36    2920.0     13.90     1655
+
+Note: template_index is unique within an insertion, not across the library.
+Pin a donor by (dataset, template_index), never by template_index alone.
+
+This is a pool-size audit. Anatomical placement feasibility, post-rescaling effective
+SNR in the selected host, and pairwise covariate balance between the region-matched and
+region-unaware arms are separate gates and are not tested here.

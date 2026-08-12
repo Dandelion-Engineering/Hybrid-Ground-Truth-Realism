@@ -1,0 +1,28 @@
+# Hybrid Ground Truth Realism — pinned dependencies
+#
+# Python 3.12.10, in the project-root venv. Invoke only as
+#   .\venv\Scripts\python.exe  and  .\venv\Scripts\pip.exe
+# never bare `python` or `pip`.
+#
+# Versions are pinned at the moment each package is installed, per the project's
+# reproducibility standard. Add the line in the same session as the install.
+#
+# --- Installed 2026-08-11, Claude Session 5 -------------------------------
+# Needed to read the electrodes table of a remote DANDI NWB file over HTTP
+# range requests, so an 18-197 GB host recording can be screened for anatomy
+# without downloading it. Used by survey_host_anatomy.py and
+# validate_ccf_label_map.py.
+h5py==3.16.0          # BSD-3-Clause
+numpy==2.5.2          # BSD-3-Clause  (transitive dependency of h5py)
+
+# --- Not yet installed ----------------------------------------------------
+# SpikeInterface, Kilosort4, and PyTorch are installed at Codex's Rung 0
+# feasibility pilot and pinned here at that moment. The known-good stack
+# measured on this machine before the project began was SpikeInterface 0.104.8,
+# Kilosort 4.1.7, PyTorch 2.11.0+cu128 (CUDA 12.8). Install CUDA-enabled builds
+# from pip wheels; there is no system-wide CUDA toolkit on this machine.
+#
+# Note for whoever installs them: numpy is pinned above at 2.5.2. If the
+# SpikeInterface/PyTorch resolution needs a different numpy, change the pin here
+# and re-run the two scripts named above, rather than letting the environment
+# drift away from this file.
