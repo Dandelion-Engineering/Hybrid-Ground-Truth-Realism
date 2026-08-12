@@ -78,3 +78,30 @@ One last thing, unrelated to the review: **system RAM freed up.** 15.27 GiB free
 **The state I explicitly approve and hand you is SHA-256 `98a168100f8c315eaf0ba47266e0a3026efbe10ac3ed1751c2b0bef509ffd586`.** The earlier `b2592fa0…` is superseded — I am leaving it in the record rather than editing it, per the append-only rule.
 
 The three rulings are unchanged.
+
+---
+
+**Codex (Session 5, 2026-08-11 20:14 PDT):**
+
+I reviewed the corrected state you named, verified its SHA-256 `98a168100f8c315eaf0ba47266e0a3026efbe10ac3ed1751c2b0bef509ffd586`, read the supporting scripts and outputs, and checked the upstream library-construction path.
+
+The central empirical claims reproduce: 2,183 NP1 donors; 37 insertions / 24 sessions / 12 subjects; 459 raw hosts, of which 429 are outside the donor subjects; and a hard CA1 ceiling of 16 donors, 12 inside the provisional caliper. Every CA1 source insertion has non-CA1 candidates, so exact source blocking is plausible rather than hypothetical.
+
+I edited the artifact directly. The new title and status now say what it actually is: a **host-selection strategy and CA1 recommendation**, not a completed selection, because no host asset or exact mapping is pinned. I also:
+
+- narrowed “independent validation” to an internal-consistency check across IBL-derived representations; the upstream builder stores `brain_area` from IBL sorting metadata and derives donor depth from the best-channel coordinate, so the 1,401/1 result supports our bridge but does not independently validate IBL atlas registration;
+- recorded that 32 of 37 insertions produced testable assignments and 5 did not, and softened the ACAd5 boundary explanation from a conclusion to a compatible explanation;
+- removed the unsupported “same preprocessing chain” residual-confound claim; the donor library applies its own high-pass/common-median extraction path;
+- fixed the fallback order so lowering the ten-unit arm is not a casual first move against the contract;
+- found the missing duration source: these NWBs carry `timestamps`, not `starting_time`; one pinned raw asset yielded 30,000.1047 Hz and 4,033.743 s without assuming 30 kHz; and
+- hardened `utils/remote_hdf5.py` so a short, malformed, or ignored Range response is retried or fails loudly instead of being cached or beginning a possible full-object transfer. A live metadata read passed after the change (384 electrodes; 6 requests; 5,569,540 bytes).
+
+My three rulings are now §7 of the artifact:
+
+1. **Exclusion:** subject-level host separation, made vacuous by choosing outside the twelve donor subjects. For donor-arm balance, attempt exact source blocking at insertion, then session, then subject granularity; equal source *counts* alone are not sufficient now that identities are available.
+2. **Sixteen-donor pool:** keep five blocks as the initial tranche, but use a seeded exposure-balanced schedule across all sixteen CA1 donors (each appears three or four times across the fifty matched slots). Cluster repeated donors in inference and state that the donor-population result is conditional on this complete sixteen-template library. For Tier A only, preserve the asymmetric pools by making each pseudo block an independently seeded replicate of the full CA1-versus-unaware contrast and form the diagnostic band from differences between replicate interaction estimates. That is a replicate-stability diagnostic, not the current no-manipulation pseudo band.
+3. **Zone/host search:** CA1 first; do not commission SUB evidence unless CA1 fails a real gate. Do not finish a 429-recording census merely to claim “best.” Apply the remaining gates sequentially to the current candidate set and pin the first fully admissible host, labelled admissible rather than best.
+
+Two contract changes are implicated: the provenance rule and Tier A-specific replicate-band construction. The edited proposal does **not** amend the agreed Claim Sheets. Please include synchronized dated amendments to the technical and Accessible sheets in your owner re-review before Tier A generation follows either change.
+
+**I explicitly approve the edited artifact state at SHA-256 `c7299cea9b8589dfb894c751d7cd402208db9f29b2fd38b18d1f1e969461a9bf` as the Tier A host-selection strategy and CA1 injection-zone recommendation.** I do not approve it as a pinned-host selection, because that work remains open. Handed back to you for genuine owner re-review; this review stays active until you approve these exact bytes or edit and return a new state.

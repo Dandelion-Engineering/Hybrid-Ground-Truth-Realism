@@ -1,8 +1,8 @@
-# Tier A — Host and Injection-Zone Selection
+# Tier A — Host-Selection Strategy and Injection-Zone Recommendation
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
-**Status:** Draft 1 — Claude Session 5, 2026-08-11. Handed to Codex for review.
+**Status:** Draft 2 — reviewer-edited in Codex Session 5, 2026-08-11. Codex explicitly approves this state as a strategy and zone recommendation; Claude's owner re-review is required before the review closes. No host is pinned yet.
 
 ---
 
@@ -16,7 +16,7 @@ The Claim Sheet's Slot 7 requires, before Tier A can run:
 - a donor pool for that zone that survives excluding the host's own provenance;
 - and ten feasible placements inside the zone, without overcrowding or label ambiguity.
 
-This document supplies the evidence for the first four and proposes a selection. It does **not** discharge the gates that follow: covariate balance between the region-matched and region-unaware arms, drift quantification, noise measurement, post-rescaling effective SNR in the host, and the manipulation check. Those are separate and, per the labor split, Codex's.
+This document supplies the provenance evidence, a CA1 zone recommendation, and a candidate-host set. It does **not** yet pin a host asset or that host's exact anatomical mapping, so it is a host-selection strategy rather than a completed host selection. It also does **not** discharge the gates that follow: covariate balance between the region-matched and region-unaware arms, drift quantification, noise measurement, post-rescaling effective SNR in the host, ten-placement feasibility, and the manipulation check. Those are separate and, per the labor split, Codex's.
 
 ---
 
@@ -56,7 +56,7 @@ Choosing the host from one of those 429 makes every exclusion granularity vacuou
 
 **Recommendation: draw the host from a subject absent from the donor library, and record subject-level separation as the declared exclusion standard.** It costs nothing — 93% of the candidate hosts qualify — and it is strictly stronger than any exclusion rule applied after the fact.
 
-**The residual confound it does *not* remove, stated plainly.** Host and donors still come from the same dandiset: the same laboratory consortium, rig design, probe type, acquisition and preprocessing chain, and species/strain. Subject-level separation bounds leakage and animal-level idiosyncrasy; it does not make host and donor provenance independent, and no available choice would, because this probe type has exactly one donor collection. This belongs in the Technical Report's limitations as a property of the substrate, not as something the design failed to control.
+**The residual confound it does *not* remove, stated plainly.** Host and donors still come from the same dandiset and consortium and use Neuropixels 1.0 hardware under the IBL acquisition program. Subject-level separation bounds leakage and animal-level idiosyncrasy; it does not make host and donor provenance independent, and no available choice would, because this probe type has exactly one donor collection. The donor templates were additionally built by the library's own high-pass/common-median preprocessing and extraction path, so “the same preprocessing chain” is not established merely because both sides originate in DANDI 000409. The shared-source boundary belongs in the Technical Report's limitations as a property of the substrate, not as something the design failed to control.
 
 ### 1.3 Provenance-count balancing is still required, and is now measurable
 
@@ -85,11 +85,11 @@ That is exactly the pinned channel/trajectory mapping Slot 7 demands, and it is 
 
 The host names structures with Allen **long names** (`Field CA1`, `Rostrolateral area layer 5`); the donor library uses Allen **acronyms** (`CA1`, `VISrl5`). Without a bridge, "region-matched" cannot be evaluated at all. `utils/ccf_labels.py` is that bridge, restricted to the structures this project can reach.
 
-**It is hand-authored, and a hand-authored table is exactly the kind of artifact that looks obviously right and is quietly wrong in two entries.** So it is checked against independent evidence rather than trusted: every donor template carries both an acronym and a `depth_along_probe`, and the same session's NWB names a structure at that same depth. `validate_ccf_label_map.py` compares the two vocabularies at the same physical place on the same probe, across all 37 donor insertions.
+**It is hand-authored, and a hand-authored table is exactly the kind of artifact that looks obviously right and is quietly wrong in two entries.** So it is checked against upstream records rather than trusted: every donor template carries both an acronym and a `depth_along_probe`, and the same session's NWB names a structure at that same depth. `validate_ccf_label_map.py` compares the two vocabularies at the same physical place on the same probe. This is a strong internal-consistency check on the bridge and coordinate compatibility, not an independent validation of IBL's atlas registration: the donor acronym comes from the IBL sorting metadata and the donor depth comes from the template's best channel, while the NWB electrode table is another export of the same upstream anatomical system.
 
-That check validates two things at once, and the second was not previously checked by anything: the label map, **and** that the donor library's `depth_along_probe` and the NWB's `rel_y` are the same coordinate — which Tier A's placement depends on as much as the labels do.
+That check supports two things at once, and the second was not previously checked by anything in this project: the label map, **and** that the donor library's `depth_along_probe` and the NWB's `rel_y` are coordinate-compatible — which Tier A's placement depends on as much as the labels do.
 
-Results are in `Reproducibility Packet/results/ccf_label_map_validation.txt`. Of **1,403 testable comparisons — those where the donor's acronym is one the table actually defines — 1,401 agree, 1 disagrees, and 1 lands on a host label the table does not cover.** Forty-four acronyms are confirmed with **zero** disagreements, including `CA1` at **16/16** and every large-pool alternative: `CP` 107/107, `SUB` 168/168, `PIR` 94/94, `MRN` 59/59, `AON` 53/53, `ENTl5` 53/53, `VISa5` 49/49, `LP` 47/47. One entry is mixed — `ACAd5` at 33/34, which is the signature of a donor sitting on a structure boundary where the ±20 µm tolerance admits the neighbour's contact. **No table entry was contradicted.**
+Results are in `Reproducibility Packet/results/ccf_label_map_validation.txt`. The validator attempted all 37 donor insertions; 32 produced testable probe assignments and 5 produced no testable comparison. Of **1,403 testable comparisons — those where the donor's acronym is one the table actually defines — 1,401 agree, 1 disagrees, and 1 lands on a host label the table does not cover.** Forty-four acronyms are confirmed with **zero** disagreements, including `CA1` at **16/16** and every large-pool alternative: `CP` 107/107, `SUB` 168/168, `PIR` 94/94, `MRN` 59/59, `AON` 53/53, `ENTl5` 53/53, `VISa5` 49/49, `LP` 47/47. One entry is mixed — `ACAd5` at 33/34, which is consistent with a donor near a structure boundary where the ±20 µm tolerance admits the neighbour's contact but does not prove that explanation. **No table entry was contradicted among the testable comparisons.**
 
 A further 650 donor rows carry acronyms the table does not define at all. Those measure its **coverage**, not its correctness — they could not have agreed however right the table is — and they are the reason §5 treats completing the map as outstanding work.
 
@@ -136,10 +136,11 @@ With a host outside the library, the largest available pools are `CP` (70), `SUB
 
 Named fallbacks, in order, if a gate kills more than six donors:
 
-1. **Reduce the CA1 arm below ten injected units.** Cheapest, but it departs from the anchor's configuration and weakens comparability with the published benchmark. Would need recording as a deliberate deviation.
-2. **Move the zone to `SUB`** (57 donors, and the nearest neighbour to CA1 in the hippocampal formation) **and commission the Tier C primary-evidence task for subiculum.** Keeps the tiers on one host; adds literature work. Named as the second fallback on proximity and pool size alone — **nothing in `references.md` yet supports subiculum burst or amplitude-attenuation parameters**, and until something does, this option is a research task rather than a substitution.
-3. **Declare depth-specific zones** — CA1 for Tier C and a larger-pool structure for Tier A within the same penetration. Slot 7 permits "a set of depth-specific zones", but the cross-tier comparison it is trying to protect gets weaker, so this is a considered amendment rather than a quiet configuration choice.
-4. **Drop Tier A**, which Slot 12.3 already pre-declares as a clean, publishable failure mode.
+1. **Move the zone to `SUB`** (57 donors, and the nearest neighbour to CA1 in the hippocampal formation) **and commission the Tier C primary-evidence task for subiculum.** Keeps the tiers on one host; adds literature work. Named first on proximity and pool size alone — **nothing in `references.md` yet supports subiculum burst or amplitude-attenuation parameters**, and until something does, this option is a research task rather than a substitution.
+2. **Declare depth-specific zones** — CA1 for Tier C and a larger-pool structure for Tier A within the same penetration. Slot 7 permits "a set of depth-specific zones", but the cross-tier comparison it is trying to protect gets weaker, so this is a considered amendment rather than a quiet configuration choice.
+3. **Drop Tier A**, which Slot 12.3 already pre-declares as a clean, publishable failure mode.
+
+Reducing the arm below ten units is not a default fallback. The ten-unit density is a contract commitment tied to anchor comparability and collision load; changing it would require a scientific amendment, not merely a note that the run was cheaper.
 
 ---
 
@@ -195,10 +196,10 @@ Full paths and asset identifiers are in `Reproducibility Packet/results/host_ana
 
 ## 5. What is not done, and what should not be assumed done
 
-1. **The host survey is partial.** Coverage is stated in §4 and in the report file. The index is append-only and resumable, so continuing it is a re-run of the same command with the same `--index`. **The host must not be pinned from a partial ranking without either completing the survey or explicitly accepting "good enough" over "best available"** — and that acceptance is a decision, not a default.
+1. **The host survey is partial.** Coverage is stated in §4 and in the report file. The index is append-only and resumable, so continuing it is a re-run of the same command with the same `--index`. Codex's reviewer ruling in §7 explicitly chooses a sequential admissibility search over a full census: screen the current candidates through the remaining gates and pin the first one that passes all of them, without making a “best available” claim. Resume the anatomy survey only if the current set fails.
 2. **The CCF label map is materially incomplete, and its incompleteness is much larger than its error rate.** The 46 screened recordings produced **296 distinct host structure names with no table entry**, and 650 donor rows name acronyms it does not define. This does not affect a `CA1`-targeted search — `CA1` is defined and validated at 16/16 — but it does affect the **region-unaware arm**, whose donors are drawn without conditioning on region and whose placement still has to be evaluated against the local host label. Completing the map needs an Allen CCF structure-name↔acronym source, and the obvious ones carry a licensing question: Allen Institute Terms of Use for the atlas data, versus permissively licensed packages that redistribute it (`iblatlas`, MIT; `brainglobe-atlasapi`, BSD-3). **That question should be resolved before importing an ontology, not after.** It is **agent work, not a director request** — reading the licences is ours to do, and it becomes director-only only if the answer requires a named exception. Nothing about it was filed in `director_requests.md`, deliberately: filing an unscoped licence question would be handing the director our homework.
 3. **No non-anatomical host gate has been applied.** Drift, noise level, and post-rescaling effective SNR are untested. A recording at the top of §4 can still fail all of them.
-   **Duration is a specific and fixable gap.** The index records each AP series' shape — `CSHL047 b52182e7` is 130,182,852 samples × 384 channels on `Probe00` — but **not its sampling rate**, because the NWB nodes screened did not expose `starting_time` where the script looked for it. Sample count without a rate is not a duration, so Slot 7's "adequate duration" screen cannot be applied from the current index. Finding where the rate actually lives and re-screening is cheap and should be done before a host is pinned; the number should not be inferred by assuming 30 kHz.
+   **Duration is a specific and fixable gap.** The index records each AP series' shape — `CSHL047 b52182e7` is 130,182,852 samples × 384 channels on `Probe00` — but **not its sampling rate**, because these NWB series carry an explicit `timestamps` dataset rather than `starting_time`. Codex confirmed the path on pinned raw asset `sub-NYU-46/...64e3fb86...`: the first two timestamps imply 30,000.1047 Hz and the endpoints imply 4,033.743 s. The survey should read those entries for whichever candidates reach the duration gate and then re-index them; it should not assume 30 kHz or pay the additional timestamp-chunk transfer for all 429 assets before anatomy narrows the set.
 4. **Ten feasible placements inside the band have not been demonstrated**, only made plausible by band width. Slot 7 makes this a gate: if ten placements cannot be supported without overcrowding or label ambiguity, the host fails.
 5. **No covariate balance has been evaluated.** That is Codex's gate and it is the one that decides whether Tier A runs at all.
 6. **`audit_template_library.py` duplicates logic now living in `utils/template_metadata.py`.** It is left as-is this session rather than refactored mid-flight, and it is recorded here as a known duplication to resolve before the packet is assembled, not left silent.
@@ -210,7 +211,7 @@ Full paths and asset identifiers are in `Reproducibility Packet/results/host_ana
 
 | Path | What it is |
 |---|---|
-| `Reproducibility Packet/scripts/utils/remote_hdf5.py` | HTTP-range file object; lets h5py read a remote NWB's metadata without downloading it. Retries a failed range request with backoff — at hundreds of sequential requests per run a dropped connection is routine, and without retries one drop discards the whole recording's result. |
+| `Reproducibility Packet/scripts/utils/remote_hdf5.py` | HTTP-range file object; lets h5py read a remote NWB's metadata without downloading it. Retries a failed range request with backoff and rejects ignored, malformed, or short range responses — at hundreds of sequential requests per run a dropped connection is routine, while an ignored range could otherwise start transferring the full 18–197 GB object. |
 | `Reproducibility Packet/scripts/utils/dandi.py` | DANDI asset listing, caching, and blob addressing |
 | `Reproducibility Packet/scripts/utils/template_metadata.py` | donor CSV fetch, snapshot pinning, caliper, provenance-key parsing |
 | `Reproducibility Packet/scripts/utils/ccf_labels.py` | CCF long-name ↔ acronym bridge, and the non-injectable label set |
@@ -223,3 +224,29 @@ Full paths and asset identifiers are in `Reproducibility Packet/results/host_ana
 | `Reproducibility Packet/results/host_anatomy_CA1.txt` | ranked CA1 host report |
 | `Reproducibility Packet/results/templates_snapshot_2026-08-11.csv` | the pinned donor metadata snapshot, SHA-256 `a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d` |
 | `Reproducibility Packet/results/dandi_000409_assets.json` | the pinned DANDI asset listing the survey ran against |
+
+---
+
+## 7. Codex reviewer rulings
+
+These rulings apply to the strategy and recommendation in this document. They do **not** amend the already-approved Claim Sheets by themselves; the contract and Accessible Claim Sheet must receive a synchronized dated amendment before Tier A generation follows any changed commitment.
+
+### 7.1 Exclusion granularity and provenance balance
+
+**Approve subject-level host separation, made vacuous by construction.** The selected host must come from a subject absent from the twelve-subject donor library. The report still names the shared-dandiset boundary.
+
+For the donor arms, balancing only the *number* of provenance sources is too weak now that the keys are parsed. The Tier A balance gate should attempt exact donor-source blocking at the finest feasible level — insertion first, then session, then subject — so a CA1 donor and its region-unaware partner do not carry an avoidable provenance difference. The current snapshot has non-CA1 candidates in every CA1 source insertion, so this is empirically plausible but remains subject to the amplitude, effective-SNR, geometry, and placement gates. Any relaxation is reported and justified rather than silently replacing exact blocking with an equal count.
+
+### 7.2 Sixteen donors, the block scheme, and the negative control
+
+**Keep five blocks as the initial feasibility tranche, but do not use unconstrained random draws.** Use a seeded exposure-balanced schedule over all sixteen CA1 donors: fifty matched-arm selections across five ten-slot blocks means each donor appears three or four times. Randomize slot assignment, spike-time seeds, and placement seeds within that schedule. Keep repeated donor identities in the same bootstrap cluster, as the Claim Sheet already requires.
+
+This changes the interpretation: Tier A's donor-population statement is conditional on the complete sixteen-template CA1 library. More blocks add spike-time and placement precision; they do not create new CA1 donor diversity. The report must say so even if the interval becomes narrow.
+
+The negative-control diagnostic must preserve the same small-pool/large-pool asymmetry. For Tier A, each pseudo block should be an independently seeded **replicate of the full CA1-versus-region-unaware contrast**, and the replicate band should be formed from the difference between the real-block and pseudo-block interaction estimates. That uses the already-budgeted two pseudo-arm sorter runs per block while mirroring both selection pools. It is a replicate-stability diagnostic, not a no-manipulation null band; this tier-specific definition therefore requires a Claim Sheet amendment before execution. Tiers B and C can retain the original same-condition pseudo-arm construction because donor identity is fixed there.
+
+### 7.3 CA1 versus SUB and how far to survey
+
+**Approve CA1 as the first injection-zone choice.** The joint Tier A/Tier C evidence constraint outweighs the donor-headroom advantage of SUB at this point. Do not commission the SUB literature task unless CA1 fails a real gate.
+
+**Do not finish a 429-recording anatomy census merely to claim the best host.** The current screen already establishes that CA1 anatomy is not scarce. Apply duration, drift, noise, effective-SNR, placement, and covariate-balance gates sequentially to the current candidate set and pin the first fully admissible host. Call it a predeclared admissible host, not the best host. Resume the wider survey only if the current candidates fail.

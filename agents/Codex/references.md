@@ -100,6 +100,14 @@ Hosts IBL Neuropixels 1.0 and Steinmetz/Ye Neuropixels Ultra templates with area
 
 *How it informed the project:* Establishes broad region feasibility, replaces the stale 601-row tutorial snapshot, and creates a snapshot/hash requirement.
 
+### Hybrid Template Library — IBL construction and metadata consolidation source
+
+**SpikeInterface developers. `upload_ibl_templates.py` and `consolidate_datasets.py`.** [IBL construction source](https://github.com/SpikeInterface/hybrid_template_library/blob/main/python/upload_ibl_templates.py) · [metadata consolidation source](https://github.com/SpikeInterface/hybrid_template_library/blob/main/python/consolidate_datasets.py) · [SpikeInterface `IblSortingExtractor`](https://github.com/SpikeInterface/spikeinterface/blob/main/src/spikeinterface/extractors/iblextractors.py)
+
+The IBL library builder combines DANDI raw recordings with IBL sorting data, applies high-pass filtering and common-median reference before template extraction, and stores the sorting's `brain_area` property. The consolidation step derives `depth_along_probe` from each template's best-channel probe coordinate. `IblSortingExtractor` maps the IBL cluster `acronym` field to the `brain_area` property.
+
+*How it informed the project:* Prevented the Tier A selection artifact from claiming that host and donor necessarily share one preprocessing chain, and bounded the CCF bridge result correctly: comparing donor acronym/depth with the NWB electrode table is a strong internal-consistency check across upstream representations, not an independent validation of IBL's atlas registration.
+
 ### DANDI 000409 — IBL Brain Wide Map
 
 **International Brain Laboratory et al. IBL — Brain Wide Map. DANDI:000409.** CC-BY-4.0. [https://dandiarchive.org/dandiset/000409/draft](https://dandiarchive.org/dandiset/000409/draft)

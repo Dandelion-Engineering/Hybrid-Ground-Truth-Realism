@@ -1,126 +1,131 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 4 · 2026-08-11 17:13 PDT**
+**Rewritten at the end of Codex Session 5 · 2026-08-11 20:16 PDT**
 
-**Next Codex session will be Session 5.**
+**Next Codex session will be Session 6.**
 
 ## Current phase
 
-**Phase 1 is closed. Phase 2 — Execution is open.** No sorter run, generator run, data download, dependency install, or scientific measurement has occurred in Codex Session 4.
+**Phase 2 — Execution is open.** No sorter run, generator run, recording download, dependency install, or scientific accuracy measurement occurred in Codex Session 5.
 
-The Phase 1 requirements are all same-state agreed:
+Phase 1 remains closed. The approved technical Claim Sheet, Accessible Claim Sheet, and Study Guide Pass 1 exact states remain the governing contract until dated amendments receive same-state approval.
 
-- technical Claim Sheet;
-- Accessible Claim Sheet;
-- Study Guide Pass 1 source/PDF pair; and
-- initial labor split.
+## Approved Phase 1 exact states
 
-Both review chats are concluded and have `Summary.md` files. Later changes to either Claim Sheet use the dated amendment protocol, not the review cycle, and both sheets must remain in sync.
+- Technical `Claim Sheet.md`: `a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3`
+- `Accessible Claim Sheet.md`: `73bff8f81dc2e31b47d4abbe1f61c8106a34dccb8ea6457051c3dba84a589760`
+- Study Guide source: `d33e74d73c41b3ef0b4edbe6de52c0cc4e5597bae2d048618edb5c4523f99819`
+- Study Guide PDF: `75e1423294cb3c4695c14920851825d602379d9ffca1aab6bcb93cbd10d998a3`
 
-## Approved exact states
+Do not treat the proposals below as amendments already in force.
 
-### Technical Claim Sheet
+## Tier A review state
 
-Path: `Claim Sheet.md`
+Active chat:
 
-SHA-256:
+`chats/Claude-Codex/Tier A Selection Review/Tier A Selection Review - Active.md`
 
-`a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3`
+Artifact:
 
-Both agents explicitly approve these bytes.
+`agents/Claude/Tier A Host and Injection Zone Selection.md`
 
-### Accessible Claim Sheet
+Current SHA-256:
 
-Path: `Accessible Claim Sheet.md`
+`c7299cea9b8589dfb894c751d7cd402208db9f29b2fd38b18d1f1e969461a9bf`
 
-SHA-256:
+**Codex explicitly approves these bytes as a host-selection strategy and CA1 injection-zone recommendation. Claude's owner re-review is open.** The review does not close until Claude re-opens the artifact and either approves this exact hash or edits and returns a new state.
 
-`73bff8f81dc2e31b47d4abbe1f61c8106a34dccb8ea6457051c3dba84a589760`
+**No host is pinned.** The original handoff overstated its scope. The artifact supplies provenance evidence, approves CA1 as the first zone, and gives candidate recordings. A completed selection still needs a DANDI asset identifier, its exact anatomical mapping, adequate duration, drift/noise/effective-SNR checks, ten-placement feasibility, and the independent balance gate.
 
-Both agents explicitly approve these bytes. It preserves all fifteen slots, decision rules, compute budgets, failure shapes, and non-transfer boundaries without softening the technical contract.
+## Tier A rulings
 
-### Study Guide Pass 1
+### Exclusion and balance
 
-Source: `Study Guide/Pass 1 - Conceptual Foundation.tex`
+- Select a host from a subject absent from the donor library's twelve subjects. This makes insertion/session/subject host leakage exclusions vacuous.
+- Report the residual shared-dandiset/IBL/NP1 provenance boundary; subject separation is not independence.
+- Within donor pairs, attempt exact provenance blocking at insertion, then session, then subject granularity. Matching only the number of sources is too weak when identities are available.
+- The pinned snapshot has non-CA1 candidates in every CA1 source insertion, including inside the provisional caliper; exact blocking is plausible but still subject to waveform/effective-SNR/placement balance.
 
-Source SHA-256:
+### Sixteen-donor pool and blocks
 
-`d33e74d73c41b3ef0b4edbe6de52c0cc4e5597bae2d048618edb5c4523f99819`
+- CA1 has exactly 16 NP1 donors, 12 inside the provisional caliper. Fifteen lie from 2,640–2,920 µm; the outlier is at 1,860 µm.
+- Keep five blocks as the initial tranche, but use a seeded exposure-balanced donor schedule: 50 matched selections means each CA1 donor appears three or four times.
+- Keep repeated donor identities in the same bootstrap cluster.
+- The donor-population result is conditional on the complete sixteen-template CA1 library. More blocks add seed/placement precision, not new donor diversity.
+- For Tier A only, each pseudo block should independently replicate the full CA1-versus-region-unaware contrast. Form the replicate-stability band from the difference between real-block and pseudo-block interaction estimates. This preserves the small/large pool asymmetry inside the already-budgeted two pseudo-arm runs.
+- That band is not the current no-manipulation null diagnostic. It requires a dated Claim Sheet amendment before Tier A execution.
 
-PDF: `Study Guide/Pass 1 - Conceptual Foundation.pdf`
+### CA1 and host search
 
-PDF SHA-256:
+- CA1 is the first zone. Do not commission SUB evidence unless CA1 fails an actual gate.
+- Do not finish a 429-recording anatomy census merely to claim “best.” Apply the remaining gates sequentially to the current candidates and pin the first fully admissible host. Call it admissible, not best.
+- Resume the survey only if the current set fails.
+- Fallback order: SUB plus primary Tier C evidence; depth-specific zones through amendment; then the already-declared Tier A failure.
+- Lowering below ten injected units is not a default fallback; ten-unit density is a contract commitment tied to anchor comparability and collision load.
 
-`75e1423294cb3c4695c14920851825d602379d9ffca1aab6bcb93cbd10d998a3`
+## Supporting evidence and code state
 
-Both agents explicitly approve this exact pair. The final guide is 13 pages. Codex independently rebuilt the source twice in a temporary directory, confirmed clean logs, rendered and visually inspected all pages, and verified that approved/rebuilt extracted text is identical.
+Verified against pinned local artifacts:
 
-## Concluded review records
+- 2,183 NP1 donors; 37 insertions; 24 sessions; 12 subjects;
+- 2,048 DANDI assets; 459 raw; 459 processed; 139 subjects;
+- 429 raw candidate hosts outside donor subjects; and
+- exact 16/12 CA1 total/in-caliper counts.
 
-- `chats/Claude-Codex/Claim Sheet Review/Claim Sheet Review - Concluded.md`
-- `chats/Claude-Codex/Claim Sheet Review/Summary.md`
-- `chats/Claude-Codex/Study Guide Pass 1 Review/Study Guide Pass 1 Review - Concluded.md`
-- `chats/Claude-Codex/Study Guide Pass 1 Review/Summary.md`
+The CCF bridge check is now bounded correctly. It is an internal consistency check across IBL-derived representations, not independent atlas validation. Thirty-two of 37 donor insertions produced testable assignments; five did not. Among 1,403 testable comparisons: 1,401 agree, 1 disagrees, 1 has an unmapped host label. CA1 is 16/16.
 
-Do not reopen these review cycles. Corrections discovered later propagate through amendments or later artifacts.
+The missing duration metadata lives in each AP series' `timestamps`, not `starting_time`. On pinned NYU-46 asset/session `64e3fb86`, the first two timestamps imply 30,000.1047 Hz and the endpoints imply 4,033.743 s. Read timing only for anatomy-screened candidates rather than transferring timestamp chunks for all 429 assets.
 
-## Labor split
+`Reproducibility Packet/scripts/utils/remote_hdf5.py` now rejects ignored, malformed, and short Range responses and retries them. Live post-change test: one 384-channel electrode table, 6 requests, 5,569,540 bytes.
 
-- **Claude:** Tier A host/injection-zone selection; Accessible Claim Sheet owner; Study Guide owner.
-- **Codex:** Rung 0 feasibility pilot; sorter-panel decision; inference and negative-control harness; Tier A balance/manipulation gate.
-- **Tier B and Tier C:** implementation assigned after Rung 0; the non-author owns each manipulation check.
-- **Reproducibility Packet:** co-owned. Surviving scripts are written directly into it.
-- Default Claude-writer/Codex-reviewer convention remains for later narrative artifacts.
+Codex's `references.md` now records the upstream IBL template builder, metadata consolidator, and `IblSortingExtractor`, including the donor high-pass/common-median path and the origin of `brain_area`/depth metadata.
 
-## Phase 2 design commitments that are easiest to violate
+## Open amendment gates
 
-- Tier A pairs covariate-matched donor slots; donor identity cannot stay fixed when donor region changes.
-- Use a pinned anatomical injection zone, not one region label for a whole penetration.
-- Exclude the exact host source dataset before claiming donor feasibility. The 37/7 audit is a conservative pool screen, not paired-arm feasibility.
-- CA1 is the only current joint-screen candidate on its face, not a selection. Its worst-case donor count is six, below the ten-unit budget.
-- Tier B's population driver is computed once from the untouched host without sorter output.
-- Every manipulation check passes at biologically justified magnitude before any sorter time is spent on that tier.
-- The primary comparative decision uses the hierarchical-bootstrap interval on `D = |I| - T`; `[−T,T]` is only within-resample shorthand.
-- A bounded positive additionally requires the interaction interval to exclude zero. A wide interval is inconclusive, never negative.
-- Five real blocks plus five pseudo blocks form the initial tranche. Pseudo-arms are sorter runs. Minimum load: 200 recording-minutes per candidate per tier.
-- Admission ceiling stays 48 sorter-hours per candidate per tier. Report per-candidate, per-tier, and whole-panel projections; two sorters × three tiers at the ceiling is 288 sorter-hours.
-- Equal real/pseudo block counts give equal nominal replication basis, not equal precision; report both achieved widths.
-- Use one host/injection zone across tiers by default. If the host changes, drop cross-tier comparison.
+Claude was asked to author synchronized dated amendments to both Claim Sheets for:
 
-## Compute state and open director requests
+1. the Tier A host-exclusion and donor-provenance balance rule;
+2. Tier A's full-contrast replicate-stability band; and
+3. the compute environment's day/overnight allocation and leaked-process explanation.
 
-Four measured free-memory points exist in `director_requests.md`:
+Codex has approved the amendment intents, not any exact bytes. Review exact technical and Accessible states before approval. Execution must not silently follow changed rules while the old contract remains authoritative.
 
-- 3.46 GiB RAM / 14,269 MiB VRAM;
-- 3.96 GiB RAM / 14,389 MiB VRAM;
-- 1.01 GiB RAM / 14,286 MiB VRAM; and
-- 0.89 GiB RAM / 14,409 MiB VRAM.
+## Compute environment
 
-The known full Kilosort4 run peaked at 29.3 GiB system RAM. The shared-memory request asks for a predictable quiet window or a decision to design around a permanent small-memory ceiling. It is non-blocking.
+Randy resolved the shared-memory request:
 
-Immediately before every heavy step:
+- the earlier 3.46 → 3.96 → 1.01 → 0.89 GiB series came from finished Claude automation processes that had not exited, not active research work;
+- those processes were cleared;
+- a process-leak fix is being built, not confirmed landed; and
+- this project runs during the day, while the other research project runs overnight.
 
-- measure free RAM and VRAM at that moment;
+The live guard is unchanged:
+
+- measure free RAM and VRAM immediately before every heavy step;
 - use no more than 75% of then-free RAM or VRAM;
 - preserve at least 4 GiB system RAM and 2 GiB VRAM;
 - stop and record a resource failure if a guard is crossed;
-- use only `./venv/Scripts/python.exe` and `./venv/Scripts/pip.exe`; and
-- pin dependencies at first install.
+- never inherit an earlier quiet-window measurement; and
+- use only `./venv/Scripts/python.exe` and `./venv/Scripts/pip.exe`, with dependencies pinned at first install.
 
-A second director entry now asks Randy to review the agreed contract, preferably through `Accessible Claim Sheet.md`. It is also non-blocking. Feedback becomes a dated amendment; execution continues meanwhile.
+The active compute chat is:
 
-## Phase-transition records
+`chats/Claude-Codex/Compute Environment Update/Compute Environment Update - Active.md`
 
-- `agents/Codex/Progress Reports/Progress Report Phase 1 Close.md` is the director-facing transition report.
-- Root `README.md` now shows Phase 2 — Execution, remains `In Progress`, records Phase 1 close in the append-only log, and marks Study Guide Pass 1 approved.
-- `agents/Codex/Session Summaries/HumanReport4.md` contains the full session evidence.
+Codex requested an amendment because Slots 4 and 10 still say projects run simultaneously without coordination or schedule. The amendment should correct those facts without relaxing any guard or changing the capacity ladder.
+
+## Director requests
+
+- Shared-memory request: **resolved and retired** in `director_requests.md`.
+- Phase 1 contract review: **open and non-blocking**. Any response is the first amendment cycle.
 
 ## What Codex should do next
 
-1. Read Claude's newest report and every new Codex-including active chat before replying.
-2. Confirm whether Claude has begun or completed Tier A host/injection-zone selection; cross-review it if present.
-3. Prepare Rung 0 without assuming a resource window. Identify the exact host segment/data inputs and candidate sorter commands before any heavy launch.
-4. Immediately before the first candidate run, measure live RAM and VRAM and enforce the admission/headroom rules. If it does not fit, do not start it; record the failure and work on the inference/negative-control harness or other non-heavy packet work.
-5. Time and memory-profile Kilosort4 plus the declared CPU candidate set on the same ~60 s segment, one admission run each, with the 60-minute wall-time ceiling.
-6. Record measured peaks, runtime, drops, and projected 200-recording-minute per-tier plus whole-panel cost before selecting the panel.
-7. Write surviving code directly into `Reproducibility Packet/`, with `argparse`, docstrings, no hard-coded paths, loud failures, and pinned dependencies.
+1. Read Claude's newest report and both active chats before replying.
+2. Review Claude's genuine owner response to Tier A hash `c7299cea…`; close only on explicit same-state approval.
+3. Review the synchronized technical/Accessible amendment bytes separately. Do not infer approval from intent or edits.
+4. Continue Rung 0 preparation independently of Tier A: identify the exact ~60 s host segment and candidate sorter commands before launch.
+5. Run Rung 0 only during the daytime window and only after fresh RAM/VRAM measurements pass the admission guards. Record runtime, RAM/VRAM peaks, failures, and projected 200-recording-minute per-tier plus whole-panel cost under the currently approved contract unless an amendment changes that budget.
+6. Write surviving code directly inside `Reproducibility Packet/`, with `argparse`, docstrings, no hard-coded paths, loud failures, and pinned dependencies.
+
+`agents/Codex/Session Summaries/HumanReport5.md` contains the full review evidence and reasoning.

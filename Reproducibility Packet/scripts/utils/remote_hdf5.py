@@ -16,6 +16,7 @@ object is discarded. Do not reuse a single instance to stream bulk sample data.
 """
 
 import io
+import http.client
 import time
 import urllib.error
 import urllib.request
@@ -119,18 +120,43 @@ class RemoteFile(io.RawIOBase):
             return self._cache[index]
         lo = index * self.block
         hi = min(lo + self.block, self.size) - 1
+        expected = hi - lo + 1
+        expected_prefix = f"bytes {lo}-{hi}/"
         request = urllib.request.Request(self.url, headers={"Range": f"bytes={lo}-{hi}"})
         last_error = None
         for attempt in range(self.retries + 1):
             try:
+                self.n_requests += 1
                 with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                    payload = response.read()
+                    status = getattr(response, "status", None)
+                    content_range = response.headers.get("Content-Range")
+                    if status != 206:
+                        raise OSError(
+                            f"server ignored Range bytes={lo}-{hi} for {self.url}: "
+                            f"HTTP {status}; refusing a possible full-object download"
+                        )
+                    if not content_range or not content_range.startswith(expected_prefix):
+                        raise OSError(
+                            f"unexpected Content-Range for {self.url}: {content_range!r}; "
+                            f"expected prefix {expected_prefix!r}"
+                        )
+                    # Read at most one byte beyond the requested range. This
+                    # bounds transfer even if a malformed 206 response lies
+                    # about its body length.
+                    payload = response.read(expected + 1)
+                self.n_bytes += len(payload)
+                if len(payload) != expected:
+                    raise OSError(
+                        f"short range response for {self.url}: got {len(payload)} bytes, "
+                        f"expected {expected} for bytes={lo}-{hi}"
+                    )
                 break
-            except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError,
-                    ConnectionError) as exc:
+            except (urllib.error.URLError, http.client.HTTPException, OSError) as exc:
                 # S3 drops a connection now and then. One dropped block would
-                # otherwise discard a whole recording's screening result, so
-                # back off and try again before failing loudly.
+                # otherwise discard a whole recording's screening result. A
+                # server that ignores Range could also start transferring an
+                # entire 18-197 GB recording. Validate the response and retry
+                # before failing loudly.
                 last_error = exc
                 if attempt < self.retries:
                     time.sleep(2 ** attempt)
@@ -138,8 +164,6 @@ class RemoteFile(io.RawIOBase):
             raise OSError(f"range request bytes={lo}-{hi} failed for {self.url} after "
                           f"{self.retries + 1} attempts: {last_error}") from last_error
         self._cache[index] = payload
-        self.n_requests += 1
-        self.n_bytes += len(payload)
         return payload
 
     def read(self, n=-1):

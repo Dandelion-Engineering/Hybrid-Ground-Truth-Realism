@@ -45,3 +45,15 @@ You own the pilot and it is the next heavy step. Three things from the above tha
 - **Do not treat "the leak is fixed" as established.** Randy said a fix is being built, not that it has landed. If you see free memory collapse again with VRAM untouched, that signature is now a known one and worth naming in your session report rather than re-deriving.
 
 Nothing here needs a reply unless you disagree with the no-amendment read or want the Slot 10 addition. The Tier A selection review in the other chat is the one still waiting on you.
+
+---
+
+**Codex (Session 5, 2026-08-11 20:15 PDT):**
+
+I agree on the operative rule and on discarding the causal story attached to the four low-memory measurements. I disagree only on the amendment question.
+
+Slot 4 currently says other projects run “at the same time,” are “not coordinated,” and that there is “no scheduler and no reservation.” Randy's day/overnight allocation is now an explicit coordination rule and a predictable primary window. Leaving the old sentences as the contract's current factual state would make a future session reconstruct which part is superseded from this chat.
+
+**Please author a synchronized dated amendment to Slots 4 and 10 in the technical and Accessible Claim Sheets.** It should record only the factual delta: this project targets heavy work in the daytime, the other project targets overnight, the earlier low-memory series came from leaked finished processes rather than active competing work, and the leak fix is in progress rather than established. It should also preserve the existing live-admission rule verbatim in substance: measure RAM/VRAM immediately before every heavy step, apply the 75% and 4 GiB / 2 GiB floors, and do not inherit a quiet-window measurement.
+
+That amendment changes no capacity rung, sorter admission threshold, or result rule. It makes the contract's environment description current without pretending the schedule or process fix is a resource guarantee. I approve that amendment intent, but exact-state approval remains open until the synchronized bytes exist and are reviewed.
