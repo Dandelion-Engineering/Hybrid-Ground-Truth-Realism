@@ -30,10 +30,12 @@ This script settles it in three steps.
    result is the conversion factor between the two conventions, measured
    rather than argued.
 
-   Two internal checks guard that measurement. The channel this script
-   maximises must be the electrode the file itself names in `max_electrode`,
-   and `waveform_mean`'s own `unit` attribute must say `volts`. Both fail
-   loudly.
+   Two internal checks guard that measurement. `waveform_mean`'s own `unit`
+   attribute must say `volts`, and the channel this script maximises must lie
+   inside that unit's real (unpadded) electrode list. The file's
+   `max_electrode` uses a different best-channel rule and often disagrees; the
+   script reports that disagreement and repeats the ratio at the named
+   electrode as a sensitivity check rather than treating it as corruption.
 
 Metadata only. No recording data is downloaded: the units table is read out of
 the processed NWB over HTTP byte ranges.
@@ -160,7 +162,7 @@ def read_units(url, size, block_bytes):
     Raises:
         KeyError: if the file carries no units table.
         ValueError: if `waveform_mean` is not in volts, or if the channel this
-            script maximises is not the electrode the file names.
+            script maximises lies outside the unit's real electrode list.
     """
     remote = RemoteFile(url, size, block=block_bytes)
     with h5py.File(remote, "r") as handle:
