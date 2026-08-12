@@ -105,7 +105,12 @@ NAME_TO_ACRONYM = {
 
 # Labels that name tissue no unit should be injected into, or no tissue at all.
 NON_INJECTABLE_ACRONYMS = frozenset({
+    # Hand-authored entries.
     "ccb", "ccs", "alv", "fiber tracts", "or", "void", "root",
+    # White-matter entries added by the derived layer. Keeping these here is
+    # load-bearing: an expanded vocabulary must not make a newly recognised
+    # fibre tract look like an admissible injection zone.
+    "ec", "ee", "fp", "int", "opt", "rust", "SCdw", "SCiw", "scp", "scwm",
 })
 
 

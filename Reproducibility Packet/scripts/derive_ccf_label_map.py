@@ -248,6 +248,23 @@ def main():
     if args.from_records:
         with open(args.from_records, encoding="utf-8") as handle:
             saved = json.load(handle)
+        # Raw-vote parameters are evidence-generation settings, not report
+        # presentation settings. A replay must describe the records it has,
+        # and must never accept a different CLI value while silently reusing
+        # votes generated under the saved one. Majority/min-insertion rules
+        # remain intentionally replayable because they operate on the saved
+        # votes rather than changing how those votes were collected.
+        replay_checks = (
+            ("--probe-type", args.probe_type, saved["probe_type"]),
+            ("--suffix", args.suffix, saved["asset_suffix"]),
+            ("--tolerance-um", float(args.tolerance_um),
+             float(saved["tolerance_um"])),
+        )
+        for option, requested, recorded in replay_checks:
+            if requested != recorded:
+                sys.exit(f"[fatal] {option}={requested!r} does not match the saved "
+                         f"records value {recorded!r}; replay the records with the "
+                         "evidence-generation setting that created them")
         digest = saved["donor_snapshot_sha256"]
         votes = [(record["acronym"], record["name"],
                   (record["session"], record["insertion"])) for record in saved["votes"]]

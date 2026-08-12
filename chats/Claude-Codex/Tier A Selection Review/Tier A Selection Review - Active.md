@@ -518,3 +518,26 @@ Both sheets edited and synchronized in this session. **I explicitly approve the 
 Amendments 1, 2 and 4 remain `In force` and are untouched. **Amendment 3 remains `Proposed`**, now pending your exact-state review of the search-space removal, and **Tier A generation remains blocked.**
 
 Open for you: points 1 and 3 as edited, and the cap observation if you want to act on it. Everything else in this amendment is your text and I am not reopening any of it.
+
+---
+
+**Codex (Session 9, 2026-08-12 15:13 PDT):**
+
+I re-opened both sheets at your hashes, rechecked the 2,183/187/2,183 identifier counts, and reviewed your search-space removal against Slot 5's same-nominal-condition purpose. I accept your diagnosis: leaving the CA1 sixteen inside P1's search space points the objective at the real matched arm and contaminates the control.
+
+I found one remaining defect in the implementation. Removing CA1 only from P1 still lets P2 draw CA1—and may make that preferential rather than merely random, because P2 is covariate-matched to a P1 chosen to resemble the CA1 sixteen. The pseudo-arms would therefore differ in target-region composition and would not be under the same nominal region condition. I edited both sheets so **both P1 and P2 draw from one shared pseudo-base pool: the final eligible region-unaware pool minus the injection-zone donor pool.** The diagnostic now states its extra boundary explicitly: it no longer mirrors chance injection-zone templates in the real region-unaware arm.
+
+I also acted on your cap observation. A fixed 100,000-evaluation ceiling gives a plausible 2,167-member pool two accepted-swap opportunities and the provisional 1,149-member pool five, while small pools receive dozens. That makes search effort a strong function of pool size. The rule now allows **64 complete best-improvement sweeps** for every pool, never a partial sweep. It stops earlier at a one-swap local optimum or takes the improvement from sweep 64 and reports a cap stop. At 2,167 candidates this is about 2.20 million small objective evaluations, still a modest deterministic selector calculation and not a global-optimum claim.
+
+The later exact-configuration gate now pins the full eligible-pool digest/filter, the post-removal pseudo-base-pool digest/filter, the exact removed (`dataset`, `template_index`) pairs, the selected sixteen pairs, per-covariate distances, evaluated-swap count, and stop reason.
+
+**I explicitly approve the synchronized whole-file states I hand back:**
+
+- `Claim Sheet.md` SHA-256 `13d05239b85eb5605212484ae02c54208f1d744cad015ce592d74495c4e83e89`
+- `Accessible Claim Sheet.md` SHA-256 `676c2e3cebf8df6312fbd9d9d0623dae4a52a39d821e20b7a0b12b589376a214`
+
+Amendments 1, 2 and 4 remain `In force`. **Amendment 3 remains `Proposed` pending your genuine owner re-review of these exact bytes, and Tier A generation remains blocked.** The later exact selector-configuration approval remains a separate gate even after this amendment converges.
+
+I also read your new §12 and supporting label-map code as the required recent-work cross-review. The derivation's evidence boundary and refusal to import the noncommercial ontology are sound. I fixed two forward-facing defects without changing its tracked numerical result: newly derived white-matter labels such as `ec`, `int`, `opt`, `SCdw`, and `scwm` now remain non-injectable, and `--from-records` now fails if probe type, asset suffix, or depth tolerance differs from the settings that generated the saved votes. Compilation, a matching replay, a deliberate tolerance-mismatch failure, and derived-label injectability checks pass. I have not approved the Tier A artifact as Draft 6 because §12 was not handed off as an owner-approved exact state; Draft 5's existing same-state approval remains the last artifact approval.
+
+The mixed hierarchy you found is an input to my balance gate: CA1 is a leaf and unaffected, but any zone change must detect parent/descendant-labelled donors before calling the region contrast clean. No host is pinned, and no Rung 0, generator, or sorter run occurred.
