@@ -34,7 +34,9 @@ Example
     ./venv/Scripts/python.exe "Reproducibility Packet/scripts/screen_host_timing.py" \
         --index "Reproducibility Packet/results/host_anatomy_index.jsonl" \
         --assets-cache "Reproducibility Packet/results/dandi_000409_assets.json" \
-        --target CA1 --min-band-channels 20 --min-duration-s 600 \
+        --target CA1 --anatomy-max-gap-um 40 \
+        --legacy-index-target CA1 --legacy-index-max-gap-um 40 \
+        --min-band-channels 20 --min-duration-s 600 \
         --timing-index "Reproducibility Packet/results/host_timing_index.jsonl" \
         --out "Reproducibility Packet/results/host_timing_CA1.txt"
 """
@@ -48,7 +50,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import h5py  # noqa: E402
 
-from utils import dandi  # noqa: E402
+from utils import anatomy_index, dandi  # noqa: E402
 from utils.remote_hdf5 import RemoteFile  # noqa: E402
 
 
@@ -202,6 +204,12 @@ def main():
     parser.add_argument("--version", default="draft", help="dandiset version (default: draft)")
     parser.add_argument("--target", default="CA1",
                         help="target structure acronym used by the anatomy screen (default: CA1)")
+    parser.add_argument("--anatomy-max-gap-um", type=float, default=40.0,
+                        help="maximum row gap used by the anatomy screen (default: 40)")
+    parser.add_argument("--legacy-index-target", default=None,
+                        help="explicit target used to build legacy anatomy-index records")
+    parser.add_argument("--legacy-index-max-gap-um", type=float, default=None,
+                        help="explicit max-gap value used to build legacy anatomy-index records")
     parser.add_argument("--min-band-channels", type=int, default=20,
                         help="minimum contiguous target-structure band, in channels "
                              "(default: 20, matching the anatomy report threshold)")
@@ -230,6 +238,16 @@ def main():
     if not anatomy:
         sys.exit(f"[fatal] no anatomy records found in {args.index!r}; run "
                  f"survey_host_anatomy.py first")
+    try:
+        anatomy_index.validate_configuration(
+            anatomy,
+            args.target,
+            args.anatomy_max_gap_um,
+            legacy_target=args.legacy_index_target,
+            legacy_max_gap_um=args.legacy_index_max_gap_um,
+        )
+    except ValueError as exc:
+        sys.exit(f"[fatal] {exc}")
     candidates = select_candidates(anatomy, args.target, args.min_band_channels)
     print(f"[timing] {len(candidates)} of {len(anatomy)} indexed assets carry a "
           f"{args.target} band of >= {args.min_band_channels} channels", flush=True)
@@ -295,6 +313,7 @@ def main():
     emit()
     emit(f"dandiset            {args.dandiset} ({args.version})")
     emit(f"target structure    {args.target}")
+    emit(f"anatomy max gap     {args.anatomy_max_gap_um:g} um")
     emit(f"band threshold      {args.min_band_channels} channels")
     emit(f"candidates          {len(candidates)}")
     emit(f"timed               {len(reported)}")

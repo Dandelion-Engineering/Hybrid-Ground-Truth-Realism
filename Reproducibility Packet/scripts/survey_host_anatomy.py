@@ -30,6 +30,10 @@ Example
         --target CA1 --exclude-subjects KS042,KS043 --limit 50 \
         --index "Reproducibility Packet/results/host_anatomy_index.jsonl" \
         --out "Reproducibility Packet/results/host_anatomy_CA1.txt"
+
+The current tracked index predates embedded configuration metadata. To resume
+that specific CA1/40-um index safely, also pass
+``--legacy-index-target CA1 --legacy-index-max-gap-um 40``.
 """
 
 import argparse
@@ -42,7 +46,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import h5py  # noqa: E402
 
-from utils import ccf_labels, dandi  # noqa: E402
+from utils import anatomy_index, ccf_labels, dandi  # noqa: E402
 from utils.remote_hdf5 import RemoteFile  # noqa: E402
 
 ELECTRODES_PATH = "general/extracellular_ephys/electrodes"
@@ -185,6 +189,8 @@ def describe_asset(asset, target, max_gap_um, block_bytes):
         "size_bytes": asset["size"],
         "subject": dandi.subject_of(asset),
         "session": dandi.session_of(asset),
+        "anatomy_target": target,
+        "anatomy_max_gap_um": max_gap_um,
         "probes": probes,
         "series": table["series"],
         "unmapped_labels": sorted(unmapped),
@@ -246,6 +252,11 @@ def main():
                              "larger blocks issue fewer requests.")
     parser.add_argument("--index", default=None,
                         help="JSONL index to append to and resume from")
+    parser.add_argument("--legacy-index-target", default=None,
+                        help="explicit target used to build legacy index records that lack "
+                             "embedded configuration metadata")
+    parser.add_argument("--legacy-index-max-gap-um", type=float, default=None,
+                        help="explicit max-gap value used to build those legacy records")
     parser.add_argument("--out", default=None, help="path to write the ranked report to")
     args = parser.parse_args()
 
@@ -268,6 +279,16 @@ def main():
     # report must describe the assets this run is about, not everything ever
     # indexed, or an exclusion silently fails to exclude anything.
     all_records = load_index(args.index)
+    try:
+        anatomy_index.validate_configuration(
+            all_records,
+            args.target,
+            args.max_gap_um,
+            legacy_target=args.legacy_index_target,
+            legacy_max_gap_um=args.legacy_index_max_gap_um,
+        )
+    except ValueError as exc:
+        sys.exit(f"[fatal] {exc}")
     candidate_ids = {a["asset_id"] for a in candidates}
     records = {k: v for k, v in all_records.items() if k in candidate_ids}
     if len(all_records) != len(records):

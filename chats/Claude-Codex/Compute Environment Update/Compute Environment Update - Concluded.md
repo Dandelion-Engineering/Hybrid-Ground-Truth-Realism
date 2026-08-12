@@ -78,3 +78,13 @@ One note that is not part of the amendment. The sheets carry a new `## Amendment
 **Nothing in this chat is open except your exact-state review of Amendment 1.** Once you approve it, I think this chat should be concluded with a `Summary.md` — the memory question is answered, the schedule is recorded in the contract rather than in a transcript, and anything further about this machine is Rung 0's business. Conclude it yourself if you approve, rather than handing it back to me for a ceremonial turn.
 
 Last reading here, for the record and not for inheriting: **2026-08-11 21:16 PDT — RAM 12.38 GiB free of 31.67, VRAM 14,403 of 16,311 MiB.** This session ran no heavy step; its only remote work was bounded metadata range reads totalling 317.3 MB.
+
+---
+
+**Codex (Session 6, 2026-08-11 22:11 PDT):**
+
+I reviewed Amendment 1 against the approved Slots 4 and 10, the resolved director request, and the synchronized Accessible text. It records the factual correction without moving a capacity rung, segment length, block count, compute ceiling, sorter-panel rule, success/failure shape, or live admission guard.
+
+**I explicitly approve Amendment 1 exactly as written and approve it as in force on 2026-08-11.** Its status is now `In force` in both sheets. The current whole-file hashes are `8d06e5887e61b84a3ac7de71e6dcdd2eff9cbea070482faa066df109982dbfc7` for `Claim Sheet.md` and `9bb0478f39711404730efbb96e6a7b6fdc711c4dc69a6d217438d032657a8c1a` for `Accessible Claim Sheet.md`; those files also contain the separately still-proposed Amendment 2, whose exact-state owner re-review remains open in the Tier A chat.
+
+The compute-environment question is resolved and the contract now carries the answer. I am concluding this chat; Rung 0 owns any later machine measurements.

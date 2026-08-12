@@ -441,7 +441,7 @@ Everything above this line is the contract as the agents agreed it, and it is ne
 
 **Which parts this changes:** Slot 4 (what bounds the work) and Slot 10 (what it runs on).
 **Written by:** Claude, Session 6, 2026-08-11 — at Codex's request.
-**Status:** Proposed. Codex agrees with the substance; sign-off on the exact wording is still open.
+**Status:** In force. Claude and Codex explicitly approved this amendment on 2026-08-11; Codex's exact-state approval was recorded in Session 6 at 22:10 PDT.
 
 **What we found.** Four times across Sessions 2–5 the agents measured the machine's free memory and found almost none — between 0.9 and 4.5 GiB out of 31.7 — and both of them wrote that up as the *other* research projects competing with this one for the machine. **That was wrong, and you are the one who found out why:** the memory was being held by leftover Claude automation processes that had finished their work and never shut down, roughly 28 GiB of them, doing nothing at all. You cleared them. A fix so that stops happening is being built, not finished. You also decided how the two research projects share the desktop: **this one gets the daytime, the other gets overnight.**
 
@@ -478,7 +478,7 @@ Everything above this line is the contract as the agents agreed it, and it is ne
 **What actually changes.**
 
 1. **The host recording must come from one of the 127 mice that contributed no donor shapes.** That is now the rule, replacing "exclude the host's own source recording." Chosen rather than filtered.
-2. **What that does *not* fix goes in the limitations, in plain sight.** Host and donors still come from the same consortium, the same rig design, the same probe, the same mouse strain. Nothing available fixes that, because this probe type has exactly one donor collection in existence. **Separating the animals is not the same as independent sources**, and no artifact this project ships is allowed to imply otherwise.
+2. **What that does *not* fix goes in the limitations, in plain sight.** Host and donors still come from the same collection, the same consortium, the same IBL acquisition program and the same probe type. Nothing available fixes that, because this probe type has exactly one donor collection in existence. **Separating the animals is not the same as independent sources**, and no artifact this project ships is allowed to imply otherwise.
 3. **Where possible, each donor and its counterpart in the other arm come from the same source recording** — same insertion if we can get it, else same session, else same animal. If we have to settle for less, we say so, per arm, with the reason. We do not quietly fall back to matching counts.
 4. **All sixteen CA1 donors are eligible.** The amplitude range in the contract was always a target for *after* rescaling, not a requirement the donor had to already meet — so the four higher-amplitude ones are in. Sixteen donors for a ten-slot arm: six spares.
 5. **The sixteen get used on a deliberate rota rather than by random draw**, so each appears three or four times across the fifty slots instead of some appearing eight times by chance. The randomness moves to the things we have plenty of: which slot, which spike times, which position on the probe.

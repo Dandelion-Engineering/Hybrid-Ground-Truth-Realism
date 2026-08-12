@@ -88,9 +88,9 @@ Reports paired in-vitro and in-vivo errors and a hybrid comparison of SpyKING CI
 
 **SpikeInterface developers. Benchmark spike sorting with hybrid recordings.** [official tutorial](https://spikeinterface.readthedocs.io/en/latest/how_to/benchmark_with_hybrid_recordings.html) · [current `hybrid_tools.py`](https://github.com/SpikeInterface/spikeinterface/blob/main/src/spikeinterface/generation/hybrid_tools.py) · [comparison module](https://spikeinterface.readthedocs.io/en/stable/modules/comparison.html)
 
-Documents the template metadata, motion-aware injection, default sorter panel, and performance outputs; source exposes current generator defaults and caller-supplied sorting support.
+Documents the template metadata, motion-aware injection, default sorter panel, and performance outputs. In SpikeInterface 0.104.8 (tag commit `76c41846f88de3cc9dc5858d5c7f97dd6cb1955f`), `generate_hybrid_recording()` passes the caller-supplied recording directly to `InjectTemplatesRecording` or `InjectDriftingTemplatesRecording`; it does not add a preprocessing stage. The official tutorial high-pass filters and common-references its host before passing it to the generator.
 
-*How it informed the project:* Confirms which axes require only configuration versus new code and defines the comparison outputs and reproducibility parameters that must be frozen.
+*How it informed the project:* Confirms which axes require only configuration versus new code and defines the comparison outputs and reproducibility parameters that must be frozen. It also makes preprocessing order a caller-owned Rung 0 commitment rather than an upstream default: the host injection substrate must be constructed before injection, and the exact chain must be pinned.
 
 ### SpikeInterface Hybrid Template Library — repository and live metadata
 
@@ -104,9 +104,9 @@ Hosts IBL Neuropixels 1.0 and Steinmetz/Ye Neuropixels Ultra templates with area
 
 **SpikeInterface developers. `upload_ibl_templates.py` and `consolidate_datasets.py`.** [IBL construction source](https://github.com/SpikeInterface/hybrid_template_library/blob/main/python/upload_ibl_templates.py) · [metadata consolidation source](https://github.com/SpikeInterface/hybrid_template_library/blob/main/python/consolidate_datasets.py) · [SpikeInterface `IblSortingExtractor`](https://github.com/SpikeInterface/spikeinterface/blob/main/src/spikeinterface/extractors/iblextractors.py)
 
-The IBL library builder combines DANDI raw recordings with IBL sorting data, applies high-pass filtering and common-median reference before template extraction, and stores the sorting's `brain_area` property. The consolidation step derives `depth_along_probe` from each template's best-channel probe coordinate. `IblSortingExtractor` maps the IBL cluster `acronym` field to the `brain_area` property.
+The IBL library builder combines DANDI raw recordings with IBL sorting data and applies `astype(float32)` → Neuropixels `phase_shift` → 1 Hz high-pass → common reference before template extraction; it stores the sorting's `brain_area` property. The consolidation step derives `depth_along_probe` from each template's best-channel probe coordinate. `IblSortingExtractor` maps the IBL cluster `acronym` field to the `brain_area` property.
 
-*How it informed the project:* Prevented the Tier A selection artifact from claiming that host and donor necessarily share one preprocessing chain, and bounded the CCF bridge result correctly: comparing donor acronym/depth with the NWB electrode table is a strong internal-consistency check across upstream representations, not an independent validation of IBL's atlas registration.
+*How it informed the project:* Prevented the Tier A selection artifact from claiming that host and donor necessarily share one preprocessing chain, and bounded the CCF bridge result correctly: comparing donor acronym/depth with the NWB electrode table is a strong internal-consistency check across upstream representations, not an independent validation of IBL's atlas registration. Combined with the 0.104.8 generator source, it confirms Claude's Rung 0 warning: injecting these already-phase-shifted templates into a raw host and phase-shifting the combined recording would transform injected spikes twice but real host spikes once. Build and pin the injection substrate first; do not rely on the generator to do it.
 
 ### DANDI 000409 — IBL Brain Wide Map
 

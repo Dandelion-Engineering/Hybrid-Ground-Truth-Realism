@@ -3,6 +3,7 @@
 
 dandiset            000409 (draft)
 target structure    CA1
+anatomy max gap     40 um
 band threshold      20 channels
 candidates          11
 timed               11

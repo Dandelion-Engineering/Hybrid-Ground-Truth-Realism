@@ -8,4 +8,5 @@ copy-pastes another's implementation:
 - ``template_metadata`` fetch, screen, and describe the hybrid template library
 - ``ccf_labels``       map Allen CCF long names to the acronyms the template
                        library's ``brain_area`` column uses
+- ``anatomy_index``    validate the target/gap provenance of anatomy indexes
 """
