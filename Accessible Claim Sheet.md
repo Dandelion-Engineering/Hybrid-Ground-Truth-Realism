@@ -429,6 +429,68 @@ Real research surfaces what a contract did not anticipate. When it does, the age
 
 ---
 
+## Amendments
+
+Everything above this line is the contract as the agents agreed it, and it is never rewritten. Changes get **added on** here, in order, each dated. Each one says what we found, why it changes the plan, what the new plan is, and what it does to the definitions of success and failure. They are numbered the same way in both documents, so Amendment 2 here is Amendment 2 there.
+
+**Read the status line.** *Proposed* means one agent wrote it and the other has not signed off yet — the work continues on the original text until they do. *In force* means both agents have explicitly approved it.
+
+---
+
+### Amendment 1 — The machine has a schedule now, and we had the memory story wrong
+
+**Which parts this changes:** Slot 4 (what bounds the work) and Slot 10 (what it runs on).
+**Written by:** Claude, Session 6, 2026-08-11 — at Codex's request.
+**Status:** Proposed. Codex agrees with the substance; sign-off on the exact wording is still open.
+
+**What we found.** Four times across Sessions 2–5 the agents measured the machine's free memory and found almost none — between 0.9 and 4.5 GiB out of 31.7 — and both of them wrote that up as the *other* research projects competing with this one for the machine. **That was wrong, and you are the one who found out why:** the memory was being held by leftover Claude automation processes that had finished their work and never shut down, roughly 28 GiB of them, doing nothing at all. You cleared them. A fix so that stops happening is being built, not finished. You also decided how the two research projects share the desktop: **this one gets the daytime, the other gets overnight.**
+
+**Why it changes the contract.** Slot 4 currently tells a reader, as a statement of fact, that other projects run on the machine at the same time and that there is no schedule and no way to reserve anything. There is a schedule now. Leaving the old sentence there would force some future session to work out from an old chat log which half of the contract still applies. Slot 10 also cites two of those misread measurements as evidence about competition.
+
+**Here is the honest part, and it is the reason this amendment exists at all.** The measurements were right; the *explanation* attached to them was invented. Neither agent could see what was holding the memory, and neither said so — the number was ours to report, the cause was not ours to assert. That is recorded here rather than quietly fixed, because a project that will publish a negative result has to be a project that says out loud when it got something wrong.
+
+**What actually changes.**
+
+1. **The description of the machine.** Two Dandelion research projects share it under your allocation: this one aims heavy work at the daytime; the other aims at overnight. It is a convention, not a reservation — nothing enforces it and nothing guarantees the memory will be there.
+2. **The old measurements are marked as misattributed.** No future session may reason from the *shape* of that four-session decline; it was measuring accumulating dead processes, not competition.
+3. **The leak fix is in progress, not done.** If free memory ever collapses again while the graphics card's memory stays untouched, that pattern is now a *known signature* and gets named in the session report rather than re-diagnosed from scratch.
+4. **Nothing about how we decide to start a job changes.** Measure free memory immediately before every heavy step. A run may take at most 75% of what was free at that moment, and must leave at least 4 GiB of system memory and 2 GiB of graphics memory for everything else. If it does not fit, do not start it. Never inherit a number from a file — including this one, and including a number measured during a quiet stretch.
+5. **No part of the experiment gets bigger or smaller because of this.** The ladder, the segment lengths, the block counts, the compute ceilings and the sorter panel are all exactly as they were. If the panel ends up smaller, it will be because the pilot measured it smaller.
+
+**Does this change what counts as success or failure?** No. It adds no rule about results and removes none. "We ran out of machine before we ran out of question" is still a possible, publishable failure — a schedule is not a guarantee.
+
+---
+
+### Amendment 2 — We can pick a recording that avoids the leakage problem entirely, and CA1 has exactly sixteen usable donor cells
+
+**Which parts this changes:** Slot 7 (how we will know), Slot 5 (how the work is done), Slot 9 (how big we build), Slot 13 (what does not transfer).
+**Written by:** Claude, Session 6, 2026-08-11, from the Session 5 provenance work and Codex's review of it.
+**Status:** Proposed. Codex has ruled on the substance; sign-off on the exact wording is still open.
+
+**What we found.** The library of donor spike shapes has a column naming where each one came from. Nobody had opened it — the earlier work counted the distinct values without reading them. Read properly, it says that **every single donor shape for this probe type comes from the same public collection our host recordings come from**: 37 probe insertions, 24 recording sessions, 12 mice. Three things follow.
+
+- **"Don't use donors from the host's own recording" turns out to mean three different things** — same probe insertion, same session, or same *mouse* — and they give very different answers. Some brain areas look perfectly healthy under the loosest reading and drop to **zero usable donors** under the strictest. The contract never said which one it meant.
+- **We can sidestep the whole question rather than answer it.** The collection holds 459 raw recordings from 139 mice, and only 12 of those mice contributed donor shapes. So **429 of the 459 possible host recordings come from an animal that contributed nothing** — pick the host there and all three readings become moot at once, at no cost, and every brain area keeps its full set of donors.
+- **CA1 — the region we want to inject into — has a hard ceiling of sixteen donor shapes in the entire library.** Not sixteen after filtering. Sixteen in total. There is no filter setting that produces more, because no more exist.
+
+**Why it changes the contract.** Two reasons. First, the contract asks the two arms to be balanced on the *number* of source recordings they draw from; now that we can read the actual identities, matching the identities is strictly better than matching a count, and the contract should ask for the better thing. Second, the plan calls for five repeat rounds with ten injected units each — fifty slots — drawn from a pool of sixteen. **Repeating the experiment cannot introduce donor cells that do not exist.** That changes what a Tier A result *means*, which is a contract question, not a detail.
+
+**What actually changes.**
+
+1. **The host recording must come from one of the 127 mice that contributed no donor shapes.** That is now the rule, replacing "exclude the host's own source recording." Chosen rather than filtered.
+2. **What that does *not* fix goes in the limitations, in plain sight.** Host and donors still come from the same consortium, the same rig design, the same probe, the same mouse strain. Nothing available fixes that, because this probe type has exactly one donor collection in existence. **Separating the animals is not the same as independent sources**, and no artifact this project ships is allowed to imply otherwise.
+3. **Where possible, each donor and its counterpart in the other arm come from the same source recording** — same insertion if we can get it, else same session, else same animal. If we have to settle for less, we say so, per arm, with the reason. We do not quietly fall back to matching counts.
+4. **All sixteen CA1 donors are eligible.** The amplitude range in the contract was always a target for *after* rescaling, not a requirement the donor had to already meet — so the four higher-amplitude ones are in. Sixteen donors for a ten-slot arm: six spares.
+5. **The sixteen get used on a deliberate rota rather than by random draw**, so each appears three or four times across the fifty slots instead of some appearing eight times by chance. The randomness moves to the things we have plenty of: which slot, which spike times, which position on the probe.
+
+**A new "this does not transfer" clause.** Because the matched arm uses up essentially the whole CA1 donor supply, **a Tier A result is a statement about those sixteen spike shapes in that one recording — not about region-matched injection in general.** More repeat rounds make the number more precise; they cannot make it more general. **This gets said even if the final interval is narrow**, because a tight number around an exhausted pool is precision, not generality, and confusing the two is exactly the kind of overclaim this contract exists to prevent.
+
+**Does this change what counts as success or failure?** The success criteria keep their shape. The pre-declared failure — "no host and region combination can support both arms fairly, so Tier A is dropped and we publish why" — is unchanged, and is still what happens if the remaining checks kill more than six of the sixteen.
+
+**One thing deliberately left out.** Codex also proposed changing how Tier A's "nothing actually changed" control band is built. The two agents do not yet agree on that, so it is **not** in this amendment and the original design still stands. Nothing gets generated on the new construction until that is settled and written down separately. If it stays unsettled, it comes to you.
+
+---
+
 ## If you read only one part of this
 
 Read the three sentences below. Everything above is what makes them precise.

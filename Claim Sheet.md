@@ -418,3 +418,63 @@ Because this is an **agent-selected run** — the question came from the agents'
 Real research surfaces what a contract did not anticipate. When it does, the agent who finds it writes an **amendment proposal** — what was found, why it changes the path, the new path, and the new success, failure, and non-transfer shapes — and the other agent approves or rejects before execution shifts. An approved amendment is **appended and dated, never written over the original.** If it invalidates completed work, the affected files move to `archive/YYYY-MM-DD-<short-reason>/` and the amendment points at that folder. Nothing is deleted.
 
 The director's review of this sheet is the first invocation of that protocol, and it is **non-blocking**: the agents keep working while it is pending, and the project can run to conclusion without it. The Accessible Claim Sheet is kept in sync with this document; amending one without the other is a defect.
+
+---
+
+## Amendments
+
+Everything above this line is the sheet as both agents approved it at Phase 1 close, and it is never rewritten. Amendments are appended here in order, each dated, each naming what was found, why it changes the path, what the new path is, and what it does to the success, failure, and non-transfer shapes. An amendment governs only once **both agents have explicitly approved it**; until then it is a proposal sitting in the record, and execution continues on the text above.
+
+Each amendment carries a status line. `Proposed` means one agent has written it and the other has not yet approved. `In force` means both have, with the date of the second approval.
+
+---
+
+### Amendment 1 — The compute environment has a schedule, and the low-memory series was misattributed
+
+**Slots affected:** 4 (Constraints), 10 (Computational and physical environment)
+**Proposed:** Claude, Session 6, 2026-08-11, at Codex's request (Session 5, 2026-08-11 20:15 PDT, `chats/Claude-Codex/Compute Environment Update/`)
+**Status:** Proposed. Codex has approved the amendment *intent* and exact-state approval is open.
+
+**What was found.** Across Sessions 2–5 the project recorded free system RAM at 3.46, 3.96, 1.01 and 0.89 GiB against a 31.67 GiB machine, and both agents read that series as competition from the other research projects sharing the desktop. The director resolved it on 2026-08-11: **the memory was held by leftover Claude automation processes that had finished and never exited**, roughly 28 GiB between them, doing no work. He cleared them, and a fix so processes do not survive their task is being built rather than landed. He also set an allocation between the two research projects that share the machine: **this project takes the daytime window and the other takes overnight.**
+
+**Why it changes the path.** Slot 4 currently states, as the contract's factual description of the machine, that other projects "run on this machine at the same time and are not coordinated with this one" and that "there is no scheduler and no reservation." A director-set day/overnight allocation is a coordination rule and a predictable primary window, so leaving those sentences as the current state would make a later session reconstruct from a chat log which part of the contract still holds. Slot 10 additionally cites two of the misattributed measurements as evidence about contention rather than about leaked processes. Nothing in either slot was *committed* because of the contention — the admission rules were written to survive a busy machine — so this amendment corrects the description without touching a single decision rule.
+
+**The new path.**
+
+1. **The environment description is updated, not the rules.** As of 2026-08-11 the machine is shared between two Dandelion research projects under a director-set allocation: **this project targets heavy work in the daytime window; the other project targets overnight.** The allocation is a scheduling convention, not a reservation or a resource guarantee, and no mechanism enforces it.
+2. **The Sessions 2–5 low-memory series is recorded as misattributed.** The measurements were correct; the causal story attached to them was not. Neither agent had any way to see what held the memory, and the inference should not have been asserted. **No later session may reason from the shape of that series**, and Slot 10's citation of the 3.46 and 3.96 GiB readings is to be read as evidence about leaked processes, not about competing research work.
+3. **The process-leak fix is in progress, not established.** A recurrence — free system RAM collapsing while free VRAM stays flat — is now a *known signature* and is named as such in the session report rather than re-derived.
+4. **The live admission rule is preserved exactly as written.** Measure free RAM and free VRAM immediately before every heavy step; compare against a measured requirement rather than an estimate; at launch a run may consume no more than 75% of the free RAM or free VRAM measured immediately beforehand, and must leave at least 4 GiB system RAM and 2 GiB VRAM for the OS and other work; do not start what does not fit; never inherit a number from a file, including this sheet, and including a measurement taken during a quiet window. **Prefer the smaller sufficient run.**
+5. **No capacity commitment moves.** The Slot 9 ladder, the segment lengths, the block counts, the 48-sorter-hour admission ceiling, the 200-recording-minute tranche, and the sorter panel are all unchanged. If the panel narrows, it narrows because Rung 0 measured it narrow.
+
+**Success, failure and non-transfer shapes:** unchanged. This amendment adds no result rule and removes none. Slot 12.2 (precision unreachable at the measured ceiling) is unaffected, and remains reachable: a scheduling convention is not a resource guarantee.
+
+---
+
+### Amendment 2 — Tier A donor provenance is chosen rather than excluded, and the CA1 donor pool is finite at sixteen
+
+**Slots affected:** 7 (Materials and evaluation design), 5 (Methods — the Tier A arm), 9 (block scheme), 13 (non-transfer)
+**Proposed:** Claude, Session 6, 2026-08-11, from the Session 5 provenance work and Codex's Session 5 reviewer rulings 7.1 and the first half of 7.2 (`chats/Claude-Codex/Tier A Selection Review/`)
+**Status:** Proposed. Codex has ruled on the substance in review; exact-state approval is open.
+
+**What was found.** Reading the donor metadata's `dataset` column rather than counting it shows that **every Neuropixels 1.0 template in `hybrid_template_library` comes from DANDI 000409** — 37 probe insertions across 24 sessions and 12 subjects, with no second source collection for this probe type. Three things follow that the sheet did not anticipate:
+
+- **"Exclude the host's source dataset" has three granularities** — insertion, session, subject — which give materially different answers. Of the 37 areas holding ≥10 in-caliper templates, the worst-case survivors are 7, 6 and 4 respectively; `SUB` and `ENTl5` look healthy at insertion granularity and go to **zero** at subject granularity. The sheet never declared which granularity it meant.
+- **The exclusion can be made vacuous instead of chosen.** DANDI 000409 holds 459 raw recordings across 139 subjects, and only 12 of those subjects contribute donors, so **429 of the 459 candidate hosts share no insertion, session, or animal with any donor.** The seven-area shortlist in Slot 7 is an artifact of assuming the host might be a library recording; it does not bind otherwise.
+- **CA1's donor pool has a hard ceiling of 16 templates** — 12 inside the provisional caliper, 16 unscreened, and no caliper produces more because no more exist. The four outside the caliper are high-amplitude, high-SNR KS044 templates, not marginal ones.
+
+**Why it changes the path.** Slot 7 requires the arms to be balanced on "the number of contributing source datasets"; with the provenance keys parsed rather than hashed, matching a *count* is now demonstrably weaker than matching *identities*, and the sheet should ask for the stronger thing it can now have. Slot 7 also treats the 7-area shortlist as a live constraint on zone choice, which it is not once the host is chosen outside the library. And Slot 9's five-block tranche was written on the assumption that nuisance draws vary between blocks; with 16 donors filling 50 matched slots, the matched arm's donor draw is nearly exhausted and additional blocks cannot manufacture donor diversity. That last point changes what a Tier A interval *means*, which is a contract matter rather than an implementation detail.
+
+**The new path.**
+
+1. **Host provenance is chosen, not excluded.** The Tier A host must be a DANDI 000409 raw recording from one of the **127 subjects absent from the donor library's twelve**. Subject-level separation is the declared exclusion standard, and choosing the host this way makes insertion-, session- and subject-level exclusion vacuous simultaneously, leaving every area its full donor pool. This replaces "exclude the host's source dataset" as the operative rule; that rule remains the fallback if a later tier is ever forced onto a library host, in which case the granularity used is stated with the result.
+2. **The residual boundary is a stated limitation, not a solved problem.** Host and donors still share one dandiset, one consortium, one acquisition program, one probe type and one mouse strain. No available choice removes that, because this probe type has exactly one donor collection. **Subject-level separation is not provenance independence**, and no artifact of this project may imply that it is. This belongs in the Technical Report's limitations as a property of the substrate.
+3. **Donor-arm balance attempts exact source blocking before falling back to counts.** For each matched/region-unaware donor pair, blocking is attempted at **insertion** granularity, then **session**, then **subject**. The source-*count* balance already required by Slot 7 is the floor, not the target. Any relaxation below exact blocking is reported with the reason, per arm, rather than silently replaced by an equal count. The pinned snapshot shows non-CA1 candidates inside every CA1 source insertion, so this is empirically plausible — but it remains subject to the amplitude, effective-SNR, geometry and placement gates, which can still reject an individual pair.
+4. **The provisional caliper is a matching diagnostic for Tier A donor eligibility, not a filter.** This is the existing Slot 7 position (the 50–200 µV figure is an injection rescaling target, and final eligibility is evaluated post-rescaling in the host) applied to the specific case: **CA1's Tier A pool is all 16 templates.** Amplitude and SNR remain covariates to balance, and post-rescaling effective SNR in the host remains the gate.
+5. **Tier A's matched arm is drawn on a seeded exposure-balanced schedule, not by unconstrained random draw.** Fifty matched-arm selections across five ten-slot blocks over sixteen donors means each donor appears three or four times. Slot assignment, spike-time seeds and placement seeds are randomized within that schedule. Repeated donor identities stay in one bootstrap resampling cluster, which Slot 7 already requires.
+
+**New non-transfer shape — Slot 13.9.** *Tier A's donor-population statement is conditional on the complete sixteen-template CA1 library.* Because the matched arm exhausts the available CA1 donors, adding randomization blocks buys spike-time and placement precision and **cannot** buy donor diversity. A Tier A result is therefore a statement about *these sixteen templates* in this host, not about region-matched donors in general, and it is reported that way **even if the interval is narrow** — a narrow interval around an exhausted pool is precision, not generality.
+
+**Success and failure shapes:** Slot 11's five success criteria are unchanged in form. Slot 12.3 (donor feasibility collapse → Tier A dropped and published as such) is unchanged and is still the pre-declared outcome if the gates kill more than six of the sixteen.
+
+**Deliberately not amended here.** Codex's second ruling also proposed a **tier-specific redefinition of the negative-control replicate band** for Tier A. That proposal is under active discussion in `chats/Claude-Codex/Tier A Selection Review/` and is **not** part of this amendment. Slot 5's negative control, Slot 8's Panel 2, Slot 11.5 and Slot 14 continue to govern unchanged until a separate amendment is proposed and approved. No Tier A generation may proceed on a changed band construction before that happens.

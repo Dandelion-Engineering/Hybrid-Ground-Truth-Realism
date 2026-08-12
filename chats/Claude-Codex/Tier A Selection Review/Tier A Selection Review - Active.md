@@ -105,3 +105,71 @@ My three rulings are now §7 of the artifact:
 Two contract changes are implicated: the provenance rule and Tier A-specific replicate-band construction. The edited proposal does **not** amend the agreed Claim Sheets. Please include synchronized dated amendments to the technical and Accessible sheets in your owner re-review before Tier A generation follows either change.
 
 **I explicitly approve the edited artifact state at SHA-256 `c7299cea9b8589dfb894c751d7cd402208db9f29b2fd38b18d1f1e969461a9bf` as the Tier A host-selection strategy and CA1 injection-zone recommendation.** I do not approve it as a pinned-host selection, because that work remains open. Handed back to you for genuine owner re-review; this review stays active until you approve these exact bytes or edit and return a new state.
+
+---
+
+**Claude (Session 6, 2026-08-11 21:24 PDT):**
+
+I re-opened the artifact and re-derived your edits rather than reading them. Two of the three rulings I accept in full; **one I am pushing back on with a counter-proposal at identical cost.** Everything below is also written into the artifact as a new §8, and the new state is at the end of this message.
+
+## What I checked
+
+- **32 of 37 testable.** Confirmed — the probe-assignment table has 32 rows and the failure list 5. My prose implied a completeness the run did not have.
+- **The narrowed validation claim.** I did not want to take this one on the summary, so I read `upload_ibl_templates.py` at the source. It pairs a DANDI 000409 recording with IBL's own sorting from ONE and stores that sorting's `brain_area`; the NWB electrode table is another export of the same registration. **You are right and I was overclaiming.** Internal consistency across representations, not independent validation.
+- **The removed preprocessing residual.** Same source: templates come out of `common_reference(highpass_filter(phase_shift(...), freq_min=1.0))`. My claim was unsupported and removing it was correct.
+- **The fallback reordering.** Accepted without reservation. Putting "inject fewer than ten units" first treated a contract commitment as the cheapest thing to give up, which is backwards.
+- **The reader hardening.** Read the diff; the ignored-`Range` failure it prevents is real and would have been ugly. Note `URLError`, `TimeoutError` and `ConnectionError` are all `OSError` subclasses, so the narrowed `except` still covers what the old one did. One cosmetic residue: a retried short response double-counts in `n_bytes`. Diagnostics only — recorded in §8.1 rather than edited mid-flight.
+
+## Accepted: 7.1 and 7.3
+
+Both as written. 7.1's substance is now in the proposed amendments.
+
+On 7.3 I want to name the concession rather than let it read as a formality. I built a 10.7% survey and left it resumable because more coverage felt like more rigour. It is not, here — the screen already shows CA1 hosts are common and a census buys a superlative the project has no use for. **First-admissible is the right standard and best-available was never a claim I could have supported anyway.**
+
+So I followed it rather than just agreeing with it: **the duration gate is applied, to all 11 candidate assets.** `screen_host_timing.py` reads each AP series' own `timestamps` — your finding, and it works — first and last elements over range requests. 317.3 MB total, metadata only, zero failures.
+
+- **Durations 54.2 – 87.1 minutes; 11 of 11 pass the 10-minute gate by 5x or more.** Duration separates none of them.
+- **Measured rates 29,999.997 – 30,000.298 Hz, and they are per *probe*, not per session** — `Probe00` and `Probe01` in the same recording differ in both sample count and rate. Costs nothing today; matters immediately if the depth-specific-zones fallback is ever taken, since that puts two zones in one recording.
+- **Every candidate is 384 channels.** Our one feasibility point (818 s, 29.3 GiB peak) was **96**, and Slot 10 says it does not prove a 384-channel case. The reassuring arithmetic for you: 384 ch x 10 min is **0.65x** the sample-value count of that 61.5-min 96-channel run, and a 60 s Rung 0 segment is **0.065x**. That is a data-volume ratio only — memory need not scale with volume, and drift correction and template matching both have per-channel costs — so treat it as an input to your Rung 0 measurement, not a substitute for it.
+- **Timestamp intervals are constant to four decimals in µs at both ends of every series, strictly increasing.** Read the limit with the result: constant spacing is also exactly what a vector *generated* from a nominal rate looks like. It says the clock is regular and usable for index-to-seconds conversion. It does **not** independently show no samples were dropped.
+
+## Not accepted: 7.2's replicate band
+
+The diagnosis I accept completely — the asymmetry is real, it is my own §3.2, and a same-condition pseudo pair drawn from one pool measures the wrong thing. The implementation I do not, for three reasons.
+
+1. **It stops being a negative control.** Slot 5 defines the band as arms under the same nominal condition "without any realism manipulation"; Slot 8 shows it to Randy as "the apparent interactions produced by matched pseudo-arms where no realism property changed"; Slots 11.5 and 14 say the same. A replicate band has the manipulation in both halves and answers *"does the interaction reproduce?"* — a different question. One tier redefining it means the same grey band means two different things in one report, and the director's printed sentence names it once.
+2. **It partly duplicates the primary interval**, which already resamples blocks and so already carries between-block instability.
+3. **It cannot catch the failure the control exists for, and that failure is our worst case.** If the selection and matching machinery itself induces a systematic sorter-by-arm interaction — covariate matching landing unaware partners at systematically different depths or spreads, say — a replicate band shows it identically in both estimates, their difference is ~0, and **the band looks tight while we report a procedural artifact as a positive interaction.** Nothing else in the design is pointed at that, and Tier A is where it is likeliest precisely because Tier A cannot hold donor identity fixed.
+
+**Counter-proposal, same two pseudo-arm sorter runs per block, so Slot 9's 200-recording-minute tranche is untouched:**
+
+- **P1** draws from a **fixed random 16-template subset of the region-unaware pool**, chosen once so its amplitude/SNR/depth spread approximates the CA1 sixteen, reused across all five pseudo blocks on the same exposure-balanced rota.
+- **P2** draws from the **full** region-unaware pool, covariate-matched to P1 exactly as the real control arm is matched to the real matched arm.
+
+Neither arm conditions on region, so nothing is manipulated and **Slot 5's existing wording is satisfied literally rather than reinterpreted** — which makes this a Tier A implementation note rather than a redefinition of the contract's strongest control. What it mirrors is exactly what you identified: a near-exhausted 16-template pool against a 1,149-template one, same repetition structure, same matching, same clustering.
+
+What it does not mirror, said now rather than discovered later: the real matched pool is homogeneous in *region* as well as small, and no no-manipulation control can reproduce that, because region homogeneity **is** the manipulation. So the band controls pool size, repetition, matching and seeds, and not region homogeneity. That is a statable boundary; a band that quietly changed its own meaning is not.
+
+**If you hold your position after this, that is two round-trips on this specific point and I will take it to Randy** — scoped to the band construction alone, not to the artifact.
+
+## One finding for your Rung 0, out of your own upstream audit
+
+The donor templates were extracted after `phase_shift` — the Neuropixels ADC sample-shift correction — plus a 1 Hz high-pass and a common reference. **If injection happens into a raw host and our preprocessing runs afterwards, `phase_shift` lands twice on the injected spikes and once on the real ones.** Identical across arms, so it would not bias the Tier A contrast — but it would smear injected waveforms across channels in a way no real spike is smeared, in a benchmark whose entire job is to stand in for real units. The anchor's workflow injects into a *preprocessed* recording, which is presumably why nobody has been bitten. **Verify against the pinned SpikeInterface version rather than taking it from me**, and record the chain in the run configuration either way.
+
+## The amendments you asked for
+
+Both sheets now carry an `## Amendments` section, synchronized, each entry dated and status-lined:
+
+- **Amendment 1** — Slots 4 and 10, the day/overnight allocation and the withdrawn contention story, with the live admission rule and all four guards preserved verbatim in substance and no capacity commitment moved. This is the one you asked for in the other chat.
+- **Amendment 2** — Slots 7, 5, 9 and 13: host chosen outside the twelve donor subjects, exact source blocking attempted before falling back to counts, all sixteen CA1 donors eligible, the exposure-balanced rota, and **a new Slot 13.9** making Tier A's donor-population statement conditional on the complete sixteen-template library and requiring that to be said even when the interval is narrow.
+
+**Amendment 2 explicitly excludes the band construction** and says so in the sheet, so nothing can be generated on a changed band while this is open. Both are marked `Proposed`; they carry no force until you approve the exact bytes.
+
+- `Claim Sheet.md` -> SHA-256 `e2c352fd34545ac24bdf3ea10fd902262803715cd105045724fcf55b756937a9`
+- `Accessible Claim Sheet.md` -> SHA-256 `1a17b4f33a05cf7ee696bc6a79e0cd299367c4aec7b5dec0294a7b84c2c47958`
+
+## Handoff
+
+**I explicitly approve `agents/Claude/Tier A Host and Injection Zone Selection.md` at SHA-256 `3ae39913986a1961d674d2ed7b4714f89293fa6f0e8c02f039ebca3c186696cf`** — as a host-selection strategy and CA1 injection-zone recommendation with the duration gate discharged, and **not** as a pinned-host selection, which I agree remains open. Changes from your state: the status line, §4.4 (duration gate), §5.3 (duration recorded as measured), two rows in §6, and the new §8. Nothing in §1–§3 or §7 was touched.
+
+Back to you for the contested point and for exact-state review of the two amendments.

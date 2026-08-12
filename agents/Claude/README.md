@@ -19,7 +19,8 @@ agents/Claude/
 │  ├─ HumanReport2.md
 │  ├─ HumanReport3.md
 │  ├─ HumanReport4.md
-│  └─ HumanReport5.md
+│  ├─ HumanReport5.md
+│  └─ HumanReport6.md
 └─ Progress Reports/                      Director-facing reports, every 8th session
    └─ Progress Report Phase 0 Close.md    and at phase transitions.
 ```
@@ -38,7 +39,7 @@ agents/Claude/
 
 **`Progress Reports/`** — Director-facing reports written at every eighth session I run, and additionally at any phase transition or approved Claim Sheet amendment. Written at the bar of the Accessible Piece: clear, honest, jargon-free.
 
-**`Tier A Host and Injection Zone Selection.md`** — The Phase 2 analysis behind my share of the labor split: which host recording and which anatomical injection zone Tier A should use, what the donor pool for that zone actually is, and what the choice costs. It is a **proposal under review**, not a decision — Codex owns Tier A's independent balance and manipulation gate precisely so the agent proposing the selection is not the agent approving it. It states what it has not tested as prominently as what it has.
+**`Tier A Host and Injection Zone Selection.md`** — The Phase 2 analysis behind my share of the labor split: which host recording and which anatomical injection zone Tier A should use, what the donor pool for that zone actually is, and what the choice costs. It is a **host-selection strategy and zone recommendation under active review**, not a completed selection — no host asset is pinned. Codex owns Tier A's independent balance and manipulation gate precisely so the agent proposing the selection is not the agent approving it. Draft 3 carries Codex's Session 5 reviewer edits and rulings (§7) and my Session 6 owner re-review (§8), which accepts two rulings, contests one, and applies the duration gate (§4.4). It states what it has not tested as prominently as what it has.
 
 ---
 
@@ -63,20 +64,21 @@ There is no scratch area in this workspace yet. If one becomes necessary, it wil
 
 | Path | My relationship to it |
 |---|---|
-| `Claim Sheet.md` | **Written by me (Session 2); reviewed and edited by Codex (Sessions 2 and 3); re-reviewed and edited by me (Session 3); re-reviewed and explicitly approved by me (Session 4).** **Same-state closed** at SHA-256 `a5f5860…` — both agents have approved identical bytes and no disagreement survived. Changes from here go through the amendment protocol, not the review cycle. |
+| `Claim Sheet.md` | **Written by me (Session 2); reviewed and edited by Codex (Sessions 2 and 3); re-reviewed and edited by me (Session 3); re-reviewed and explicitly approved by me (Session 4).** **Same-state closed** at SHA-256 `a5f5860…` — both agents approved identical bytes and no disagreement survived. Changes from here go through the amendment protocol, not the review cycle. **Session 6 added an `## Amendments` section** carrying Amendments 1 and 2, both `Proposed` and both awaiting Codex's exact-state approval; the approved text above that section is untouched and still governs. |
 | `README.md` (repository root — the Live-Run README) | **Created and currently maintained by me.** Ownership is open to the Phase 1 labor split. Built per `Playbooks/live-run-readme.md`. |
 | `CITATION.cff`, `LICENSING.md` | Updated by me in Session 1 to describe this project rather than the framework template. Shared. |
 | `Reproducibility Packet/scripts/audit_template_library.py` | Written by me (Session 2). The packet is **co-owned** with Codex; this script is mine and is packet-ready as written. **Known duplication:** its CSV fetch and caliper logic now also live in `utils/template_metadata.py`; it should be refactored onto the shared module before the packet is assembled. Recorded rather than left silent. |
 | `Reproducibility Packet/scripts/utils/` | Written by me (Session 5): `remote_hdf5.py`, `dandi.py`, `template_metadata.py`, `ccf_labels.py`. Shared logic, imported rather than copy-pasted, per the software standard. Co-owned with Codex like the rest of the packet. |
 | `Reproducibility Packet/scripts/audit_donor_provenance.py` · `survey_host_anatomy.py` · `validate_ccf_label_map.py` | Written by me (Session 5) for Tier A selection. Packet-ready as written. |
+| `Reproducibility Packet/scripts/screen_host_timing.py` | Written by me (Session 6). Applies the duration gate by measuring each candidate's real rate and duration from its own `timestamps` dataset. Packet-ready as written; resumable via `host_timing_index.jsonl`. |
 | `requirements.txt` | **Created by me (Session 5)** at the project's first dependency install (`h5py`, `numpy`). Shared and append-as-you-install: whoever installs a package pins it here in the same session. |
 | `chats/Claude-Codex/Phase 0 Literature Comparison/` | Opened by me. **Concluded** — see its `Summary.md`. |
 | `chats/Claude-Codex/Claim Sheet Review/` | Opened by me. **Concluded** (Codex, Session 4) — see its `Summary.md`. |
 | `chats/Claude-Codex/Study Guide Pass 1 Review/` | Opened by me (Session 3). **Concluded** (Codex, Session 4) — see its `Summary.md`. |
-| `chats/Claude-Codex/Tier A Selection Review/` | Opened by me (Session 5). Active. The selection proposal handed to Codex for its gate. |
-| `chats/Claude-Codex/Compute Environment Update/` | Opened by me (Session 5 addendum). Active. Relays the director's answer on shared-machine memory and the day/overnight run schedule. Informational — needs a reply only if Codex disagrees with the no-amendment read. |
+| `chats/Claude-Codex/Tier A Selection Review/` | Opened by me (Session 5). **Active, and the live one.** Codex reviewed, edited and ruled (Session 5); I re-reviewed, accepted two rulings, contested the third, and handed back a new state (Session 6). Open on: the contested negative-control construction, and exact-state review of the two amendments. |
+| `chats/Claude-Codex/Compute Environment Update/` | Opened by me (Session 5 addendum). Active but effectively done — Codex asked for a contract amendment, I withdrew my no-amendment read and wrote it, and the only thing left is Codex's exact-state approval. Codex is invited to conclude it with a `Summary.md` rather than hand it back. |
 | `Study Guide/Pass 1 - Conceptual Foundation.tex` | **Written by me (Session 3); reviewed and edited by Codex (Session 3); re-reviewed by me (Session 4); explicitly approved by Codex (Session 4) at the same source/PDF state.** Same-state closed at source `d33e74d…` / PDF `75e1423…`. 13 pages. Changes from here go through the amendment protocol. |
-| `Accessible Claim Sheet.md` | **Written by me (Session 4) against the exact approved Claim Sheet state; explicitly approved by Codex (Session 4) without edits.** Same-state closed at SHA-256 `73bff8f…`. Mine under the agreed labor split. **It must be kept in sync with the technical sheet forever; drift between them is a defect, not a backlog item.** |
+| `Accessible Claim Sheet.md` | **Written by me (Session 4) against the exact approved Claim Sheet state; explicitly approved by Codex (Session 4) without edits.** Same-state closed at SHA-256 `73bff8f…`. Mine under the agreed labor split. **It must be kept in sync with the technical sheet forever; drift between them is a defect, not a backlog item** — Session 6's two amendments went into both sheets in the same session, which is the standard. |
 | `Technical Report/` (not yet created) | **Default writer**, Codex reviews. |
 | `Accessible Piece/` (not yet created) | **Default writer**, Codex reviews. |
 | `Study Guide/Pass 2 - Concept Delta.tex` (not yet created) | **Default writer**, Codex reviews. Phase 3, under the no-spoiler rule. |

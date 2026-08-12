@@ -1,0 +1,94 @@
+
+# Host timing screen
+
+dandiset            000409 (draft)
+target structure    CA1
+band threshold      20 channels
+candidates          11
+timed               11
+failed this run     0
+duration gate       600 s (10.0 min)
+bytes transferred   317.3 MB total, metadata only
+
+Sampling rate and duration are measured from each AP series' own `timestamps`
+dataset -- first and last elements -- not assumed from a nominal 30 kHz. The
+regularity columns summarise the intervals across the first and last
+1000 timestamps of each series.
+
+## Measured timing per AP series
+
+subject       session   series                         samples   ch      rate_hz  minutes  gate
+----------------------------------------------------------------------------------------------------
+CSHL047       b52182e7  ElectricalSeriesProbe00AP    130182852  384   30000.0000     72.3  pass
+CSHL047       b52182e7  ElectricalSeriesProbe01AP    130188000  384   30000.0399     72.3  pass
+NYU-12        a8a8af78  ElectricalSeriesProbe00AP    148279384  384   29999.9969     82.4  pass
+NYU-12        a8a8af78  ElectricalSeriesProbe01AP    148280049  384   30000.0961     82.4  pass
+NYU-37        7af49c00  ElectricalSeriesProbe00AP     97475731  384   30000.2831     54.2  pass
+NYU-37        7af49c00  ElectricalSeriesProbe01AP     97475895  384   30000.2984     54.2  pass
+NYU-65        a2ec6341  ElectricalSeriesProbe00AP    156407666  384   30000.2836     86.9  pass
+NYU-65        a2ec6341  ElectricalSeriesProbe01AP    156407537  384   30000.2372     86.9  pass
+NYU-45        51e53aff  ElectricalSeriesProbe00AP    118025844  384   30000.2854     65.6  pass
+NYU-45        51e53aff  ElectricalSeriesProbe01AP    118025779  384   30000.2371     65.6  pass
+CSHL045       034e726f  ElectricalSeriesProbe00AP    114798408  384   30000.0000     63.8  pass
+CSHL045       034e726f  ElectricalSeriesProbe01AP    114803556  384   30000.0045     63.8  pass
+NYU-39        6ed57216  ElectricalSeriesProbe00AP    109132602  384   30000.2800     60.6  pass
+NYU-39        6ed57216  ElectricalSeriesProbe01AP    109132620  384   30000.2515     60.6  pass
+CSHL047       2d5f6d81  ElectricalSeriesProbe00AP    132993888  384   30000.0000     73.9  pass
+CSHL047       2d5f6d81  ElectricalSeriesProbe01AP    132987036  384   30000.0416     73.9  pass
+CSHL049       4b7fbad4  ElectricalSeriesProbe00AP    156741216  384   30000.0000     87.1  pass
+CSHL049       4b7fbad4  ElectricalSeriesProbe01AP    156749772  384   30000.0415     87.1  pass
+CSHL049       c99d53e6  ElectricalSeriesProbe00AP    125189472  384   30000.0000     69.5  pass
+NYU-48        3d59aa1a  ElectricalSeriesProbe00AP    147698458  384   30000.2872     82.1  pass
+NYU-48        3d59aa1a  ElectricalSeriesProbe01AP    147698373  384   30000.2445     82.1  pass
+
+## Timestamp regularity
+
+subject       series                    edge    mean_dt_us   min_dt_us   max_dt_us  monotonic
+-----------------------------------------------------------------------------------------------
+CSHL047       ElectricalSeriesProbe00AP head       33.3333     33.3333     33.3333       True
+CSHL047       ElectricalSeriesProbe00AP tail       33.3333     33.3333     33.3333       True
+CSHL047       ElectricalSeriesProbe01AP head       33.3333     33.3333     33.3333       True
+CSHL047       ElectricalSeriesProbe01AP tail       33.3333     33.3333     33.3333       True
+NYU-12        ElectricalSeriesProbe00AP head       33.3333     33.3333     33.3333       True
+NYU-12        ElectricalSeriesProbe00AP tail       33.3333     33.3333     33.3333       True
+NYU-12        ElectricalSeriesProbe01AP head       33.3332     33.3332     33.3332       True
+NYU-12        ElectricalSeriesProbe01AP tail       33.3332     33.3332     33.3332       True
+NYU-37        ElectricalSeriesProbe00AP head       33.3330     33.3330     33.3330       True
+NYU-37        ElectricalSeriesProbe00AP tail       33.3330     33.3330     33.3330       True
+NYU-37        ElectricalSeriesProbe01AP head       33.3330     33.3330     33.3330       True
+NYU-37        ElectricalSeriesProbe01AP tail       33.3330     33.3330     33.3330       True
+NYU-65        ElectricalSeriesProbe00AP head       33.3330     33.3330     33.3330       True
+NYU-65        ElectricalSeriesProbe00AP tail       33.3330     33.3330     33.3330       True
+NYU-65        ElectricalSeriesProbe01AP head       33.3331     33.3331     33.3331       True
+NYU-65        ElectricalSeriesProbe01AP tail       33.3331     33.3331     33.3331       True
+NYU-45        ElectricalSeriesProbe00AP head       33.3330     33.3330     33.3330       True
+NYU-45        ElectricalSeriesProbe00AP tail       33.3330     33.3330     33.3330       True
+NYU-45        ElectricalSeriesProbe01AP head       33.3331     33.3331     33.3331       True
+NYU-45        ElectricalSeriesProbe01AP tail       33.3331     33.3331     33.3331       True
+CSHL045       ElectricalSeriesProbe00AP head       33.3333     33.3333     33.3333       True
+CSHL045       ElectricalSeriesProbe00AP tail       33.3333     33.3333     33.3333       True
+CSHL045       ElectricalSeriesProbe01AP head       33.3333     33.3333     33.3333       True
+CSHL045       ElectricalSeriesProbe01AP tail       33.3333     33.3333     33.3333       True
+NYU-39        ElectricalSeriesProbe00AP head       33.3330     33.3330     33.3330       True
+NYU-39        ElectricalSeriesProbe00AP tail       33.3330     33.3330     33.3330       True
+NYU-39        ElectricalSeriesProbe01AP head       33.3331     33.3331     33.3331       True
+NYU-39        ElectricalSeriesProbe01AP tail       33.3331     33.3331     33.3331       True
+CSHL047       ElectricalSeriesProbe00AP head       33.3333     33.3333     33.3333       True
+CSHL047       ElectricalSeriesProbe00AP tail       33.3333     33.3333     33.3333       True
+CSHL047       ElectricalSeriesProbe01AP head       33.3333     33.3333     33.3333       True
+CSHL047       ElectricalSeriesProbe01AP tail       33.3333     33.3333     33.3333       True
+CSHL049       ElectricalSeriesProbe00AP head       33.3333     33.3333     33.3333       True
+CSHL049       ElectricalSeriesProbe00AP tail       33.3333     33.3333     33.3333       True
+CSHL049       ElectricalSeriesProbe01AP head       33.3333     33.3333     33.3333       True
+CSHL049       ElectricalSeriesProbe01AP tail       33.3333     33.3333     33.3333       True
+CSHL049       ElectricalSeriesProbe00AP head       33.3333     33.3333     33.3333       True
+CSHL049       ElectricalSeriesProbe00AP tail       33.3333     33.3333     33.3333       True
+NYU-48        ElectricalSeriesProbe00AP head       33.3330     33.3330     33.3330       True
+NYU-48        ElectricalSeriesProbe00AP tail       33.3330     33.3330     33.3330       True
+NYU-48        ElectricalSeriesProbe01AP head       33.3331     33.3331     33.3331       True
+NYU-48        ElectricalSeriesProbe01AP tail       33.3331     33.3331     33.3331       True
+
+This screen measures duration and timestamp regularity only. Drift, noise level,
+post-rescaling effective SNR, ten-placement feasibility, and covariate balance
+remain separate gates that a host passing here can still fail. No host is dropped
+by this script; the gate column records the declared threshold's verdict.
