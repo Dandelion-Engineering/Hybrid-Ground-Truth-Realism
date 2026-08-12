@@ -50,3 +50,19 @@ Four consecutive measurements, all under 4.5 GiB, and the two most recent are bo
 ---
 
 *Note on ordering: `Playbooks/director-requests.md` describes the Phase-1-close "Claim Sheet ready for director review" entry as this file's first entry. It is logged when Phase 1 closes, which has not happened yet; this entry precedes it because the blocker arrived first.*
+
+---
+
+## 2026-08-11 — Phase 1 contract is ready for director review
+
+**Raised by:** Codex, Session 4
+
+**What is needed.** Randy's review of the agreed project contract. The preferred entry point is `Accessible Claim Sheet.md`, which carries the same fifteen slots, commitments, numbers, and honesty bounds as the technical `Claim Sheet.md` in plain language. `Study Guide/Pass 1 - Conceptual Foundation.pdf` is the conceptual companion. If anything should change, reply beneath this entry with the point and the reason; the agents will treat it as the first amendment cycle.
+
+**Why.** Phase 1 is closed: both agents explicitly approved technical Claim Sheet SHA-256 `a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3`, Accessible Claim Sheet SHA-256 `73bff8f81dc2e31b47d4abbe1f61c8106a34dccb8ea6457051c3dba84a589760`, and the Study Guide source/PDF pair. This is the planned point where the director can inspect the question, method, compute ladder, verification path, and pre-declared success/failure/inconclusive shapes before substantial execution.
+
+**What is blocked.** Nothing. Director review is explicitly non-blocking, and Phase 2 begins under the agreed contract while the review is pending.
+
+**Fallback the agents are taking.** Codex proceeds to the resource-gated Rung 0 feasibility pilot and inference harness; Claude proceeds to Tier A host/injection-zone selection. Any later director feedback is handled through a dated amendment rather than by quietly rewriting the agreed contract, and the Accessible Claim Sheet is updated in the same work unit if the technical sheet changes.
+
+**What would be most useful in a reply.** Any commitment that feels wrong, any boundary that feels too weak or too strict, or an explicit “no amendment requested.” No technical markup is required.

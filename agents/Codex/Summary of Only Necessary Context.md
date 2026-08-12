@@ -1,25 +1,25 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 3 · 2026-08-11 15:16 PDT**
+**Rewritten at the end of Codex Session 4 · 2026-08-11 17:13 PDT**
 
-**Next Codex session will be Session 4.**
+**Next Codex session will be Session 5.**
 
-## Current phase and gates
+## Current phase
 
-The project remains in **Phase 1 — Sharpening**. Phase 0 is closed. The initial labor split is explicitly agreed by both agents.
+**Phase 1 is closed. Phase 2 — Execution is open.** No sorter run, generator run, data download, dependency install, or scientific measurement has occurred in Codex Session 4.
 
-Two exact-state review loops are active:
+The Phase 1 requirements are all same-state agreed:
 
-1. **Technical Claim Sheet.** Codex explicitly approved an edited current state. Claude must genuinely re-review Codex's edits and either explicitly approve the same bytes or edit and hand it back.
-2. **Study Guide Pass 1.** Codex explicitly approved an edited source/PDF pair. Claude must genuinely re-review both the feedback and edited artifact pair and either explicitly approve them or edit and hand them back.
+- technical Claim Sheet;
+- Accessible Claim Sheet;
+- Study Guide Pass 1 source/PDF pair; and
+- initial labor split.
 
-The **Accessible Claim Sheet does not yet exist**. Claude committed to writing it as soon as the technical sheet converges. Phase 1 cannot close until the technical Claim Sheet, Accessible Claim Sheet, and Study Guide Pass 1 each have same-state approval from both agents.
+Both review chats are concluded and have `Summary.md` files. Later changes to either Claim Sheet use the dated amendment protocol, not the review cycle, and both sheets must remain in sync.
 
-Nothing is blocked on the director. The shared-memory entry in `director_requests.md` is open but explicitly non-blocking.
+## Approved exact states
 
-## Exact states at handoff
-
-### Claim Sheet
+### Technical Claim Sheet
 
 Path: `Claim Sheet.md`
 
@@ -27,11 +27,17 @@ SHA-256:
 
 `a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3`
 
-**Codex verdict: APPROVE.** Recorded in:
+Both agents explicitly approve these bytes.
 
-`chats/Claude-Codex/Claim Sheet Review/Claim Sheet Review - Active.md`
+### Accessible Claim Sheet
 
-This approval supersedes Codex Session 2's approval hash and Claude Session 3's handoff hash. It applies only to the bytes above.
+Path: `Accessible Claim Sheet.md`
+
+SHA-256:
+
+`73bff8f81dc2e31b47d4abbe1f61c8106a34dccb8ea6457051c3dba84a589760`
+
+Both agents explicitly approve these bytes. It preserves all fifteen slots, decision rules, compute budgets, failure shapes, and non-transfer boundaries without softening the technical contract.
 
 ### Study Guide Pass 1
 
@@ -39,88 +45,82 @@ Source: `Study Guide/Pass 1 - Conceptual Foundation.tex`
 
 Source SHA-256:
 
-`37f724699305a7ae578ed6a8f1550161ed376cabe71b9fc85c6f5dcf5f3468d4`
+`d33e74d73c41b3ef0b4edbe6de52c0cc4e5597bae2d048618edb5c4523f99819`
 
-Compiled PDF: `Study Guide/Pass 1 - Conceptual Foundation.pdf`
+PDF: `Study Guide/Pass 1 - Conceptual Foundation.pdf`
 
 PDF SHA-256:
 
-`b42878216a3154c180875d2bea4426bc12b250da22d12e21e0b7e76a669abf55`
+`75e1423294cb3c4695c14920851825d602379d9ffca1aab6bcb93cbd10d998a3`
 
-**Codex verdict: APPROVE.** Recorded in:
+Both agents explicitly approve this exact pair. The final guide is 13 pages. Codex independently rebuilt the source twice in a temporary directory, confirmed clean logs, rendered and visually inspected all pages, and verified that approved/rebuilt extracted text is identical.
 
-`chats/Claude-Codex/Study Guide Pass 1 Review/Study Guide Pass 1 Review - Active.md`
+## Concluded review records
 
-Final build is 13 pages, two successful `pdflatex` passes, no LaTeX/package warnings, no overfull or underfull boxes, and complete rendered-page visual QA.
+- `chats/Claude-Codex/Claim Sheet Review/Claim Sheet Review - Concluded.md`
+- `chats/Claude-Codex/Claim Sheet Review/Summary.md`
+- `chats/Claude-Codex/Study Guide Pass 1 Review/Study Guide Pass 1 Review - Concluded.md`
+- `chats/Claude-Codex/Study Guide Pass 1 Review/Summary.md`
 
-## What changed in the technical Claim Sheet
+Do not reopen these review cycles. Corrections discovered later propagate through amendments or later artifacts.
 
-Claude Session 3 added three sound corrections:
+## Labor split
 
-- The negative-control pseudo-arms are sorter runs. The minimum Rung 2 tranche is `10 min × 2 arms × 5 blocks × 2 contrast types = 200 recording-minutes per candidate per tier`.
-- The admission ceiling stays **≤48 sorter-hours per candidate per tier**. Rung 0 records candidate, tier, and whole-panel projections; at the ceiling, two sorters across three tiers project to 288 sorter-hours.
-- `D = |I| − T` is the authoritative comparative decision quantity; a bounded negative is deliberately harder to call because `|I|` is folded at zero.
-- One host and injection zone are used across tiers by default. If the host changes, cross-tier comparison is dropped.
-- CA1 is the only current joint-screen candidate where Tier C's verified biology and Tier A's donor screen overlap on their face. It is not selected: 12 pre-exclusion templates fall to 6 in the worst case, below the ten-unit budget.
+- **Claude:** Tier A host/injection-zone selection; Accessible Claim Sheet owner; Study Guide owner.
+- **Codex:** Rung 0 feasibility pilot; sorter-panel decision; inference and negative-control harness; Tier A balance/manipulation gate.
+- **Tier B and Tier C:** implementation assigned after Rung 0; the non-author owns each manipulation check.
+- **Reproducibility Packet:** co-owned. Surviving scripts are written directly into it.
+- Default Claude-writer/Codex-reviewer convention remains for later narrative artifacts.
 
-Codex Session 3 then made two direct coherence corrections:
+## Phase 2 design commitments that are easiest to violate
 
-- Equal real and pseudo-arm block counts establish the same **nominal replication basis**, not guaranteed equal precision. Both achieved interval widths must be reported.
-- Slot 11's numbered success checklist now uses the same `D` rule as the rest of the sheet: interval below zero for bounded negative; above zero plus interaction interval excluding zero for bounded positive.
+- Tier A pairs covariate-matched donor slots; donor identity cannot stay fixed when donor region changes.
+- Use a pinned anatomical injection zone, not one region label for a whole penetration.
+- Exclude the exact host source dataset before claiming donor feasibility. The 37/7 audit is a conservative pool screen, not paired-arm feasibility.
+- CA1 is the only current joint-screen candidate on its face, not a selection. Its worst-case donor count is six, below the ten-unit budget.
+- Tier B's population driver is computed once from the untouched host without sorter output.
+- Every manipulation check passes at biologically justified magnitude before any sorter time is spent on that tier.
+- The primary comparative decision uses the hierarchical-bootstrap interval on `D = |I| - T`; `[−T,T]` is only within-resample shorthand.
+- A bounded positive additionally requires the interaction interval to exclude zero. A wide interval is inconclusive, never negative.
+- Five real blocks plus five pseudo blocks form the initial tranche. Pseudo-arms are sorter runs. Minimum load: 200 recording-minutes per candidate per tier.
+- Admission ceiling stays 48 sorter-hours per candidate per tier. Report per-candidate, per-tier, and whole-panel projections; two sorters × three tiers at the ceiling is 288 sorter-hours.
+- Equal real/pseudo block counts give equal nominal replication basis, not equal precision; report both achieved widths.
+- Use one host/injection zone across tiers by default. If the host changes, drop cross-tier comparison.
 
-The stricter 48-hour ceiling is accepted. There is no open Codex disagreement about Claude's three additions.
+## Compute state and open director requests
 
-## Study Guide Pass 1 review outcome
+Four measured free-memory points exist in `director_requests.md`:
 
-The guide's structure, audience choice, continuous narrative, and omission of sorter-internal detail were accepted. Codex edited these technical points before approval:
+- 3.46 GiB RAM / 14,269 MiB VRAM;
+- 3.96 GiB RAM / 14,389 MiB VRAM;
+- 1.01 GiB RAM / 14,286 MiB VRAM; and
+- 0.89 GiB RAM / 14,409 MiB VRAM.
 
-- A multichannel template reflects probe-relative position plus cell anatomy, tissue, and probe geometry.
-- SHYBRID reuses observed spike times after a fixed shift and a fixed template's per-spike fitted amplitudes; the insertion train receives fresh random sub-sample jitter by default. It does not preserve observed timing jitter or transport arbitrary full per-spike waveform shapes unchanged. Both relevant implementation files are linked in `agents/Codex/references.md`.
-- Tier A needs no new **generator mechanism**, but still needs selection, balance, and analysis code. Its expected weak interaction is explicitly the project's prior.
-- For `I = Δ₁ − Δ₂`, a negative value means realism hurt sorter 1 more. The original guide's read-aloud sentence had the sign backwards.
-- A near-zero interaction says the between-sorter comparison is stable; it does not validate the absolute scores.
-- The guide now teaches `D = |I| − T`, the folded-at-zero conservative negative call, and the full resampling hierarchy: paired slots within blocks, blocks within hosts, hosts at the top, repeated donors clustered, and one-host intervals conditional on that host.
-- The 50%-of-gap component is a declared judgement, not a theorem about reader decisions.
-- CA1 is a candidate with open host-specific feasibility and balance gates.
-- A manipulation below the declared biological range does not pass the biological-realism gate; any later stress-test result is bounded to the achieved magnitude.
+The known full Kilosort4 run peaked at 29.3 GiB system RAM. The shared-memory request asks for a predictable quiet window or a decision to design around a permanent small-memory ceiling. It is non-blocking.
 
-## Labor split — agreed by both agents
+Immediately before every heavy step:
 
-- **Claude:** Accessible Claim Sheet, Study Guide Pass 1 owner, Tier A host/injection-zone selection.
-- **Codex:** Rung 0 feasibility pilot, sorter-panel decision, inference and negative-control harness.
-- **Codex owns Tier A's balance/manipulation gate**, so Claude does not grade its own host/zone selection.
-- Tier B and Tier C implementation are assigned after Rung 0; the non-author owns each manipulation check.
-- Reproducibility Packet remains co-owned. The default Claude-writer/Codex-reviewer convention remains for narrative artifacts.
-
-## Compute and director state
-
-`director_requests.md` records three early free-memory measurements: 3.46 GiB, 3.96 GiB, and 1.01 GiB free system RAM, while VRAM stayed broadly free. The known full Kilosort4 run peaked at 29.3 GiB RAM. Randy was asked for a quiet window, information about other workloads, or a decision to design around a small permanent ceiling.
-
-This request is non-blocking. Before any heavy step:
-
-- measure live free RAM and VRAM immediately beforehand;
-- preserve at least 4 GiB system RAM and 2 GiB VRAM;
+- measure free RAM and VRAM at that moment;
 - use no more than 75% of then-free RAM or VRAM;
+- preserve at least 4 GiB system RAM and 2 GiB VRAM;
 - stop and record a resource failure if a guard is crossed;
-- use only `./venv/Scripts/python.exe` and `./venv/Scripts/pip.exe`;
-- install nothing without pinning it at first install.
+- use only `./venv/Scripts/python.exe` and `./venv/Scripts/pip.exe`; and
+- pin dependencies at first install.
 
-No heavy compute ran in Codex Session 3, so no live memory measurement was needed.
+A second director entry now asks Randy to review the agreed contract, preferably through `Accessible Claim Sheet.md`. It is also non-blocking. Feedback becomes a dated amendment; execution continues meanwhile.
 
-## Public record and closeout state
+## Phase-transition records
 
-The root Live-Run README was checked and intentionally left unchanged. No artifact or phase completed because Claude's same-state re-reviews are still open. Do not log a review as closed until those explicit approvals exist.
-
-No progress report was due in Codex Session 3. A phase-transition progress report and the structural Claim-Sheet-ready `director_requests.md` entry are required from whichever session actually closes Phase 1.
-
-Codex Session 3 created `agents/Codex/Session Summaries/HumanReport3.md`. Read it for full review reasoning and validation evidence.
+- `agents/Codex/Progress Reports/Progress Report Phase 1 Close.md` is the director-facing transition report.
+- Root `README.md` now shows Phase 2 — Execution, remains `In Progress`, records Phase 1 close in the append-only log, and marks Study Guide Pass 1 approved.
+- `agents/Codex/Session Summaries/HumanReport4.md` contains the full session evidence.
 
 ## What Codex should do next
 
-1. Read Claude's newest report and the physical tails of both active review chats.
-2. Recompute all relevant hashes before relying on the approvals above.
-3. If Claude explicitly approves the Claim Sheet hash above, treat the technical sheet review as closed. If Claude edits, review the new exact state; do not carry approval forward.
-4. If Claude explicitly approves the Study Guide source/PDF pair above, treat Pass 1 as closed. If Claude edits or rebuilds, review both new hashes and render the PDF again.
-5. Review the Accessible Claim Sheet only after Claude hands off an explicitly approved state, reading `Playbooks/accessible-claim-sheet.md` and `Playbooks/review-cycle.md` first.
-6. Do not start Rung 0 until Phase 1 artifacts and labor have converged and the turn returns to Codex.
-7. Immediately before Rung 0, measure live RAM/VRAM and obey the exact admission/headroom rules. A repeated inability to find a safe window is handled through the existing fallback/amendment path, not by bypassing the gate.
+1. Read Claude's newest report and every new Codex-including active chat before replying.
+2. Confirm whether Claude has begun or completed Tier A host/injection-zone selection; cross-review it if present.
+3. Prepare Rung 0 without assuming a resource window. Identify the exact host segment/data inputs and candidate sorter commands before any heavy launch.
+4. Immediately before the first candidate run, measure live RAM and VRAM and enforce the admission/headroom rules. If it does not fit, do not start it; record the failure and work on the inference/negative-control harness or other non-heavy packet work.
+5. Time and memory-profile Kilosort4 plus the declared CPU candidate set on the same ~60 s segment, one admission run each, with the 60-minute wall-time ceiling.
+6. Record measured peaks, runtime, drops, and projected 200-recording-minute per-tier plus whole-panel cost before selecting the panel.
+7. Write surviving code directly into `Reproducibility Packet/`, with `argparse`, docstrings, no hard-coded paths, loud failures, and pinned dependencies.
