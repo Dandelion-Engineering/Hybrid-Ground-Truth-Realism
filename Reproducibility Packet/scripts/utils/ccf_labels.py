@@ -26,6 +26,8 @@ that appear in the canonical Allen names ("Dentate gyrus, molecular layer"
 becomes "Dentate gyrus molecular layer").
 """
 
+import json
+import os
 import re
 
 _PUNCT_RE = re.compile(r"[,\.]")
@@ -123,18 +125,103 @@ def normalise(label):
 _NORMALISED = {normalise(name): acronym for name, acronym in NAME_TO_ACRONYM.items()}
 
 
-def to_acronym(label, default=None):
+def to_acronym(label, default=None, include_derived=False):
     """Translate a host-side CCF long name into a donor-side acronym.
 
     Args:
         label: the ``location`` string from an NWB electrodes table.
         default: value returned when the label is not in the table.
+        include_derived: also consult the derived layer built by
+            ``derive_ccf_label_map.py``. Off by default so that callers written
+            against the hand-authored table keep exactly their original
+            behaviour; the hand-authored entry always wins where both define a
+            label. Use ``provenance`` to report which layer answered.
 
     Returns:
         The template-library acronym, or ``default`` when unmapped. Callers
         should report unmapped labels rather than silently discarding them.
     """
-    return _NORMALISED.get(normalise(label), default)
+    key = normalise(label)
+    if key in _NORMALISED:
+        return _NORMALISED[key]
+    if include_derived and key in _DERIVED_NORMALISED:
+        return _DERIVED_NORMALISED[key]
+    return default
+
+
+# ---------------------------------------------------------------------------
+# The derived layer.
+#
+# The hand-authored table above covers the structures a CA1-targeted search
+# needs. It does not cover the host vocabulary the region-unaware arm meets,
+# and the obvious fix -- importing the Allen CCF ontology -- is not available
+# to this project: the Allen Institute Terms of Use permit noncommercial use
+# only and forbid commercial redistribution without written permission, which
+# Dandelion's licensing standard does not accept by default.
+#
+# ``derive_ccf_label_map.py`` therefore reads the correspondence off two
+# commercial-use-permitting sources the project already holds -- DANDI 000409
+# (CC-BY-4.0) electrode annotations and hybrid_template_library (MIT) donor
+# rows -- and writes it to the JSON beside this module.
+#
+# The derived layer is **opt-in on every call**. ``to_acronym`` keeps its
+# original hand-authored-only behaviour by default, so a caller written before
+# this layer existed cannot silently change meaning underneath itself. Ask for
+# the derived entries explicitly, and use ``provenance`` to report which layer
+# answered.
+# ---------------------------------------------------------------------------
+
+DERIVED_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "ccf_label_map_derived.json")
+
+HAND_AUTHORED = "hand-authored"
+
+
+def _load_derived(path=DERIVED_PATH):
+    """Load the derived map written by ``derive_ccf_label_map.py``.
+
+    Args:
+        path: JSON file to read. Defaults to the copy beside this module.
+
+    Returns:
+        A tuple of (metadata dict, entries dict). Both are empty when the file
+        is absent, which keeps this module importable in a checkout that has
+        not run the derivation yet.
+    """
+    if not os.path.exists(path):
+        return {}, {}
+    with open(path, encoding="utf-8") as handle:
+        document = json.load(handle)
+    entries = document.pop("entries", {})
+    return document, entries
+
+
+DERIVED_META, DERIVED_ENTRIES = _load_derived()
+
+_DERIVED_NORMALISED = {normalise(name): entry["acronym"]
+                       for name, entry in DERIVED_ENTRIES.items()}
+_DERIVED_TIER = {normalise(name): entry["tier"] for name, entry in DERIVED_ENTRIES.items()}
+
+
+def provenance(label):
+    """Say which layer defines a host label, without resolving it.
+
+    Args:
+        label: the ``location`` string from an NWB electrodes table.
+
+    Returns:
+        ``"hand-authored"``, ``"derived:unanimous"``, ``"derived:majority"``,
+        or None when no layer defines it. Callers reporting a region
+        assignment should state this rather than presenting both layers as
+        equally established: the hand-authored entries were validated against
+        independent evidence, and the derived ones were read off that evidence.
+    """
+    key = normalise(label)
+    if key in _NORMALISED:
+        return HAND_AUTHORED
+    if key in _DERIVED_NORMALISED:
+        return f"derived:{_DERIVED_TIER[key]}"
+    return None
 
 
 def is_injectable(acronym):

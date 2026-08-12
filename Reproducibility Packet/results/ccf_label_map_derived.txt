@@ -1,0 +1,371 @@
+# CCF label-map derivation from first-party data
+
+donor snapshot sha256   a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d
+matches pinned          True
+probe type              Neuropixels 1.0
+donor insertions        37 (assigned a probe: 32)
+depth tolerance         20.0 um
+majority fraction       0.667
+min supporting insertions  1
+electrode table source  _desc-processed_behavior+ecephys.nwb
+metadata transferred    146.6 MB in 150 range requests (no recording data read)
+
+Licence position, because it is why this script exists rather than an ontology import.
+The Allen Institute Terms of Use permit use for research or other noncommercial
+purposes and forbid commercial redistribution without written permission. Both inputs
+used here instead permit commercial use: DANDI 000409 is CC-BY-4.0 and the
+hybrid_template_library is MIT. No ontology file is downloaded, vendored, or derived
+from. Every correspondence below is read off those two licensed sources.
+
+## Derived entries
+
+One row per donor acronym. 'votes' counts donor templates whose nearest electrode
+carried that host name; 'ins' counts the distinct donor insertions those votes came
+from, which is the number that matters -- many votes from one probe is one observation
+repeated. A unanimous acronym saw exactly one host name. A majority acronym saw more
+than one and its leader cleared the fraction above. An ambiguous acronym is reported
+and NOT emitted into the map.
+
+acronym     tier         votes  ins  host long name
+------------------------------------------------------------------------------------------------
+ACAd5       majority        68    2  Anterior cingulate area dorsal part layer 5
+ACAd6a      unanimous       12    1  Anterior cingulate area dorsal part layer 6a
+ACAv2/3     unanimous       18    1  Anterior cingulate area ventral part layer 2/3
+ACAv5       unanimous       50    2  Anterior cingulate area ventral part layer 5
+ACAv6a      unanimous        2    1  Anterior cingulate area ventral part 6a
+AId5        unanimous       80    2  Agranular insular area dorsal part layer 5
+AId6a       majority        20    1  Agranular insular area dorsal part layer 6a
+AIp1        unanimous        2    1  Agranular insular area posterior part layer 1
+AIp2/3      unanimous       42    1  Agranular insular area posterior part layer 2/3
+AIp5        unanimous       16    1  Agranular insular area posterior part layer 5
+AIp6a       unanimous       18    1  Agranular insular area posterior part layer 6a
+AIp6b       unanimous        2    1  Agranular insular area posterior part layer 6b
+AIv2/3      ambiguous        4    0  Piriform area/Agranular insular area ventral part layer 2/3
+AIv5        unanimous       32    1  Agranular insular area ventral part layer 5
+AOBgl       unanimous        2    1  Accessory olfactory bulb glomerular layer
+AON         unanimous      106    4  Anterior olfactory nucleus
+APN         unanimous       30    1  Anterior pretectal nucleus
+AUDp6a      unanimous       52    1  Primary auditory area layer 6a
+AUDv6a      unanimous       22    1  Ventral auditory area layer 6a
+BMAp        unanimous       28    1  Basomedial amygdalar nucleus posterior part
+CA1         unanimous       32    4  Field CA1
+CA3         unanimous       16    2  Field CA3
+CLA         unanimous       12    1  Claustrum
+COApl       unanimous       26    1  Cortical amygdalar area posterior part lateral zone
+COApm       unanimous       10    1  Cortical amygdalar area posterior part medial zone
+CP          unanimous      214    4  Caudoputamen
+CTXsp       unanimous        2    1  Cortical subplate
+DG-mo       unanimous        4    2  Dentate gyrus molecular layer
+DG-po       majority        10    2  Dentate gyrus polymorph layer
+DG-sg       majority        30    3  Dentate gyrus granule cell layer
+ECT5        unanimous       16    1  Ectorhinal area/Layer 5
+ENTl2       unanimous       22    1  Entorhinal area lateral part layer 2
+ENTl3       unanimous       68    2  Entorhinal area lateral part layer 3
+ENTl5       unanimous      106    2  Entorhinal area lateral part layer 5
+ENTl6a      majority       102    2  Entorhinal area lateral part layer 6a
+ENTm5       unanimous       16    1  Entorhinal area medial part dorsal zone layer 5
+ENTm6       unanimous       28    1  Entorhinal area medial part dorsal zone layer 6
+EPd         unanimous       44    2  Endopiriform nucleus dorsal part
+EW          unanimous        2    1  Edinger-Westphal nucleus
+FRP2/3      unanimous        6    2  Frontal pole layer 2/3
+FRP6a       unanimous       12    1  Frontal pole layer 6a
+ILA1        unanimous        2    1  Infralimbic area layer 1
+ILA2/3      unanimous        8    1  Infralimbic area layer 2/3
+ILA5        unanimous       34    1  Infralimbic area layer 5
+IVn         unanimous        2    1  Periaqueductal gray
+LGd-sh      unanimous        2    1  Dorsal part of the lateral geniculate complex shell
+LGv         unanimous        4    1  Ventral part of the lateral geniculate complex
+LP          unanimous       94    2  Lateral posterior nucleus of the thalamus
+LSc         majority        18    1  Lateral septal nucleus caudal (caudodorsal) part
+LSr         unanimous       16    1  Lateral septal nucleus rostral (rostroventral) part
+MB          majority        34    4  Midbrain
+MEA         unanimous       44    1  Medial amygdalar nucleus
+MGm         unanimous       10    1  Medial geniculate complex medial part
+MOp5        unanimous       28    1  Primary motor area Layer 5
+MOp6a       unanimous       48    1  Primary motor area Layer 6a
+MOs2/3      unanimous       12    1  Secondary motor area layer 2/3
+MOs5        majority        40    3  Secondary motor area layer 5
+MOs6a       unanimous       46    1  Secondary motor area layer 6a
+MRN         majority       118    7  Midbrain reticular nucleus
+OLF         unanimous       42    3  Olfactory areas
+ORBl1       unanimous       10    3  Orbital area lateral part layer 1
+ORBl2/3     unanimous       12    2  Orbital area lateral part layer 2/3
+ORBvl2/3    unanimous       46    1  Orbital area ventrolateral part layer 2/3
+ORBvl5      majority        60    1  Orbital area ventrolateral part layer 5
+ORBvl6a     unanimous       62    1  Orbital area ventrolateral part layer 6a
+P           ambiguous        4    0  Pontine reticular nucleus/Pons
+PA          majority         8    1  Posterior amygdalar nucleus
+PAG         majority        50    4  Periaqueductal gray
+PERI2/3     unanimous        2    1  Perirhinal area layer 2/3
+PERI5       unanimous        6    1  Perirhinal area layer 5
+PIR         unanimous      188    6  Piriform area
+PL5         unanimous       60    1  Prelimbic area layer 5
+PL6a        majority        22    1  Prelimbic area layer 6a
+PRNc        unanimous        2    1  Pontine reticular nucleus caudal part
+PRNr        unanimous        6    1  Pontine reticular nucleus
+PVT         unanimous       32    1  Paraventricular nucleus of the thalamus
+Pa4         unanimous        2    1  Paratrochlear nucleus
+PoT         unanimous       46    2  Posterior triangular thalamic nucleus
+ProS        unanimous       30    2  Prosubiculum
+RN          unanimous       36    2  Red nucleus
+RSPagl5     unanimous        2    1  Retrosplenial area lateral agranular part layer 5
+RSPagl6a    unanimous        4    1  Retrosplenial area lateral agranular part layer 6a
+RSPd2/3     unanimous        2    1  Retrosplenial area dorsal part layer 2/3
+RSPd5       unanimous       18    2  Retrosplenial area dorsal part layer 5
+RSPd6a      majority        14    2  Retrosplenial area dorsal part layer 6a
+RSPv1       majority         8    1  Retrosplenial area ventral part layer 1
+RSPv2/3     majority        10    1  Retrosplenial area ventral part layer 2/3
+RSPv5       unanimous       16    2  Retrosplenial area ventral part layer 5
+SCdg        unanimous       44    3  Superior colliculus motor related deep gray layer
+SCdw        unanimous        6    2  Superior colliculus motor related deep white layer
+SCig        unanimous       16    4  Superior colliculus motor related intermediate gray layer
+SCiw        unanimous       44    4  Superior colliculus motor related intermediate white layer
+SCsg        unanimous        8    3  Superior colliculus superficial gray layer
+SF          majority        26    2  Septofimbrial nucleus
+SGN         unanimous       26    2  Suprageniculate nucleus
+SPFp        unanimous       10    2  Subparafascicular nucleus parvicellular part
+SSp-m4      unanimous        2    1  Primary somatosensory area mouth layer 4
+SSp-m5      unanimous       18    1  Primary somatosensory area mouth layer 5
+SSp-m6a     unanimous      112    3  Primary somatosensory area mouth layer 6a
+SSp-m6b     majority        18    3  Primary somatosensory area mouth layer 6b
+SSp-n5      unanimous       24    1  Primary somatosensory area nose layer 5
+SSp-n6a     unanimous        2    1  Primary somatosensory area nose layer 6a
+SSp-ul4     unanimous        2    1  Primary somatosensory area upper limb layer 4
+SSs5        unanimous       28    1  Supplemental somatosensory area layer 5
+SSs6a       unanimous       16    1  Supplemental somatosensory area layer 6a
+SSs6b       unanimous        6    1  Supplemental somatosensory area layer 6b
+SUB         unanimous      336    3  Subiculum
+TEa5        unanimous        6    2  Temporal association areas layer 5
+TEa6a       unanimous        8    2  Temporal association areas layer 6a
+TRS         unanimous       14    2  Triangular nucleus of septum
+VISC5       majority        40    1  Visceral area layer 5
+VISa2/3     unanimous        8    1  Anterior area layer 2/3
+VISa4       unanimous        6    1  Anterior area layer 4
+VISa5       majority       100    3  Anterior area layer 5
+VISa6a      unanimous       26    3  Anterior area layer 6a
+VISa6b      unanimous        4    2  Anterior area layer 6b
+VISl2/3     unanimous        2    1  Lateral visual area layer 2/3
+VISl5       unanimous       16    1  Lateral visual area layer 5
+VISl6a      unanimous        2    1  Lateral visual area layer 6a
+VISli2/3    unanimous        6    1  Laterointermediate area layer 2/3
+VISli4      unanimous       28    1  Laterointermediate area layer 4
+VISli5      unanimous       26    3  Laterointermediate area layer 5
+VISli6a     unanimous       10    1  Laterointermediate area layer 6a
+VISp5       unanimous        4    1  Primary visual area layer 5
+VISpm5      unanimous        2    1  posteromedial visual area layer 6a
+VISpm6a     unanimous       12    1  posteromedial visual area layer 6a
+VISpor5     majority        88    2  Postrhinal area layer 5
+VISpor6a    unanimous       70    3  Postrhinal area layer 6a
+VISpor6b    majority         6    1  Postrhinal area layer 6b
+VISrl6b     unanimous        6    1  Rostrolateral area layer 6b
+VPL         unanimous       30    1  Ventral posterolateral nucleus of the thalamus
+VPM         unanimous       18    1  Ventral posteromedial nucleus of the thalamus
+alv         unanimous        2    1  alveus
+ccb         majority        34    3  corpus callosum body
+ccs         unanimous        2    1  corpus callosum splenium
+ec          unanimous        6    2  external capsule
+ee          unanimous        2    1  corpus callosum extreme capsule
+fiber tractsunanimous        4    2  fiber tracts
+fp          unanimous        4    1  corpus callosum posterior forceps
+int         unanimous        4    1  internal capsule
+opt         unanimous        4    1  optic tract
+rust        unanimous        8    1  rubrospinal tract
+scp         unanimous        2    1  superior cerebelar peduncles
+scwm        unanimous        8    3  supra-callosal cerebral white matter
+
+donor rows placed              2053
+donor rows with no electrode within tolerance  0
+distinct donor acronyms seen   144
+  unanimous  119
+  majority   23
+  ambiguous  2
+withheld for name collision    4
+entries emitted                138
+
+## Withheld: one host long name claimed by more than one acronym (2)
+
+Each of these is a donor acronym whose winning host name another acronym also won.
+At most one can be right and this evidence cannot say which, so NONE of them is
+emitted. The usual cause is a donor one contact outside its own layer.
+
+  'Periaqueductal gray': IVn (2 votes, 1 ins), PAG (50 votes, 4 ins)
+  'posteromedial visual area layer 6a': VISpm5 (2 votes, 1 ins), VISpm6a (12 votes, 1 ins)
+
+## Audit against the hand-authored table
+
+Every emitted entry is compared with utils/ccf_labels.py. This is independent evidence
+about the long-name spellings in that table, which the existing validation could not
+give: that run could only test names the table already contained.
+
+AGREE, same long name and acronym (44): AId5, AIp2/3, alv, VISa2/3, VISa5, ACAd5, ACAv5, AON, BMAp, CP, ccb, ccs, DG-sg, DG-mo, DG-po, ENTl3, ENTl5, ENTl6a, fiber tracts, CA1, CA3, ILA5, LP, VISli4, MEA, MRN, ORBvl2/3, ORBvl6a, PVT, PIR, VISpor5, VISpor6a, PL5, AUDp6a, MOp5, MOp6a, SSp-m6a, ProS, MOs5, MOs6a, SF, SUB, SSs5, VISC5
+
+NEW, long name the table did not contain (94): AOBgl, AId6a, AIp1, AIp5, AIp6a, AIp6b, AIv5, VISa4, VISa6a, VISa6b, ACAd6a, ACAv6a, ACAv2/3, APN, CLA, ee, fp, COApl, COApm, CTXsp, LGd-sh, ECT5, EW, EPd, ENTl2, ENTm5, ENTm6, ec, FRP2/3, FRP6a, ILA1, ILA2/3, int, LSc, LSr, VISl2/3, VISl5, VISl6a, VISli2/3, VISli5, VISli6a, MGm, MB, OLF, opt, ORBl1, ORBl2/3, ORBvl5, Pa4, PERI2/3, PERI5, PRNr, PRNc, PA, PoT, VISpor6b, PL6a, SSp-m4, SSp-m5, SSp-m6b, SSp-n5, SSp-n6a, SSp-ul4, VISp5, RN, RSPd2/3, RSPd5, RSPd6a, RSPagl5, RSPagl6a, RSPv1, RSPv2/3, RSPv5, VISrl6b, rust, MOs2/3, SPFp, scp, SCdg, SCdw, SCig, SCiw, SCsg, SSs6a, SSs6b, scwm, SGN, TEa5, TEa6a, TRS, AUDv6a, LGv, VPL, VPM
+
+DISAGREE, table says something different (0): none
+
+A DISAGREE row is the one that matters and must be diagnosed before the entry is
+trusted. It means the derivation and the hand-authored table describe the same place
+differently, and only one of them can be right.
+
+## Acronyms that saw more than one host name (25)
+
+Expected at structure borders: a donor sitting at the edge of its structure can be
+nearest an electrode belonging to the neighbour. Listed so the boundary cases are
+visible rather than absorbed by the majority rule.
+
+  ACAd5        'Anterior cingulate area dorsal part layer 5' x64, 'Anterior cingulate area ventral part layer 5' x2, 'Prelimbic area layer 5' x2
+  AId6a        'Agranular insular area dorsal part layer 6a' x18, 'Agranular insular area dorsal part layer 5' x2
+  AIv2/3       'Piriform area' x2, 'Agranular insular area ventral part layer 2/3' x2
+  DG-po        'Dentate gyrus polymorph layer' x8, 'Dentate gyrus granule cell layer' x2
+  DG-sg        'Dentate gyrus granule cell layer' x26, 'Dentate gyrus polymorph layer' x4
+  ENTl6a       'Entorhinal area lateral part layer 6a' x100, 'Entorhinal area lateral part layer 5' x2
+  LSc          'Lateral septal nucleus caudal (caudodorsal) part' x16, 'corpus callosum body' x2
+  MB           'Midbrain' x26, 'Anterior tegmental nucleus' x4, 'Midbrain reticular nucleus' x2, 'Paratrochlear nucleus' x2
+  MOs5         'Secondary motor area layer 5' x38, 'Anterior cingulate area dorsal part layer 5' x2
+  MRN          'Midbrain reticular nucleus' x116, 'Ventral tegmental nucleus' x2
+  ORBvl5       'Orbital area ventrolateral part layer 5' x58, 'Orbital area ventrolateral part layer 2/3' x2
+  P            'Pontine reticular nucleus' x2, 'Pons' x2
+  PA           'Posterior amygdalar nucleus' x6, 'Cortical amygdalar area posterior part medial zone' x2
+  PAG          'Periaqueductal gray' x48, 'Midbrain reticular nucleus' x2
+  PL6a         'Prelimbic area layer 6a' x20, 'Secondary motor area layer 6a' x2
+  RSPd6a       'Retrosplenial area dorsal part layer 6a' x12, 'Retrosplenial area lateral agranular part layer 6a' x2
+  RSPv1        'Retrosplenial area ventral part layer 1' x6, 'Retrosplenial area ventral part layer 2/3' x2
+  RSPv2/3      'Retrosplenial area ventral part layer 2/3' x8, 'Retrosplenial area ventral part layer 5' x2
+  SF           'Septofimbrial nucleus' x24, 'Triangular nucleus of septum' x2
+  SSp-m6b      'Primary somatosensory area mouth layer 6b' x16, 'supra-callosal cerebral white matter' x2
+  VISC5        'Visceral area layer 5' x38, 'Agranular insular area posterior part layer 5' x2
+  VISa5        'Anterior area layer 5' x96, 'Anterior area layer 4' x4
+  VISpor5      'Postrhinal area layer 5' x86, 'Postrhinal area layer 6a' x2
+  VISpor6b     'Postrhinal area layer 6b' x4, 'Postrhinal area layer 6a' x2
+  ccb          'corpus callosum body' x32, 'supra-callosal cerebral white matter' x2
+
+## Coverage against the host vocabulary seen in these recordings
+
+distinct host long names seen  209
+  mapped after derivation      143
+  still unmapped               66
+
+A host structure that holds no donor template cannot be derived here however common
+it is in the host. That is the method's ceiling, and it is why this closes the donor
+side of the gap completely and the host side only partly.
+
+Still unmapped:
+  Accessory olfactory bulb mitral layer
+  Agranular insular area ventral part layer 2/3
+  Anterior area layer 1
+  Anterior cingulate area ventral part layer 1
+  Anterior tegmental nucleus
+  Anteromedial visual area layer 2/3
+  Cuneiform nucleus
+  Dorsal auditory area layer 5
+  Dorsal auditory area layer 6a
+  Dorsal peduncular area
+  Ectorhinal area/Layer 6b
+  Hippocampal formation
+  Induseum griseum
+  Inferior colliculus dorsal nucleus
+  Interpeduncular nucleus lateral
+  Lateral visual area layer 1
+  Lateral visual area layer 4
+  Laterointermediate area layer 6b
+  Main olfactory bulb
+  Medial accesory oculomotor nucleus
+  Olfactory tubercle
+  Orbital area lateral part layer 5
+  Pons
+  Pontine gray
+  Primary motor area Layer 1
+  Primary motor area Layer 2/3
+  Primary somatosensory area barrel field layer 1
+  Primary somatosensory area barrel field layer 2/3
+  Primary somatosensory area nose layer 4
+  Primary visual area layer 1
+  Primary visual area layer 2/3
+  Primary visual area layer 4
+  Primary visual area layer 6a
+  Primary visual area layer 6b
+  Retrosplenial area dorsal part layer 1
+  Retrosplenial area ventral part layer 6a
+  Secondary motor area layer 1
+  Striatum
+  Subfornical organ
+  Superior central nucleus raphe
+  Superior colliculus optic layer
+  Superior colliculus zonal layer
+  Supplemental somatosensory area layer 2/3
+  Supplemental somatosensory area layer 4
+  Taenia tecta dorsal part
+  Taenia tecta ventral part
+  Temporal association areas layer 2/3
+  Temporal association areas layer 4
+  Temporal association areas layer 6b
+  Thalamus
+  Ventral tegmental nucleus
+  Zona incerta
+  anterior commissure olfactory limb
+  auditory radiation
+  brachium of the superior colliculus
+  dorsal hippocampal commissure
+  external medullary lamina of the thalamus
+  genu of corpus callosum
+  medial lemniscus
+  posteromedial visual area layer 2/3
+  posteromedial visual area layer 4
+  posteromedial visual area layer 5
+  posteromedial visual area layer 6a
+  third ventricle
+  trochlear nerve
+  ventral hippocampal commissure
+
+## Probe assignment per donor insertion
+
+Assignment uses the hand-authored table's agreement, exactly as the validation run
+does, because the donor 'dataset' string names an insertion UUID the NWB does not
+carry. The derivation therefore inherits that one dependency; the entries it emits
+are new, but which probe they were read from is not independent of the table.
+
+   session     probe   agree  compared  probes
+  07dc4b76   Probe00      13        13       2
+  07dc4b76   Probe01      20        20       2
+  0a018f12   Probe00      53        54       1
+  0ac8d013   Probe01       4         4       2
+  0ac8d013   Probe00      55        55       2
+  196a2adf   Probe01      45        46       2
+  1b9e349e   Probe01       7         7       2
+  69c9a415   Probe00      67        67       2
+  69c9a415   Probe01      13        13       2
+  6b0b5d24   Probe01      11        11       2
+  752456f3   Probe01       6         6       2
+  781b35fd   Probe00      23        23       2
+  781b35fd   Probe01      48        48       2
+  78b4fff5   Probe00      21        21       2
+  872ce8ff   Probe00      81        81       2
+  872ce8ff   Probe01     125       125       2
+  8c552ddc   Probe01      20        20       2
+  8c552ddc   Probe00      56        56       2
+  9468fa93   Probe01      41        41       2
+  a6fe44a8   Probe01      11        11       2
+  aa3432cd   Probe00      67        67       2
+  aa3432cd   Probe01      14        14       2
+  ac7d3064   Probe00      31        31       2
+  ac7d3064   Probe01      28        28       2
+  b22f694e   Probe00      44        44       2
+  b22f694e   Probe01     175       175       2
+  dfbe628d   Probe00      57        57       2
+  dfbe628d   Probe01     115       115       2
+  e45481fa   Probe00      87        87       2
+  e5c75b62   Probe00       7         7       2
+  f819d499   Probe01       5         5       2
+  ffef0311   Probe00      51        51       1
+
+## Failures (5)
+
+  1b715600-0cbc-442c-bd00-5b0ac2865de1: no probe could be assigned: no depth overlap, or every donor acronym here is undefined in the hand-authored table used for assignment
+  7082d8ff-255a-47d7-a839-bf093483ec30: no probe could be assigned: no depth overlap, or every donor acronym here is undefined in the hand-authored table used for assignment
+  9468fa93-21ae-4984-955c-e8402e280c83: no probe could be assigned: no depth overlap, or every donor acronym here is undefined in the hand-authored table used for assignment
+  a6fe44a8-07ab-49b8-81f9-e18575aa85cc: no probe could be assigned: no depth overlap, or every donor acronym here is undefined in the hand-authored table used for assignment
+  e5c75b62-6871-4135-b3d0-f6464c2d90c0: no probe could be assigned: no depth overlap, or every donor acronym here is undefined in the hand-authored table used for assignment
+
+This derives a vocabulary bridge from annotations IBL already made. It does not
+validate the atlas registration itself, which is inherited as given, and it is not an
+ontology: it defines only the structures these recordings actually contain.

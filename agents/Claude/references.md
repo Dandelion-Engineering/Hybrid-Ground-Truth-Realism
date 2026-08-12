@@ -29,6 +29,7 @@ Corrections propagate forward, not backward. `Literature Foundation.md` is a fro
 | 2 | The anchor's Cohen's *d* (0.276 / 0.408) can serve as the ranking-flip threshold | It cannot: the two quantities are standardized over different denominators and sampling structures. The *d* values are **contextual calibration** — they establish that sorter-versus-sorter differences here are small-to-moderate. The decision threshold is the paired sorter gap measured **inside this experiment**, in raw accuracy units. | Codex Session 1; accepted by Claude Session 2 |
 | 4 | SHYBRID relocation "carries its real spike train and per-spike waveform variability with it" | Overstated, and reasoned from the design idea rather than from the source. The implementation reuses observed spike times after a fixed shift and each spike's **fitted template amplitude**, but assigns **fresh random sub-sample jitter** to the insertion train and does not transport observed waveform shape. | Codex Session 3 from the public implementation; accepted by Claude Session 4 |
 | 8 | The 50–200 µV rescaling target "brackets the `good` units" and is "too loud" for the MUA population | Reasoning from an undefined comparison. Donor `amplitude_uv` is the **peak-to-peak of an average waveform**; host `median_spike_amplitude_uV` is a **median over per-spike single-sided peaks**. Measured conversion: ratio median **1.207** on `ibl_quality_score == 1.0` units (p10 1.10, p90 1.51). Restated, the target is roughly **41–165 µV** in host-column terms, population-level only — never unit-level. The direction of the original observation survives; its numbers do not. | Flagged by Claude Session 7, sharpened by Codex Session 7, measured by Claude Session 8 |
+| 9 | The derivation's first audit reported 31 hand-authored entries as disagreeing with the derived long names | 30 of the 31 were punctuation, not anatomy: the NWB export strips the commas the canonical Allen names carry, and `to_acronym` already resolves both spellings through `normalise`. An audit that does not use the same key its lookup uses is not auditing the lookup. On the normalised key the count is **44 agree, 0 disagree**. The one surviving finding was `IVn` claiming `PAG`'s long name, now withheld as a collision. | Claude Session 9, caught before the result was reported anywhere |
 
 ---
 
@@ -242,6 +243,40 @@ Two parts of these files the project had not opened before this session.
 **How it informed the project.** They are **not** the same quantity — a peak-to-peak span of an average versus a median over per-spike single-sided peaks. Evaluating the donor definition on host units via the file's own `waveform_mean` gives a ratio with median **1.207** on `ibl_quality_score == 1.0` units (p10 1.10, p90 1.51) and 1.250 over all units. That supports restating the 50–200 µV target as roughly **41–165 µV** in host-column terms at the population level, and does **not** support converting any single unit. It supersedes the flagged comparison in the entry above: the direction of that observation survives the correction, the numbers it was reached on do not.
 
 *Boundary:* one session, and definitional only. The preprocessing difference between the donor pipeline and IBL's is untouched and unmeasured.
+
+---
+
+### Allen Institute Terms of Use — the licence that closed the ontology path
+
+**What it covers.** The terms governing Allen Institute Content, including the Allen Mouse Brain Common Coordinate Framework structure ontology — the canonical source for a CCF structure-name↔acronym table. Read in full at [https://alleninstitute.org/terms-of-use/](https://alleninstitute.org/terms-of-use/) on 2026-08-12.
+
+**How it informed the project.** It closed the obvious route to completing the CCF label map and forced a better one. The terms permit use, copying, distribution and derivative works "for research or other noncommercial purposes," and state that you "may not redistribute the Content or Improvements for commercial purposes without our written permission." Under *Project Details*' licensing standard that makes the ontology a restrictive input usable only under an explicitly approved, named exception stating the downstream limits — which here would mean shipping part of the Reproducibility Packet under a noncommercial restriction, a director-level decision about what Dandelion may release. **No exception was requested, because the ontology proved unnecessary:** the bridge was derived instead from DANDI 000409 (CC-BY-4.0) and `hybrid_template_library` (MIT). See `agents/Claude/Tier A Host and Injection Zone Selection.md` §12.
+
+*Boundary:* this is a reading of published terms, not legal advice, and it is deliberately the conservative reading. It also does not claim the derived map is free of Allen's *intellectual* contribution — the structure names and acronyms are Allen's vocabulary, and the CCF registration behind IBL's annotations is inherited as given. What it claims is narrower and is the thing that matters for shipping: no Allen file was downloaded, vendored, or copied, and every correspondence in the packet was read off two commercial-use-permitting sources.
+
+*Citation:* Allen Institute for Brain Science. *Terms of Use.* https://alleninstitute.org/terms-of-use/ (accessed 2026-08-12).
+
+---
+
+### `iblatlas` and `brainglobe-atlasapi` — permissive wrappers, checked and declined
+
+**What it covers.** The two obvious permissively licensed packages that redistribute the Allen CCF ontology. `iblatlas`' licence file was read directly at [https://raw.githubusercontent.com/int-brain-lab/iblatlas/main/LICENSE](https://raw.githubusercontent.com/int-brain-lab/iblatlas/main/LICENSE) — "MIT License", "Copyright (c) 2023 International Brain Laboratory". `brainglobe-atlasapi` is BSD-3.
+
+**How it informed the project.** It ruled out the shortcut of treating a permissive wrapper as a fix for a restrictive payload. Both licences are honest about the packages' own code; neither party is the Allen Institute, and a third party's permissive licence over a redistribution is not a grant of rights in the upstream content it redistributes. Importing the ontology through an MIT dependency would have been exactly the "import on the assumption that it will be fine" the standard forbids. Neither package is installed and neither is a project dependency.
+
+*Boundary:* this is a decision about the *ontology data*, not a judgement about either package's code, which is permissively licensed and would be usable on its own terms.
+
+*Citation:* International Brain Laboratory. *iblatlas.* MIT Licence. https://github.com/int-brain-lab/iblatlas — accessed 2026-08-12.
+
+---
+
+### The derived CCF label map (this project's own result)
+
+**What it covers.** Whether the host and donor vocabularies can be bridged without an ontology. `Reproducibility Packet/scripts/derive_ccf_label_map.py` → `results/ccf_label_map_derived.txt` and `scripts/utils/ccf_label_map_derived.json`, over 32 of 37 donor insertions, 146.6 MB of metadata in 150 range requests, no recording data read.
+
+**How it informed the project.** It closed the donor side of the label-map gap and supplied the first independent check of the hand-authored table's long-name spellings. Pairing each donor's `(session, depth, acronym)` with the nearest host electrode's CCF long name yields **138 entries — 94 structures the hand-authored table did not contain** — of which 119 acronyms saw exactly one host name and 23 cleared a two-thirds majority. Audited against `utils/ccf_labels.py`: **44 agree, 0 disagree.** Two entries were withheld because two acronyms claimed one long name (`PAG`/`IVn`, `VISpm6a`/`VISpm5`), which is boundary contamination the evidence cannot adjudicate. The derived layer is opt-in in `to_acronym`, and re-running `validate_ccf_label_map.py` after the change reproduced its tracked report byte for byte.
+
+*Boundary:* coverage is bounded by the donor library. Of 209 distinct host long names on the assigned probes, **143 are mapped and 66 remain unmapped**, and those 66 would need the ontology if the region-unaware arm's placement ever lands in one. The 44 agreements are the only non-circular confirmation claimed: validating the *derived* entries against the evidence they were derived from would agree trivially, and that check was deliberately not run. This also validates the vocabulary bridge, not the atlas registration, which is IBL's and inherited as given.
 
 ---
 

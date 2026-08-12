@@ -1,0 +1,1163 @@
+{
+  "asset_suffix": "_desc-processed_behavior+ecephys.nwb",
+  "donor_snapshot_sha256": "a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d",
+  "entries": {
+    "Accessory olfactory bulb glomerular layer": {
+      "acronym": "AOBgl",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Agranular insular area dorsal part layer 5": {
+      "acronym": "AId5",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 80,
+      "votes_total": 80
+    },
+    "Agranular insular area dorsal part layer 6a": {
+      "acronym": "AId6a",
+      "competing": {
+        "Agranular insular area dorsal part layer 5": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 18,
+      "votes_total": 20
+    },
+    "Agranular insular area posterior part layer 1": {
+      "acronym": "AIp1",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Agranular insular area posterior part layer 2/3": {
+      "acronym": "AIp2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 42,
+      "votes_total": 42
+    },
+    "Agranular insular area posterior part layer 5": {
+      "acronym": "AIp5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Agranular insular area posterior part layer 6a": {
+      "acronym": "AIp6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 18,
+      "votes_total": 18
+    },
+    "Agranular insular area posterior part layer 6b": {
+      "acronym": "AIp6b",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Agranular insular area ventral part layer 5": {
+      "acronym": "AIv5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 32,
+      "votes_total": 32
+    },
+    "Anterior area layer 2/3": {
+      "acronym": "VISa2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 8,
+      "votes_total": 8
+    },
+    "Anterior area layer 4": {
+      "acronym": "VISa4",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Anterior area layer 5": {
+      "acronym": "VISa5",
+      "competing": {
+        "Anterior area layer 4": 4
+      },
+      "insertions": 3,
+      "tier": "majority",
+      "votes": 96,
+      "votes_total": 100
+    },
+    "Anterior area layer 6a": {
+      "acronym": "VISa6a",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 26,
+      "votes_total": 26
+    },
+    "Anterior area layer 6b": {
+      "acronym": "VISa6b",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "Anterior cingulate area dorsal part layer 5": {
+      "acronym": "ACAd5",
+      "competing": {
+        "Anterior cingulate area ventral part layer 5": 2,
+        "Prelimbic area layer 5": 2
+      },
+      "insertions": 2,
+      "tier": "majority",
+      "votes": 64,
+      "votes_total": 68
+    },
+    "Anterior cingulate area dorsal part layer 6a": {
+      "acronym": "ACAd6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 12,
+      "votes_total": 12
+    },
+    "Anterior cingulate area ventral part 6a": {
+      "acronym": "ACAv6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Anterior cingulate area ventral part layer 2/3": {
+      "acronym": "ACAv2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 18,
+      "votes_total": 18
+    },
+    "Anterior cingulate area ventral part layer 5": {
+      "acronym": "ACAv5",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 50,
+      "votes_total": 50
+    },
+    "Anterior olfactory nucleus": {
+      "acronym": "AON",
+      "competing": {},
+      "insertions": 4,
+      "tier": "unanimous",
+      "votes": 106,
+      "votes_total": 106
+    },
+    "Anterior pretectal nucleus": {
+      "acronym": "APN",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 30,
+      "votes_total": 30
+    },
+    "Basomedial amygdalar nucleus posterior part": {
+      "acronym": "BMAp",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 28,
+      "votes_total": 28
+    },
+    "Caudoputamen": {
+      "acronym": "CP",
+      "competing": {},
+      "insertions": 4,
+      "tier": "unanimous",
+      "votes": 214,
+      "votes_total": 214
+    },
+    "Claustrum": {
+      "acronym": "CLA",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 12,
+      "votes_total": 12
+    },
+    "Cortical amygdalar area posterior part lateral zone": {
+      "acronym": "COApl",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 26,
+      "votes_total": 26
+    },
+    "Cortical amygdalar area posterior part medial zone": {
+      "acronym": "COApm",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 10,
+      "votes_total": 10
+    },
+    "Cortical subplate": {
+      "acronym": "CTXsp",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Dentate gyrus granule cell layer": {
+      "acronym": "DG-sg",
+      "competing": {
+        "Dentate gyrus polymorph layer": 4
+      },
+      "insertions": 3,
+      "tier": "majority",
+      "votes": 26,
+      "votes_total": 30
+    },
+    "Dentate gyrus molecular layer": {
+      "acronym": "DG-mo",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "Dentate gyrus polymorph layer": {
+      "acronym": "DG-po",
+      "competing": {
+        "Dentate gyrus granule cell layer": 2
+      },
+      "insertions": 2,
+      "tier": "majority",
+      "votes": 8,
+      "votes_total": 10
+    },
+    "Dorsal part of the lateral geniculate complex shell": {
+      "acronym": "LGd-sh",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Ectorhinal area/Layer 5": {
+      "acronym": "ECT5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Edinger-Westphal nucleus": {
+      "acronym": "EW",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Endopiriform nucleus dorsal part": {
+      "acronym": "EPd",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 44,
+      "votes_total": 44
+    },
+    "Entorhinal area lateral part layer 2": {
+      "acronym": "ENTl2",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 22,
+      "votes_total": 22
+    },
+    "Entorhinal area lateral part layer 3": {
+      "acronym": "ENTl3",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 68,
+      "votes_total": 68
+    },
+    "Entorhinal area lateral part layer 5": {
+      "acronym": "ENTl5",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 106,
+      "votes_total": 106
+    },
+    "Entorhinal area lateral part layer 6a": {
+      "acronym": "ENTl6a",
+      "competing": {
+        "Entorhinal area lateral part layer 5": 2
+      },
+      "insertions": 2,
+      "tier": "majority",
+      "votes": 100,
+      "votes_total": 102
+    },
+    "Entorhinal area medial part dorsal zone layer 5": {
+      "acronym": "ENTm5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Entorhinal area medial part dorsal zone layer 6": {
+      "acronym": "ENTm6",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 28,
+      "votes_total": 28
+    },
+    "Field CA1": {
+      "acronym": "CA1",
+      "competing": {},
+      "insertions": 4,
+      "tier": "unanimous",
+      "votes": 32,
+      "votes_total": 32
+    },
+    "Field CA3": {
+      "acronym": "CA3",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Frontal pole layer 2/3": {
+      "acronym": "FRP2/3",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Frontal pole layer 6a": {
+      "acronym": "FRP6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 12,
+      "votes_total": 12
+    },
+    "Infralimbic area layer 1": {
+      "acronym": "ILA1",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Infralimbic area layer 2/3": {
+      "acronym": "ILA2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 8,
+      "votes_total": 8
+    },
+    "Infralimbic area layer 5": {
+      "acronym": "ILA5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 34,
+      "votes_total": 34
+    },
+    "Lateral posterior nucleus of the thalamus": {
+      "acronym": "LP",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 94,
+      "votes_total": 94
+    },
+    "Lateral septal nucleus caudal (caudodorsal) part": {
+      "acronym": "LSc",
+      "competing": {
+        "corpus callosum body": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 16,
+      "votes_total": 18
+    },
+    "Lateral septal nucleus rostral (rostroventral) part": {
+      "acronym": "LSr",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Lateral visual area layer 2/3": {
+      "acronym": "VISl2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Lateral visual area layer 5": {
+      "acronym": "VISl5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Lateral visual area layer 6a": {
+      "acronym": "VISl6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Laterointermediate area layer 2/3": {
+      "acronym": "VISli2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Laterointermediate area layer 4": {
+      "acronym": "VISli4",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 28,
+      "votes_total": 28
+    },
+    "Laterointermediate area layer 5": {
+      "acronym": "VISli5",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 26,
+      "votes_total": 26
+    },
+    "Laterointermediate area layer 6a": {
+      "acronym": "VISli6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 10,
+      "votes_total": 10
+    },
+    "Medial amygdalar nucleus": {
+      "acronym": "MEA",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 44,
+      "votes_total": 44
+    },
+    "Medial geniculate complex medial part": {
+      "acronym": "MGm",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 10,
+      "votes_total": 10
+    },
+    "Midbrain": {
+      "acronym": "MB",
+      "competing": {
+        "Anterior tegmental nucleus": 4,
+        "Midbrain reticular nucleus": 2,
+        "Paratrochlear nucleus": 2
+      },
+      "insertions": 4,
+      "tier": "majority",
+      "votes": 26,
+      "votes_total": 34
+    },
+    "Midbrain reticular nucleus": {
+      "acronym": "MRN",
+      "competing": {
+        "Ventral tegmental nucleus": 2
+      },
+      "insertions": 7,
+      "tier": "majority",
+      "votes": 116,
+      "votes_total": 118
+    },
+    "Olfactory areas": {
+      "acronym": "OLF",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 42,
+      "votes_total": 42
+    },
+    "Orbital area lateral part layer 1": {
+      "acronym": "ORBl1",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 10,
+      "votes_total": 10
+    },
+    "Orbital area lateral part layer 2/3": {
+      "acronym": "ORBl2/3",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 12,
+      "votes_total": 12
+    },
+    "Orbital area ventrolateral part layer 2/3": {
+      "acronym": "ORBvl2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 46,
+      "votes_total": 46
+    },
+    "Orbital area ventrolateral part layer 5": {
+      "acronym": "ORBvl5",
+      "competing": {
+        "Orbital area ventrolateral part layer 2/3": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 58,
+      "votes_total": 60
+    },
+    "Orbital area ventrolateral part layer 6a": {
+      "acronym": "ORBvl6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 62,
+      "votes_total": 62
+    },
+    "Paratrochlear nucleus": {
+      "acronym": "Pa4",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Paraventricular nucleus of the thalamus": {
+      "acronym": "PVT",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 32,
+      "votes_total": 32
+    },
+    "Perirhinal area layer 2/3": {
+      "acronym": "PERI2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Perirhinal area layer 5": {
+      "acronym": "PERI5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Piriform area": {
+      "acronym": "PIR",
+      "competing": {},
+      "insertions": 6,
+      "tier": "unanimous",
+      "votes": 188,
+      "votes_total": 188
+    },
+    "Pontine reticular nucleus": {
+      "acronym": "PRNr",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Pontine reticular nucleus caudal part": {
+      "acronym": "PRNc",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Posterior amygdalar nucleus": {
+      "acronym": "PA",
+      "competing": {
+        "Cortical amygdalar area posterior part medial zone": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 6,
+      "votes_total": 8
+    },
+    "Posterior triangular thalamic nucleus": {
+      "acronym": "PoT",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 46,
+      "votes_total": 46
+    },
+    "Postrhinal area layer 5": {
+      "acronym": "VISpor5",
+      "competing": {
+        "Postrhinal area layer 6a": 2
+      },
+      "insertions": 2,
+      "tier": "majority",
+      "votes": 86,
+      "votes_total": 88
+    },
+    "Postrhinal area layer 6a": {
+      "acronym": "VISpor6a",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 70,
+      "votes_total": 70
+    },
+    "Postrhinal area layer 6b": {
+      "acronym": "VISpor6b",
+      "competing": {
+        "Postrhinal area layer 6a": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 4,
+      "votes_total": 6
+    },
+    "Prelimbic area layer 5": {
+      "acronym": "PL5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 60,
+      "votes_total": 60
+    },
+    "Prelimbic area layer 6a": {
+      "acronym": "PL6a",
+      "competing": {
+        "Secondary motor area layer 6a": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 20,
+      "votes_total": 22
+    },
+    "Primary auditory area layer 6a": {
+      "acronym": "AUDp6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 52,
+      "votes_total": 52
+    },
+    "Primary motor area Layer 5": {
+      "acronym": "MOp5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 28,
+      "votes_total": 28
+    },
+    "Primary motor area Layer 6a": {
+      "acronym": "MOp6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 48,
+      "votes_total": 48
+    },
+    "Primary somatosensory area mouth layer 4": {
+      "acronym": "SSp-m4",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Primary somatosensory area mouth layer 5": {
+      "acronym": "SSp-m5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 18,
+      "votes_total": 18
+    },
+    "Primary somatosensory area mouth layer 6a": {
+      "acronym": "SSp-m6a",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 112,
+      "votes_total": 112
+    },
+    "Primary somatosensory area mouth layer 6b": {
+      "acronym": "SSp-m6b",
+      "competing": {
+        "supra-callosal cerebral white matter": 2
+      },
+      "insertions": 3,
+      "tier": "majority",
+      "votes": 16,
+      "votes_total": 18
+    },
+    "Primary somatosensory area nose layer 5": {
+      "acronym": "SSp-n5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 24,
+      "votes_total": 24
+    },
+    "Primary somatosensory area nose layer 6a": {
+      "acronym": "SSp-n6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Primary somatosensory area upper limb layer 4": {
+      "acronym": "SSp-ul4",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Primary visual area layer 5": {
+      "acronym": "VISp5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "Prosubiculum": {
+      "acronym": "ProS",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 30,
+      "votes_total": 30
+    },
+    "Red nucleus": {
+      "acronym": "RN",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 36,
+      "votes_total": 36
+    },
+    "Retrosplenial area dorsal part layer 2/3": {
+      "acronym": "RSPd2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Retrosplenial area dorsal part layer 5": {
+      "acronym": "RSPd5",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 18,
+      "votes_total": 18
+    },
+    "Retrosplenial area dorsal part layer 6a": {
+      "acronym": "RSPd6a",
+      "competing": {
+        "Retrosplenial area lateral agranular part layer 6a": 2
+      },
+      "insertions": 2,
+      "tier": "majority",
+      "votes": 12,
+      "votes_total": 14
+    },
+    "Retrosplenial area lateral agranular part layer 5": {
+      "acronym": "RSPagl5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "Retrosplenial area lateral agranular part layer 6a": {
+      "acronym": "RSPagl6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "Retrosplenial area ventral part layer 1": {
+      "acronym": "RSPv1",
+      "competing": {
+        "Retrosplenial area ventral part layer 2/3": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 6,
+      "votes_total": 8
+    },
+    "Retrosplenial area ventral part layer 2/3": {
+      "acronym": "RSPv2/3",
+      "competing": {
+        "Retrosplenial area ventral part layer 5": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 8,
+      "votes_total": 10
+    },
+    "Retrosplenial area ventral part layer 5": {
+      "acronym": "RSPv5",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Rostrolateral area layer 6b": {
+      "acronym": "VISrl6b",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Secondary motor area layer 2/3": {
+      "acronym": "MOs2/3",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 12,
+      "votes_total": 12
+    },
+    "Secondary motor area layer 5": {
+      "acronym": "MOs5",
+      "competing": {
+        "Anterior cingulate area dorsal part layer 5": 2
+      },
+      "insertions": 3,
+      "tier": "majority",
+      "votes": 38,
+      "votes_total": 40
+    },
+    "Secondary motor area layer 6a": {
+      "acronym": "MOs6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 46,
+      "votes_total": 46
+    },
+    "Septofimbrial nucleus": {
+      "acronym": "SF",
+      "competing": {
+        "Triangular nucleus of septum": 2
+      },
+      "insertions": 2,
+      "tier": "majority",
+      "votes": 24,
+      "votes_total": 26
+    },
+    "Subiculum": {
+      "acronym": "SUB",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 336,
+      "votes_total": 336
+    },
+    "Subparafascicular nucleus parvicellular part": {
+      "acronym": "SPFp",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 10,
+      "votes_total": 10
+    },
+    "Superior colliculus motor related deep gray layer": {
+      "acronym": "SCdg",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 44,
+      "votes_total": 44
+    },
+    "Superior colliculus motor related deep white layer": {
+      "acronym": "SCdw",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Superior colliculus motor related intermediate gray layer": {
+      "acronym": "SCig",
+      "competing": {},
+      "insertions": 4,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Superior colliculus motor related intermediate white layer": {
+      "acronym": "SCiw",
+      "competing": {},
+      "insertions": 4,
+      "tier": "unanimous",
+      "votes": 44,
+      "votes_total": 44
+    },
+    "Superior colliculus superficial gray layer": {
+      "acronym": "SCsg",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 8,
+      "votes_total": 8
+    },
+    "Supplemental somatosensory area layer 5": {
+      "acronym": "SSs5",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 28,
+      "votes_total": 28
+    },
+    "Supplemental somatosensory area layer 6a": {
+      "acronym": "SSs6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 16,
+      "votes_total": 16
+    },
+    "Supplemental somatosensory area layer 6b": {
+      "acronym": "SSs6b",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Suprageniculate nucleus": {
+      "acronym": "SGN",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 26,
+      "votes_total": 26
+    },
+    "Temporal association areas layer 5": {
+      "acronym": "TEa5",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "Temporal association areas layer 6a": {
+      "acronym": "TEa6a",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 8,
+      "votes_total": 8
+    },
+    "Triangular nucleus of septum": {
+      "acronym": "TRS",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 14,
+      "votes_total": 14
+    },
+    "Ventral auditory area layer 6a": {
+      "acronym": "AUDv6a",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 22,
+      "votes_total": 22
+    },
+    "Ventral part of the lateral geniculate complex": {
+      "acronym": "LGv",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "Ventral posterolateral nucleus of the thalamus": {
+      "acronym": "VPL",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 30,
+      "votes_total": 30
+    },
+    "Ventral posteromedial nucleus of the thalamus": {
+      "acronym": "VPM",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 18,
+      "votes_total": 18
+    },
+    "Visceral area layer 5": {
+      "acronym": "VISC5",
+      "competing": {
+        "Agranular insular area posterior part layer 5": 2
+      },
+      "insertions": 1,
+      "tier": "majority",
+      "votes": 38,
+      "votes_total": 40
+    },
+    "alveus": {
+      "acronym": "alv",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "corpus callosum body": {
+      "acronym": "ccb",
+      "competing": {
+        "supra-callosal cerebral white matter": 2
+      },
+      "insertions": 3,
+      "tier": "majority",
+      "votes": 32,
+      "votes_total": 34
+    },
+    "corpus callosum extreme capsule": {
+      "acronym": "ee",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "corpus callosum posterior forceps": {
+      "acronym": "fp",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "corpus callosum splenium": {
+      "acronym": "ccs",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "external capsule": {
+      "acronym": "ec",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 6,
+      "votes_total": 6
+    },
+    "fiber tracts": {
+      "acronym": "fiber tracts",
+      "competing": {},
+      "insertions": 2,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "internal capsule": {
+      "acronym": "int",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "optic tract": {
+      "acronym": "opt",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 4,
+      "votes_total": 4
+    },
+    "rubrospinal tract": {
+      "acronym": "rust",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 8,
+      "votes_total": 8
+    },
+    "superior cerebelar peduncles": {
+      "acronym": "scp",
+      "competing": {},
+      "insertions": 1,
+      "tier": "unanimous",
+      "votes": 2,
+      "votes_total": 2
+    },
+    "supra-callosal cerebral white matter": {
+      "acronym": "scwm",
+      "competing": {},
+      "insertions": 3,
+      "tier": "unanimous",
+      "votes": 8,
+      "votes_total": 8
+    }
+  },
+  "insertions_read": 32,
+  "majority_fraction": 0.6666666666666666,
+  "min_insertions": 1,
+  "probe_type": "Neuropixels 1.0",
+  "source": "derived from DANDI 000409 (CC-BY-4.0) electrode annotations and hybrid_template_library (MIT) donor rows; no Allen ontology file used",
+  "tolerance_um": 20.0
+}

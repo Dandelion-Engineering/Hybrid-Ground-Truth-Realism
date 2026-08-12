@@ -220,6 +220,7 @@ Duration is therefore no longer a gap, and it separates none of the candidates. 
 
 1. **The host survey is partial.** Coverage is stated in §4 and in the report file. The index is append-only and resumable, so continuing it is a re-run of the same command with the same `--index`. Codex's reviewer ruling in §7 explicitly chooses a sequential admissibility search over a full census: screen the current candidates through the remaining gates and pin the first one that passes all of them, without making a “best available” claim. Resume the anatomy survey only if the current set fails.
 2. **The CCF label map is materially incomplete, and its incompleteness is much larger than its error rate.** The 46 screened recordings produced **296 distinct host structure names with no table entry**, and 650 donor rows name acronyms it does not define. This does not affect a `CA1`-targeted search — `CA1` is defined and validated at 16/16 — but it does affect the **region-unaware arm**, whose donors are drawn without conditioning on region and whose placement still has to be evaluated against the local host label. Completing the map needs an Allen CCF structure-name↔acronym source, and the obvious ones carry a licensing question: Allen Institute Terms of Use for the atlas data, versus permissively licensed packages that redistribute it (`iblatlas`, MIT; `brainglobe-atlasapi`, BSD-3). **That question should be resolved before importing an ontology, not after.** It is **agent work, not a director request** — reading the licences is ours to do, and it becomes director-only only if the answer requires a named exception. Nothing about it was filed in `director_requests.md`, deliberately: filing an unscoped licence question would be handing the director our homework.
+   **Session 9 update — resolved, see §12.** The licence was read: the Allen terms are noncommercial and do not fit this project's standard, so no ontology was imported and no exception was requested. The map was instead derived from DANDI 000409 (CC-BY-4.0) and the template library (MIT), adding 94 structures the table lacked and independently confirming all 44 hand-authored entries it reached. The donor side of this item is closed; the host side is closed to 143 of the 209 names seen, and §12.5 states the residual and why it is not the 296 quoted above.
 3. **No non-anatomical host gate has been applied *except duration*.** Drift, noise level, and post-rescaling effective SNR are untested, and a recording at the top of §4 can still fail all of them.
    **Duration is now measured rather than missing** — see §4.4. The gap was real: the anatomy index records each AP series' shape but not its sampling rate, because these NWB series carry an explicit `timestamps` dataset rather than `starting_time`, and a sample count without a rate is not a duration. Codex found the path in review and confirmed it on one pinned asset; Session 6 applied it to all 11 candidates, which is the sequential-gate order ruling 7.3 asks for and avoids paying the timestamp-chunk transfer on 429 assets to learn something anatomy has already narrowed.
 4. **Ten feasible placements inside the band have not been demonstrated**, only made plausible by band width. Slot 7 makes this a gate: if ten placements cannot be supported without overcrowding or label ambiguity, the host fails.
@@ -499,3 +500,77 @@ The obvious way to compare the two columns is to match library templates to file
 **Closed:** the convention question raised in §10.4. The two columns are different quantities; the conversion between their definitions is measured; the restated target is on the record.
 
 **Left open, and named so it is not mistaken for closed:** whether the *preprocessing* difference matters. The donor averages are built on a 1 Hz highpass plus CMR; the host column is IBL's number on IBL's destriped data. This report measures the definitional difference and does not touch the preprocessing one. That second difference can only be measured once the stack is installed and a donor template can be rendered through the host's own preprocessing — which is Rung 0 territory, not metadata.
+
+---
+
+## 12. Session 9 — the CCF label map, completed without importing an ontology
+
+§5.2 named the largest open item nobody was working on: the hand-authored label map is materially incomplete, completing it appears to need an Allen CCF ontology, and the ontology carries a licensing question that had to be read rather than assumed. This section resolves both halves. The licence answer turned out to be the interesting one, because it closed the obvious path and forced a better one.
+
+### 12.1 The licence, read rather than inferred
+
+**Allen Institute Terms of Use — read at `https://alleninstitute.org/terms-of-use/`, 2026-08-12.** The Content may be used, copied, distributed and built on "for research or other noncommercial purposes," and "You may not redistribute the Content or Improvements for commercial purposes without our written permission." Attribution is required, and commercial exceptions are granted only by written permission from the Institute.
+
+**That is a genuine conflict with this project's standard, not a technicality.** *Project Details* requires commercial-use-permitting licences by default and allows a restrictive input only under an explicitly approved and named exception that states the downstream limits it creates. Importing the CCF ontology would have put a noncommercial restriction on a component of a shipped artifact — the Reproducibility Packet's label map — which is a decision about what Dandelion may release, not an implementation detail. That is a director-level call.
+
+**The permissive redistributions do not dissolve it.** `iblatlas` is MIT (read at `https://raw.githubusercontent.com/int-brain-lab/iblatlas/main/LICENSE`: "MIT License", "Copyright (c) 2023 International Brain Laboratory") and `brainglobe-atlasapi` is BSD-3. Both are honest about their own code. Neither is the Allen Institute, and a third party's permissive licence on a redistribution is not a grant of rights over the upstream content it redistributes. Treating an MIT wrapper as laundering the terms on the data inside it would be exactly the "import on the assumption that it will be fine" that the standard forbids.
+
+**No exception was requested and none is needed, because the ontology turned out not to be necessary.** Nothing was filed in `director_requests.md`: a request should be filed when the director is the dependency, and after §12.2 he is not.
+
+### 12.2 The bridge is derivable from data the project already holds
+
+The two vocabularies annotate the same physical places on the same probes, and the project holds both sides under commercial-use-permitting licences:
+
+| side | source | licence | what it carries |
+|---|---|---|---|
+| host | DANDI 000409 electrodes table | CC-BY-4.0 | CCF **long name** + `rel_y` depth, per electrode |
+| donor | `hybrid_template_library` rows | MIT | CCF **acronym** + `depth_along_probe`, per template |
+
+So the correspondence can be *read off* rather than imported: a donor at 2,900 µm in session S carrying `CA1`, next to a host electrode at 2,900 µm in session S labelled "Field CA1", is direct evidence that those two strings name the same structure. This is the evidence `validate_ccf_label_map.py` already uses to **check** the hand-authored table, run in the other direction to **build** the entries it lacks.
+
+`Reproducibility Packet/scripts/derive_ccf_label_map.py` → `results/ccf_label_map_derived.txt`, `results/ccf_label_map_derived_records.json`, and the map itself at `scripts/utils/ccf_label_map_derived.json`. **146.6 MB in 150 range requests, metadata only, no recording data read**; 32 of 37 donor insertions assigned a probe; 2,053 donor rows placed, none outside the 20 µm tolerance.
+
+**Result: 138 entries emitted, 94 of them structures the hand-authored table did not contain.** By tier: 119 acronyms saw exactly one host name, 23 cleared the two-thirds majority, 2 were ambiguous and are not emitted.
+
+### 12.3 The audit, which is the part that was not planned
+
+Every emitted entry is compared against the hand-authored table. This is a check nobody had run and the existing validation could not give: that run could only test names the table already contained, so it could confirm the table's *acronyms* but never its *long-name spellings*.
+
+**44 AGREE. 0 DISAGREE.** Every hand-authored entry the derivation reached independently reproduced its long name and acronym. The hand-authored table has now been checked from both directions and has no known error.
+
+**That result depended on getting the comparison right, and the first version got it wrong.** Comparing raw strings reported 31 disagreements; 30 were punctuation. The NWB export strips the commas the canonical Allen names carry, so `"Primary motor area Layer 5"` and `"Primary motor area, layer 5"` are the same structure and `to_acronym` already resolves them identically through `normalise`. **An audit that does not use the same key its lookup uses is not auditing the lookup.** The comparison now runs on the normalised key and the 30 false alarms are gone; the one real finding survived as a collision (§12.4).
+
+### 12.4 Two entries withheld, and why the withholding matters more than the entries
+
+A map keyed by long name can have two acronyms win the same name. The first version wrote them into a dict and **silently kept whichever came last** — the classic quiet failure the *Software engineering* standard exists to prevent. Collisions are now refused outright and reported:
+
+- `'Periaqueductal gray'` — claimed by `PAG` (50 votes, 4 insertions) and `IVn` (2 votes, 1 insertion). `IVn` is the trochlear nerve; it is not PAG. One donor sat one contact outside its own structure.
+- `'posteromedial visual area layer 6a'` — claimed by `VISpm6a` (12 votes) and `VISpm5` (2 votes). A layer-5 donor nearest a layer-6a electrode.
+
+Both are boundary contamination, and in both cases the majority claimant is obviously right. **Neither is emitted anyway.** The rule is not "prefer the better-supported claim" — this evidence cannot establish which claim is correct, only which is more common, and a map that resolves collisions by vote count would resolve a genuinely ambiguous one the same confident way. Two structures lost is a small price for a rule that cannot quietly guess.
+
+### 12.5 What this closes, and the ceiling it does not cross
+
+**Closed:** the donor side, completely. Every acronym the donor library uses in these 32 insertions is now either defined or explicitly reported as unresolvable, and the licence question in §5.2 is answered without an exception.
+
+**The ceiling, stated plainly:** a host structure that holds no donor template cannot be derived by this method, however common it is in the host. Across the 209 distinct host long names seen on the assigned probes, **143 are mapped and 66 remain unmapped**. Those 66 are not resolvable from this evidence and would need the ontology — which means the licence question returns if the region-unaware arm's placement ever lands in one of them.
+
+**Do not read the 66 against §5.2's 296.** The 296 came from the 46 screened recordings; the 209 here are the host names on the 32 donor-session probes. Different denominators over different recording sets. The honest statement is the one in the report: the derivation reached 143 of the 209 names it saw.
+
+### 12.6 How it is wired, and what it deliberately does not change
+
+`utils/ccf_labels.py` gains the derived layer as **opt-in on every call**. `to_acronym(label)` keeps its original hand-authored-only behaviour; `to_acronym(label, include_derived=True)` consults the derived layer, with the hand-authored entry always winning where both define a label. `provenance(label)` reports which layer answered — `hand-authored`, `derived:unanimous`, or `derived:majority` — so a region assignment can be reported with the strength of the evidence behind it rather than presenting a validated entry and a derived one as equally established.
+
+**The default was chosen so no existing consumer changes meaning underneath itself, and that was verified rather than asserted:** `validate_ccf_label_map.py` was re-run after the module change and reproduced `results/ccf_label_map_validation.txt` **byte for byte**.
+
+**The validation report was deliberately not regenerated against the derived map.** Validating derived entries with the evidence they were derived from would agree trivially and would look like independent confirmation. The 44 AGREE rows in §12.3 are the non-circular part — they test the table that was written before the data was consulted — and they are the only confirmation claimed here.
+
+### 12.7 One structural fact about the donor vocabulary, found on the way
+
+**The donor library's acronyms sit at mixed levels of the CCF hierarchy.** `MB` (Midbrain) and `OLF` (Olfactory areas) are parent structures, and they appear alongside `MRN` and `PIR`, which are their descendants. `MB` in particular is a majority entry precisely because host electrodes near `MB` donors are sometimes labelled with a child structure.
+
+This matters for the region-unaware arm and belongs in Codex's balance gate rather than here: **"same region" is not a well-defined test when one label is a parent of the other.** A donor labelled `MB` is not region-matched to a `MRN` injection zone in the sense Tier A means, and it is not cleanly mismatched either. CA1 is unaffected — it is a leaf structure and its sixteen donors are all labelled `CA1` — so this is not a Tier A blocker, but any zone change should check whether the candidate region has parent-labelled donors before assuming the region axis is clean there.
+
+### 12.8 Replay
+
+`derive_ccf_label_map.py --from-records` rebuilds the report and the map from `results/ccf_label_map_derived_records.json` with **no network reads at all**, the same pattern `screen_injection_placement.py --from-records` established. Verified: the replayed report and JSON are byte-identical to the tracked ones. Any later change to a tier rule, the majority fraction, or the presentation costs nothing and touches no remote file.

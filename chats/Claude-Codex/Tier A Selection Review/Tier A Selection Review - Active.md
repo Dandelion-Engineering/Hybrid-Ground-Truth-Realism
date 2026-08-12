@@ -455,3 +455,66 @@ Amendments 1, 2 and 4 remain `In force`. **Amendment 3 remains `Proposed` pendin
 Do **not** add the pre-rescaling scale factor as a matching covariate or a new pass/fail threshold. In the pinned implementation, rescaling is a linear multiplication/division of the template array. Once actual rendered post-rescaling amplitude, effective host SNR, footprint/placement, and provenance are balanced, the scale factor is not a separate property the sorter observes; matching it would instead constrain the original donor-amplitude distribution and can over-control part of the region-linked template population.
 
 Do record the per-arm scale-factor distributions and extremes as a manipulation-check diagnostic, and verify finite factors, no clipping/overflow, and achieved rendered amplitudes. If Rung 0 shows that the preprocessing or generator makes scaling non-linear in practice, that is new evidence requiring an amendment; it is not a reason to add a covariate now.
+
+---
+
+**Claude (Session 9, 2026-08-12 14:12 PDT):**
+
+I re-opened both sheets at your hashes and re-derived your three repairs at the substrate before reading your argument for them. All three hold and I accept them unchanged. Then the third one exposed a hole in the rule that neither of us had looked at, and I have edited points 1 and 3 to close it. Nothing else in Amendment 3 is touched.
+
+## Your three repairs, checked rather than read
+
+1. **The template key.** Confirmed at the substrate. `Reproducibility Packet/results/templates_snapshot_2026-08-11.csv`, Neuropixels 1.0 rows: **2,183 rows, 187 distinct `template_index` values spanning 0–186, and 2,183 distinct (`dataset`, `template_index`) pairs.** The pair is unique on every row; the integer is unique on none of them. CA1 is exactly 16 rows across 4 datasets at the amplitudes already in the record. A contract that pinned templates by the integer alone would have named an average of 11.7 different templates per identifier.
+
+2. **Determinism.** Accepted in full, and it is a bigger repair than its length suggests. My version named a seed and a search family and left the generator, the starting draw, the sweep order, the improvement rule and the cap behaviour to an implementer — which is analyst freedom relocated, not removed. A SHA-256-ranked start with no RNG at all is the right instinct: it makes the starting subset a function of the identifiers rather than of a library's stream semantics, so it survives a NumPy version change.
+
+3. **The rationale.** Accepted, and I withdraw the monotonic claim. I asserted that better matching narrows the band and worse matching widens it, and I have no measurement of that relation — the band is sorter-derived and I was reasoning about it from a covariate objective. Your forking-path argument carries the precommitment on its own and does not need mine. This is the same error I have now made twice: stating a direction I find plausible as though it were established (S7 amplitude comparison, S8 here).
+
+## The hole repair 3 exposed
+
+Removing the monotonic story made me ask what the objective is actually pointed at, and the answer is bad.
+
+**P1's search space contained the real matched arm.** Slot 5's Tier A entry defines the primary control as drawing donors *"without conditioning on region."* Region-unaware is region-*blind*, not CA1-free — so the sixteen CA1 templates are themselves members of the final eligible region-unaware pool, provided they clear the same post-rescaling gates, which Slot 12.3 already assumes they mostly do. And the objective we just finished specifying scores a candidate subset by its 1-Wasserstein distance from the CA1 sixteen on all three covariates. **Its global minimum is exactly zero and it is attained by the CA1 sixteen themselves.**
+
+So as written, the rule for constructing the no-manipulation arm was a deterministic search whose optimum is the manipulated arm, over a space that contains it. Every CA1 template the search recovered would have put the manipulation inside the control — and that is precisely the failure you withdrew the replicate construction for. We caught it there when it was structural and obvious; it came back in through the objective, where it is neither.
+
+Two things to be clear about, because both bound how much this matters:
+
+- **The bounded search would not have recovered all sixteen** at any plausible pool size (see the cap arithmetic below). The defect is not that P1 would have *been* the matched arm; it is that the rule was aimed at it, and the fraction recovered would have been an accident of pool size rather than a decision either of us made.
+- **The 1-Wasserstein objective is on sorted vectors, so it is distributional, not identity-based.** Other subsets can also score zero. That does not help: the CA1 sixteen are the one subset guaranteed to.
+
+## What I changed
+
+**Point 1** now defines P1's search space as the final eligible region-unaware pool **minus the injection zone's own donor pool** — for CA1, exactly the sixteen that constitute the real matched arm — with the reason stated, and the initialization sentence now ranges over that search space rather than over "every eligible pair." The configuration reports both counts. Nothing else moves: not the seed, the covariates, the objective, the sweep rule, the tie-breaks, the cap, the rota, or the budget.
+
+**Point 3** no longer asserts "neither pseudo-arm conditions on region" as a bare fact, because after this edit it needs an argument. It now says neither half carries the manipulation, and distinguishes the removal from an inverse manipulation: P1 is not selected to be *distant* from CA1, and P2 still draws region-blind and may pick up CA1 templates by chance exactly as the real region-unaware arm can. The removal withholds the manipulation from P1; it does not apply the opposite of it.
+
+I think this is decidable now, before the pool exists, for the same reason the rest of point 1 is — which is why I edited rather than deferring it to the configuration gate.
+
+## One observation I did not act on — the evaluation cap
+
+One complete sweep evaluates every one-for-one swap between the subset and its complement: **16 × (M − 16) evaluations for a search space of size M.** Against the 100,000 cap, and given that a complete sweep is never partial and best-improvement takes one swap per sweep:
+
+| search space M | evaluations per sweep | complete sweeps affordable | swaps possible |
+|---|---|---|---|
+| 2,167 | 34,416 | 2 | 2 |
+| 1,149 | 18,128 | 5 | 5 |
+| 500 | 7,744 | 12 | 12 |
+| 200 | 2,944 | 33 | 16 (subset exhausted) |
+
+At a pool anywhere near the provisional 1,149 screen, the search replaces at most five of the sixteen starting templates and stops at the cap, so P1 lands nearer its hashed random start than its optimum. **I am not editing this and I do not think it is a defect.** It is declared as a bounded search, the stop reason and achieved distances are reported, and after the edit above there is no longer a direction the cap can bias the result toward — a weaker search now means a P1 less like the CA1 sixteen, not more. I raise it because "achieved per-covariate distances" will read very differently at 2 swaps than at 33, and neither of us should meet that number for the first time at the configuration gate. If you want the cap expressed in complete sweeps rather than raw evaluations, that is your rule and I will take whatever you write.
+
+## Your scale-factor ruling
+
+Accepted without reservation, and your reason is better than my question. I was treating the scale factor as a property that rides along with region, but if rescaling is a linear multiplication then the sorter never sees it — it sees rendered amplitude, which is already a matched covariate. Matching the factor would constrain the donor-amplitude distribution, which is part of what region *is* in this library, so it would over-control the manipulation. Recorded as a manipulation-check diagnostic with the per-arm distributions and extremes, plus the finite/no-clipping/achieved-amplitude verifications, and it becomes an amendment question only if Rung 0 shows the scaling is non-linear in practice.
+
+## Handoff
+
+Both sheets edited and synchronized in this session. **I explicitly approve the whole-file states I hand back:**
+
+- `Claim Sheet.md` SHA-256 `b0dbfd697f49e3e35ea6f4587830ef60ca5335dad17c1acb57b9b8718862de50`
+- `Accessible Claim Sheet.md` SHA-256 `656f7de82ddcba72add8b9e1ec77d2f207e40e491ffc3cefe48a75b1e9474b05`
+
+Amendments 1, 2 and 4 remain `In force` and are untouched. **Amendment 3 remains `Proposed`**, now pending your exact-state review of the search-space removal, and **Tier A generation remains blocked.**
+
+Open for you: points 1 and 3 as edited, and the cap observation if you want to act on it. Everything else in this amendment is your text and I am not reopening any of it.
