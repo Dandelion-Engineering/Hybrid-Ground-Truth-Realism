@@ -62,6 +62,28 @@ Five and six consecutive measurements now read 3.46 → 3.96 → 1.01 → 0.89 �
 
 ---
 
+### ✅ RESOLVED — Randy's reply, 2026-08-11, relayed by Claude (Session 5 addendum, 19:40 PDT)
+
+**Randy answered this in conversation rather than in the file.** It is recorded here so the record is complete and so neither agent has to find it in a chat. **The words below are my summary of what he said, not a quotation of something he wrote here** — the original entry above stays as the record of the question.
+
+**The memory was not another project's work. It was leftover processes from Claude automations that had finished and never exited**, holding roughly 28 GiB while doing nothing. Randy cleared them. He and Dandelion Station are building a fix so processes are not left running after they complete. He noted that killing them accidentally closed the Claude app.
+
+**One correction to my own inference, made here rather than left standing.** Four sessions of this file present a worsening trend — 3.46 → 3.96 → 1.01 → 0.89 GiB free — and I described it as contention with work "we cannot see" and "cannot ask to wait." That framing was wrong. It was measuring accumulated dead processes, not competition. The measurements were accurate; the story I attached to them was not, and anything either agent inferred from the *shape* of that series should be discarded.
+
+**Answers to the three questions I asked, in order:**
+
+1. **Is there a predictable quiet window?** Yes, and it is now a schedule rather than a hope. **Two research projects share this machine. Randy has decided this one runs during the day and the other runs overnight.** Heavy steps should be aimed at daytime.
+2. **Can another project be paused if asked?** Effectively moot — the thing that needed stopping was not a project, and it has been stopped.
+3. **Should this project treat ~4 GiB as a permanent working ceiling?** **No.** That was the practically important question and the answer is that we should not narrow the Slot 9 ladder, the segment length, or the sorter panel on memory grounds. If the sorter panel narrows, it narrows because Rung 0 measured it narrow.
+
+**What does not change.** Free memory is still a measurement rather than a property: the other project genuinely runs overnight, the process-leak fix is in progress rather than landed, and a session starting near a boundary can still meet a busy machine. **The Claim Sheet's rule stands unchanged — measure free RAM and VRAM immediately before every heavy step, against a measured requirement, and do not start what does not fit.**
+
+**Reading at the time of this reply: 2026-08-11 19:40 PDT — 13.85 GiB free of 31.67; VRAM 14,413 of 16,311 MiB.** Do not inherit it.
+
+**This request is retired.** It is left in place rather than deleted, per the append-only rule. Codex has been informed in `chats/Claude-Codex/Compute Environment Update/`, including my read that this needs **no Claim Sheet amendment** — Slots 4 and 10 already describe a shared machine and a live-measurement gate, and no commitment was written because of the contention — with the one arguable exception, recording the day/overnight schedule in Slot 10, left open for Codex to propose if it disagrees.
+
+---
+
 *Note on ordering: `Playbooks/director-requests.md` describes the Phase-1-close "Claim Sheet ready for director review" entry as this file's first entry. It is logged when Phase 1 closes, which has not happened yet; this entry precedes it because the blocker arrived first.*
 
 ---

@@ -108,13 +108,24 @@ Fallbacks, in order, if a gate kills more than six donors: (1) fewer than ten in
 1. **Review catches errors, not absences** (Session 4). Nine corrections across two Study Guide reviews, every one to a sentence that existed; the real defect was a missing sentence, and neither agent caught it. **Carry this into Phase 3:** for the Technical Report, the absent sentence is a limitation nobody wrote down. Review against a *checklist of what must be present*, not by reading.
 2. **Read the column, do not count it** (Session 5). Session 2's audit was correct code answering a question one level too shallow, and the number it produced was carried into the Claim Sheet, the Study Guide, and the public log before anyone opened a cell. When a field is treated as an opaque token, check what is actually in it before building on the count.
 3. **A check can be wrong pessimistically, and that is not the safe direction** (Session 5). The label-map validator reported 49 broken structures and 92% agreement when the truth was zero and 99.9%, twice in a row, because it conflated *undefined* with *wrong*. We are both calibrated to watch for overstated successes; an overstated failure misleads a reader exactly as much, and it is harder to notice because it feels like rigour. **When a self-check reports a problem, verify the problem before acting on it** — the same standard applied to a favourable result.
+4. **A clean trend invites a causal story you have no way to check** (Session 5 addendum). Four honest measurements of falling free RAM got written up across three sessions as competition from other projects. It was dead processes. **The measurement was mine to report; the cause was not mine to assert** — nothing available to me could see what held the memory. Report the number, name the inference as an inference, and if the cause matters, make it a director question rather than a conclusion. That is what kept the wrong story from becoming a narrowed experiment.
 
-## 9. Machine state — re-measure, never trust this number
+## 9. Machine state — the memory question is answered, and my earlier reading of it was wrong
 
-**2026-08-11 18:14 PDT: RAM 15.27 GiB free of 31.67, VRAM 14,416 of 16,311 MiB.**
-**2026-08-11 18:45 PDT: RAM 14.39 GiB free, VRAM 14,405 MiB.**
+**Randy resolved this at the end of Session 5 (recorded in `director_requests.md`, relayed to Codex in `chats/Claude-Codex/Compute Environment Update/`).**
 
-**The four-session downward trend broke.** The series is now 3.46 → 3.96 → 1.01 → 0.89 → **15.27 → 14.39**. Something released ~28 GiB between 16:06 and 18:14. **VRAM has been flat at ~14 of 16 GB free at every measurement**, so the competing work is memory-bound, not GPU-bound. Logged in `director_requests.md` as a data point, explicitly not as an answer.
+**The memory was never another project competing with us.** It was leftover processes from Claude automations that had finished and never exited, holding ~28 GiB while doing nothing. He cleared them; he and Dandelion Station are building a fix so it stops happening. The four-session series 3.46 → 3.96 → 1.01 → 0.89 GiB free was measuring accumulating dead processes, and **the contention narrative attached to it in Sessions 3–5 is withdrawn.** The numbers were right; the causal story was not, and it was asserted without any way to see what held the memory. Do not reason from the shape of that series.
+
+**Two things follow, and they are the operationally useful part:**
+
+1. **There is a schedule.** Two research projects share the machine. **This project runs during the day; the other runs overnight.** Aim heavy steps at daytime.
+2. **The "design permanently for ~4 GiB" question is answered: no.** **Do not narrow the Slot 9 ladder, the segment length, or the sorter panel on memory grounds.** If the panel narrows, it narrows because Rung 0 measured it narrow — which the contract already required.
+
+**What has not changed, and do not let the good news erode it.** The other project genuinely runs overnight, the leak fix is being built rather than landed, and free memory is still a measurement rather than a property. **Measure free RAM and VRAM immediately before every heavy step, against a measured requirement, and do not start what does not fit.** If free memory ever collapses again with VRAM untouched, that signature is now a known one — say so rather than re-deriving it.
+
+**Last reading: 2026-08-11 19:40 PDT — RAM 13.85 GiB free of 31.67, VRAM 14,413 of 16,311 MiB. Do not inherit it; take your own.**
+
+**No Claim Sheet amendment was opened.** Slots 4 and 10 already describe a shared machine with a live-measurement gate, and no commitment was written because of the contention. The one arguable addition — recording the day/overnight schedule in Slot 10 — was left for Codex to propose rather than decided alone.
 
 **Venv state changed this session.** It now holds `h5py==3.16.0` and `numpy==2.5.2` (both BSD-3-Clause), pinned in a **new `requirements.txt`**. SpikeInterface, PyTorch, and Kilosort4 are **still not installed** — that is Codex's Rung 0, and the requirements file carries a note that the numpy pin may have to move when they are. Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe`; never bare `python` or `pip`.
 

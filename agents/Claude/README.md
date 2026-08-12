@@ -74,6 +74,7 @@ There is no scratch area in this workspace yet. If one becomes necessary, it wil
 | `chats/Claude-Codex/Claim Sheet Review/` | Opened by me. **Concluded** (Codex, Session 4) — see its `Summary.md`. |
 | `chats/Claude-Codex/Study Guide Pass 1 Review/` | Opened by me (Session 3). **Concluded** (Codex, Session 4) — see its `Summary.md`. |
 | `chats/Claude-Codex/Tier A Selection Review/` | Opened by me (Session 5). Active. The selection proposal handed to Codex for its gate. |
+| `chats/Claude-Codex/Compute Environment Update/` | Opened by me (Session 5 addendum). Active. Relays the director's answer on shared-machine memory and the day/overnight run schedule. Informational — needs a reply only if Codex disagrees with the no-amendment read. |
 | `Study Guide/Pass 1 - Conceptual Foundation.tex` | **Written by me (Session 3); reviewed and edited by Codex (Session 3); re-reviewed by me (Session 4); explicitly approved by Codex (Session 4) at the same source/PDF state.** Same-state closed at source `d33e74d…` / PDF `75e1423…`. 13 pages. Changes from here go through the amendment protocol. |
 | `Accessible Claim Sheet.md` | **Written by me (Session 4) against the exact approved Claim Sheet state; explicitly approved by Codex (Session 4) without edits.** Same-state closed at SHA-256 `73bff8f…`. Mine under the agreed labor split. **It must be kept in sync with the technical sheet forever; drift between them is a defect, not a backlog item.** |
 | `Technical Report/` (not yet created) | **Default writer**, Codex reviews. |
@@ -81,7 +82,7 @@ There is no scratch area in this workspace yet. If one becomes necessary, it wil
 | `Study Guide/Pass 2 - Concept Delta.tex` (not yet created) | **Default writer**, Codex reviews. Phase 3, under the no-spoiler rule. |
 | `Reproducibility Packet/` | **Co-owned** with Codex — its contents come out of both agents' execution. Created Session 2, early, per the packet-ready-as-you-go standard. |
 | `Reproducibility Packet/results/` | Outputs and pinned upstream snapshots from my Session 5 scripts. The two snapshots (`templates_snapshot_2026-08-11.csv`, `dandi_000409_assets.json`) are **inputs a reader needs**, not rebuildable outputs — upstream is mutable, so "re-download it" is not equivalent. `.gitignore` carries a note so nobody adds a rule that catches them. |
-| `director_requests.md` | **Created by me (Session 3).** Shared, append-only. Carries two open entries — shared-machine RAM contention (fallback attached, non-blocking; measurements appended in Sessions 4 and 5) and Codex's Phase-1-close contract review. Neither blocks. |
+| `director_requests.md` | **Created by me (Session 3).** Shared, append-only. The shared-machine RAM entry is **resolved and retired** — the director answered it at the end of Session 5 and the reply is recorded in place, including a correction to my own reading of the trend. Codex's Phase-1-close contract review remains open and does not block. |
 
 ---
 

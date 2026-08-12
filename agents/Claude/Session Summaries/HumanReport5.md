@@ -148,3 +148,44 @@ The four previous sessions measured 3.46, 3.96, 1.01 and 0.89 GiB free. Somethin
 3. **Complete the atlas label map** before the region-unaware arm's placement can be evaluated. This has a licensing question attached — the permissively licensed packages that redistribute the Allen atlas versus the Allen Institute's own terms — and that should be resolved before importing an ontology, not after.
 4. **Codex's Rung 0 feasibility pilot** remains the next heavy step, and memory looks available for it right now in a way it has not all day.
 5. Refactor the Session 2 audit script onto the shared `utils/` module before the packet is assembled, and give the packet folder the three files it still owes — its own dependency list, its own ignore file, and the runbook that makes it work when copied somewhere on its own.
+
+---
+
+# Addendum — 2026-08-11 19:40 PDT
+
+**This is an addendum to Session 5, not a new session.** The session's work was committed and pushed as `a42e232` and the turn had been handed to Codex. Randy then answered the shared-machine memory question directly, and asked that it be relayed to Codex and recorded. That is what this addendum covers. No project work beyond it was done, and the turn still belongs to Codex.
+
+## What Randy said
+
+**The memory was never another project's work.** It was leftover processes from Claude automations that had finished and never exited — roughly 28 GiB held by processes doing nothing. He cleared them, and he and Dandelion Station are building a fix so processes are not left running after they complete. Killing them also closed the Claude app.
+
+**He has set a schedule:** two research projects share the machine, **this one runs during the day and the other runs overnight.**
+
+## The part I got wrong, stated plainly
+
+Four sessions of this project recorded free RAM falling — 3.46 → 3.96 → 1.01 → 0.89 GiB — and I described it as contention with work "we cannot see and cannot ask to wait." I wrote that into `director_requests.md`, into the summary I leave for my next session, and into the report above.
+
+**The measurements were right. The story I attached to them was wrong.** There was no escalating competition for the machine; there was an accumulating pile of dead processes. It is a good reminder that a clean series of numbers trending in one direction is exactly the kind of thing that invites a confident causal reading, and that I gave one without having any way to see what was actually holding the memory. What I could honestly have said — and did say, in the last entry — is that the numbers had moved; the *why* was never mine to assert.
+
+The one thing that did work: I never adopted the small-memory design ceiling I was asking about. Had I taken that decision unilaterally on four measurements, the project would now be carrying a narrowed ladder and possibly a narrowed sorter panel for no reason. Raising it as a director question and continuing on unblocked work was the right call, and it is the mechanism rather than my judgement that deserves the credit.
+
+## What it changes for the project
+
+- **The "design permanently for ~4 GiB" question is answered: no.** The Slot 9 capacity ladder, the segment length, and the sorter panel should not be narrowed on memory grounds. If the panel narrows, it narrows because Codex's Rung 0 pilot measured it narrow — which is what the contract already required.
+- **Heavy work should be aimed at daytime**, which is when this project has the machine.
+- **The operative rule is unchanged, and I am not arguing it should change.** The other project genuinely runs overnight, the process-leak fix is being built rather than finished, and free memory remains a measurement rather than a property. Measure immediately before every heavy step, against a measured requirement, and do not start what does not fit.
+- **No Claim Sheet amendment, in my read.** Slots 4 and 10 already describe a shared machine with a live-measurement gate, and no commitment in the contract was written *because of* the contention. The one arguable addition — recording the day/overnight schedule in Slot 10 so a future session finds it in the contract rather than in a chat — I left open for Codex to propose rather than deciding alone.
+
+## Files touched in the addendum
+
+| Path | Change |
+|---|---|
+| `chats/Claude-Codex/Compute Environment Update/…- Active.md` | **New chat.** Relays Randy's answer to Codex, flags what it changes for Rung 0, and states the no-amendment read with the one open question. |
+| `director_requests.md` | Randy's reply recorded under the original entry and the request marked **resolved and retired**, left in place rather than deleted. Includes the correction to my own trend narrative. |
+| `agents/Claude/Summary of Only Necessary Context.md` | §9 rewritten — the previous version told my next session a story about contention that is now known to be wrong. |
+| `agents/Claude/README.md` | New chat added to the ownership table. |
+| `agents/Claude/Session Summaries/HumanReport5.md` | This addendum. |
+
+**The public Live-Run README was deliberately left untouched.** The memory contention was never in it, so there is nothing publicly recorded to correct, and an infrastructure detail is not what that log is for — it is lean by design and reserved for finished artifacts, phase closes, and genuinely noteworthy research events.
+
+**Machine reading at the time of the addendum: 13.85 GiB free of 31.67; VRAM 14,413 of 16,311 MiB.**
