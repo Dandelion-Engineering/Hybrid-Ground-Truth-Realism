@@ -1,84 +1,91 @@
 # Summary of Only Necessary Context — Claude
 
-**Rewritten at the end of Claude Session 6 · 2026-08-11 21:32 PDT**
-**Next session will be Claude Session 7.**
+**Rewritten at the end of Claude Session 7 · 2026-08-12 10:20 PDT**
+**Next session will be Claude Session 8 — which is a count-based progress-report trigger. Do the session's work first, then write `Progress Reports/Progress Report Session 8.md`.**
 
 You start with no memory of the last session. This file restores the state and nothing else. It omits anything already in `Project Details/Project Details.md`, the `Playbooks/`, or `AgentPrompt.md` — you re-read those anyway.
 
-**Read `Claim Sheet.md` before doing any work**, including its new `## Amendments` section at the end. The text above that section is the same-state-approved contract and still governs; the two amendments below it are **`Proposed`** and carry no force until Codex approves the exact bytes. `Accessible Claim Sheet.md` is the same content in plain language and carries the same two amendments.
+**Read `Claim Sheet.md` before doing any work**, including its `## Amendments` section. Amendments 1 and 2 are `In force` and govern. Amendments 3 and 4 are **`Proposed`** and carry no force until Codex approves the exact bytes. `Accessible Claim Sheet.md` is the same content in plain language and carries the same four amendments.
 
 ---
 
 ## 1. Where the project is
 
-**Phase 2 — Execution.** **No scientific result exists, and no sorter has been run.** Nothing has been downloaded beyond bounded metadata range reads.
+**Phase 2 — Execution. No scientific result exists, no sorter has run, no host is pinned, and nothing beyond bounded metadata range reads has been downloaded.**
 
 | Artifact | State |
 |---|---|
-| `Claim Sheet.md` | Approved text at `a5f5860…` (Session 4) + **Amendments 1 and 2, `Proposed`** (Session 6). Whole-file hash now `e2c352fd34545ac24bdf3ea10fd902262803715cd105045724fcf55b756937a9`. |
-| `Accessible Claim Sheet.md` | Same, whole-file hash `1a17b4f33a05cf7ee696bc6a79e0cd299367c4aec7b5dec0294a7b84c2c47958`. |
-| `Study Guide/Pass 1….tex` / `.pdf` | Same-state approved, `d33e74d7…` / `75e14232…`. Unchanged. |
-| `agents/Claude/Tier A Host and Injection Zone Selection.md` | Draft 3, **`3ae39913986a1961d674d2ed7b4714f89293fa6f0e8c02f039ebca3c186696cf`**, explicitly approved by me and handed to Codex. Review still open. |
-
-**Your progress-report counter: Session 8 is your next count-based trigger.** Session 6 closed no phase and approved no amendment, so nothing extra is owed yet. **If your session writes the approving turn on Amendment 1 or 2, you owe a progress report** — that is one of the two event triggers.
+| `Claim Sheet.md` | Approved Phase-1 text + **A1, A2 `In force`; A3, A4 `Proposed`**. Whole-file `a43eb4f686cb5baed399ef07151cc37dff27b2d983e1bfa1a5d0465a59b96fba`. |
+| `Accessible Claim Sheet.md` | Synchronized. Whole-file `71eedf5eee9b3bd64ab93077695cc9c622fd78d8a466c3e35599fa1f065d2134`. |
+| `Study Guide/Pass 1….tex` / `.pdf` | Same-state approved, `d33e74d7…` / `75e14232…`. Unchanged since Session 4. |
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` | **Draft 4**, `c3303cf35837120d22af4a992a2e8d1357d983c9243812173f7484bcd3763113`, explicitly approved by me and handed to Codex. §1–§8 are the jointly approved Draft 3 text; §9 and §10 are new. |
 
 ## 2. The first thing to do next session
 
-**Open `chats/Claude-Codex/Tier A Selection Review/`.** Everything live is there. Three things are outstanding and two of them are Codex's move:
+**Open `chats/Claude-Codex/Tier A Selection Review/`** — it is the only active chat and everything live is in it. Three things are outstanding and all three are Codex's move:
 
-1. **The contested negative-control construction** (see §3 below). If Codex has replied holding its position, **that is two round-trips and it goes to Randy** — scoped to that one question, not the artifact. Do not loop. If Codex has accepted the counter-proposal, write the third amendment (Slot 5's Tier A implementation note) into **both** sheets in the same session.
-2. **Exact-state review of Amendments 1 and 2.** If Codex approves, flip both status lines from `Proposed` to `In force` with the date of its approval, in both sheets, same session.
-3. **Codex's reply on the injection-stage finding** (§5.3 below).
+1. **Exact-state review of Amendments 3 and 4.** If Codex approves, flip both status lines to `In force` with the date, **in both sheets, same session**. **Amendment 3 blocks all Tier A generation until it is `In force`** — that prohibition comes from Amendment 2 and Amendment 3 discharges it, not before.
+2. **Who measures the donor template footprint.** I asked; see §4 below for why it matters more than anything else open.
+3. **Whether to set an overcrowding threshold.** I proposed declining. If Codex wants one, that is a contract amendment, not a script parameter.
 
-`chats/Claude-Codex/Compute Environment Update/` needs nothing from you unless Codex disagrees with something; I invited it to conclude that chat itself.
+**If your session writes the approving turn on A3 or A4, you owe a progress report** — and Session 8 owes one anyway on the count.
 
-## 3. The one open disagreement — do not soften it and do not let it drift
+## 3. What Session 7 settled
 
-**Codex proposed replacing Tier A's negative-control band with a replicate-stability band; I accepted the diagnosis and rejected the implementation.** The full argument is §8.3 of the Tier A artifact and the Session 6 chat message. The short form:
+### 3.1 Amendment 2 is closed, and checking it produced Amendment 4
 
-- **The problem is real and is originally mine:** the matched arm draws from 16 CA1 donors, the unaware arm from 1,149, so a same-condition pseudo pair drawn from one pool does not resemble the real contrast.
-- **Codex's fix:** each pseudo block is an independently seeded replicate of the whole contrast; the band is the difference between real and pseudo interaction estimates.
-- **Why I rejected it — the third reason is the load-bearing one.** (1) It stops being a *negative* control: both halves contain the manipulation, so it answers "does it reproduce?" not "can the machinery fake it?", and Slot 8 shows that band to Randy as the second question. (2) It partly duplicates the primary bootstrap. (3) **If the selection/matching machinery itself induces a systematic sorter-by-arm interaction, a replicate band shows the artifact identically in both estimates, the difference is ~0, the band looks tight, and we publish a procedural artifact as a positive result.** Nothing else in the design points at that failure, and Tier A is where it is likeliest because Tier A cannot hold donor identity fixed.
-- **My counter, at identical cost:** pseudo-arm P1 draws from a *fixed random 16-template subset of the region-unaware pool* (chosen once, covariate spread approximating the CA1 sixteen, reused across all five pseudo blocks on the same rota); P2 draws from the full unaware pool, covariate-matched to P1. Neither arm conditions on region, so **Slot 5's existing wording is satisfied literally** — an implementation note, not a redefinition of the contract's strongest control. Mirrors pool size, repetition, matching and clustering.
-- **The boundary I stated rather than hid:** it does not mirror the matched pool's *region* homogeneity, and no no-manipulation control can, because region homogeneity is the manipulation.
+Codex removed "one mouse strain" (technical) and "same rig design / same mouse strain" (accessible) from Amendment 2 as unestablished. I verified at the substrate instead of accepting the argument, and found more than the removal claimed. `Reproducibility Packet/scripts/audit_subject_provenance.py` → `results/subject_provenance.txt`, 21 subjects, 88.7 MB metadata:
 
-## 4. What Session 6 settled
+- **The files carry no `genotype`, `strain` or `description` field at all.** Strain is *unverifiable*, not merely unsupported. **Never report it as shared or as different.**
+- **All 12 donor subjects are `cortexlab`/UCL.** The whole NP1.0 donor library is one laboratory's work → new **Slot 13.10** in Amendment 4.
+- **All 9 candidate host subjects are `churchlandlab`/CSHL or `angelakilab`/NYU.** Zero overlap. Host/donor separate at **laboratory, institution and rig**, not just animal — stronger than the contract claims.
+- Boundary: one asset read per subject, so `lab` is verified per session read. Not a gate; every candidate already satisfies it.
 
-### 4.1 Two of Codex's three rulings are accepted and are now Amendment 2
+**The transferable lesson: removing an unverified claim can create a new one.** A limitations list that stops mentioning strain reads as though strain were checked and found different.
 
-- **Host provenance is chosen, not excluded** — the host must be one of the 127 DANDI 000409 subjects absent from the donor library's twelve, which makes insertion/session/subject exclusion vacuous at once. Residual shared-dandiset/consortium/probe/strain boundary stays as a limitation. **Subject separation is not provenance independence; never let a draft imply it is.**
-- **Exact donor-source blocking** attempted at insertion → session → subject before falling back to the source-*count* balance, with any relaxation reported per arm.
-- **All 16 CA1 donors eligible** (the caliper is a matching diagnostic, not a filter), drawn on a **seeded exposure-balanced rota** — each appears 3–4 times across the 50 matched slots.
-- **New Slot 13.9:** Tier A's donor-population statement is conditional on the complete 16-template CA1 library, **reported even if the interval is narrow**, because more blocks buy precision and cannot buy donor diversity.
-- **Amendment 1** records the day/overnight machine allocation and withdraws the contention story, preserving every admission rule and moving no capacity commitment.
+### 3.2 Amendment 3 settles the negative-control band
 
-### 4.2 The duration gate is discharged, and it separated nobody
+Codex accepted my counter-proposal (P1 = fixed seeded 16-template subset of the region-unaware pool; P2 = full unaware pool matched to P1; neither conditions on region) and withdrew its replicate-stability construction — but ruled it a contract change, not an implementation note, because Slot 5 says "same selection ... procedure." Amendment 3 delivers all seven contents Codex specified, Tier A-only, and adds one obligation Codex did not ask for: **Slot 8's Panel 2 caption and the Technical Report must name which band construction is shown**, because otherwise one grey band means two things in one report.
 
-`screen_host_timing.py`, 11 of 11 candidates, 317.3 MB metadata-only, zero failures. Report: `Reproducibility Packet/results/host_timing_CA1.txt`.
+### 3.3 The placement gate is applied — Slot 7's last metadata-only gate
 
-| | |
-|---|---|
-| Durations | **54.2 – 87.1 min**; all pass the 10-min gate by ≥5× |
-| Channels | **384 on every candidate** |
-| Rates | 29,999.997 – 30,000.298 Hz, **per probe, not per session** |
-| Timestamps | Constant dt to 4 decimals in µs at both ends, strictly increasing |
+`Reproducibility Packet/scripts/screen_injection_placement.py` → `results/injection_placement_CA1.txt` / `.json`. 13 bands, **170.2 MB metadata, zero failures.**
 
-**Three things to carry forward.** (a) **384 channels is 4× the 96-channel feasibility run** that is the project's only proof this machine sorts anything; the reassuring ratio is that 384 ch × 10 min is 0.65× that run's sample-value count and a 60 s Rung 0 segment is 0.065× — **a data-volume ratio, not a memory measurement**, and it is Codex's pilot that settles it. (b) The two probes in one recording have **different clocks**; irrelevant now, immediate if the depth-specific-zones fallback is taken. (c) **Regular timestamps are also what a generated timestamp vector looks like** — the check shows the clock is usable, not that no samples were dropped. Do not let that get upgraded.
+- **Label ambiguity: closed.** All 13 bands **100% pure**; nearest other structure exactly 20 µm beyond each edge; recomputed band matches the index on all 13; raw and processed electrode tables agree contact-for-contact on all 13.
+- **Placement capacity: 9 of 13 pass** at 60 µm edge margin / 40 µm separation. **Both are declared, not measured** — at 100 µm only 5 pass, at 140 µm only 2. **The verdict is parameterized, not decided.**
+- **Overcrowding measured, not gated.** Ten injected units = +3.7%…+45.5% of native clusters, +17%…+1000% of `good` units. The Claim Sheet fixes no threshold and a script is not where one gets invented.
 
-### 4.3 Corrections I accepted after verifying them at the source
+### 3.4 Two findings that arrived sideways
 
-- **The 1,401/1 label-map result is internal consistency, not independent validation.** The upstream builder takes `brain_area` from IBL's sorting metadata and the NWB electrode table is another export of the same registration. I read `upload_ibl_templates.py` myself; Codex was right and I was overclaiming.
-- **"Host and donor share a preprocessing chain" was unsupported** and is removed. Donor templates come out of `common_reference(highpass_filter(phase_shift(...), freq_min=1.0))`; host raw data has had none of it. The real residual is shared *acquisition*.
-- **The fallback order was wrong.** Reducing below ten injected units is not a casual first fallback; it is a contract commitment and would need a scientific amendment.
+- **NYU-39 Probe00 should be dropped on yield, not geometry.** 22 sorted units in its CA1 band, **one** `good`, versus 174/32 in a comparable CSHL047 band. It passes the geometric gate at exactly ten sites.
+- **The 50–200 µV rescaling target brackets `good` units** (51–110 µV median, p90 to 258) and is too loud for the MUA population (all-unit medians 20–60 µV). **Caveat is load-bearing:** IBL's `median_spike_amplitude_uV` convention versus the donor library's `amplitude_uv` is **unverified**. Run that check before treating the target as validated.
+
+### 3.5 A shortcut found and rejected
+
+`cumulative_drift_um_per_hour` exists in the processed files and would have discharged the drift gate for free. Its values reach ~6.5 × 10⁶, which is impossible for a probe in a mouse brain, so the name does not describe the values. **Not used. Drift is still open.** Do not rediscover this column and trust it.
+
+## 4. Host selection: where it stands, and the one thing that unblocks it
+
+Gates **discharged**: anatomy · duration · donor-lab separation · label ambiguity · placement capacity *at declared parameters*.
+Gates **open**: **donor template footprint measurement** (re-decides placement) · **drift** · **noise** · **post-rescaling effective SNR** · **Codex's covariate balance**.
+
+**The footprint measurement is the highest-value remaining piece of my share.** It converts the placement gate from parameterized to decided, and it needs the template arrays from the upstream zarr store (`s3://spikeinterface-template-database/…`, paths in `results/templates_snapshot_2026-08-11.csv`). If Codex's Rung 0 pulls templates through SpikeInterface anyway, measuring extent there is nearly free; doing it myself costs a separate zarr reader. **Do not start writing that reader before reading Codex's answer in the chat.**
+
+**Recommended order for spending the remaining gates** (a recommendation, not a selection — nothing downstream may treat it as one):
+
+1. **CSHL047 Probe01** — 700 µm, 174/32 units, the only band holding ten at every swept parameter up to a 140 µm margin.
+2. **NYU-12 Probe01** — 640 µm, 267/60 units, densest native neighbourhood and smallest relative perturbation.
+3. **CSHL047 Probe00, session b52182e7** — 560 µm, 182/35, same recording as (1), so the natural depth-specific-zones fallback. **Its two probes carry different clocks** (§4.4 of the artifact).
+
+**First-admissible, never "best"** (Codex ruling 7.3, accepted). Do not resume the 46-of-429 anatomy survey out of tidiness; resume only if every current candidate fails.
 
 ## 5. What is still not done — do not let a later session assume otherwise
 
-1. **No host is pinned.** The artifact is a *strategy and zone recommendation*. Remaining gates: **drift, noise, post-rescaling effective SNR, ten-placement feasibility, covariate balance.** The last is Codex's and decides whether Tier A runs at all.
-2. **The host survey stays at 46 of 429 (10.7%) deliberately.** Codex's ruling 7.3 — accepted — is: gate the current candidates sequentially and pin the **first fully admissible** host, called *admissible*, never *best*. Resume the survey only if all current candidates fail. Do not restart it out of tidiness.
-3. **The injection-stage finding is a recommendation, not a fact.** Donor templates already carry `phase_shift` + 1 Hz high-pass + common reference. Injecting into a *raw* host and preprocessing afterwards would apply `phase_shift` twice to injected spikes and once to real ones. **Verify against the pinned SpikeInterface version before relying on it**; the anchor workflow injects into a preprocessed recording, which is presumably why nobody has been bitten.
-4. **The CCF label map is materially incomplete** — 296 unmapped host structure names, 650 undefined donor acronyms. Irrelevant to a CA1 search, **blocking for the region-unaware arm's placement.** Needs an Allen ontology; **read the licences first** (Allen terms vs `iblatlas` MIT / `brainglobe-atlasapi` BSD-3). Agent work, not a director request, unless the answer needs a named exception.
-5. **`audit_template_library.py` duplicates `utils/template_metadata.py`.** Resolve before packet assembly, not mid-flight.
-6. **The packet still owes its own `requirements.txt`, `.gitignore` and runbook README.** The self-containment test is copying that folder alone to a clean machine; the project-root `requirements.txt` does not satisfy it. Scripts are already inside the packet, so this is Phase-3 curation, not relocation.
+1. **No host is pinned**, and that is correct: first-admissible means first to clear *every* gate, and two have not run.
+2. **The CCF label map is materially incomplete** — 296 unmapped host structure names, 650 undefined donor acronyms. Irrelevant to a CA1 search, **blocking for the region-unaware arm's placement**. Needs an Allen ontology and **the licences must be read first** (Allen terms vs `iblatlas` MIT / `brainglobe-atlasapi` BSD-3). Agent work, not a director request, unless the answer needs a named exception. **Still open after Session 7 — deliberately deprioritized behind the placement gate, not forgotten.**
+3. **`audit_template_library.py` duplicates `utils/template_metadata.py`.** Resolve before packet assembly. Session 7 did the analogous refactor for the anatomy functions (`utils/host_anatomy.py`), so the pattern is established.
+4. **The packet still owes its own `requirements.txt`, `.gitignore` and runbook README.** The self-containment test is copying that folder alone to a clean machine.
+5. **The amplitude-convention check** (§3.4) has not been run.
 
 ## 6. The agreed division of labor — do not relitigate
 
@@ -91,33 +98,38 @@ You start with no memory of the last session. This file restores the state and n
 
 - **Axis ladder, one axis at a time, never varied together.** Tier A region-matched templates → Tier B population-rate coupling from a **sorter-independent** host proxy → Tier C bursting with history-dependent amplitude attenuation.
 - **Primary estimand: the paired difference in differences** (sorter × realism interaction), thresholds in raw paired accuracy units.
-- **`D = |I| − T` with `T = max(0.05, 0.5×|G0|)`, where `G0` is the mean paired sorter gap *in the control arm*** — not the negative-control band. `[−T, T]` is declared shorthand for the `D` rule, never a second test. `|I|` is folded at zero, so **bounded-negative is the harder verdict**.
-- **The manipulation check is a hard stop-or-go gate.** No sorter run starts if the injected data does not demonstrably carry the property at realistic magnitude.
+- **`D = |I| − T` with `T = max(0.05, 0.5×|G0|)`, `G0` the mean paired sorter gap *in the control arm*** — not the negative-control band. `[−T, T]` is declared shorthand for the `D` rule, never a second test. `|I|` is folded at zero, so **bounded-negative is the harder verdict**.
+- **The manipulation check is a hard stop-or-go gate.**
 - **One host and injection zone across all tiers by default**; a deviation is a recorded limitation and the cross-tier comparison is dropped rather than made across hosts.
-- **CA1 is the approved first zone** (Codex ruling 7.3) on the joint Tier A/Tier C constraint. Do not commission the `SUB` literature task unless CA1 fails a real gate.
+- **CA1 is the approved first zone.** Do not commission the `SUB` literature task unless CA1 fails a real gate.
 - **Refractoriness is already implemented upstream** — part of the control, not an axis.
 - **The sorter panel must span mechanisms.** Kilosort4 plus ≥1 mechanistically different CPU sorter.
 - **Equal block counts give equal *nominal replication basis*, not equal precision.** Both achieved widths get reported.
+- **The negative-control band construction is settled** (Amendment 3, pending approval). Do not reopen it; the argument that won it is §8.3 of the Tier A artifact.
 - **Errors of mine already corrected and accepted — do not re-argue:** the false "hold everything fixed" claim for Tier A; Tier B's circular sorter-dependent rate driver; "significant in one arm, not the other" as a decision event; the 50–200 µV rescaling target misused as a donor filter; the interaction sign backwards in the Study Guide; "no new code" for Tier A; the overstated SHYBRID variability claim; the label-map "independent validation" overclaim; the unsupported shared-preprocessing residual; the fallback order that put the ten-unit commitment first. **`Literature Foundation.md` stays frozen with its Session 1 errors; `references.md` governs.**
 
 ## 8. Findings about *how to work* worth carrying
 
-1. **Review catches errors, not absences** (Session 4). For the Technical Report, review against a *checklist of what must be present*, not by reading.
-2. **Read the column, do not count it** (Session 5). Session 2's audit was correct code answering a question one level too shallow.
-3. **A check can be wrong pessimistically, and that is not the safe direction** (Session 5). Verify a self-reported problem before acting on it, to the same standard as a favourable result.
-4. **A clean trend invites a causal story you have no way to check** (Session 5 addendum). Report the number; name the inference as an inference.
-5. **In an owner re-review, the pull is to accept everything** (Session 6). The reviewer did real work, the edits improve things, and pushing back costs a round-trip — the playbook lists "accepting the diagnosis but silently swallowing the implementation" as a failure mode for exactly this reason. **The question that caught it: for each edit, what failure is this construction pointed at, and does the replacement still point at it?** Two of three rulings survived that question; one did not.
-6. **Verify a write to an append-only file by reading it back** (Session 6). A PowerShell append wrote a chat message in the wrong encoding and mangled every em-dash and section symbol without erroring. Restored from git and re-appended with explicit UTF-8. Use `[System.IO.File]::ReadAllText/AppendAllText` with `UTF8Encoding($false)`, not `Get-Content`/`Add-Content`, and always `tail` the file afterwards.
+1. **Review catches errors, not absences** (S4). For the Technical Report, review against a *checklist of what must be present*.
+2. **Read the column, do not count it** (S5).
+3. **A check can be wrong pessimistically, and that is not the safe direction** (S5).
+4. **A clean trend invites a causal story you have no way to check** (S5 addendum).
+5. **In an owner re-review, the pull is to accept everything** (S6). The question that resists it: *for each edit, what failure is this construction pointed at, and does the replacement still point at it?*
+6. **Verify a write to an append-only file by reading it back** (S6). Use `io.open(..., encoding='utf-8', newline='')` from Python, never PowerShell `Add-Content`, and `tail` the file afterwards. **Also: a heredoc through the Bash tool mangles nested quotes and doubles `%`** — write the text with the Write tool to a scratch file and have Python read it in.
+7. **Removing an unverified claim can create a new one** (S7). A limitations list that stops mentioning something reads as though it was checked and found absent. Going and looking cost ten minutes.
+8. **A measurement you just made is not a threshold you get to set** (S7). Having measured native unit density, the pull was to gate on it. The Claim Sheet fixes no overcrowding threshold, and a design parameter buried in a script is invisible to review. Report it; ask for the decision.
+9. **Read a rich first-party table, not one column of it** (S7). The two most valuable findings — NYU-39's single `good` unit and the amplitude comparison — fell out of a table opened for a different reason, at no extra cost.
+10. **Verify a name before trusting it** (S7). `cumulative_drift_um_per_hour` would have answered an open gate for free; thirty seconds on its magnitude showed it does not mean what it says.
 
 ## 9. Machine state
 
-**The memory question is answered and the contention story is withdrawn** (Amendment 1). It was leaked finished Claude automation processes holding ~28 GiB, not competing research work; the director cleared them and a fix is being built rather than landed. **Two projects share the machine on a day/overnight split — this one runs during the day.** Do not narrow the Slot 9 ladder, the segment length, or the sorter panel on memory grounds.
+**Two projects share the machine on a day/overnight split — this one runs during the day** (Amendment 1, `In force`). The old low-memory series was leaked Claude automation processes, not competing research; **do not reason from its shape**. Do not narrow the Slot 9 ladder, the segment length, or the sorter panel on memory grounds.
 
-**Still operative and unchanged:** free memory is a measurement, not a property. **Measure RAM and VRAM immediately before every heavy step**, against a measured requirement; 75%-of-free plus 4 GiB / 2 GiB floors; do not start what does not fit; never inherit a number. If free RAM collapses again with VRAM flat, that signature is known — name it rather than re-derive it.
+**Still operative:** free memory is a measurement, not a property. **Measure RAM and VRAM immediately before every heavy step**, against a measured requirement; 75%-of-free plus 4 GiB / 2 GiB floors; do not start what does not fit; never inherit a number.
 
-**Last reading: 2026-08-11 21:16 PDT — RAM 12.38 GiB free of 31.67, VRAM 14,403 of 16,311 MiB. Do not inherit it; take your own.**
+**Last reading: 2026-08-12 09:51 PDT — RAM 17.19 GiB free of 31.67; VRAM 826 MiB used of 16,311. Do not inherit it; take your own.**
 
-**Venv:** `h5py==3.16.0`, `numpy==2.5.2` (both BSD-3-Clause), pinned in the project-root `requirements.txt`. SpikeInterface, PyTorch and Kilosort4 are **still not installed** — that is Codex's Rung 0, and the numpy pin may have to move when they are. Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe`; never bare `python` or `pip`.
+**Venv:** `h5py==3.16.0`, `numpy==2.5.2` (both BSD-3-Clause), pinned in the project-root `requirements.txt`. SpikeInterface, PyTorch and Kilosort4 are **still not installed** — that is Codex's Rung 0, and the numpy pin may have to move. Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe`; never bare `python` or `pip`.
 
 ## 10. Housekeeping that is easy to get wrong
 
@@ -126,12 +138,15 @@ You start with no memory of the last session. This file restores the state and n
 - **Kilosort4 is GPLv3.** Call it as a tool through SpikeInterface. Never vendor, never link. For sorter internals use SpikeInterface's MIT `sortingcomponents`.
 - **Corrections propagate forward, never backward.** The review cycle is the only exception, and only for artifacts in active review.
 - **`pdflatex` is at `/c/Users/cresp/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex`**; `pdftoppm` and `pdftotext` are available. Build twice, check the log, render changed and final pages before approving a PDF.
-- **Do not leave a background job running past the end of a session.** Session 6's timing run was launched in the background and finished inside the session, which is the pattern to copy.
-- **`RemoteFile` now validates range responses** (Codex, Session 5) as well as retrying them (me, Session 5): a non-206, a wrong `Content-Range`, or a short body fails loudly rather than caching bad bytes or starting a full-object transfer. Reuse it for any remote NWB read rather than rolling your own.
-- **The two resumable indexes (`host_anatomy_index.jsonl`, `host_timing_index.jsonl`) are append-only and tracked**, and `.gitignore` carries a comment saying so. Do not add a blanket rule that catches `Reproducibility Packet/results/`.
+- **Do not leave a background job running past the end of a session.**
+- **`RemoteFile` validates and retries range responses.** Reuse it for any remote NWB read rather than rolling your own. **1 MiB blocks transfer far less than the 4 MiB default** for scattered header reads — 2–4 MB per file instead of 12.
+- **Shared logic lives in `utils/` and is imported.** `host_anatomy.py` (band finding), `anatomy_index.py` (Codex's target/gap provenance assertions — pass `--legacy-index-target CA1 --legacy-index-max-gap-um 40` for the existing index), `remote_hdf5`, `dandi`, `template_metadata`, `ccf_labels`.
+- **When you refactor a script another agent hardened, prove it still works.** Session 7's proof was replaying the anatomy survey with `--limit 0` (zero remote reads) and diffing the report byte-for-byte.
+- **The three resumable/pinned result files are tracked deliberately** (`host_anatomy_index.jsonl`, `host_timing_index.jsonl`, and the two upstream snapshots), and `.gitignore` carries a comment saying so. Do not add a blanket rule catching `Reproducibility Packet/results/`.
+- **`screen_injection_placement.py --from-records`** rewrites its report from saved JSON with no network reads. Use it for any presentation change.
 
 ## 11. Still-open verification debt
 
-Nothing in `references.md` *Pending* is citable: the regional waveform-duration figures, Steinmetz & Ye 2022, and **Quirk & Wilson** (activity-dependent amplitude attenuation, PMC6762418 located, citation unconfirmed). If Quirk & Wilson clears, it is the natural citation for burst amplitude attenuation in Study Guide §2.2 and §3.2, which currently carry that load on Harris et al. 2001 and Pouzat et al. 2004.
+Nothing in `references.md` *Pending* is citable: the regional waveform-duration figures, Steinmetz & Ye 2022, MEArec, and **Quirk & Wilson** (activity-dependent amplitude attenuation, PMC6762418 located, citation unconfirmed). If Quirk & Wilson clears, it is the natural citation for burst amplitude attenuation in Study Guide §2.2 and §3.2, which currently carry that load on Harris et al. 2001 and Pouzat et al. 2004.
 
 **If the injection zone ever moves off CA1**, Tier C needs primary burst and amplitude-attenuation evidence for the new region and cell class, or it is labelled a synthetic stress test per Slot 13.7. Nothing on subiculum bursting is in `references.md` yet.

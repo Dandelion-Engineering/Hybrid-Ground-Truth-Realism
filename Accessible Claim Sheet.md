@@ -465,7 +465,7 @@ Everything above this line is the contract as the agents agreed it, and it is ne
 
 **Which parts this changes:** Slot 7 (how we will know), Slot 5 (how the work is done), Slot 9 (how big we build), Slot 13 (what does not transfer).
 **Written by:** Claude, Session 6, 2026-08-11, from the Session 5 provenance work and Codex's review of it.
-**Status:** Proposed. Codex has ruled on the substance; sign-off on the exact wording is still open.
+**Status:** In force. Codex explicitly approved this exact wording in its Session 6 (2026-08-11 22:11 PDT), after first cutting two claims about shared rigs and mouse strain that the evidence never established; Claude approved the same wording in Session 7 (2026-08-12 09:48 PDT), having gone and checked what the recordings actually say about where the animals came from. Amendment 4 is what that check found; it adds to this one rather than reopening it.
 
 **What we found.** The library of donor spike shapes has a column naming where each one came from. Nobody had opened it — the earlier work counted the distinct values without reading them. Read properly, it says that **every single donor shape for this probe type comes from the same public collection our host recordings come from**: 37 probe insertions, 24 recording sessions, 12 mice. Three things follow.
 
@@ -488,6 +488,62 @@ Everything above this line is the contract as the agents agreed it, and it is ne
 **Does this change what counts as success or failure?** The success criteria keep their shape. The pre-declared failure — "no host and region combination can support both arms fairly, so Tier A is dropped and we publish why" — is unchanged, and is still what happens if the remaining checks kill more than six of the sixteen.
 
 **One thing deliberately left out.** Codex also proposed changing how Tier A's "nothing actually changed" control band is built. The two agents do not yet agree on that, so it is **not** in this amendment and the original design still stands. Nothing gets generated on the new construction until that is settled and written down separately. If it stays unsettled, it comes to you.
+
+---
+
+### Amendment 3 — The "nothing changed" comparison has to be lopsided in the same way the real one is
+
+**Which parts this changes:** Slot 5 (how the work is done), Slot 8 (your verification picture), Slot 11 (what counts as success), Slot 14 (what gets published).
+**Written by:** Claude, Session 7, 2026-08-12 — at Codex's request, settling the one disagreement Amendment 2 left open.
+**Status:** Proposed. Codex has not signed off on the exact wording yet, and **nothing may be generated on this design until it does.**
+
+**The thing this is about.** The contract's strongest safety check is a fake comparison. We build two arms where **nothing was actually changed**, sort them exactly like the real ones, and look at how much apparent difference the machinery invents on its own. If the invented difference is as big as the real one, the real one means nothing. That grey band is the second thing you look at in your verification picture.
+
+**What we found.** The real Tier A comparison is lopsided. One arm draws its spike shapes from a pool of **sixteen** — every CA1 donor in existence for this probe. The other draws from a pool of about **1,149**. The fake comparison, as originally written, draws both of its arms from one pool, so it is *even* where the real one is *lopsided*. It therefore cannot tell us what we need to know: how much apparent difference this particular lopsided design can manufacture out of nothing.
+
+**The disagreement, and how it was settled.** Codex proposed fixing it by making the fake comparison a straight *repeat* of the real one, and reading how much the answer wobbles between repeats. I pushed back, and Codex withdrew the proposal after reading the argument. The reason is worth keeping, because it is the whole point of the check: **a repeat would reproduce a mistake as faithfully as it reproduces a real effect.** If our own selection machinery quietly biases one arm, every repeat contains that same bias, the wobble between repeats is tiny, the band looks reassuringly tight — and we publish an artifact of our own procedure as a finding. The check exists to catch exactly that, so it cannot be built in a way that hides it.
+
+**What actually changes.**
+
+1. **The first fake arm draws from a fixed set of sixteen** shapes taken from the big region-blind pool — chosen once, by a fixed random seed, to spread out across amplitude, signal quality and depth roughly like the real CA1 sixteen do. Those sixteen get named in the published run configuration.
+2. **The second fake arm draws from the whole big pool**, matched to the first one by exactly the same matching procedure the real comparison uses.
+3. **Neither fake arm pays any attention to brain region.** Nothing is manipulated — which is what makes it a genuine "nothing changed" check — while the *lopsidedness* of the real design is reproduced faithfully.
+4. **The sixteen get used on the same deliberate rota** as the real arm's sixteen, so donor reuse matches too.
+5. **The cost does not move.** Same two fake arms per round, same five rounds, same compute budget.
+6. **This applies to Tier A only.** Tiers B and C reuse the same spike shape in both arms, so their pools are already even and their fake comparison is built as originally written. The report says, per tier, which construction produced that tier's band.
+
+**The one thing it cannot do, said now rather than later.** It copies the lopsidedness, the reuse, the matching and the seeds. It does **not** copy the fact that the real matched arm is all-CA1, and no honest "nothing changed" check can, because being all-CA1 *is* the change. So a tight band means "the lopsided machinery did not invent a difference this big." It does not mean "region is the only thing that differs between the arms" — that is what the balance checks and the manipulation gate are for.
+
+**Does this change what counts as success or failure?** No. Same thresholds, same intervals, same failure shapes. It fixes how one diagnostic is built, and it adds one publishing obligation: the figure caption has to say which construction produced the band it is showing.
+
+---
+
+### Amendment 4 — The donated spike shapes and the host recording come from different labs, and all the donations come from one lab
+
+**Which parts this changes:** Slot 7 (how we will know), Slot 13 (what does not transfer).
+**Written by:** Claude, Session 7, 2026-08-12, from going and checking the recordings rather than arguing about them.
+**Status:** Proposed. Codex has not signed off yet.
+
+**Why this exists.** Amendment 2 said host and donor recordings still share "the same collection, the same consortium, the same acquisition program and the same probe type" — a sentence Codex had just corrected, because an earlier draft of it also claimed they shared a rig design and a mouse strain, which nobody had checked. Rather than accept the correction on the argument alone, I went and read what the recordings themselves say. It cost 89 MB of file headers and no recording data at all.
+
+**What the recordings say.**
+
+- **They carry no mouse strain or genotype field whatsoever.** So that claim was not merely unsupported — it is **uncheckable from our own materials.** The rule is now that we never report strain as the same *or* as different, in any artifact.
+- **All twelve donor animals belong to one laboratory**: `cortexlab`, University College London. Every donated spike shape this project can use, in both arms, comes from that one lab.
+- **All nine candidate host animals belong to different labs entirely** — three at Cold Spring Harbor, six at New York University. There is **no overlap** with the donor lab, and even the version of the behavioural task differs between the two sides.
+
+**Why it matters, in both directions.** The good direction: picking a host from an animal that donated nothing turns out to separate host from donor by *laboratory, institution and rig*, not just by animal. That is a stronger separation than the contract claims, and now it is something a reader can verify rather than take our word for. The other direction is the one that goes in the limitations: **the entire donor library is one laboratory's work.** So a Tier A result is not a statement about "CA1 spike shapes." It is a statement about *one lab's* CA1 spike shapes, from sixteen cells in twelve mice. There is no alternative library for this probe, so this is not a choice we made — but it is a boundary we have to say out loud.
+
+**What actually changes.**
+
+1. **The limitations section states the checked position**: same collection, consortium, acquisition program and probe type; **different** laboratory, institution and task version. With the file that proves it.
+2. **Strain and genotype get named as uncheckable** — once, plainly, so a reader is not left to guess from silence.
+3. **"Host lab contributed no donors" becomes a recorded property, not a new hurdle.** Every current candidate already passes it, so it eliminates nobody. It is written down so a future search knows it was checked rather than assumed.
+4. **The evidence has a boundary.** One recording was read per animal, so the lab is confirmed for that recording. In this dataset an animal belongs to one lab, so this is safe — but the evidence is what it is, and it gets described that way.
+
+**A new "this does not transfer" clause.** *The donated shapes are one laboratory's.* Whatever Tier A finds is conditional on that lab's recording and processing practice, on top of being conditional on those sixteen CA1 shapes. Both conditions get stated together.
+
+**Does this change what counts as success or failure?** No. Nothing here can make a tier pass or fail. It adds one limitation and one verified fact.
 
 ---
 

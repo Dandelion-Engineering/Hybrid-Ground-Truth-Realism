@@ -1,0 +1,1549 @@
+[
+ {
+  "asset_id": "d54fbf42-bb56-462c-b63a-36b9911753ec",
+  "io": {
+   "bytes": 15576661,
+   "requests": 16
+  },
+  "path": "sub-CSHL047/sub-CSHL047_ses-b52182e7-39f6-4914-9717-136db589706e_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 2740.0,
+     "depth_lo_um": 2180.0,
+     "n_channels": 58,
+     "n_rows": 29,
+     "span_um": 560.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 19,
+      "usable_span_um": 360.0
+     },
+     "margin100_sep40": {
+      "fits": true,
+      "max_sites": 10,
+      "usable_span_um": 360.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 360.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 15,
+      "usable_span_um": 280.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 280.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 280.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 27,
+      "usable_span_um": 520.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 14,
+      "usable_span_um": 520.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 520.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 23,
+      "usable_span_um": 440.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 440.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 440.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 59.63357704549974,
+      "n": 182,
+      "p10": 22.052459014120362,
+      "p90": 123.39452943280455
+     },
+     "amplitude_uv_good": {
+      "median": 108.49596326588437,
+      "n": 35,
+      "p10": 46.49038511191888,
+      "p90": 205.3173039320684
+     },
+     "firing_rate_hz": {
+      "median": 4.626080269457893,
+      "n": 182,
+      "p10": 0.10508319524136588,
+      "p90": 12.435766552642693
+     },
+     "good_per_100um": 6.25,
+     "n_drift_finite": 178,
+     "n_good": 35,
+     "n_units": 182,
+     "units_per_100um": 32.5
+    },
+    "passes": true,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 58,
+     "n_on_target": 58,
+     "purity": 1.0
+    }
+   },
+   {
+    "band": {
+     "depth_hi_um": 1020.0,
+     "depth_lo_um": 320.0,
+     "n_channels": 72,
+     "n_rows": 36,
+     "span_um": 700.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 26,
+      "usable_span_um": 500.0
+     },
+     "margin100_sep40": {
+      "fits": true,
+      "max_sites": 13,
+      "usable_span_um": 500.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 500.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 22,
+      "usable_span_um": 420.0
+     },
+     "margin140_sep40": {
+      "fits": true,
+      "max_sites": 11,
+      "usable_span_um": 420.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 420.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 34,
+      "usable_span_um": 660.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 17,
+      "usable_span_um": 660.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 9,
+      "usable_span_um": 660.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 30,
+      "usable_span_um": 580.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 15,
+      "usable_span_um": 580.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 580.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 43.60305580738137,
+      "n": 174,
+      "p10": 17.557520108478194,
+      "p90": 112.10780356043414
+     },
+     "amplitude_uv_good": {
+      "median": 110.485170351134,
+      "n": 32,
+      "p10": 55.20456259921456,
+      "p90": 220.81855216975381
+     },
+     "firing_rate_hz": {
+      "median": 4.309512905194175,
+      "n": 174,
+      "p10": 0.14747952085791366,
+      "p90": 7.64520009922344
+     },
+     "good_per_100um": 4.571428571428571,
+     "n_drift_finite": 163,
+     "n_good": 32,
+     "n_units": 174,
+     "units_per_100um": 24.857142857142858
+    },
+    "passes": true,
+    "probe": "Probe01",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 72,
+     "n_on_target": 72,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-CSHL047/sub-CSHL047_ses-b52182e7-39f6-4914-9717-136db589706e_desc-processed_behavior+ecephys.nwb",
+  "session": "b52182e7-39f6-4914-9717-136db589706e",
+  "subject": "CSHL047"
+ },
+ {
+  "asset_id": "277e10d0-d2ae-41c1-be76-623878a9cc67",
+  "io": {
+   "bytes": 16084348,
+   "requests": 16
+  },
+  "path": "sub-NYU-12/sub-NYU-12_ses-a8a8af78-16de-4841-ab07-fde4b5281a03_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 3160.0,
+     "depth_lo_um": 2720.0,
+     "n_channels": 46,
+     "n_rows": 23,
+     "span_um": 440.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 13,
+      "usable_span_um": 240.0
+     },
+     "margin100_sep40": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 240.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 240.0
+     },
+     "margin140_sep20": {
+      "fits": false,
+      "max_sites": 9,
+      "usable_span_um": 160.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 160.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 3,
+      "usable_span_um": 160.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 21,
+      "usable_span_um": 400.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 11,
+      "usable_span_um": 400.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 400.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 17,
+      "usable_span_um": 320.0
+     },
+     "margin60_sep40": {
+      "fits": false,
+      "max_sites": 9,
+      "usable_span_um": 320.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 320.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 55.10400197757163,
+      "n": 73,
+      "p10": 22.953551114428734,
+      "p90": 120.93458069595007
+     },
+     "amplitude_uv_good": {
+      "median": 94.36423512405746,
+      "n": 22,
+      "p10": 55.10400197757163,
+      "p90": 194.97926059106587
+     },
+     "firing_rate_hz": {
+      "median": 2.928800858370557,
+      "n": 73,
+      "p10": 0.13292499060164797,
+      "p90": 16.235462398508133
+     },
+     "good_per_100um": 5.0,
+     "n_drift_finite": 73,
+     "n_good": 22,
+     "n_units": 73,
+     "units_per_100um": 16.59090909090909
+    },
+    "passes": false,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 46,
+     "n_on_target": 46,
+     "purity": 1.0
+    }
+   },
+   {
+    "band": {
+     "depth_hi_um": 3820.0,
+     "depth_lo_um": 3180.0,
+     "n_channels": 66,
+     "n_rows": 33,
+     "span_um": 640.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 23,
+      "usable_span_um": 440.0
+     },
+     "margin100_sep40": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 440.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 440.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 19,
+      "usable_span_um": 360.0
+     },
+     "margin140_sep40": {
+      "fits": true,
+      "max_sites": 10,
+      "usable_span_um": 360.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 360.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 31,
+      "usable_span_um": 600.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 16,
+      "usable_span_um": 600.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 600.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 27,
+      "usable_span_um": 520.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 14,
+      "usable_span_um": 520.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 520.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 53.2589941459875,
+      "n": 267,
+      "p10": 26.527768538149576,
+      "p90": 153.48475992326178
+     },
+     "amplitude_uv_good": {
+      "median": 107.77604963924,
+      "n": 60,
+      "p10": 48.73824754435361,
+      "p90": 257.67830824987624
+     },
+     "firing_rate_hz": {
+      "median": 3.357919480483256,
+      "n": 267,
+      "p10": 0.14688495166782212,
+      "p90": 7.677470056389596
+     },
+     "good_per_100um": 9.375,
+     "n_drift_finite": 257,
+     "n_good": 60,
+     "n_units": 267,
+     "units_per_100um": 41.71875
+    },
+    "passes": true,
+    "probe": "Probe01",
+    "profile": {
+     "gap_to_other_above_um": null,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 66,
+     "n_on_target": 66,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-NYU-12/sub-NYU-12_ses-a8a8af78-16de-4841-ab07-fde4b5281a03_desc-processed_behavior+ecephys.nwb",
+  "session": "a8a8af78-16de-4841-ab07-fde4b5281a03",
+  "subject": "NYU-12"
+ },
+ {
+  "asset_id": "2dfd3080-a447-426f-8847-31f8a3c39839",
+  "io": {
+   "bytes": 16429779,
+   "requests": 16
+  },
+  "path": "sub-NYU-37/sub-NYU-37_ses-7af49c00-63dd-4fed-b2e0-1b3bd945b20b_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 3780.0,
+     "depth_lo_um": 3200.0,
+     "n_channels": 60,
+     "n_rows": 30,
+     "span_um": 580.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 20,
+      "usable_span_um": 380.0
+     },
+     "margin100_sep40": {
+      "fits": true,
+      "max_sites": 10,
+      "usable_span_um": 380.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 380.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 16,
+      "usable_span_um": 300.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 300.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 300.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 28,
+      "usable_span_um": 540.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 14,
+      "usable_span_um": 540.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 540.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 24,
+      "usable_span_um": 460.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 460.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 460.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 19.819548834084383,
+      "n": 86,
+      "p10": 13.112889904322596,
+      "p90": 58.40043147325279
+     },
+     "amplitude_uv_good": {
+      "median": 60.86336271712004,
+      "n": 12,
+      "p10": 37.44055290851513,
+      "p90": 85.98259082120789
+     },
+     "firing_rate_hz": {
+      "median": 13.108497631914844,
+      "n": 86,
+      "p10": 0.9300888638260371,
+      "p90": 16.516309989530264
+     },
+     "good_per_100um": 2.0689655172413794,
+     "n_drift_finite": 80,
+     "n_good": 12,
+     "n_units": 86,
+     "units_per_100um": 14.827586206896552
+    },
+    "passes": true,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 60,
+     "n_on_target": 60,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-NYU-37/sub-NYU-37_ses-7af49c00-63dd-4fed-b2e0-1b3bd945b20b_desc-processed_behavior+ecephys.nwb",
+  "session": "7af49c00-63dd-4fed-b2e0-1b3bd945b20b",
+  "subject": "NYU-37"
+ },
+ {
+  "asset_id": "e4625dfa-7bda-47de-91c1-d929bbf4c2a4",
+  "io": {
+   "bytes": 13286547,
+   "requests": 13
+  },
+  "path": "sub-NYU-65/sub-NYU-65_ses-a2ec6341-c55f-48a0-a23b-0ef2f5b1d71e_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 3300.0,
+     "depth_lo_um": 2720.0,
+     "n_channels": 60,
+     "n_rows": 30,
+     "span_um": 580.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 20,
+      "usable_span_um": 380.0
+     },
+     "margin100_sep40": {
+      "fits": true,
+      "max_sites": 10,
+      "usable_span_um": 380.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 380.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 16,
+      "usable_span_um": 300.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 300.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 300.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 28,
+      "usable_span_um": 540.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 14,
+      "usable_span_um": 540.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 540.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 24,
+      "usable_span_um": 460.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 460.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 460.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 42.29959084159415,
+      "n": 123,
+      "p10": 23.186646626587606,
+      "p90": 86.68748152145868
+     },
+     "amplitude_uv_good": {
+      "median": 71.05810605243148,
+      "n": 27,
+      "p10": 23.719765688465074,
+      "p90": 119.88944136525947
+     },
+     "firing_rate_hz": {
+      "median": 4.57770684291396,
+      "n": 123,
+      "p10": 0.09820606316818685,
+      "p90": 16.689660094512256
+     },
+     "good_per_100um": 4.655172413793103,
+     "n_drift_finite": 119,
+     "n_good": 27,
+     "n_units": 123,
+     "units_per_100um": 21.20689655172414
+    },
+    "passes": true,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 60,
+     "n_on_target": 60,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-NYU-65/sub-NYU-65_ses-a2ec6341-c55f-48a0-a23b-0ef2f5b1d71e_desc-processed_behavior+ecephys.nwb",
+  "session": "a2ec6341-c55f-48a0-a23b-0ef2f5b1d71e",
+  "subject": "NYU-65"
+ },
+ {
+  "asset_id": "a4061a5f-81ff-4c40-b5ac-7518ba2d37d9",
+  "io": {
+   "bytes": 17628704,
+   "requests": 18
+  },
+  "path": "sub-NYU-45/sub-NYU-45_ses-51e53aff-1d5d-4182-a684-aba783d50ae5_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 2960.0,
+     "depth_lo_um": 2420.0,
+     "n_channels": 56,
+     "n_rows": 28,
+     "span_um": 540.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 18,
+      "usable_span_um": 340.0
+     },
+     "margin100_sep40": {
+      "fits": false,
+      "max_sites": 9,
+      "usable_span_um": 340.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 340.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 14,
+      "usable_span_um": 260.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 260.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 260.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 26,
+      "usable_span_um": 500.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 13,
+      "usable_span_um": 500.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 500.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 22,
+      "usable_span_um": 420.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 11,
+      "usable_span_um": 420.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 420.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 47.57379379834428,
+      "n": 90,
+      "p10": 23.002321262972565,
+      "p90": 108.72210060295784
+     },
+     "amplitude_uv_good": {
+      "median": 82.86872137232118,
+      "n": 20,
+      "p10": 50.60685082734928,
+      "p90": 208.48905627761832
+     },
+     "firing_rate_hz": {
+      "median": 6.754705975651175,
+      "n": 90,
+      "p10": 0.08566026619231,
+      "p90": 25.114980004146535
+     },
+     "good_per_100um": 3.7037037037037037,
+     "n_drift_finite": 88,
+     "n_good": 20,
+     "n_units": 90,
+     "units_per_100um": 16.666666666666668
+    },
+    "passes": true,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 56,
+     "n_on_target": 56,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-NYU-45/sub-NYU-45_ses-51e53aff-1d5d-4182-a684-aba783d50ae5_desc-processed_behavior+ecephys.nwb",
+  "session": "51e53aff-1d5d-4182-a684-aba783d50ae5",
+  "subject": "NYU-45"
+ },
+ {
+  "asset_id": "ae56c65d-e8a5-4751-9307-014fa0c1a0ab",
+  "io": {
+   "bytes": 15321204,
+   "requests": 15
+  },
+  "path": "sub-CSHL045/sub-CSHL045_ses-034e726f-b35f-41e0-8d6c-a22cc32391fb_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 2420.0,
+     "depth_lo_um": 1880.0,
+     "n_channels": 56,
+     "n_rows": 28,
+     "span_um": 540.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 18,
+      "usable_span_um": 340.0
+     },
+     "margin100_sep40": {
+      "fits": false,
+      "max_sites": 9,
+      "usable_span_um": 340.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 340.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 14,
+      "usable_span_um": 260.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 260.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 260.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 26,
+      "usable_span_um": 500.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 13,
+      "usable_span_um": 500.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 500.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 22,
+      "usable_span_um": 420.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 11,
+      "usable_span_um": 420.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 420.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 33.71461182280841,
+      "n": 108,
+      "p10": 15.68892178696075,
+      "p90": 70.54044235719306
+     },
+     "amplitude_uv_good": {
+      "median": 72.52136681736397,
+      "n": 10,
+      "p10": 19.202668994192596,
+      "p90": 158.27583851098
+     },
+     "firing_rate_hz": {
+      "median": 7.730876338200373,
+      "n": 108,
+      "p10": 0.088590307901495,
+      "p90": 14.910088546666067
+     },
+     "good_per_100um": 1.8518518518518519,
+     "n_drift_finite": 103,
+     "n_good": 10,
+     "n_units": 108,
+     "units_per_100um": 20.0
+    },
+    "passes": true,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 56,
+     "n_on_target": 56,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-CSHL045/sub-CSHL045_ses-034e726f-b35f-41e0-8d6c-a22cc32391fb_desc-processed_behavior+ecephys.nwb",
+  "session": "034e726f-b35f-41e0-8d6c-a22cc32391fb",
+  "subject": "CSHL045"
+ },
+ {
+  "asset_id": "d3e8a94d-7f64-4ccb-9f46-ee9148cee05f",
+  "io": {
+   "bytes": 16777216,
+   "requests": 16
+  },
+  "path": "sub-NYU-39/sub-NYU-39_ses-6ed57216-498d-48a6-b48b-a243a34710ea_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 2860.0,
+     "depth_lo_um": 2360.0,
+     "n_channels": 52,
+     "n_rows": 26,
+     "span_um": 500.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 16,
+      "usable_span_um": 300.0
+     },
+     "margin100_sep40": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 300.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 300.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 220.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 220.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 3,
+      "usable_span_um": 220.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 24,
+      "usable_span_um": 460.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 460.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 460.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 20,
+      "usable_span_um": 380.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 10,
+      "usable_span_um": 380.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 380.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 20.875820702161775,
+      "n": 22,
+      "p10": 9.283122111983785,
+      "p90": 41.11036339978435
+     },
+     "amplitude_uv_good": {
+      "median": 51.31885466831815,
+      "n": 1,
+      "p10": 51.31885466831815,
+      "p90": 51.31885466831815
+     },
+     "firing_rate_hz": {
+      "median": 8.072109501939758,
+      "n": 22,
+      "p10": 0.783184851213267,
+      "p90": 13.341082490077593
+     },
+     "good_per_100um": 0.2,
+     "n_drift_finite": 19,
+     "n_good": 1,
+     "n_units": 22,
+     "units_per_100um": 4.4
+    },
+    "passes": true,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 52,
+     "n_on_target": 52,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-NYU-39/sub-NYU-39_ses-6ed57216-498d-48a6-b48b-a243a34710ea_desc-processed_behavior+ecephys.nwb",
+  "session": "6ed57216-498d-48a6-b48b-a243a34710ea",
+  "subject": "NYU-39"
+ },
+ {
+  "asset_id": "f4ef09e1-b3e1-4d6b-9ad9-4aca37782d42",
+  "io": {
+   "bytes": 15639965,
+   "requests": 16
+  },
+  "path": "sub-CSHL047/sub-CSHL047_ses-2d5f6d81-38c4-4bdc-ac3c-302ea4d5f46e_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 2460.0,
+     "depth_lo_um": 1960.0,
+     "n_channels": 52,
+     "n_rows": 26,
+     "span_um": 500.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 16,
+      "usable_span_um": 300.0
+     },
+     "margin100_sep40": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 300.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 300.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 220.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 220.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 3,
+      "usable_span_um": 220.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 24,
+      "usable_span_um": 460.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 460.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 460.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 20,
+      "usable_span_um": 380.0
+     },
+     "margin60_sep40": {
+      "fits": true,
+      "max_sites": 10,
+      "usable_span_um": 380.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 380.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 51.66668994687396,
+      "n": 74,
+      "p10": 30.549177743495814,
+      "p90": 101.36783482177745
+     },
+     "amplitude_uv_good": {
+      "median": 83.28596495679761,
+      "n": 22,
+      "p10": 37.622928522696505,
+      "p90": 139.2138035023557
+     },
+     "firing_rate_hz": {
+      "median": 8.933781201774199,
+      "n": 74,
+      "p10": 0.03248278587169349,
+      "p90": 25.317624688162432
+     },
+     "good_per_100um": 4.4,
+     "n_drift_finite": 74,
+     "n_good": 22,
+     "n_units": 74,
+     "units_per_100um": 14.8
+    },
+    "passes": true,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 52,
+     "n_on_target": 52,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-CSHL047/sub-CSHL047_ses-2d5f6d81-38c4-4bdc-ac3c-302ea4d5f46e_desc-processed_behavior+ecephys.nwb",
+  "session": "2d5f6d81-38c4-4bdc-ac3c-302ea4d5f46e",
+  "subject": "CSHL047"
+ },
+ {
+  "asset_id": "902b880d-6fbd-4a3b-b563-389867903e9f",
+  "io": {
+   "bytes": 14680064,
+   "requests": 14
+  },
+  "path": "sub-CSHL049/sub-CSHL049_ses-4b7fbad4-f6de-43b4-9b15-c7c7ef44db4b_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 3060.0,
+     "depth_lo_um": 2600.0,
+     "n_channels": 48,
+     "n_rows": 24,
+     "span_um": 460.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 14,
+      "usable_span_um": 260.0
+     },
+     "margin100_sep40": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 260.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 260.0
+     },
+     "margin140_sep20": {
+      "fits": true,
+      "max_sites": 10,
+      "usable_span_um": 180.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 180.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 3,
+      "usable_span_um": 180.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 22,
+      "usable_span_um": 420.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 11,
+      "usable_span_um": 420.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 420.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 18,
+      "usable_span_um": 340.0
+     },
+     "margin60_sep40": {
+      "fits": false,
+      "max_sites": 9,
+      "usable_span_um": 340.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 340.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 36.619665373376634,
+      "n": 107,
+      "p10": 19.485629654636,
+      "p90": 81.83983165769244
+     },
+     "amplitude_uv_good": {
+      "median": 76.82466866225442,
+      "n": 13,
+      "p10": 48.21770005660676,
+      "p90": 98.76807526450835
+     },
+     "firing_rate_hz": {
+      "median": 6.634071758820387,
+      "n": 107,
+      "p10": 0.14737703050378517,
+      "p90": 14.007899651273409
+     },
+     "good_per_100um": 2.8260869565217392,
+     "n_drift_finite": 106,
+     "n_good": 13,
+     "n_units": 107,
+     "units_per_100um": 23.26086956521739
+    },
+    "passes": false,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 48,
+     "n_on_target": 48,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-CSHL049/sub-CSHL049_ses-4b7fbad4-f6de-43b4-9b15-c7c7ef44db4b_desc-processed_behavior+ecephys.nwb",
+  "session": "4b7fbad4-f6de-43b4-9b15-c7c7ef44db4b",
+  "subject": "CSHL049"
+ },
+ {
+  "asset_id": "b7421c6f-7bdb-401a-bd66-6a4d6209e806",
+  "io": {
+   "bytes": 12213283,
+   "requests": 12
+  },
+  "path": "sub-CSHL049/sub-CSHL049_ses-c99d53e6-c317-4c53-99ba-070b26673ac4_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 2960.0,
+     "depth_lo_um": 2520.0,
+     "n_channels": 46,
+     "n_rows": 23,
+     "span_um": 440.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 13,
+      "usable_span_um": 240.0
+     },
+     "margin100_sep40": {
+      "fits": false,
+      "max_sites": 7,
+      "usable_span_um": 240.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 240.0
+     },
+     "margin140_sep20": {
+      "fits": false,
+      "max_sites": 9,
+      "usable_span_um": 160.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 160.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 3,
+      "usable_span_um": 160.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 21,
+      "usable_span_um": 400.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 11,
+      "usable_span_um": 400.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 400.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 17,
+      "usable_span_um": 320.0
+     },
+     "margin60_sep40": {
+      "fits": false,
+      "max_sites": 9,
+      "usable_span_um": 320.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 320.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 42.366318921599756,
+      "n": 89,
+      "p10": 19.558847828648325,
+      "p90": 83.6798319751764
+     },
+     "amplitude_uv_good": {
+      "median": 84.23847741195058,
+      "n": 12,
+      "p10": 61.531795542543385,
+      "p90": 190.1966799270675
+     },
+     "firing_rate_hz": {
+      "median": 6.262208684901268,
+      "n": 89,
+      "p10": 0.06901561691610153,
+      "p90": 15.981189154576024
+     },
+     "good_per_100um": 2.727272727272727,
+     "n_drift_finite": 86,
+     "n_good": 12,
+     "n_units": 89,
+     "units_per_100um": 20.227272727272727
+    },
+    "passes": false,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 46,
+     "n_on_target": 46,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-CSHL049/sub-CSHL049_ses-c99d53e6-c317-4c53-99ba-070b26673ac4_desc-processed_behavior+ecephys.nwb",
+  "session": "c99d53e6-c317-4c53-99ba-070b26673ac4",
+  "subject": "CSHL049"
+ },
+ {
+  "asset_id": "5d251e48-87bf-4ea2-bbc1-267453001311",
+  "io": {
+   "bytes": 16577481,
+   "requests": 17
+  },
+  "path": "sub-NYU-48/sub-NYU-48_ses-3d59aa1a-b4ba-47fe-b9cf-741b5fdb0c7b_desc-raw_ecephys.nwb",
+  "probes": [
+   {
+    "band": {
+     "depth_hi_um": 2280.0,
+     "depth_lo_um": 1860.0,
+     "n_channels": 44,
+     "n_rows": 22,
+     "span_um": 420.0
+    },
+    "band_matches_index": true,
+    "capacity": {
+     "margin100_sep20": {
+      "fits": true,
+      "max_sites": 12,
+      "usable_span_um": 220.0
+     },
+     "margin100_sep40": {
+      "fits": false,
+      "max_sites": 6,
+      "usable_span_um": 220.0
+     },
+     "margin100_sep80": {
+      "fits": false,
+      "max_sites": 3,
+      "usable_span_um": 220.0
+     },
+     "margin140_sep20": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 140.0
+     },
+     "margin140_sep40": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 140.0
+     },
+     "margin140_sep80": {
+      "fits": false,
+      "max_sites": 2,
+      "usable_span_um": 140.0
+     },
+     "margin20_sep20": {
+      "fits": true,
+      "max_sites": 20,
+      "usable_span_um": 380.0
+     },
+     "margin20_sep40": {
+      "fits": true,
+      "max_sites": 10,
+      "usable_span_um": 380.0
+     },
+     "margin20_sep80": {
+      "fits": false,
+      "max_sites": 5,
+      "usable_span_um": 380.0
+     },
+     "margin60_sep20": {
+      "fits": true,
+      "max_sites": 16,
+      "usable_span_um": 300.0
+     },
+     "margin60_sep40": {
+      "fits": false,
+      "max_sites": 8,
+      "usable_span_um": 300.0
+     },
+     "margin60_sep80": {
+      "fits": false,
+      "max_sites": 4,
+      "usable_span_um": 300.0
+     }
+    },
+    "electrode_table_agrees": true,
+    "native": {
+     "amplitude_uv": {
+      "median": 36.51484735694348,
+      "n": 66,
+      "p10": 17.04623100896412,
+      "p90": 84.25146655609062
+     },
+     "amplitude_uv_good": {
+      "median": 95.94365402278805,
+      "n": 8,
+      "p10": 28.851194366664306,
+      "p90": 115.95804510598877
+     },
+     "firing_rate_hz": {
+      "median": 8.463256525290097,
+      "n": 66,
+      "p10": 0.9595340099473298,
+      "p90": 12.130874190534373
+     },
+     "good_per_100um": 1.9047619047619047,
+     "n_drift_finite": 63,
+     "n_good": 8,
+     "n_units": 66,
+     "units_per_100um": 15.714285714285714
+    },
+    "passes": false,
+    "probe": "Probe00",
+    "profile": {
+     "gap_to_other_above_um": 20.0,
+     "gap_to_other_below_um": 20.0,
+     "interlopers": {},
+     "n_contacts_in_range": 44,
+     "n_on_target": 44,
+     "purity": 1.0
+    }
+   }
+  ],
+  "processed_path": "sub-NYU-48/sub-NYU-48_ses-3d59aa1a-b4ba-47fe-b9cf-741b5fdb0c7b_desc-processed_behavior+ecephys.nwb",
+  "session": "3d59aa1a-b4ba-47fe-b9cf-741b5fdb0c7b",
+  "subject": "NYU-48"
+ }
+]

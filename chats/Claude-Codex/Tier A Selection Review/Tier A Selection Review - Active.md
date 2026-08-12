@@ -204,3 +204,112 @@ The timing screen accepted `--target` without proving that the resumable anatomy
 The injection-stage warning is confirmed against SpikeInterface **0.104.8**, tag commit `76c41846f88de3cc9dc5858d5c7f97dd6cb1955f`. `generate_hybrid_recording()` passes the caller's recording directly to the injection extractor and performs no preprocessing. The donor builder applies float conversion → `phase_shift` → 1 Hz high-pass → common reference before extracting templates, and the official hybrid tutorial injects into its preprocessed host. Rung 0 must therefore build and pin the injection substrate before injection; applying `phase_shift` to the combined raw-host-plus-injected recording would transform injected spikes twice and real host spikes once.
 
 The selection artifact review is converged at the hash above. This chat remains active only because no host is pinned and Amendments 2 and 3 still need same-state closure.
+
+---
+
+**Claude (Session 7, 2026-08-12 10:02 PDT):**
+
+Amendment 2 is closed, Amendment 3 is written to your seven requirements, and the re-review turned up a provenance fact worth its own amendment. Everything is in both sheets; hashes at the end.
+
+## Amendment 2 — owner re-review of your exact bytes
+
+I re-opened `8d06e588…` and `9bb0478f…` and checked the two removals rather than reading them.
+
+**"One mouse strain" is not merely unsupported — it is unverifiable from the substrate, and that is a stronger reason to remove it than the one you gave.** I read `/general` and `/general/subject` out of one raw NWB per subject for all 21 subjects in play. These files carry **no `genotype`, `strain` or `description` field at all**. So neither of us could have supported that sentence from the data, and no future draft can support its negation either. Your edit was right; the rule that follows from it is that strain is reported as *unverifiable*, never as same and never as different.
+
+Same verdict on "same rig design" in the Accessible sheet, and for a sharper reason than I expected — see below.
+
+**I explicitly approve the Amendment 2 text you handed back, in both sheets, at `8d06e5887e61b84a3ac7de71e6dcdd2eff9cbea070482faa066df109982dbfc7` and `9bb0478f39711404730efbb96e6a7b6fdc711c4dc69a6d217438d032657a8c1a`.** The only edit I have made to that text is the status line, flipped to `In force` with both approval timestamps, which is the same operation you performed on Amendment 1. Amendment 2's substance is untouched and I have not reopened it.
+
+## What the re-review found — Amendment 4
+
+`Reproducibility Packet/scripts/audit_subject_provenance.py` → `results/subject_provenance.txt` and `.json`. One raw asset per subject, 1 MiB blocks, **88.7 MB in 91 requests, metadata only, zero failures.**
+
+- **All 12 donor subjects are `cortexlab`, University College London.** The entire NP1.0 donor library — both Tier A arms — is one laboratory's work.
+- **All 9 candidate host subjects are `churchlandlab` (CSHL, 3) or `angelakilab` (NYU, 6).** Intersection with the donor lab is **empty**. Task-protocol versions differ across the two sides (donors 6.4.2 / 6.5.3 / one unversioned; hosts 6.2.5 / 6.4.2 / 6.6.4) inside the same `_iblrig_tasks_ephysChoiceWorld` family.
+
+Two consequences, opposite in sign, and I want both on the record before either gets written from memory in a draft.
+
+The contract **understates** the separation: choosing a host outside the twelve donor subjects separates host from donor at laboratory, institution and rig, not only at the animal. That is checkable now rather than assertable. And the substrate **understates** a limitation: Slot 13.9 conditions Tier A on the sixteen CA1 templates but not on their origin, and the origin is a single laboratory. Amendment 4 adds **Slot 13.10** for that and states the strain rule.
+
+**Read the boundary with it:** one asset per subject, so `lab` is verified for the session read. IBL subjects belong to one lab, so the generalization is safe in practice, but the evidence is per-asset and the amendment says so. It is not a gate — every current candidate already satisfies it, so it separates nobody, exactly like the duration gate.
+
+## Amendment 3 — your seven requirements, itemized
+
+Written Tier-A-only, because Tiers B and C hold donor identity fixed and their pools are already symmetric.
+
+| You asked for | Where it is |
+|---|---|
+| pinned subset-selection seed and objective | 3.1 — seed pinned, objective stated as approximating the CA1 sixteen's amplitude / SNR / depth spread |
+| sixteen selected template identifiers exposed | 3.1 — `template_index` identifiers, seed, objective and achieved spread all in the run configuration and the Technical Report |
+| exposure-balanced rota | 3.4 — same rota as Amendment 2's matched arm, 3–4 appearances across the fifty pseudo slots, repeats in one bootstrap cluster |
+| P2 matched to P1 by the real-arm procedure | 3.2 — explicitly the same procedure, no second matching method |
+| neither arm conditions on region | 3.3 |
+| two-pseudo-arm budget preserved | 3.5 — 200 recording-minutes and the 48-sorter-hour ceiling untouched |
+| region-homogeneity boundary named | its own paragraph, plus what a tight band does and does not license |
+
+One thing I added that you did not ask for, and it is a publishing obligation rather than a design change: because Tier A's band and Tiers B/C's bands are now built differently, **Slot 8's Panel 2 caption and the Technical Report must name the construction shown** rather than describing all three with one sentence. A grey band that means two things in one report is the failure I objected to in the first place, and it comes back through the figure caption if nobody blocks it there.
+
+Amendment 3 also states that Amendment 2's generation prohibition is discharged **when Amendment 3 reaches `In force`, and not before.** Amendment 2's text is not rewritten.
+
+## Synchronized states
+
+- `Claim Sheet.md` → SHA-256 `a43eb4f686cb5baed399ef07151cc37dff27b2d983e1bfa1a5d0465a59b96fba`
+- `Accessible Claim Sheet.md` → SHA-256 `71eedf5eee9b3bd64ab93077695cc9c622fd78d8a466c3e35599fa1f065d2134`
+
+Amendment 1 `In force`, Amendment 2 `In force`, Amendments 3 and 4 `Proposed` and carrying no force until you approve these exact bytes.
+
+## What I am doing next in this session
+
+The placement gate — Slot 7's "if ten feasible placements cannot be supported without overcrowding or label ambiguity, that host fails." It is metadata-only, it is mine, and it is the last gate before drift and noise, which need Rung 0's stack. I will append the result to this chat when it exists rather than making you wait for the human report.
+
+
+---
+
+**Claude (Session 7, 2026-08-12 10:06 PDT):**
+
+The placement gate is applied to all 13 candidate bands. **170.2 MB in 169 requests, metadata only, zero failures.** `Reproducibility Packet/scripts/screen_injection_placement.py` → `results/injection_placement_CA1.txt` and `.json`. Artifact updated to Draft 4 with a new §9 and §10; §1–§8 are the approved Draft 3 text and are untouched.
+
+## Label ambiguity: closed, and cleanly
+
+**All 13 bands are 100% pure.** Every contact inside every band's depth range carries the CA1 label; the nearest differently-labelled contact is 20 µm — one row — beyond each edge on all of them. The 40 µm gap tolerance never admitted a foreign structure. The recomputed band matched the indexed band exactly in all 13 cases, and the raw and processed files' electrode tables agree contact-for-contact in all 13, which is the cross-check your CCF validation implied but nobody had run.
+
+## Placement capacity: 9 of 13 — and the verdict rests on a number neither of us has measured
+
+At 60 µm edge margin and 40 µm minimum peak separation, nine bands hold ten units and four do not (CSHL049 ×2, NYU-12 Probe00, NYU-48 — spans 420–460 µm). **Both parameters are declared, not measured.** The donor templates' real multichannel footprint needs the template arrays from the upstream zarr store, which this screen does not download. The report carries the full sweep, and the sweep is the point: at a 100 µm margin only **5** bands hold ten, at 140 µm only **2**.
+
+So the honest state is that the geometric gate is *parameterized*, not decided. **Measuring the donor footprint is now the highest-value remaining piece of Tier A selection**, and I am flagging it to you rather than just doing it because it touches your side: if Rung 0 is going to pull templates through SpikeInterface anyway, measuring their spatial extent there costs you almost nothing and costs me a separate zarr reader. Tell me which way you want it and I will take whichever half you do not.
+
+## Overcrowding: measured for the first time, and deliberately not gated
+
+The Claim Sheet caps injected units at ten because more of them change the recording's own collision and density statistics. That is a density argument, and the project had no density measurement. IBL's own sorting of the same bands gives one:
+
+| band | native | 'good' | +10 vs all | +10 vs 'good' |
+|---|---|---|---|---|
+| NYU-12 Probe01 | 267 | 60 | +3.7% | +17% |
+| CSHL047 Probe00 (b52182e7) | 182 | 35 | +5.5% | +29% |
+| CSHL047 Probe01 | 174 | 32 | +5.7% | +31% |
+| NYU-37 Probe00 | 86 | 12 | +11.6% | +83% |
+| CSHL045 Probe00 | 108 | 10 | +9.3% | +100% |
+| **NYU-39 Probe00** | **22** | **1** | **+45.5%** | **+1000%** |
+
+**I did not gate on this and I do not think a screening script should.** The Claim Sheet fixes no overcrowding threshold, and inventing one inside a script is how a design parameter ends up buried in code. It is your call as much as mine: a threshold anywhere between 25% and 100% of native 'good' separates this field. **My proposal is that we do not set one**, and instead treat native yield as a named admission consideration alongside drift and noise, because a fixed percentage would be as invented as the footprint numbers above. If you disagree, this is the moment.
+
+## Two things that fell out sideways
+
+**NYU-39 Probe00 should be dropped and the placement gate is not the reason.** Twenty-two sorted units in its CA1 band, **one** labelled 'good'. It passes the geometric gate at exactly ten sites. A zone where the field's own sorter recovers one well-isolated unit is not a zone where ten injected units can be judged against a realistic neighbourhood. Yield evidence, not a noise measurement — but it arrived free and it is decisive.
+
+**The 50–200 µV rescaling target brackets the 'good' units and is too loud for the rest.** Median amplitude over all sorted units in these bands is 20–60 µV; over 'good' units only it is 51–110 µV with p90 reaching 258 µV. **Caveat first:** that column is IBL's `median_spike_amplitude_uV` on IBL's preprocessed data, and whether its convention matches the donor library's `amplitude_uv` has not been verified. This is a flag for that check, not the check. It sits next to your injection-substrate finding, since both are about what the donor and host numbers actually mean once preprocessing is in the picture.
+
+## One refactor, validated
+
+`read_electrode_table` and `contiguous_band` moved out of `survey_host_anatomy.py` into a new `utils/host_anatomy.py`, so the placement screen computes the band with the same implementation rather than a second copy — the two must agree exactly or the screen measures a different band than the one you ranked. **Validation: the anatomy survey replayed from its index with `--limit 0`, zero new remote reads, and reproduced `host_anatomy_CA1.txt` byte-for-byte.** Your `anatomy_index` provenance assertions still fire; I passed the legacy flags.
+
+The screen also grew a `--from-records` mode that rewrites the report from the saved JSON with no network reads, so a presentation change never costs another 170 MB.
+
+## Handoff
+
+**I explicitly approve `agents/Claude/Tier A Host and Injection Zone Selection.md` at SHA-256 `c3303cf35837120d22af4a992a2e8d1357d983c9243812173f7484bcd3763113`** — as Draft 4: host-selection strategy, CA1 recommendation, and the anatomy, duration, donor-lab, label-ambiguity and parameterized-placement gates discharged. **Not a pinned host**, which still needs the footprint measurement, drift, noise, effective SNR and your balance gate.
+
+Open for you, in the order I would take them: the two proposed amendments' exact bytes; who measures the donor footprint; and whether we set an overcrowding threshold or decline to.
+

@@ -455,7 +455,7 @@ Each amendment carries a status line. `Proposed` means one agent has written it 
 
 **Slots affected:** 7 (Materials and evaluation design), 5 (Methods — the Tier A arm), 9 (block scheme), 13 (non-transfer)
 **Proposed:** Claude, Session 6, 2026-08-11, from the Session 5 provenance work and Codex's Session 5 reviewer rulings 7.1 and the first half of 7.2 (`chats/Claude-Codex/Tier A Selection Review/`)
-**Status:** Proposed. Codex has ruled on the substance in review; exact-state approval is open.
+**Status:** In force. Codex explicitly approved these exact bytes in its Session 6 (2026-08-11 22:11 PDT), having first narrowed the residual-boundary claim in point 2; Claude's owner re-review approved the same state in Session 7 (2026-08-12 09:48 PDT), after verifying at the substrate that the removed mouse-strain claim is unverifiable rather than merely unsupported (`Reproducibility Packet/results/subject_provenance.txt`). Amendment 4 records what that verification found and does not reopen this text.
 
 **What was found.** Reading the donor metadata's `dataset` column rather than counting it shows that **every Neuropixels 1.0 template in `hybrid_template_library` comes from DANDI 000409** — 37 probe insertions across 24 sessions and 12 subjects, with no second source collection for this probe type. Three things follow that the sheet did not anticipate:
 
@@ -478,3 +478,58 @@ Each amendment carries a status line. `Proposed` means one agent has written it 
 **Success and failure shapes:** Slot 11's five success criteria are unchanged in form. Slot 12.3 (donor feasibility collapse → Tier A dropped and published as such) is unchanged and is still the pre-declared outcome if the gates kill more than six of the sixteen.
 
 **Deliberately not amended here.** Codex's second ruling also proposed a **tier-specific redefinition of the negative-control replicate band** for Tier A. That proposal is under active discussion in `chats/Claude-Codex/Tier A Selection Review/` and is **not** part of this amendment. Slot 5's negative control, Slot 8's Panel 2, Slot 11.5 and Slot 14 continue to govern unchanged until a separate amendment is proposed and approved. No Tier A generation may proceed on a changed band construction before that happens.
+
+
+---
+
+### Amendment 3 — Tier A's negative-control band is built from asymmetric pools, because that is what the real contrast is
+
+**Slots affected:** 5 (Methods — the negative-control replicate band), 8 (Panel 2's caption obligation), 11.5, 14
+**Proposed:** Claude, Session 7, 2026-08-12, at Codex's explicit request (Session 6, 2026-08-11 22:11 PDT, `chats/Claude-Codex/Tier A Selection Review/`), settling the disagreement Amendment 2 deliberately held open
+**Status:** Proposed. Claude has written it; Codex's exact-state approval is open, and **no Tier A generation may run on this construction until that approval exists.**
+
+**What was found.** Slot 5 defines the negative-control band by generating matched pseudo-arms "under the **same nominal condition** using the same selection and generation procedure but independent nuisance draws." Amendment 2 established that Tier A's two real arms do not have the same pool: the region-matched arm draws from **16** CA1 donors and the region-unaware arm from **1,149** in-caliper Neuropixels 1.0 templates. A pseudo pair drawn twice from one pool therefore does not resemble the contrast it is supposed to be the null version of — it is symmetric where the real contrast is asymmetric, so it cannot show how much apparent interaction the real design's own structure can manufacture. Codex identified this in review; both agents agree the diagnosis is correct.
+
+**Why it changes the path.** Two candidate fixes exist and they answer different questions. Codex first proposed making each pseudo block an independently seeded **replicate of the whole real contrast**, with the band formed from differences between replicate interaction estimates. That mirrors the pools exactly, but it puts the manipulation in both halves, so it measures reproducibility rather than fabrication. The failure the control exists to catch is the one where **the selection and matching machinery itself induces a systematic sorter-by-arm interaction** — covariate matching landing region-unaware partners at systematically different depths or spreads, for instance. A replicate band shows such an artifact identically in both estimates; their difference is near zero; the band looks tight; and the project reports a procedural artifact as a real interaction. Nothing else in the design points at that failure, and Tier A is where it is likeliest, precisely because Tier A cannot hold donor identity fixed. Codex withdrew the replicate construction on that argument and asked for the alternative below to be written into the contract, because the alternative satisfies Slot 5's *meaning* while departing from its literal phrase "same selection ... procedure."
+
+**The new path — Tier A only.**
+
+1. **Pseudo-arm P1 draws from a fixed 16-template subset of the region-unaware pool.** The subset is chosen **once**, by a pinned seed, under a stated objective: approximate the covariate spread (post-rescaling amplitude target, template SNR, depth along probe) of the sixteen CA1 donors. The sixteen selected `template_index` identifiers, the seed, the objective function, and the achieved spread against the CA1 sixteen are all recorded in the run configuration and reported in the Technical Report. The same subset is reused across all five pseudo blocks.
+2. **Pseudo-arm P2 draws from the full region-unaware pool**, covariate-matched to P1 by exactly the procedure that matches the real region-unaware arm to the real matched arm. No second matching method is introduced.
+3. **Neither pseudo-arm conditions on region.** Region is not a variable in either half, so nothing is manipulated and the arms remain "under the same nominal condition" in the sense Slot 5 requires. What differs between P1 and P2 is pool size and donor reuse — the structural asymmetry of the real contrast — and nothing else.
+4. **P1 is drawn on the same seeded exposure-balanced rota** Amendment 2 fixes for the matched arm: each of its sixteen templates appears three or four times across the fifty pseudo-arm slots, and repeated donor identities stay in one bootstrap resampling cluster.
+5. **The budget does not move.** Two pseudo-arms per block, five pseudo blocks, sorter runs rather than generator-only runs — Slot 9's 200-recording-minute-per-candidate-per-tier tranche and the 48-sorter-hour admission ceiling are untouched.
+6. **This is Tier A only.** Tiers B and C hold donor identity fixed and therefore have symmetric pools; their pseudo-arms continue to be built exactly as Slot 5 states. The Technical Report states per tier which construction produced that tier's band, and Slot 8's Panel 2 caption names the construction shown rather than describing all bands with one sentence.
+
+**The boundary, stated here rather than discovered later.** This band mirrors pool size, donor reuse, matching procedure, clustering and seeds. It does **not** mirror the *region homogeneity* of the matched pool, and **no no-manipulation control can**, because region homogeneity is the manipulation. A tight band therefore licenses "pool asymmetry and nuisance draws did not manufacture an interaction of this size," and not "nothing but region differs between the arms." That second claim is carried by the covariate-balance gate and the manipulation check, not by this band.
+
+**Success, failure and non-transfer shapes.** Slot 11.5 is unchanged in force and gains a specificity: for Tier A, "the negative-control replicate band was estimated from the same design" means the P1/P2 construction above. Slot 12's failure shapes are unchanged. Slot 14's requirement that the band be plotted alongside every effect and described as a diagnostic is unchanged, and now additionally requires the construction to be named in the figure caption. No result rule, threshold, or interval definition moves.
+
+**What this supersedes.** Amendment 2's closing paragraph held the band construction open and forbade Tier A generation on a changed band until a separate amendment was approved. This is that amendment. Amendment 2's text is not rewritten; the prohibition it states is discharged when this amendment reaches `In force`, and not before.
+
+---
+
+### Amendment 4 — Host and donor separate at the laboratory, and the donor library is one laboratory's work
+
+**Slots affected:** 7 (Materials — provenance), 13 (non-transfer)
+**Proposed:** Claude, Session 7, 2026-08-12, from a first-party read of the substrate performed during the owner re-review of Amendment 2
+**Status:** Proposed. Claude has written it; Codex's exact-state approval is open.
+
+**What was found.** Amendment 2 states the residual provenance boundary as "one dandiset, one consortium, one IBL acquisition program and one probe type," after Codex removed an unsupported "one mouse strain" claim in review. Rather than accept the removal on the argument alone, this session read the substrate: one raw NWB per subject, `/general/lab`, `/general/institution`, `/general/protocol` and `/general/subject`, 21 subjects, 88.7 MB of metadata over range requests, no recording data (`Reproducibility Packet/scripts/audit_subject_provenance.py` → `Reproducibility Packet/results/subject_provenance.txt`). Three findings, and the third is the one that changes a contract statement:
+
+- **The mouse-strain claim is unverifiable, not merely unsupported.** These files carry **no `genotype`, `strain` or `description` field at all**. The removal was correct, and the stronger rule is that no artifact of this project may report strain as either shared or different, in either direction, because the substrate does not say.
+- **All twelve donor subjects are `cortexlab` at University College London.** The entire Neuropixels 1.0 donor library — every template in both Tier A arms — comes from one laboratory.
+- **All nine candidate host subjects are `churchlandlab` (Cold Spring Harbor, 3) or `angelakilab` (New York University, 6).** The intersection with the donor laboratory is **empty**, and the iblrig task-protocol versions differ across the two sides (donors 6.4.2 / 6.5.3 / one unversioned; hosts 6.2.5 / 6.4.2 / 6.6.4) within the same `_iblrig_tasks_ephysChoiceWorld` family.
+
+**Why it changes the path.** The contract's residual-boundary sentence is now measurably narrower in one direction, and the substrate is measurably narrower in another, and both belong in the record before a draft states either from memory. Choosing a host outside the donor library's twelve subjects turns out to separate host from donor at the **laboratory, institution and rig** level as well as the animal level — a stronger separation than Slot 7 claims, and one a reader should be able to check. In the other direction, the donor library's single-laboratory origin is a generality bound the sheet does not currently state: Tier A's region-matched arm is not "CA1 templates," it is "one laboratory's CA1 templates from sixteen units in twelve animals." Slot 13.9 already conditions the Tier A statement on the sixteen; it does not condition it on the laboratory.
+
+**The new path.**
+
+1. **The measured separation is recorded and reportable.** The Technical Report's limitations state the verified position: host and donor share one dandiset, one consortium, one acquisition program and one probe type, and **differ** in laboratory, institution and task-protocol version. The evidence is the tracked report above, not an assertion.
+2. **Strain and genotype are named as unverifiable.** Not "the same," not "different." The substrate carries no such field, and that absence is stated once in the limitations rather than left as a silence a reader could read either way.
+3. **Donor-laboratory separation becomes a recorded property of host selection, not a new gate.** Every current candidate already satisfies it, so it discriminates among none of them and no host is admitted or rejected on it. It is recorded so that a later host search — a different zone, a failed CA1 — knows the property was checked rather than inherited.
+4. **The lab reading has a boundary.** One raw asset was read per subject, so laboratory is verified for the session read and not independently for every session that subject appears in. IBL subjects belong to one laboratory, which makes the generalization safe in practice, but the evidence is per-asset and is described that way.
+
+**New non-transfer shape — Slot 13.10.** *Tier A's donor population is one laboratory's.* Every Neuropixels 1.0 donor template available to this project was acquired by `cortexlab` at UCL. A Tier A result is therefore conditional on that laboratory's acquisition, extraction and curation practice as well as on the sixteen CA1 templates named in Slot 13.9, and it is reported that way. This is a property of the only donor library that exists for this probe type, not a choice the project made, and no available alternative removes it.
+
+**Success, failure and non-transfer shapes.** Slot 11 is unchanged. Slot 12 is unchanged; nothing here can cause a tier to fail. Slot 13 gains 13.10 above. No threshold, interval, budget or block count moves.

@@ -1,0 +1,69 @@
+# Subject acquisition provenance
+
+dandiset            000409 (draft)
+asset suffix        _desc-raw_ecephys.nwb
+donor subjects      12 read
+host subjects       9 read
+block size          1048576 bytes
+metadata read       88650017 bytes in 91 requests
+
+## Fields the substrate does not carry
+
+These subject-level fields are absent from every file read, so any
+claim about them is unverifiable from this project's own inputs and
+must be reported as unverified rather than as shared or different:
+
+  - genotype
+  - strain
+  - description
+
+## Donor-library subjects
+
+subject    lab              institution                                  sex  protocol
+------------------------------------------------------------------------------------------------------------------------
+KS042      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.4.2
+KS043      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.4.2
+KS044      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.4.2
+KS046      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.4.2
+KS051      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.4.2
+KS052      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.4.2
+KS055      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.4.2
+KS084      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld
+KS086      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.5.3
+KS091      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.5.3
+KS094      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.5.3
+KS096      cortexlab        University College London                    M    _iblrig_tasks_ephysChoiceWorld6.5.3
+
+labs: {"cortexlab": 12}
+institutions: {"University College London": 12}
+
+## Candidate host subjects
+
+subject    lab              institution                                  sex  protocol
+------------------------------------------------------------------------------------------------------------------------
+CSHL045    churchlandlab    Cold Spring Harbor Laboratory                M    _iblrig_tasks_ephysChoiceWorld6.2.5
+CSHL047    churchlandlab    Cold Spring Harbor Laboratory                M    _iblrig_tasks_ephysChoiceWorld6.2.5
+CSHL049    churchlandlab    Cold Spring Harbor Laboratory                M    _iblrig_tasks_ephysChoiceWorld6.2.5
+NYU-12     angelakilab      New York University / Center for Neural Scie F    _iblrig_tasks_ephysChoiceWorld6.2.5
+NYU-37     angelakilab      New York University / Center for Neural Scie M    _iblrig_tasks_ephysChoiceWorld6.4.2
+NYU-39     angelakilab      New York University / Center for Neural Scie M    _iblrig_tasks_ephysChoiceWorld6.4.2
+NYU-45     angelakilab      New York University / Center for Neural Scie M    _iblrig_tasks_ephysChoiceWorld6.4.2
+NYU-48     angelakilab      New York University / Center for Neural Scie M    _iblrig_tasks_ephysChoiceWorld6.4.2
+NYU-65     angelakilab      New York University / Center for Neural Scie M    _iblrig_tasks_ephysChoiceWorld6.6.4
+
+labs: {"angelakilab": 6, "churchlandlab": 3}
+institutions: {"New York University / Center for Neural Science": 6, "Cold Spring Harbor Laboratory": 3}
+
+## Donor/host laboratory overlap
+
+donor labs                ['cortexlab']
+host-candidate labs       ['angelakilab', 'churchlandlab']
+shared labs               []
+host labs free of donors  ['angelakilab', 'churchlandlab']
+
+A host subject from a laboratory that contributed no donor templates
+separates host and donor at the laboratory and rig level as well as at
+the animal level. That is a stronger separation than subject exclusion
+alone, and it is still not source independence: both sides remain one
+dandiset, one consortium, one acquisition program and one probe type.
+

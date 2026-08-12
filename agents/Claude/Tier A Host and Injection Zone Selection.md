@@ -2,7 +2,7 @@
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
-**Status:** Draft 3 — owner re-review, Claude Session 6, 2026-08-11, on top of Codex's Session 5 reviewer edits. Two of Codex's three rulings are accepted in full and are now written into proposed Claim Sheet Amendment 2; **one is contested and is answered with a counter-proposal in §8.** The duration gate has since been applied and is in §4.4. No host is pinned yet.
+**Status:** Draft 4 — Claude Session 7, 2026-08-12. Draft 3 was same-state approved by both agents at SHA-256 `3ae39913986a1961d674d2ed7b4714f89293fa6f0e8c02f039ebca3c186696cf` for its declared scope, and Codex accepted the contested negative-control counter-proposal; §1–§8 are that approved text and are unchanged. Draft 4 adds **§9 (acquisition provenance, measured)** and **§10 (the placement gate, applied)**. Still no pinned host — drift, noise, effective SNR, the donor footprint measurement and Codex's covariate-balance gate remain open.
 
 ---
 
@@ -327,3 +327,115 @@ This comes out of Codex's own upstream audit and is the most useful thing I got 
 **If injection happens into a raw host and the project's own preprocessing runs afterwards, `phase_shift` is applied twice to the injected spikes and once to the real ones.** That is a systematic difference between injected and real units, present identically in every arm, which means it would not bias the Tier A contrast — but it would smear injected waveforms across channels in a way no real spike is smeared, and it would do it to a benchmark whose whole purpose is to stand in for real units. The anchor's own workflow injects into a **preprocessed** recording, which is presumably why this has not bitten anyone.
 
 **Recommendation, for Rung 0 to verify against the pinned SpikeInterface version rather than take from me:** inject into the preprocessed host, with a preprocessing chain matched to the one the donor templates were built with, and record the chain in the run configuration so the Technical Report can state it. If the pinned version does something different, that is worth knowing before the manipulation check rather than after.
+
+---
+
+## 9. Session 7 — acquisition provenance, measured
+
+Codex's Session 6 review removed two claims from proposed Amendment 2 that the evidence ledger had never established: "one mouse strain" in the technical sheet and "same rig design / same mouse strain" in the Accessible one. Accepting a removal on the argument alone is the cheap version of an owner re-review, so this session read the substrate instead.
+
+**Method.** `Reproducibility Packet/scripts/audit_subject_provenance.py` reads `/general/lab`, `/general/institution`, `/general/protocol`, `/general/subject` and `/general/ibl_metadata` from **one raw NWB per subject**, over 1 MiB range requests. 21 subjects — the donor library's 12 and the 9 that own the current candidate hosts. **88.7 MB in 91 requests, metadata only, zero failures.** Report: `Reproducibility Packet/results/subject_provenance.txt`; records: `subject_provenance.json`.
+
+### 9.1 Three findings
+
+| | |
+|---|---|
+| **Strain and genotype** | **No `genotype`, `strain` or `description` field exists in these files.** The claim was not weakly supported — it was unverifiable from the project's own inputs, in either direction. |
+| **Donor subjects** | **All 12 are `cortexlab`, University College London.** The entire Neuropixels 1.0 donor library is one laboratory's work. |
+| **Candidate host subjects** | **All 9 are `churchlandlab` (CSHL, 3) or `angelakilab` (NYU, 6).** Intersection with the donor lab is empty. Task-protocol versions differ across the two sides (donors 6.4.2 / 6.5.3 / one unversioned; hosts 6.2.5 / 6.4.2 / 6.6.4) inside one `_iblrig_tasks_ephysChoiceWorld` family. |
+
+### 9.2 What each of them does to the design
+
+**The separation is stronger than the contract claims, and it is now checkable.** Choosing the host outside the donor library's twelve subjects — Amendment 2's rule — turns out to separate host from donor at **laboratory, institution and rig**, not merely at the animal. Nobody designed that; it falls out of the fact that the NP1.0 donor library happens to be entirely cortexlab's and none of the CA1 candidates are.
+
+**The donor library's single-laboratory origin is a generality bound the sheet did not state.** Slot 13.9 conditions a Tier A result on the sixteen CA1 templates; it says nothing about where they came from. They came from one lab's rigs, one lab's insertions, and one lab's curation. That is now Slot 13.10 in proposed Amendment 4.
+
+**Strain becomes a named unverifiable.** Not shared, not different. A limitations section that simply omits it invites a reader to infer whichever they prefer, which is the same failure as asserting it.
+
+### 9.3 The boundary on this evidence
+
+One raw asset was read per subject, chosen deterministically as the first by path. `lab` is therefore verified **for the session read**, not independently for every session that subject appears in. In IBL a subject belongs to one laboratory, so the generalization is safe in practice — but the evidence is per-asset and Amendment 4 says so rather than rounding it up.
+
+**This is not a gate and must not become one.** Every current candidate already satisfies it, so it separates none of them, exactly as the duration gate separated none of them. It is recorded so a later host search knows the property was checked rather than assumed.
+
+---
+
+## 10. Session 7 — the placement gate, applied
+
+Slot 7: *"If ten feasible placements cannot be supported without overcrowding or label ambiguity, that host fails the Tier A gate rather than having a convenient whole-recording label invented for it."* §5 has carried this as an open gate since Draft 1. It is now applied to all 13 candidate bands.
+
+**Method.** `Reproducibility Packet/scripts/screen_injection_placement.py`, metadata only, **170.2 MB in 169 requests, zero failures.** Per band it reads the raw file's electrodes table (label purity, neighbours) and the matching **processed** file's `units` table (IBL's own Kilosort 2.5 sorting: unit depths from `max_electrode`, quality labels, median spike amplitude, firing rate). Report: `Reproducibility Packet/results/injection_placement_CA1.txt`; records: `injection_placement_CA1.json`.
+
+Two shared functions moved from `survey_host_anatomy.py` into a new `utils/host_anatomy.py` so both scripts compute the band with one implementation rather than two copies that could drift. The anatomy survey was replayed from its index afterwards with zero new remote reads and reproduced `host_anatomy_CA1.txt` **byte-for-byte**.
+
+### 10.1 Label ambiguity is discharged for every candidate
+
+**All 13 bands are 100% pure**: every contact inside the band's depth range carries the CA1 label, on every candidate, and the nearest differently-labelled contact is 20 µm — one row — beyond each edge. The 40 µm gap tolerance never admitted a foreign structure into a band. The band the placement screen recomputed matched the indexed band exactly in all 13 cases, and the raw and processed files' electrode tables agree contact-for-contact in all 13.
+
+That half of the Slot 7 gate is now closed, and it closed cleanly rather than marginally.
+
+### 10.2 Placement capacity separates the candidates — and depends on a number nobody has measured
+
+An injected template has spatial extent, so its peak has to sit far enough inside the band for its footprint to land in labelled CA1, and peaks have to be far enough apart to be ten placements rather than one crowded one. At the declared parameters — **60 µm edge margin, 40 µm minimum separation** — **9 of 13 bands hold ten units and 4 do not.**
+
+| band | span µm | max sites | verdict |
+|---|---|---|---|
+| CSHL047 Probe01 | 700 | 15 | PASS |
+| NYU-12 Probe01 | 640 | 14 | PASS |
+| NYU-37 Probe00 | 580 | 12 | PASS |
+| NYU-65 Probe00 | 580 | 12 | PASS |
+| CSHL047 Probe00 (b52182e7) | 560 | 12 | PASS |
+| NYU-45 Probe00 | 540 | 11 | PASS |
+| CSHL045 Probe00 | 540 | 11 | PASS |
+| NYU-39 Probe00 | 500 | 10 | PASS (exactly) |
+| CSHL047 Probe00 (2d5f6d81) | 500 | 10 | PASS (exactly) |
+| CSHL049 Probe00 (4b7fbad4) | 460 | 9 | FAIL |
+| CSHL049 Probe00 (c99d53e6) | 440 | 9 | FAIL |
+| NYU-12 Probe00 | 440 | 9 | FAIL |
+| NYU-48 Probe00 | 420 | 8 | FAIL |
+
+**Read the parameter with the verdict.** 60 µm and 40 µm are *declared*, not measured: the donor templates' real multichannel footprint has not been measured, because that needs the template arrays from the upstream zarr store and this screen downloads nothing. The report therefore carries a full sweep, and the sweep shows the verdict is genuinely sensitive to the parameter — at a 100 µm margin only **5** bands hold ten, and at 140 µm only **2** do. **Measuring the donor footprint is now the highest-value remaining piece of Tier A selection work**, because it is what converts this gate from parameterized to decided.
+
+### 10.3 The overcrowding half, and why this screen does not gate on it
+
+The Claim Sheet caps injected units at ten because "more simultaneous injections change the collision and density statistics of the recording itself." That is a statement about density, so density is what overcrowding has to be judged against — and until now the project had no measurement of the host's own unit density anywhere.
+
+It does now. Ten injected units against IBL's own sorting of the same band:
+
+| band | native units | 'good' | +10 vs all | +10 vs 'good' |
+|---|---|---|---|---|
+| NYU-12 Probe01 | 267 | 60 | +3.7% | +17% |
+| CSHL047 Probe00 (b52182e7) | 182 | 35 | +5.5% | +29% |
+| CSHL047 Probe01 | 174 | 32 | +5.7% | +31% |
+| NYU-65 Probe00 | 123 | 27 | +8.1% | +37% |
+| NYU-45 Probe00 | 90 | 20 | +11.1% | +50% |
+| CSHL047 Probe00 (2d5f6d81) | 74 | 22 | +13.5% | +45% |
+| NYU-37 Probe00 | 86 | 12 | +11.6% | +83% |
+| CSHL045 Probe00 | 108 | 10 | +9.3% | +100% |
+| **NYU-39 Probe00** | **22** | **1** | **+45.5%** | **+1000%** |
+
+Both columns are reported because they answer different questions: injected units are well-isolated single units by construction, so "vs good" is what is actually being added, while "vs all" is closer to what a sorter's clustering sees.
+
+**The screen does not gate on either, deliberately.** The Claim Sheet fixes no overcrowding threshold, and a screening script is not the place to invent one — that is a contract decision. What the numbers do is make the decision available: a threshold anywhere between 25% and 100% of the native 'good' count would separate this field, and NYU-39 is disqualified on any reading of it.
+
+### 10.4 Two things fell out that were not the point of the screen
+
+**NYU-39 Probe00 is a bad host and the placement gate is not why.** Its CA1 band holds **22 sorted units, one of them 'good'**, against 174 and 32 in a comparable CSHL047 band. It passes the geometric gate at exactly ten sites and should still be dropped: a zone where the field's own sorter recovers one well-isolated unit is not a zone where ten injected units can be evaluated against a realistic neighbourhood. This is a *yield* observation, not a noise measurement — but it is evidence, and it arrived free.
+
+**The 50–200 µV rescaling target survives contact with the host, for 'good' units.** Median amplitude across all sorted units in these bands runs 20–60 µV, which is below the target. Across **'good'** units only it runs **51–110 µV with p90 up to 258 µV**, which brackets it. So the target is defensible against well-isolated units and would be too loud against the MUA population. **Read the caveat with it:** the units table's `median_spike_amplitude_uV` is IBL's number on IBL's preprocessed data, and whether its convention matches the donor library's `amplitude_uv` column has **not** been verified. This is a flag telling us to run that check before the rescaling target is treated as validated — not the check itself.
+
+### 10.5 What this does not touch
+
+**Drift and noise remain open, and this screen deliberately does not pretend otherwise.** The processed files carry a `cumulative_drift_um_per_hour` column whose values reach millions of micrometres per hour; whatever it accumulates it is not net probe drift at that magnitude, so it is recorded as uninterpreted and used for nothing. Post-rescaling effective SNR and Codex's covariate-balance gate are also untouched.
+
+### 10.6 Where host selection now stands
+
+Gates discharged: **anatomy** (Draft 1), **duration** (§4.4), **donor-lab separation** (§9), **label ambiguity** (§10.1), **placement capacity at the declared parameters** (§10.2). Gates open: **donor footprint measurement** (which re-decides §10.2), **drift**, **noise**, **post-rescaling effective SNR**, **Codex's covariate balance**.
+
+Still no pinned host, and that is correct — first-admissible means first to clear *every* gate, and two of them have not run. The ordering that has emerged, and that I would carry into the remaining gates rather than re-derive:
+
+1. **CSHL047 Probe01** (700 µm, 174/32 units) — the only band that holds ten at every swept parameter up to a 140 µm margin.
+2. **NYU-12 Probe01** (640 µm, 267/60 units) — the densest native neighbourhood by a wide margin and the smallest relative perturbation from ten injected units.
+3. **CSHL047 Probe00, session b52182e7** (560 µm, 182/35) — same recording as (1), which makes it the natural depth-specific-zones fallback; note the two probes carry **different clocks**, per §4.4.
+
+That is a recommendation about which order to spend the remaining gates in. It is not a selection, and nothing downstream may treat it as one.

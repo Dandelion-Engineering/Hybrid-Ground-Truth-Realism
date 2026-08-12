@@ -9,4 +9,6 @@ copy-pastes another's implementation:
 - ``ccf_labels``       map Allen CCF long names to the acronyms the template
                        library's ``brain_area`` column uses
 - ``anatomy_index``    validate the target/gap provenance of anatomy indexes
+- ``host_anatomy``     read a host electrodes table and find contiguous
+                       single-structure depth bands
 """

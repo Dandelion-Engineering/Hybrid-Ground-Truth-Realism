@@ -1,0 +1,653 @@
+[
+ {
+  "asset_id": "e172bda5-89e9-4082-9871-5c1300f49df1",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "07dc4b76-5b93-4a03-82a0-b3d9cc73f412",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 3897897,
+   "requests": 4
+  },
+  "path": "sub-KS042/sub-KS042_ses-07dc4b76-5b93-4a03-82a0-b3d9cc73f412_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "07dc4b76-5b93-4a03-82a0-b3d9cc73f412",
+  "subject": "KS042",
+  "subject_fields": {
+   "date_of_birth": "2020-07-08T00:00:00+01:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS042",
+   "weight": "0.024800000000000003 kg"
+  }
+ },
+ {
+  "asset_id": "39b89708-bf18-4fa3-8de4-ba3e7b180648",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "9468fa93-21ae-4984-955c-e8402e280c83",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4194304,
+   "requests": 4
+  },
+  "path": "sub-KS043/sub-KS043_ses-9468fa93-21ae-4984-955c-e8402e280c83_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "9468fa93-21ae-4984-955c-e8402e280c83",
+  "subject": "KS043",
+  "subject_fields": {
+   "date_of_birth": "2020-07-08T00:00:00+01:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS043",
+   "weight": "0.0258 kg"
+  }
+ },
+ {
+  "asset_id": "e8232faa-ebfb-454a-ae33-1bdc2913a4f2",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "781b35fd-e1f0-4d14-b2bb-95b7263082bb",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4049011,
+   "requests": 4
+  },
+  "path": "sub-KS044/sub-KS044_ses-781b35fd-e1f0-4d14-b2bb-95b7263082bb_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "781b35fd-e1f0-4d14-b2bb-95b7263082bb",
+  "subject": "KS044",
+  "subject_fields": {
+   "date_of_birth": "2020-07-08T00:00:00+01:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS044",
+   "weight": "0.024300000000000002 kg"
+  }
+ },
+ {
+  "asset_id": "4fd02683-d7b1-4596-b582-17299fc4912e",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "0ac8d013-b91e-4732-bc7b-a1164ff3e445",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4822984,
+   "requests": 5
+  },
+  "path": "sub-KS046/sub-KS046_ses-0ac8d013-b91e-4732-bc7b-a1164ff3e445_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "0ac8d013-b91e-4732-bc7b-a1164ff3e445",
+  "subject": "KS046",
+  "subject_fields": {
+   "date_of_birth": "2020-07-08T00:00:00+01:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS046",
+   "weight": "0.0256 kg"
+  }
+ },
+ {
+  "asset_id": "28f95990-071e-4790-adb5-b2328c1eba75",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "0a018f12-ee06-4b11-97aa-bbbff5448e9f",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 3460831,
+   "requests": 4
+  },
+  "path": "sub-KS051/sub-KS051_ses-0a018f12-ee06-4b11-97aa-bbbff5448e9f_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "0a018f12-ee06-4b11-97aa-bbbff5448e9f",
+  "subject": "KS051",
+  "subject_fields": {
+   "date_of_birth": "2020-11-24T00:00:00+00:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS051",
+   "weight": "0.024 kg"
+  }
+ },
+ {
+  "asset_id": "9cd2a3a5-2ce1-4cf3-8743-da623603fae6",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "ac7d3064-7f09-48a3-88d2-e86a4eb86461",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4832774,
+   "requests": 5
+  },
+  "path": "sub-KS052/sub-KS052_ses-ac7d3064-7f09-48a3-88d2-e86a4eb86461_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "ac7d3064-7f09-48a3-88d2-e86a4eb86461",
+  "subject": "KS052",
+  "subject_fields": {
+   "date_of_birth": "2020-11-24T00:00:00+00:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS052",
+   "weight": "0.0238 kg"
+  }
+ },
+ {
+  "asset_id": "ccbd8034-075e-44f0-81df-4a51476c0ce0",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "872ce8ff-9fb3-485c-be00-bc5479e0095b",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4531553,
+   "requests": 5
+  },
+  "path": "sub-KS055/sub-KS055_ses-872ce8ff-9fb3-485c-be00-bc5479e0095b_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "872ce8ff-9fb3-485c-be00-bc5479e0095b",
+  "subject": "KS055",
+  "subject_fields": {
+   "date_of_birth": "2020-11-24T00:00:00+00:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS055",
+   "weight": "0.024800000000000003 kg"
+  }
+ },
+ {
+  "asset_id": "c4a4cbfb-592e-406f-987f-80523968f521",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld",
+   "session_id": "1b715600-0cbc-442c-bd00-5b0ac2865de1",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4194304,
+   "requests": 4
+  },
+  "path": "sub-KS084/sub-KS084_ses-1b715600-0cbc-442c-bd00-5b0ac2865de1_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "1b715600-0cbc-442c-bd00-5b0ac2865de1",
+  "subject": "KS084",
+  "subject_fields": {
+   "date_of_birth": "2021-08-17T00:00:00+01:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS084",
+   "weight": "0.0282 kg"
+  }
+ },
+ {
+  "asset_id": "590eaded-1aa6-4e6a-a624-f427a2da89a0",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.5.3",
+   "session_id": "e45481fa-be22-4365-972c-e7404ed8ab5a",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4194304,
+   "requests": 4
+  },
+  "path": "sub-KS086/sub-KS086_ses-e45481fa-be22-4365-972c-e7404ed8ab5a_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "e45481fa-be22-4365-972c-e7404ed8ab5a",
+  "subject": "KS086",
+  "subject_fields": {
+   "date_of_birth": "2021-08-17T00:00:00+01:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS086",
+   "weight": "0.031100000000000003 kg"
+  }
+ },
+ {
+  "asset_id": "94815140-46a6-4aba-b08c-eeb083ac4b48",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.5.3",
+   "session_id": "196a2adf-ff83-49b2-823a-33f990049c2e",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4194304,
+   "requests": 4
+  },
+  "path": "sub-KS091/sub-KS091_ses-196a2adf-ff83-49b2-823a-33f990049c2e_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "196a2adf-ff83-49b2-823a-33f990049c2e",
+  "subject": "KS091",
+  "subject_fields": {
+   "date_of_birth": "2021-12-14T00:00:00+00:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS091",
+   "weight": "0.028399999999999998 kg"
+  }
+ },
+ {
+  "asset_id": "74b6f75b-ed70-4b5d-b1c6-2efefd07c2d9",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.5.3",
+   "session_id": "3f859b5c-e73a-4044-b49e-34bb81e96715",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4897522,
+   "requests": 5
+  },
+  "path": "sub-KS094/sub-KS094_ses-3f859b5c-e73a-4044-b49e-34bb81e96715_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "3f859b5c-e73a-4044-b49e-34bb81e96715",
+  "subject": "KS094",
+  "subject_fields": {
+   "date_of_birth": "2022-02-01T00:00:00+00:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS094",
+   "weight": "0.028399999999999998 kg"
+  }
+ },
+ {
+  "asset_id": "3f62048f-77d5-4131-b097-fc89bfdf3047",
+  "general": {
+   "institution": "University College London",
+   "lab": "cortexlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.5.3",
+   "session_id": "1b9e349e-93f2-41cc-a4b5-b212d7ddc8df",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4614194,
+   "requests": 5
+  },
+  "path": "sub-KS096/sub-KS096_ses-1b9e349e-93f2-41cc-a4b5-b212d7ddc8df_desc-raw_ecephys.nwb",
+  "role": "donor",
+  "session": "1b9e349e-93f2-41cc-a4b5-b212d7ddc8df",
+  "subject": "KS096",
+  "subject_fields": {
+   "date_of_birth": "2022-02-01T00:00:00+00:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "KS096",
+   "weight": "0.028300000000000002 kg"
+  }
+ },
+ {
+  "asset_id": "ae56c65d-e8a5-4751-9307-014fa0c1a0ab",
+  "general": {
+   "institution": "Cold Spring Harbor Laboratory",
+   "lab": "churchlandlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.2.5",
+   "session_id": "034e726f-b35f-41e0-8d6c-a22cc32391fb",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 3817267,
+   "requests": 4
+  },
+  "path": "sub-CSHL045/sub-CSHL045_ses-034e726f-b35f-41e0-8d6c-a22cc32391fb_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "034e726f-b35f-41e0-8d6c-a22cc32391fb",
+  "subject": "CSHL045",
+  "subject_fields": {
+   "date_of_birth": "2019-08-06T00:00:00-04:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "CSHL045",
+   "weight": "0.02485 kg"
+  }
+ },
+ {
+  "asset_id": "f4ef09e1-b3e1-4d6b-9ad9-4aca37782d42",
+  "general": {
+   "institution": "Cold Spring Harbor Laboratory",
+   "lab": "churchlandlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.2.5",
+   "session_id": "2d5f6d81-38c4-4bdc-ac3c-302ea4d5f46e",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 3733676,
+   "requests": 4
+  },
+  "path": "sub-CSHL047/sub-CSHL047_ses-2d5f6d81-38c4-4bdc-ac3c-302ea4d5f46e_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "2d5f6d81-38c4-4bdc-ac3c-302ea4d5f46e",
+  "subject": "CSHL047",
+  "subject_fields": {
+   "date_of_birth": "2019-08-06T00:00:00-04:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "CSHL047",
+   "weight": "0.0246 kg"
+  }
+ },
+ {
+  "asset_id": "902b880d-6fbd-4a3b-b563-389867903e9f",
+  "general": {
+   "institution": "Cold Spring Harbor Laboratory",
+   "lab": "churchlandlab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.2.5",
+   "session_id": "4b7fbad4-f6de-43b4-9b15-c7c7ef44db4b",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 3145728,
+   "requests": 3
+  },
+  "path": "sub-CSHL049/sub-CSHL049_ses-4b7fbad4-f6de-43b4-9b15-c7c7ef44db4b_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "4b7fbad4-f6de-43b4-9b15-c7c7ef44db4b",
+  "subject": "CSHL049",
+  "subject_fields": {
+   "date_of_birth": "2019-08-06T00:00:00-04:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "CSHL049",
+   "weight": "0.024399999999999998 kg"
+  }
+ },
+ {
+  "asset_id": "ee5d03f6-9609-4284-b736-282dd887fd83",
+  "general": {
+   "institution": "New York University / Center for Neural Science",
+   "lab": "angelakilab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.2.5",
+   "session_id": "032ffcdf-7692-40b3-b9ff-8def1fc18b2e",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4606168,
+   "requests": 5
+  },
+  "path": "sub-NYU-12/sub-NYU-12_ses-032ffcdf-7692-40b3-b9ff-8def1fc18b2e_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "032ffcdf-7692-40b3-b9ff-8def1fc18b2e",
+  "subject": "NYU-12",
+  "subject_fields": {
+   "date_of_birth": "2019-08-27T00:00:00-04:00",
+   "description": null,
+   "genotype": null,
+   "sex": "F",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "NYU-12",
+   "weight": "0.01838 kg"
+  }
+ },
+ {
+  "asset_id": "eac8b375-111b-48d3-8ce2-4735c09812c0",
+  "general": {
+   "institution": "New York University / Center for Neural Science",
+   "lab": "angelakilab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "21d21fc3-4201-4edc-802a-c67b61952548",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 3108625,
+   "requests": 3
+  },
+  "path": "sub-NYU-37/sub-NYU-37_ses-21d21fc3-4201-4edc-802a-c67b61952548_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "21d21fc3-4201-4edc-802a-c67b61952548",
+  "subject": "NYU-37",
+  "subject_fields": {
+   "date_of_birth": "2020-08-31T00:00:00-04:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "NYU-37",
+   "weight": "0.024 kg"
+  }
+ },
+ {
+  "asset_id": "6d44a45a-5803-4d5f-a766-da550e429f8c",
+  "general": {
+   "institution": "New York University / Center for Neural Science",
+   "lab": "angelakilab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "35ed605c-1a1a-47b1-86ff-2b56144f55af",
+   "source_script": "Created using NeuroConv v0.9.1"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4856575,
+   "requests": 5
+  },
+  "path": "sub-NYU-39/sub-NYU-39_ses-35ed605c-1a1a-47b1-86ff-2b56144f55af_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "35ed605c-1a1a-47b1-86ff-2b56144f55af",
+  "subject": "NYU-39",
+  "subject_fields": {
+   "date_of_birth": "2020-12-08T00:00:00-05:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "NYU-39",
+   "weight": "0.022 kg"
+  }
+ },
+ {
+  "asset_id": "a4061a5f-81ff-4c40-b5ac-7518ba2d37d9",
+  "general": {
+   "institution": "New York University / Center for Neural Science",
+   "lab": "angelakilab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "51e53aff-1d5d-4182-a684-aba783d50ae5",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4827269,
+   "requests": 5
+  },
+  "path": "sub-NYU-45/sub-NYU-45_ses-51e53aff-1d5d-4182-a684-aba783d50ae5_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "51e53aff-1d5d-4182-a684-aba783d50ae5",
+  "subject": "NYU-45",
+  "subject_fields": {
+   "date_of_birth": "2021-02-02T00:00:00-05:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "NYU-45",
+   "weight": "0.0228 kg"
+  }
+ },
+ {
+  "asset_id": "5d251e48-87bf-4ea2-bbc1-267453001311",
+  "general": {
+   "institution": "New York University / Center for Neural Science",
+   "lab": "angelakilab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.4.2",
+   "session_id": "3d59aa1a-b4ba-47fe-b9cf-741b5fdb0c7b",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4476423,
+   "requests": 5
+  },
+  "path": "sub-NYU-48/sub-NYU-48_ses-3d59aa1a-b4ba-47fe-b9cf-741b5fdb0c7b_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "3d59aa1a-b4ba-47fe-b9cf-741b5fdb0c7b",
+  "subject": "NYU-48",
+  "subject_fields": {
+   "date_of_birth": "2021-02-21T00:00:00-05:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "NYU-48",
+   "weight": "0.0183 kg"
+  }
+ },
+ {
+  "asset_id": "7db3ed07-c06d-4ec1-914a-c49955aa7a51",
+  "general": {
+   "institution": "New York University / Center for Neural Science",
+   "lab": "angelakilab",
+   "protocol": "_iblrig_tasks_ephysChoiceWorld6.6.4",
+   "session_id": "8c025071-c4f3-426c-9aed-f149e8f75b7b",
+   "source_script": "Created using NeuroConv v0.9.2"
+  },
+  "ibl_metadata": {
+   "revision": "2025-05-06"
+  },
+  "io": {
+   "bytes": 4194304,
+   "requests": 4
+  },
+  "path": "sub-NYU-65/sub-NYU-65_ses-8c025071-c4f3-426c-9aed-f149e8f75b7b_desc-raw_ecephys.nwb",
+  "role": "host",
+  "session": "8c025071-c4f3-426c-9aed-f149e8f75b7b",
+  "subject": "NYU-65",
+  "subject_fields": {
+   "date_of_birth": "2022-05-03T00:00:00-04:00",
+   "description": null,
+   "genotype": null,
+   "sex": "M",
+   "species": "Mus musculus",
+   "strain": null,
+   "subject_id": "NYU-65",
+   "weight": "0.0247 kg"
+  }
+ }
+]
