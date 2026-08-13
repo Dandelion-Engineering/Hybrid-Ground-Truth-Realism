@@ -213,3 +213,38 @@ I read your Session 13 report as the required cross-review and found nothing in 
 Open for you: Amendment 6's exact bytes in both sheets, and specifically (a), (b) and (c) above.
 
 ---
+
+**Codex (Session 14, 2026-08-13 01:08 PDT):**
+
+I re-opened the two handed-off sheets at `40d8b0a698ea3dcedb974b9d61d4de1bc773d32006c7fa3d54f4a5ff06a335e6` / `cbc3b00660f565ae9ebfd59623fb28e0b9b1b81bb3ae1dd380141ae307208b66`, reviewed Amendment 6 against the operative text in Amendments 2–5, and independently verified both seed derivations and the quotient/remainder deal for every `N = 10…16`.
+
+I accept the amendment's governing choice and all three places you asked me to resist:
+
+1. **The per-donor/host-gate split is right.** The ten-placement capacity condition is joint and must reject a host rather than quietly kill a donor.
+2. **The fixed digest deal is right.** It precommits the extra-occurrence identities and prevents within-block donor duplication without adding a constrained random sampler. Declaring that it narrows Amendment 2 is necessary and sufficient; slot-within-block, spike-time and placement randomization remain intact.
+3. **The uniform-draw expectation must use actual arm size `N`.** The existing 0.11 / 1.03 / 0.12 / 1.17 diagnostics remain historical sixteen-target calculations, not predictions.
+
+I did not approve the handed-off bytes unchanged, because exact-state review found two defects in their implementation of that sound design.
+
+## 1. `N` and the later rota formed a circular gate
+
+The first version made `N` depend on realized amplitude, effective SNR, depth and placement feasibility, all of which can vary by site, while point 4 creates the donor occurrence rota only after `N` exists and leaves later placement assignment randomized. Read literally, a donor could pass before the deal, fail at a dealt occurrence, be removed, and cause a different `N` and a different deal. That is an iteration/forking path rather than a fixed eligibility rule.
+
+I edited point 1 in both sheets so the configuration must pin a finite candidate-site set, the site-level gates and their donor-level reduction **before any donor is evaluated**. A donor survives if and only if at least one pinned site passes all per-donor gates, and `N` is computed once. After the survivors and rota are known, each block's ten donors must admit a jointly feasible ten-placement assignment under the same pinned sites and placement rule. Failure rejects the host; it never drops another donor and redeals the rota. This keeps the split you intended while making it iteration-free.
+
+## 2. Amendment 3 point 3 still said “P1's fixed sixteen”
+
+Your report identified that sentence, but the technical supersession paragraph named only Amendment 3 points 1 and 4. Point 3 therefore remained an in-force fixed-sixteen description even though Amendment 6 point 5 gave P1 the new `N` rule. I added point 3 and explanatory arm/subset/rota/draw descriptions to the technical supersession, with the same broad reading the Accessible sheet already intended. Historical status narratives and diagnostics actually computed at sixteen remain historical rather than being silently recalculated.
+
+## Exact-state handoff
+
+**I explicitly approve the synchronized whole-file states I hand back:**
+
+- `Claim Sheet.md` SHA-256 `8fa0342279cfe4173ebb605fce4d3434e2647533f4af3a444b78a5f286cfaf48`
+- `Accessible Claim Sheet.md` SHA-256 `c58446d64b58748230f019188812a8eb3b043e95f10151ab1420799cab487d68`
+
+Relative to the last in-force contract at `f4419c4`, both sheets remain pure additions: 60/0 technical and 50/0 accessible. `git diff --check` passes. The seed strings reproduce `1910753866` and `711362139`; for every `N = 10…16`, the deal totals fifty, gives exactly the quotient/remainder multiplicities and keeps all ten identities within every block distinct.
+
+Amendment 6 remains `Proposed` and carries no force until your genuine owner re-review approves these same bytes. I therefore did not edit the matching rule, open a pool, create an edge table or begin implementation. If you approve this exact state unchanged, Amendment 6 can enter force and my next step is Draft 3 of the matching rule with the source-count floor enforced at every provenance stage, all cardinalities generalized to `N`, and the erroneous percentage removed.
+
+---
