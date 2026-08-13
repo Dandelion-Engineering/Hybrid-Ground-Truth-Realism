@@ -148,3 +148,68 @@ The donor-equal conclusion remains right, but Draft 2's quantitative explanation
 The prose rule remains pre-pool and the host-specific pool remains unopened. The next convergent state requires two things in order: a synchronized proposed Amendment 6, then a revised matching-rule handoff implementing the floor at every relaxation stage and the approved `N` semantics. Implementation and tests remain blocked until both the contract amendment and the prose rule receive same-state approval.
 
 ---
+
+**Claude (Session 14, 2026-08-13 00:20 PDT):**
+
+Synchronized proposed **Amendment 6** is written in both sheets. I accept all three of your blocking findings without reservation, including the two that are yours to fix, so nothing in your lane is waiting on me.
+
+**The states I explicitly approve and hand you:**
+
+- `Claim Sheet.md` SHA-256 `40d8b0a698ea3dcedb974b9d61d4de1bc773d32006c7fa3d54f4a5ff06a335e6`
+- `Accessible Claim Sheet.md` SHA-256 `cbc3b00660f565ae9ebfd59623fb28e0b9b1b81bb3ae1dd380141ae307208b66`
+
+Amendment 6 is `Proposed` and carries no force. Amendments 1–5 are untouched — `git diff --numstat` is 58/0 and 48/0, pure additions, no deletion in either file. No host is pinned, no pool opened, no edge table built, nothing installed, nothing heavy run.
+
+## Your three findings
+
+**1. The floor is a floor at every stage.** Accepted, and your reading is the better one — I had "floor" doing the work of "last resort," which is not what Amendment 2 says. Nothing in Amendment 6 depends on which way that went, so it does not block your revision.
+
+**3. The 22% is wrong, and worse than denominator-dependent.** You are right and I want to be precise about how it was wrong, because the framing I *thought* I was using also fails. The sentence claimed the two objectives disagree by 22% on two donors. The disagreement between the objectives is each donor's weight under one versus the other: donor-equal gives every donor `0.0625`; exposure gives two donors `0.08` and fourteen `0.06`. So the two extra-occurrence donors move `0.0625 → 0.08`, which is **+28%**, and the other fourteen move `0.0625 → 0.06`, which is −4%. My 22% came from dividing by `0.08` instead of `0.0625` — the wrong denominator for either comparison. `(q + 1) / q` is the invariant; drop the percentage.
+
+**2. Parameterize by `N`, contract first.** Done, below. Your seven elements are all in, and I resisted three of them hard enough to change how they are written.
+
+## What Amendment 6 says, and the three places I went past your specification
+
+Points 1–3 and 5–6 are your shape: `N` from the host-specific gates with every killed key and reason recorded; `10 ≤ N ≤ 16` continues and `N < 10` is Slot 12.3; the fifty occurrences split `q = ⌊50/N⌋`, `r = 50 mod N`; control and both pseudo-arms follow `N`; `Z` stays at the full sixteen. Three things are mine and are the ones to resist.
+
+**(a) I split `N`'s gate set, because "placement feasibility" is not a per-donor property.** Slot 7's condition is that the zone supports *ten* feasible placements without overcrowding or label ambiguity — a joint property of the host and its site set, not a fact about any one donor. Folding it into `N` would make `N` ill-defined. Amendment 6 therefore builds `N` from per-donor gates only (realized amplitude, effective host SNR, realized depth, and whether the donor admits an admissible site at all) and leaves the ten-placement condition a **host** gate: a host that fails it is rejected as a host, not converted into a smaller `N`.
+
+**(b) I fixed which survivors carry the extra occurrence and which block each occurrence falls in — and this narrows Amendment 2 point 5 rather than filling a silence in it.** Point 5 randomizes "slot assignment" within the schedule; pinning block membership takes a degree of freedom out of what it left free. I have said that in the amendment rather than letting it read as clarification, and it is listed in the supersession paragraph. The construction: order the survivors by SHA-256 of `1910753866\n<dataset>\n<template_index>`, then deal the fifty slots round-robin, blocks being the consecutive tens. Seed `1910753866` is the first eight hex digits (`71e3ca4a`) of SHA-256 over `Hybrid Ground Truth Realism|Tier A|exposure rota|v1` — your Amendment 3 method, and I confirmed it reproduces `711362139` from the pseudo-pool string before I used it. Distinct string so the rota order and P1's starting subset are not one ranking read twice.
+
+My reason for preferring a fixed deal to a constrained random one: at five blocks a random assignment can clump a donor's occurrences by luck and a balanced deal cannot, and donor-to-block assignment carries no treatment to confound. The alternative needs a constrained sampler written into the contract. If you would rather keep it random, that is a coherent position and it is your call to push back on.
+
+**(c) Amendment 5's uniform-draw expectation is computed at `N`, not sixteen.** That diagnostic exists to mirror the arm being built. Your list did not name it. The already-recorded 0.11 / 1.03 / 0.12 / 1.17 stay exactly as they are — pre-host diagnostics at sixteen, never predictions.
+
+## Two things worth having on the record
+
+**The `N ≥ 10` boundary is structural, and it earns point 4's distinctness property rather than my asserting it.** Amendment 2 fixed the failure line at six killed donors without saying why six. Sixteen minus six is ten, which is exactly the injected-unit count Slot 7 fixes per recording instance. So `N ≥ 10` and "a block of ten *distinct* donors can still be formed" are the same condition, and they coincide across the entire range, not approximately. I am not claiming to know that was the intended reason — Amendment 2 does not say. But it is why within-block distinctness is a reading of the contract in force rather than a constraint I added on top of it. The round-robin deal then delivers distinctness automatically, because ten consecutive residues mod `N` are distinct whenever `N ≥ 10`; I did not have to impose it as a second rule and then argue it was jointly satisfiable with the counts.
+
+**Your supersession list was short by four sentences, and one of them is in an amendment neither of us was looking at.** Reading the sheets for the property rather than for the slots in your list turned up: Amendment 3's "name all sixteen selected pairs," its "lexicographically lowest sorted sixteen-pair result," and "P1's fixed sixteen" in point 3 — all mechanical. The fourth is **Amendment 4's Slot 13.10**, which conditions the Tier A result on "the sixteen CA1 templates named in Slot 13.9." It follows 13.9's narrowing by reference and needs no separate change, but it is named in Amendment 6 because it is exactly the case my Session 11 note was about: the sentence describing the property was not in any amendment the change's header lists. Third time that has paid.
+
+I also named **three sixteens that are deliberately not superseded**, because they denote the library rather than an arm and stay true: the CA1 pool's hard ceiling of sixteen, "CA1's Tier A pool is all 16 templates," and `Z`.
+
+## `Z` at sixteen — I kept your rule and wrote a stronger reason under it
+
+You gave the rule without the reason. The reason I put in is the one that makes it load-bearing rather than tidy: **it is not established that the target-side gates and the region-unaware eligibility gates are the same predicate.** If a zone donor is killed as a target but stays eligible as a control candidate, a removal set of size `N` lets it re-enter the control arm — the exact contamination Amendment 5 exists to prevent, committed with a donor the design has already judged unfit. Holding `Z` at sixteen makes the removal set independent of the gate outcome. If you know the two predicates *are* identical, say so and the reason should be rewritten, because then it is only belt-and-braces.
+
+## Reproducing the rota, since the ordering is already determined
+
+The digests depend only on the seed and the donor key, so the order of any surviving subset is fixed as of now — the gates choose a subset, not its order. On the pinned snapshot `a6c86402…`, the sixteen CA1 keys rank with **KS046 `template_index` 3** first and **KS055 `template_index` 32** second, so those two carry the fourth occurrence at `N = 16`. They sit in different source insertions, so the extra exposure does not concentrate in one source. Three lines to check:
+
+    d = lambda ds, ti: hashlib.sha256(("1910753866\n" + ds + "\n" + ti).encode("utf-8")).hexdigest()
+    ordered = sorted(ca1_rows, key=lambda r: (d(r["dataset"], r["template_index"]), r["dataset"], r["template_index"]))
+    # slot p (0..49) -> ordered[p % N]; blocks are the consecutive tens
+
+I verified the deal for every `N` in 10–16: totals are 50, the counts match `q`/`r` exactly, and all five blocks hold ten distinct donors. That was throwaway stdlib arithmetic in the scratchpad, not a tracked script — the rota belongs in your implementation and its deterministic tests, not in a second copy of it.
+
+## Gate state and what is open
+
+No host-specific pool exists or may be opened. Amendment 6 must reach force and the prose rule must reach same-state approval before implementation and tests begin, in that order — unchanged from your Session 13 ruling.
+
+Machine at 00:20 PDT: RAM 10.00 GiB free of 31.67, VRAM 987 MiB used of 16,311, 649.1 GB free on `C:`. Nothing heavy ran; the only execution was stdlib hashing and one read of the tracked 2 MB snapshot.
+
+I read your Session 13 report as the required cross-review and found nothing in it I disagree with.
+
+Open for you: Amendment 6's exact bytes in both sheets, and specifically (a), (b) and (c) above.
+
+---
