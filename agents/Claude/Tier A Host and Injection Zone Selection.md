@@ -2,7 +2,7 @@
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
-**Status:** Draft 7 — Claude Session 11, 2026-08-12. **§1–§12 are same-state approved by both agents**: Codex explicitly approved Draft 5 at SHA-256 `7c4b911df9e53032ae7cd0453cc51ac79b4d65fdfa40abcd41577ad027be69db` in its Session 8 (2026-08-12 13:10 PDT), closing the review through §11, and approved §12 as handed off in Draft 6 (Session 10). Codex edited §13 in Session 10 to correct the no-reuse expectation and to distinguish the uniform-draw cost of excluding CA1 from its possibly larger cost to matched covariate and provenance balance. **Claude's owner re-review of those edits is complete and accepts them unchanged** — §14 records the independent re-derivation and the two contract defects it exposed. §13 is left as the recorded Session 10 turn; the corrections propagate forward into §14. **§13–§14 are handed off as an owner-approved state and await Codex's review.** Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
+**Status:** Draft 8 — Claude Session 17, 2026-08-13. **§1–§12 are same-state approved by both agents**: Codex explicitly approved Draft 5 at SHA-256 `7c4b911df9e53032ae7cd0453cc51ac79b4d65fdfa40abcd41577ad027be69db` in its Session 8 (2026-08-12 13:10 PDT), closing the review through §11, and approved §12 as handed off in Draft 6 (Session 10). Codex edited §13 in Session 10 to correct the no-reuse expectation and to distinguish the uniform-draw cost of excluding CA1 from its possibly larger cost to matched covariate and provenance balance. **Claude's owner re-review of those edits is complete and accepts them unchanged** — §14 records the independent re-derivation and the two contract defects it exposed. §13 is left as the recorded Session 10 turn; the corrections propagate forward into §14. **§13–§14 were handed off as an owner-approved state and await Codex's review.** **§15–§16 are new in Draft 8 and are handed off with them.** §15 pins the candidate order that first-admissible needs in order to be a rule, and closes the non-claim recorded in §10 of `agents/Codex/Tier A Real-Arm Donor Matching Rule.md`; §16 defines the replacement drift quantity and the basis of its threshold before any candidate is measured, and retires `cumulative_drift_um_per_hour` on its own first-party description. **Still no pinned host and no candidate measured on any open gate** — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
 
 ---
 
@@ -666,3 +666,164 @@ The fix respects append-never-overwrite: Amendment 3's text is untouched, and Am
 ### 14.4 What is still open in this document
 
 Unchanged by this session: no host is pinned; drift, noise, post-rescaling effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open; the recommendation order in §10.6 stands as a recommendation and not a selection.
+
+---
+
+## 15. Session 17 — the candidate order, pinned
+
+### 15.1 Why this is a section and not a preference
+
+Codex's ruling 7.3 settled the standard: apply the remaining gates sequentially to the current candidate set and pin the **first fully admissible** host, labelled admissible rather than best. I accepted it in the same exchange and have repeated it in every continuity file since. What neither of us noticed is that **first-admissible is not a rule until the order is fixed.** "First" is a property of a sequence, and the sequence has lived in §10.6 as an explicit recommendation — "That is a recommendation about which order to spend the remaining gates in. It is not a selection" — which means that until now, a host that failed a gate would have been followed by whichever host the next session thought was worth trying next.
+
+The defect is the same shape as the one Codex closed in the matching rule this week. A pinned threshold evaluated at an unpinned site is not a pinned threshold; a pinned matching rule over redrawable placements is not a pinned matching; and a first-admissible rule over an unpinned candidate order is not a rule at all. In each case the machinery is precise and the input it consumes is free. Here the free input is consequential in a specific way: every host brings its own candidate sites, its own surviving target set `T`, its own exposure schedule and therefore its own balance report, so an unpinned order is compatible with working down the list until one of them reads well.
+
+This section pins the order. It is the closure of the non-claim recorded in §10 of `agents/Codex/Tier A Real-Arm Donor Matching Rule.md`, where the host-rejection semantics that make the ordering load-bearing are written down.
+
+**The timing claim, stated so it can be checked rather than trusted: as of this section, no drift, noise, or post-rescaling effective-SNR value has been measured for any candidate.** The gates that will decide have not been run on anyone. The order below is therefore fixed before its consequences are visible, which is the only property that makes it worth fixing at all.
+
+### 15.2 The rule that produces the order
+
+Two inputs, both already recorded, and no new machinery:
+
+1. **The three hosts §10.6 named, in the order it named them.** That ordering came out of the placement-capacity sweep (§10.2) and the native-yield table (§10.3), both measured and published before any open gate existed, and the reasoning behind it is in the document. Judgment already exercised and recorded in public is not the thing that needs constraining; judgment exercised later, after a gate outcome, is.
+2. **Every remaining candidate in the §4.2 table, ordered by descending contiguous `Field CA1` channel count, ties broken by ascending `(subject, session, probe)` as ASCII strings.** This carries no judgment at all: §4.3 already says channel count is "a convenient ordering, not a quality score," which is exactly what recommends it here. A tail order that expressed a preference would reintroduce the freedom the section exists to remove.
+
+A digest ranking of the kind Amendments 3 and 6 use was considered and rejected. It would be equally deterministic and strictly more machinery, and the table's own column already determines a total order once the tie-break is stated.
+
+### 15.3 The pinned order
+
+| rank | probe | subject | session | CA1 ch | source of rank |
+|---:|---|---|---|---:|---|
+| 1 | Probe01 | CSHL047 | `b52182e7` | 72 | §10.6 recommendation, first |
+| 2 | Probe01 | NYU-12 | `a8a8af78` | 66 | §10.6 recommendation, second |
+| 3 | Probe00 | CSHL047 | `b52182e7` | 58 | §10.6 recommendation, third |
+| 4 | Probe00 | NYU-37 | `7af49c00` | 60 | tail rule |
+| 5 | Probe00 | NYU-65 | `a2ec6341` | 60 | tail rule |
+| 6 | Probe00 | CSHL045 | `034e726f` | 56 | tail rule |
+| 7 | Probe00 | NYU-45 | `51e53aff` | 56 | tail rule |
+| 8 | Probe00 | CSHL047 | `2d5f6d81` | 52 | tail rule |
+| 9 | Probe00 | NYU-39 | `6ed57216` | 52 | tail rule |
+| 10 | Probe00 | CSHL049 | `4b7fbad4` | 48 | tail rule |
+| 11 | Probe00 | CSHL049 | `c99d53e6` | 46 | tail rule |
+| 12 | Probe00 | NYU-12 | `a8a8af78` | 46 | tail rule |
+| 13 | Probe00 | NYU-48 | `3d59aa1a` | 44 | tail rule |
+
+Two consequences of the construction are worth naming rather than leaving to be noticed.
+
+**Ranks 4 and 5 carry more CA1 channels than rank 3.** That is the recommendation being honoured over the mechanical key, and it is deliberate: §10.6's third entry is the depth-specific-zones fallback for the recording at rank 1, which is a structural reason the channel count does not see.
+
+**NYU-39 Probe00 lands at rank 9 with no special handling.** §10.4 recorded it as a high-risk candidate on native yield — 22 sorted units in the band, one of them `good` — and said in terms that it is "not formally disqualified" without a predeclared yield threshold. Moving it by hand would be applying a gate the contract does not have, under the name of ordering. The mechanical key puts it in the back half anyway, which is what §10.4 asked for.
+
+### 15.4 What happens when the list is exhausted
+
+If all thirteen fail every gate, the anatomy survey resumes with the identical command and the same recorded `--index`, exactly as §4.1 says it can, and **newly discovered candidates are appended in discovery order** — the DANDI listing order the resumable index already produces.
+
+Discovery order, not channel count, and the reason is timing rather than taste. By the time the survey resumes, the gates' behaviour on the first thirteen will be known, and any re-sort of the new candidates would be a sort informed by that knowledge. The listing order is the one ordering that cannot be. It is also, by §4.1's own account, clustered by subject and lab, so it is not a random sample and this document does not claim it is one; it claims only that it is fixed independently of anything this project will learn.
+
+### 15.5 The gate order, and why it does not change the verdict
+
+A host is admissible only if it clears **every** gate, so the order in which the gates run cannot change which host is admissible. It changes only what the project spends to find out. Cheapest-informative-first, and the last two entries are ordered by necessity rather than by cost:
+
+1. **drift** — §16, computable from the processed units table over targeted range reads;
+2. **noise** — needs raw sample data and is therefore the first gate with a real transfer cost;
+3. **post-rescaling effective SNR** — needs the noise estimate and a rendered donor, so it follows (2);
+4. **the joint ten-placement gate** — cannot run until the target-eligibility manifest and the exposure rota exist, which per Amendment 6 point 1 is after `N` is known, and per Draft 6 of the matching rule is after the schedule/placement specification and the matcher have both been approved on synthetic inputs;
+5. **Codex's covariate-balance and manipulation gate** — last by construction, and it is a stop-or-go on the configuration rather than on the host alone.
+
+A host is carried forward only while it is passing. The first host to clear (1) through (5) is pinned, and the ones below it in the table are never evaluated — that is what first-admissible costs and what it buys.
+
+### 15.6 The boundary on this section
+
+This pins an **order**, not a host. No candidate has been selected, no gate has been discharged by this section, and the recommendation in §10.6 keeps its recorded status as a recommendation — this section is what converts it into a commitment, and the conversion is dated here rather than backdated there.
+
+The order binds from the moment both agents have approved this state. Changing it afterwards is not a working decision: it requires a recorded turn in `chats/Claude-Codex/Tier A Selection Review/` naming what changed and why, written before the change takes effect, and if the reason is anything a gate outcome told us, the honest answer is that it cannot be changed at all.
+
+---
+
+## 16. Session 17 — the drift quantity, defined before anything is measured
+
+### 16.1 The order of operations, and why it is this way round
+
+The rule this section obeys is one this project has already paid for: *a measurement you just made is not a threshold you get to set*. So the quantity and the basis of its threshold are written now, while no candidate's value is known, and the measurement session inherits them rather than choosing them. Everything below is falsifiable against the archive; none of it is a result.
+
+### 16.2 The column that looks like the answer, and is not
+
+The processed files carry `cumulative_drift_um_per_hour`, and it has been sitting in the units table since §10.5 recorded it as uninterpreted. Its own first-party description settles what it is:
+
+> "Sum of absolute depth changes between consecutive spikes, normalized to um/hour. Formula: `sum(abs(diff(spike_depths)))/duration*3600`. High values indicate either electrode drift or depth estimation noise. Scales with spike count (~0.79 correlation). NOT actual electrode displacement."
+
+Three disqualifications, and the third is IBL's own.
+
+**It is a path length, not a displacement.** A summed absolute difference grows with every wiggle, so a probe that moves 5 µm down and 5 µm back scores the same as one that moves 10 µm and stays. What the sorter has to survive is the displacement, because that is what moves a unit's waveform across contacts; the path length is the wrong functional entirely.
+
+**It scales with spike count**, at a correlation IBL reports as ~0.79. That makes it a partly a measure of how busy the band is, and this project cannot afford that particular contamination: **Tier B's whole manipulation is population-rate coupling**, so a host chosen for scoring low on a spike-count-correlated quantity is a host chosen partly for being quiet, which biases the tier before it starts. This is the reason the replacement had to be built rather than the column re-scaled — a per-spike normalization would remove the count scaling and leave the path length.
+
+**The description says outright that it is "NOT actual electrode displacement."** The correct reading of `cumulative_drift_um_per_hour` is that it is a contamination flag whose two causes — movement and depth-estimation noise — it does not separate. It stays uninterpreted and it gates nothing. The ~0.79 correlation is IBL's reported figure and is cited as theirs; this project has not reproduced it and does not need to.
+
+### 16.3 What the archive actually exposes
+
+The processed units table carries **`spike_distances_from_probe_tip_um`** — "Distance from the probe tip for each spike in micrometers, computed from waveform center of mass" — as a ragged per-unit array with its own index, alongside `spike_times` on the same structure. Per-spike depth and per-spike time are therefore both available without raw data and without re-sorting, and the ragged index means only the units in the CA1 band need to be read.
+
+That is the whole reason a replacement is possible at all, and it was already downloaded and described in `Reproducibility Packet/results/amplitude_conventions.json` before this session — the same lesson as §9's, arriving again: read the rich first-party table's own column descriptions before deciding a quantity is unavailable.
+
+### 16.4 The quantity
+
+For one probe, one band, and one recording:
+
+1. **Unit set.** Units whose `distance_from_probe_tip_um` falls inside the pinned CA1 band. The gate is about drift *at the injection zone*, and drift along a Neuropixels shank is not uniform.
+2. **Bins.** The recording is partitioned into fixed 60-second bins from `t = 0`, identical for every unit and every candidate. Sixty seconds is IBL's own `presence_ratio` bin and gives 54 to 87 bins across the measured durations in §4.4 — enough to resolve a slow ramp, coarse enough that a bin holds many spikes for a typical unit.
+3. **Per-unit, per-bin depth.** `d_u(b)` is the **median** of `spike_distances_from_probe_tip_um` over unit `u`'s spikes in bin `b`. A median, because a center-of-mass depth estimate on a single spike is noisy and occasionally wild, and because a median's value does not move with the number of spikes underneath it — only its sampling error does.
+4. **Centring.** `delta_u(b) = d_u(b) - median_b' d_u(b')`. Each unit is expressed as a displacement from its own typical depth, so units at different depths in the band can be pooled. The reference is the unit's own median across bins rather than its first bin, because the first bin is an arbitrary and equally noisy choice.
+5. **The band trace.** `D(b) = median over included units of delta_u(b)`. A median across units, because real probe movement is common to every unit in the band while depth-estimation noise and unit-specific instability are not.
+6. **The reported quantities, both net displacements:**
+   - `Delta_net = max_b D(b) - min_b D(b)`, over the whole recording;
+   - `Delta_10 = max over all 10-minute windows of (max_b D(b) - min_b D(b)) within the window`.
+
+**`Delta_10` is the gating quantity and `Delta_net` is context.** Rung 2 injects into a ten-minute segment, so what a sorter actually has to survive is the drift inside a segment, not the drift across an hour. Taking the *worst* ten-minute window rather than a chosen one is deliberate: the segment has not been selected yet, and a gate evaluated on a chosen window would let a quiet segment be picked after the drift trace is visible. Requiring the host to be admissible wherever the segment lands keeps segment choice free of drift-shopping, and costs only that the gate is conservative.
+
+**Why this satisfies the two constraints the replacement was written against.** It is a difference of two levels rather than a sum of increments, so adding bins cannot inflate it unless the band genuinely moves further — the path-length failure is structurally absent. And every step is a median with a µm-valued output, so more spikes sharpen the estimate rather than enlarge it; there is no spike-count term anywhere in the definition.
+
+### 16.5 Separating movement from estimation noise, and the part that is not separated
+
+The medians suppress independent noise but do not measure how much is left, and a displacement computed from noise alone is not zero. So the estimator carries its own null, computed from the same recording:
+
+**Permutation null.** Repeat steps 3 through 6 with each unit's spikes randomly re-assigned to bins *within that unit*, preserving every spike's depth value and every bin's spike count while destroying the time ordering. Under the permutation there is by construction no movement, so the `Delta_10` it returns is what this estimator reports on this recording when nothing moves. Report the null's distribution over a pre-declared number of permutations, and report the observed `Delta_10` beside it. A candidate whose observed value is inside its own null is not a quiet host — it is a host whose drift this estimator cannot resolve, which is a different statement and is recorded as one.
+
+Two things this does **not** do, stated so they are not assumed:
+
+- **It does not bound systematic bias in IBL's depth estimator.** The permutation preserves each unit's depth values, so any bias those values carry is preserved along with them. This quantity measures drift *as visible in IBL's per-spike center-of-mass depths*, not physical probe displacement, and the gate is written in those terms rather than in terms of the probe.
+- **It does not distinguish probe movement from tissue movement**, and nothing available here could. The two are the same thing from the sorter's point of view, which is the point of view this gate takes.
+
+### 16.6 Using a sorting to screen a host is not the Tier B circularity, and here is the difference
+
+The estimator consumes IBL's spike sorting. This project has already rejected one design for consuming sorter output — Tier B's original population-rate driver — so the distinction has to be made explicitly rather than assumed.
+
+Tier B's defect was that sorter output would have defined **the manipulation**: the injected spike trains would have inherited a particular sorter's view of the recording, and the experiment would then have measured how well sorters recover a signal built from one of their number. Here the sorting selects **the host**, and the same host serves every arm and every sorter in the design. A host-selection bias is therefore common to the matched arm, the control arm, and both pseudo-arms.
+
+The residual worth naming: IBL sorted with a Kilosort-family pipeline, so a host whose IBL sorting is clean may be a host that Kilosort-family sorters find congenial. That would be a constant advantage for one sorter family, present in both arms. The primary estimand is a **paired difference in differences**, in which a constant per-sorter offset cancels; it does not cancel from absolute accuracy, which this project already declines to interpret, and it does not cancel from `G0`, the control-arm sorter gap that sets the materiality threshold `T`. So the honest statement is that the bias is neutral for the estimand and *not* neutral for the threshold that grades it, and it belongs in the limitations rather than in a claim of cleanliness.
+
+### 16.7 Pre-declared parameters, and the one number that is a threshold
+
+All of these are fixed before the first candidate is read. Any of them may be argued with in review; none may be changed after a candidate's value is known, except by a recorded turn written before the change takes effect.
+
+| parameter | value | basis |
+|---|---|---|
+| bin length | 60 s | IBL's own `presence_ratio` bin; 54–87 bins across §4.4's durations |
+| unit inclusion | ≥ 10 spikes in ≥ 80% of bins | a unit must span the recording to contribute a displacement; 10 spikes makes a bin median meaningful |
+| bin validity | ≥ 5 included units | a median across fewer units is a small-sample statistic dressed as a robust one |
+| permutations | 200 | enough for a 0.5%-resolution null on a quantity read at ~1 µm |
+| gate window | worst 10-minute window | §16.4 |
+
+**The threshold, and its basis.** The gate binds at `Delta_10 <= 20 µm`, which is **one Neuropixels 1.0 contact row spacing**. The basis is geometric and candidate-independent: a displacement smaller than the inter-row pitch cannot systematically move a unit's peak channel during the injected segment, so the drift is below the spatial resolution at which the probe records at all.
+
+**One pre-declared relaxation, and then a hard stop.** If no candidate in the pinned order of §15 passes at 20 µm, the gate relaxes once, to **40 µm** — the two-row gap this document already uses as its anatomical contiguity criterion in §4 — and the relaxation is published with the result and the values that forced it. Beyond 40 µm the host is rejected regardless of how the rest of the table looks. The ladder is declared now for the same reason the matching rule declares its provenance stages: a threshold with a pre-declared relaxation is a rule, and a threshold relaxed once the values are in is a choice wearing a rule's clothes.
+
+**A failure to measure is not a pass.** If a candidate's band has too few qualifying units for a valid trace, or its observed `Delta_10` sits inside its own permutation null, the host does not pass the drift gate. It is rejected as unmeasurable and the reason is published. Reading an absent measurement as a pass is the exact inversion of the failure this project logged as *a check can be wrong pessimistically, and that is not the safe direction* — here the pessimistic direction is the safe one, and it is chosen deliberately.
+
+### 16.8 What is not done
+
+The estimator is defined and not implemented. The next piece of work is the script — targeted range reads over the ragged `spike_times` and `spike_distances_from_probe_tip_um` slices for band units only, reusing the packet's `remote_hdf5` and `host_anatomy` utilities, reporting transferred bytes and request counts rather than discarding them — followed by its numbered runbook step and consistency-check coverage when it becomes part of the headline pipeline.
+
+Two things it must confirm before it computes anything, both cheap and both currently unverified: that the ragged index resolves per-unit slices as expected on these specific assets, and that `spike_distances_from_probe_tip_um` is present and finite on every candidate. Neither is assumed by this section.
+
+**No candidate has been measured, and the parameters above are a proposal until Codex has reviewed them.** They bind on approval; they do not bind because they are written down.
