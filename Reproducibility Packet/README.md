@@ -88,6 +88,24 @@ reports byte for byte. The remaining steps read file metadata from the DANDI
 archive over HTTP range requests; they are marked **[archive]** and each one
 prints the exact number of bytes and requests it used.
 
+### Design documents these scripts refer to
+
+Several scripts explain a choice by naming the project's **Claim Sheet** — the
+contract that fixes the question, the method, the numerical budgets and the
+pre-declared shapes of success, failure and an inconclusive result, all before
+any measurement exists — and one names the **Tier A host-selection artifact**,
+which records why the host screens run in the order they do. Neither document is
+copied into this packet and **neither is needed to run anything here**: they are
+living documents, and a stale copy would be worse than a pointer. Both are in
+the project repository:
+
+<https://github.com/Dandelion-Engineering/Hybrid-Ground-Truth-Realism>
+
+`Claim Sheet.md` is the technical contract, `Accessible Claim Sheet.md` is the
+same content in plain language, and `agents/Claude/Tier A Host and Injection
+Zone Selection.md` is the selection artifact. Everything needed to *reproduce*
+the recorded results is inside this folder.
+
 ---
 
 ## The runbook
@@ -269,6 +287,34 @@ yet. It will appear here, as the last step of this runbook, when they do.
 
 ---
 
+## Checking this runbook against the scripts
+
+Each script repeats its own command in its module docstring, which `argparse`
+prints as the first thing you see in `--help`. Two copies of one command drift,
+and these two already did once: the docstrings assumed a different working
+directory from the runbook, so `--help` and this file disagreed about where to
+stand and what to pass. Rather than delete one copy — a reader running `--help`
+should not have to open a second file to find a working invocation — the copies
+are checked against each other:
+
+```bash
+python scripts/check_runbook_consistency.py
+```
+
+It reads every numbered step above and every script's `Example` block and
+compares them character for character, then checks that each script has exactly
+one step and names the right step number. It reads the docstring through
+Python's parser, so what it compares is the string `--help` will print rather
+than the source text behind it — which is not a fine distinction: a backslash
+line continuation inside an ordinary docstring is an escape, so Python deletes
+the newline and `--help` shows one long line with runs of spaces while the
+source looks neatly wrapped. That is why the examples here are single lines, and
+it is also why they copy-paste on PowerShell, where a trailing backslash is not
+a continuation.
+
+Nothing is imported, downloaded, or written. Exit status 0 means the runbook and
+the scripts agree; any disagreement is printed. Run it after editing either side.
+
 ## Validation status
 
 Being explicit about what has and has not been checked, because a runbook that
@@ -280,7 +326,15 @@ from `requirements.txt` alone, and steps 1, 2, 3, 4, and 8 were run in it using
 only the commands printed above. All five reproduced their tracked report **byte
 for byte** — with the single documented exception of step 1's `etag` and
 `last-modified` lines, which only a live HTTP response can supply. The label map
-JSON that step 4 writes also matched byte for byte.
+JSON that step 4 writes also matched byte for byte. That test was run twice, on
+two separate occasions, the second after the docstring examples above were
+rewritten; both gave the same result.
+
+**Also verified in that copy.** Every script compiles; the consistency check
+above passes; and `--help` was rendered for all eleven scripts, each showing a
+command relative to this folder and none showing a path from outside it. The
+`--help` render is what caught the line-continuation defect described above,
+which reading the source did not.
 
 **Not re-run.** Steps 5, 6, 7, 9, and 10 read file metadata from the archive.
 They have not been re-executed since this runbook was written, and step 6 in

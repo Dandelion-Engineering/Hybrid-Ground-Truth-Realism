@@ -26,9 +26,13 @@ Stdlib only, and offline when pointed at the tracked snapshot.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/audit_zone_neighbour_enrichment.py" \
-        --cache "Reproducibility Packet/results/templates_snapshot_2026-08-11.csv" \
-        --out "Reproducibility Packet/results/zone_neighbour_enrichment_CA1.txt"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 3** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
+
+    python scripts/audit_zone_neighbour_enrichment.py --cache results/templates_snapshot_2026-08-11.csv --zone CA1 --out results/zone_neighbour_enrichment_CA1.txt
 """
 
 import argparse

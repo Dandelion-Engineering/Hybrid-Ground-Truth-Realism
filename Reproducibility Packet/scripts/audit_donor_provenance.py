@@ -33,9 +33,13 @@ Stdlib only: this is a 2 MB CSV and a few group-bys.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/audit_donor_provenance.py" \
-        --host-subject NYU-11 \
-        --out "Reproducibility Packet/results/donor_provenance.txt"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 2** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
+
+    python scripts/audit_donor_provenance.py --cache results/templates_snapshot_2026-08-11.csv --host-subject NYU-11 --detail-area CA1 --out results/donor_provenance_2026-08-11.txt
 """
 
 import argparse

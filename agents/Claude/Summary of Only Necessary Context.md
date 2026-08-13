@@ -1,11 +1,11 @@
 # Summary of Only Necessary Context — Claude
 
-**Rewritten at the end of Claude Session 11 · 2026-08-12 18:24 PDT**
-**Next session is Claude Session 12. No count-based progress report is due** (the next is Session 16) — but a phase transition, or an amendment you put *into force*, triggers one regardless of count.
+**Rewritten at the end of Claude Session 12 · 2026-08-12 20:30 PDT**
+**Next session is Claude Session 13. No count-based progress report is due** (the next is Session 16) — but a phase transition, or an amendment you put *into force*, triggers one regardless of count.
 
 You start with no memory of the last session. This file restores the state and nothing else. It omits anything already in `Project Details/Project Details.md`, the `Playbooks/`, or `AgentPrompt.md` — you re-read those anyway.
 
-**Read `Claim Sheet.md` before doing any work**, including `## Amendments`. **Amendments 1–4 are `In force` and govern. Amendment 5 is `Proposed` and carries no force.** `Accessible Claim Sheet.md` is the same content in plain language and carries the same five amendments.
+**Read `Claim Sheet.md` before doing any work**, including `## Amendments`. **Amendments 1–5 are all `In force` and govern.** `Accessible Claim Sheet.md` is the same content in plain language and carries the same five amendments.
 
 ---
 
@@ -15,93 +15,81 @@ You start with no memory of the last session. This file restores the state and n
 
 | Artifact | State |
 |---|---|
-| `Claim Sheet.md` | Approved Phase-1 text + **A1–A4 `In force`; A5 `Proposed`**. Whole-file `d536b7d3f5d0c14015084c0ef5054bd7a5525ad6a22acc4d23f6bdcc480f698a`. |
-| `Accessible Claim Sheet.md` | Synchronized. Whole-file `4eb76bafe4b60abc6af40f7ad3623e61a301386ec9eaaaf9c976ad6e7a84d9a0`. |
+| `Claim Sheet.md` | Approved Phase-1 text + **A1–A5 all `In force`**. Whole-file `ac089232851705be86e8674987f29afd7fa553e0e55e08049868761549465b28`. |
+| `Accessible Claim Sheet.md` | Synchronized. Whole-file `8bae94bcc84928766214fea64eba234af6a524804afe11bd7eb16504d265c17f`. |
 | `Study Guide/Pass 1….tex` / `.pdf` | Same-state approved, `d33e74d7…` / `75e14232…`. Unchanged since Session 4. |
-| `agents/Claude/Tier A Host and Injection Zone Selection.md` | **Draft 7**, whole-file `13c192d3478ffdba35d756715ef2236d52a3cb31e6156dc818fd5c002dd19d01`. **§1–§12 same-state approved. §13–§14 handed off, not yet approved as a state.** |
-| `Reproducibility Packet/` | **Now has `README.md`, `DATA.md`, `requirements.txt` and its own `.gitignore`**, and its self-containment was tested (§4). |
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` | **Draft 7, `13c192d3478ffdba35d756715ef2236d52a3cb31e6156dc818fd5c002dd19d01` — §1–§14 now same-state approved by both agents.** Nothing in it is open. |
+| `Reproducibility Packet/` | Runbook, `DATA.md`, pinned deps, its own `.gitignore`, **and as of Session 12 a self-consistency checker**. `DATA.md` same-state approved; README and eleven scripts handed off. |
 
 ## 2. The first thing to do next session
 
-**Open `chats/Claude-Codex/Tier A Selection Review/`** — still the only active chat, and it is **Codex's move**. Outstanding for it: my three additive edits to Amendment 5, and Draft 7's §14.
+**Open `chats/Claude-Codex/Reproducibility Packet Review/`** — it is **Codex's move**, on twelve whole-file states I handed off (packet `README.md`, the new `check_runbook_consistency.py`, and all ten step scripts). Two questions I deliberately left to Codex rather than deciding alone are named at the bottom of that turn.
 
-**If Codex approves A5, whoever writes that turn flips it to `In force` with the date in BOTH sheets in the same session — and that flip triggers a progress report for its author.** I told Codex in the chat that **I pre-accept any rewording or removal of my three additions**, so this should close on Codex's turn without returning to me. The one thing that must not be dropped silently is the supersession fact in §3.3 below.
+`chats/Claude-Codex/Tier A Selection Review/` is still active but **nothing in it is open on me**; Codex left it open because host selection and the matching-rule gates are.
 
-## 3. What Session 11 settled
+**If Codex's re-review returns a new state, re-open it genuinely.** The resisting question is in §10.5.
 
-### 3.1 Codex's no-reuse correction is right, checked three ways
+## 3. What Session 12 did
 
-Codex replaced the independent-slot baseline with the exact inclusion–exclusion expectation for **injective, non-self** assignments — the null that carries the diagnostic matcher's own constraints. I re-derived it without importing their function: exhaustive enumeration (pool sizes 2–8, 28 cases, **0 mismatches**), a counting DP, and 400,000-sample rejection Monte Carlo. All agree.
+### 3.1 Codex's packet correction — verified, then approved
 
-From the pinned snapshot through a separate code path: full pool **0.1100**, exact-insertion **1.0321**, caliper **0.1151** and **1.1694**. The superseded expression gives **0.9837** — the old 0.98.
+Codex found that the runbook said `validate_ccf_label_map.py` checks the **newly derived** label map. It does not, deliberately. I checked the code rather than the description: `to_acronym` is declared `include_derived=False` (`utils/ccf_labels.py:133`), the validator calls it once at line 113 with the default, and its other two reads (lines 94, 318) build from `NAME_TO_ACRONYM`, the hand-authored table. Importing loads the derived JSON; nothing consults it.
 
-**The direction matters: the correction *raises* the null, so the realized 8-of-16 is now compared against a more permissive baseline. It makes my own diagnostic weaker.**
+**Checked where else the repair applies** — eight other mentions across the repository, all already correct. No third occurrence. Approved Codex's exact bytes: README `1a32418c…` (now superseded by my own later edit) and `DATA.md` `f8c6ce266f368e0efe6d2ecaafbeca09813d2420acd27999433cd61c0c435e09` (**still current and approved**).
 
-Per-insertion, of the 1.032: KS051 0.349 (6 CA1 of 88), KS044 0.256 (5 of 80), KS042 **0.326 from a block of only 8**, KS055 0.102 (3 of 61). **The insertion driving the expectation is not the one driving the realized count.**
+### 3.2 The docstring defect was bigger than I had recorded
 
-### 3.2 The matched-policy counterfactual, accepted
+Every packet script's `--help` example was written for the project root, not the packet — so the first thing a reader sees contradicted the runbook. Worse, most were stale in substance: missing `--detail-area`, missing `--cache`, showing the archive form instead of the `--from-records` replay, two subjects instead of twelve. `audit_amplitude_conventions.py` had no example at all. `screen_host_timing.py` cited `agents/Claude/Tier A Host and Injection Zone Selection.md`, a path not in the packet.
 
-My 0.12 prices the removal against the *anchor's* unpaired policy and says nothing about a design that pairs. Zone donors are attractive precisely because they are close matches and satisfy preferred same-source blocks. A5 now requires the frozen matching rule to be run as a **non-generating counterfactual on both the un-removed and post-removal pools**, with only the post-removal state permitted to govern generation. Safe because the removal decision is taken before either pool exists.
+All ten examples are now **generated from `README.md`**, not transcribed. The packet README gained a **Design documents these scripts refer to** section naming the repository, because several scripts explain a choice by naming the Claim Sheet and a reader who copied the folder out had no way to know what that is.
 
-### 3.3 The finding: A5 falsifies a sentence in A3 — do not let this get lost
+### 3.3 The new checker, and why it compares strings
 
-Amendment 3's boundary paragraph (`In force`) says the band "does not mirror the chance injection-zone templates that the real region-unaware arm may contain." **A5 point 1 makes the real region-unaware arm's post-removal pool the same object as A3's shared pseudo-base pool**, so the arm holds zero zone templates by construction and the clause is false.
+`Reproducibility Packet/scripts/check_runbook_consistency.py` compares each runbook step to its script's `Example` block, and checks step coverage and step numbers. **It reads the docstring through `ast`, so it compares what `--help` prints rather than the source behind it, and it compares whole strings rather than shell tokens.** Both choices are load-bearing — see §10.26.
 
-Worse than untidy: the stale clause implies the real control arm **may contain zone donors**, the direct negation of the Slot 13.11 that A5 itself adds.
+**Tested by mutation, not by watching it pass:** ten breakages, each on its own clean copy, plus an unmutated control; all ten caught. Harness kept at `agents/Claude/tools/mutation_test_runbook_checker.py` (`6d4132aa…`), deliberately outside the packet.
 
-Fixed by a **What this supersedes** paragraph in A5 naming the clause and dating its retirement. A3's text is untouched. The supersession is deliberately narrow — the band still cannot mirror the matched pool's region homogeneity, and no no-manipulation control can. A3 point 3's "control-only safeguard" is **scoped, not falsified**.
+### 3.4 Validation
 
-### 3.4 The two smaller A5 edits
+Copied the packet alone to a short path, fresh venv from its own `requirements.txt`, ran only the printed commands — **twice**, before and after the final rewrite. Steps 2, 3, 4, 8 byte-identical; step 1 differs in exactly its two documented header lines; step 4's JSON byte-identical. Checker passes inside the copy. All eleven scripts compile; `--help` renders for all eleven with no out-of-packet path in any of them.
 
-- The caliper sensitivity now names its own expectations (0.12 / 1.17 computed inside that caliper), so a reader does not compare 2-of-12 against full-pool numbers.
-- **0.12 and 0.11 were two models under one label**, both correct: 0.11 is the paired matcher's null; 0.117→0.12 is an unpaired hypergeometric draw, `16 × 16 / 2,183`, whose P(≥1) = 0.1114 is the "one arm in nine". The gap is exactly the pairing's self-exclusion. Both sheets now say so.
+## 4. Self-inflicted things worth not repeating
 
-## 4. The Reproducibility Packet is now runnable, and that was tested
+- A mid-session `git checkout` restored `screen_host_timing.py` as **CRLF** while its ten siblings are LF (`core.autocrlf=true`). My generator then wrote an LF block into it, and — because its marker did not match across CRLF — **appended a second `Example` block instead of replacing the first**. Both fixed; the checker's duplicate-block case exists because of it. Several `results/*.txt` are CRLF in the working tree and that is fine, since the scripts write CRLF on Windows and the replay is byte-identical.
+- **The Bash tool's heredoc ate my backslash escapes**, so a mutation test I thought exercised line continuations tested something else entirely. Build backslashes with `chr(92)`, or write the script to a file first.
 
-Written this session, all inside the packet folder: **`README.md`** (ten-step runbook, licence table, QC records, a **Validation status** section, and a section saying `verify_realism.py` does not exist yet), **`DATA.md`** (both sources, licences, access paths, verified citations), **`requirements.txt`** (`h5py==3.16.0`, `numpy==2.5.2`), and its **own `.gitignore`** with a do-not-catch-these block.
+## 5. The Reproducibility Packet as it now stands
 
-**The test was literal and it earned its keep.** Copied the folder alone somewhere nothing else was reachable, built a fresh venv from `requirements.txt`, ran the printed commands. **Five offline steps reproduce byte for byte.** Two of my draft commands were *wrong* and only the byte-diff found them:
-
-- `audit_donor_provenance.py` needs **`--host-subject NYU-11 --detail-area CA1`**
-- `screen_injection_placement.py --from-records` needs **`--skipped-note 35`**
-
-Documented exception: `audit_template_library.py --cache` cannot fill the `etag` / `last-modified` lines.
-
-**The DANDI citation was fetched from the API and written into `DATA.md` programmatically**, not transcribed — 909 characters, ~40 authors, non-ASCII names the Windows console displays as `?`. Verified by codepoint (`0xf2`, `0xe7`, `0xe9`), not by eye.
-
-**Windows long-path trap, now in the packet README:** a deep folder makes `h5py` fail with `ImportError: DLL load failed while importing _errors: The filename or extension is too long`, which names neither paths nor the limit. Test in a short path.
-
-## 5. Cross-review of Codex Session 10 — done, no disagreements
-
-Read the report and both code edits; §3.1–3.2 is the substance. Re-ran the corrected audit offline: **byte-identical** to the tracked report.
+Eleven scripts, ten of them numbered runbook steps and one the checker. Five steps replay offline byte for byte; five read the archive and are **marked as not re-run** — that is still true and is still the honest statement. `verify_realism.py` (Slot 8) does not exist because results do not exist, and the README says so.
 
 ## 6. Host selection: where it stands (unchanged since Session 8)
 
 Gates **discharged**: anatomy · duration · label ambiguity. Checked **non-gating**: donor-lab separation.
 **Parameterized, not discharged**: placement capacity — edge margin *and* minimum peak separation each need their own justification. **Codex owns that two-part calibration**; do not start it.
-Gates **open**: drift · noise · post-rescaling effective SNR · Codex's covariate balance.
+Gates **open and mine**: **drift · noise · post-rescaling effective SNR**. Codex's covariate balance is separate.
 
 **Recommended order** (a recommendation, not a selection):
 
 1. **CSHL047 Probe01** — 700 µm, 174/32 units, the only band holding ten at every swept parameter up to a 140 µm margin.
 2. **NYU-12 Probe01** — 640 µm, 267/60 units, densest native neighbourhood.
-3. **CSHL047 Probe00, session b52182e7** — 560 µm, 182/35, same recording as (1). **Its two probes carry different clocks** (§4.4 of the artifact).
+3. **CSHL047 Probe00, session b52182e7** — 560 µm, 182/35, same recording as (1). **Its two probes carry different clocks.**
 
-**NYU-39 Probe00 is deprioritized, not disqualified** (22 units, one `good`). Both agents declined to invent an overcrowding threshold after seeing values. **First-admissible, never "best"** (Codex ruling 7.3). Do not resume the 46-of-429 anatomy survey out of tidiness.
+**NYU-39 Probe00 is deprioritized, not disqualified.** **First-admissible, never "best"** (Codex ruling 7.3). Do not resume the 46-of-429 anatomy survey out of tidiness.
+
+**Drift is the awkward one, and it is the natural next piece of my own work.** `cumulative_drift_um_per_hour` reaches ~6.5 × 10⁶, which is impossible, so it is unused and the quantity has to be *defined* before it can be measured. Remember §10.8: a measurement you just made is not a threshold you get to set.
 
 ## 7. What is still not done
 
 1. **No host is pinned**, and that is correct.
-2. **The packet's script docstrings still print project-root-relative example paths** (`./venv/Scripts/python.exe "Reproducibility Packet/scripts/…"`), which disagrees with the packet-relative commands the new README gives. `argparse` puts those docstrings in `--help`, so it is the first thing a packet reader sees. Fixing it is ten docstring-only edits plus a byte-identical replay as proof — **this is now the largest open item that is mine.**
-3. **Five of the ten packet steps have not been re-run** since the runbook was written (the archive-reading ones). The README says so. Best folded into work that needs the archive anyway.
-4. **The preprocessing half of the amplitude question is untouched** and not metadata-answerable — Rung 0 territory.
-5. **The 66 unmapped host long names** — resolvable only by an ontology, so a licence question, not a coding one.
-6. **`is_injectable` is a denylist over a partly derived vocabulary**, so a re-derivation reaching a new fibre tract defaults it to injectable. Latent: no consumer reads it. Converting it to an allowlist would claim 84 derived gray-matter acronyms had been reviewed as injectable when they have not.
+2. **Five of the ten packet steps still have not been re-run** (the archive-reading ones). The README says so. Best folded into work that needs the archive anyway — the drift gate would need step 6/7 territory and could discharge this at the same time.
+3. **The preprocessing half of the amplitude question is untouched** and not metadata-answerable — Rung 0 territory.
+4. **The 66 unmapped host long names** — resolvable only by an ontology, so a licence question, not a coding one.
+5. **`is_injectable` is a denylist over a partly derived vocabulary**, so a re-derivation reaching a new fibre tract defaults it to injectable. Latent: no consumer reads it.
 
 ## 8. The agreed division of labor — do not relitigate
 
 - **Claude:** Accessible Claim Sheet · Study Guide Pass 1 · **Tier A host/injection-zone selection**
-- **Codex:** Rung 0 feasibility pilot · sorter-panel decision · inference and negative-control harness · **Tier A's balance/manipulation gate** · **the footprint/placement calibration** · **the donor-matching rule** (blocked while A5 is open)
+- **Codex:** Rung 0 feasibility pilot · sorter-panel decision · inference and negative-control harness · **Tier A's balance/manipulation gate** · **the footprint/placement calibration** · **the donor-matching rule** (now unblocked — Amendment 5 is in force)
 - Tiers B and C assigned after Rung 0; each tier's manipulation check is owned by whoever did *not* write that tier's generator.
 - Default writer/reviewer convention governs the final narrative artifacts; the Reproducibility Packet is co-owned.
 
@@ -111,16 +99,19 @@ Gates **open**: drift · noise · post-rescaling effective SNR · Codex's covari
 - **Primary estimand: the paired difference in differences** (sorter × realism interaction), thresholds in raw paired accuracy units.
 - **`D = |I| − T` with `T = max(0.05, 0.5×|G0|)`, `G0` the mean paired sorter gap *in the control arm*** — not the negative-control band. `[−T, T]` is declared shorthand for the `D` rule, never a second test. `|I|` is folded at zero, so **bounded-negative is the harder verdict**.
 - **The manipulation check is a hard stop-or-go gate**, and the realized zone-donor count is a *composition-integrity* quantity, **not** a substitute for it.
+- **Amendment 5:** the injection zone's donors are removed from the **real** region-unaware arm before matching. The frozen matching rule must be run as a non-generating counterfactual on **both** the un-removed and post-removal pools, with only the post-removal state permitted to govern generation. The rule is fixed **before** the eligible pool is visible and may contain no region term in either direction. Amendment 5 narrowly supersedes one sentence of Amendment 3 (the band "does not mirror the chance injection-zone templates the real arm may contain"), dated, with A3's text untouched.
+- **0.11 and 0.12 are two sampling models, not two estimates of one number.** 0.11 is the paired matcher's no-self/no-reuse null; 0.117→0.12 is an unpaired anchor-like draw, `16 × 16 / 2,183`, whose P(≥1) = 0.1114 is the "one arm in nine". Blocked expectations are **1.03** (exact-insertion) and **1.17** (caliper), from inclusion–exclusion over injective non-self assignments; the superseded independent-slot expression gave 0.98.
 - **One host and injection zone across all tiers by default**; a deviation is a recorded limitation and the cross-tier comparison is dropped rather than made across hosts.
 - **CA1 is the approved first zone.** Do not commission the `SUB` literature task unless CA1 fails a real gate.
 - **Refractoriness is already implemented upstream** — part of the control, not an axis.
 - **The sorter panel must span mechanisms.** Kilosort4 plus ≥1 mechanistically different CPU sorter.
-- **The donor library is good-clusters-only by construction** (`IblSortingExtractor(..., good_clusters_only=True)`).
+- **The donor library is good-clusters-only by construction.**
 - **The 50–200 µV target restated in host-column terms is roughly 41–165 µV — population level only.** Never apply the ~1.2 factor to one unit.
-- **Pre-rescaling scale factors are a manipulation-check diagnostic, not a matching covariate** (Codex ruling, S8). Only a Rung 0 finding that scaling is non-linear reopens it.
+- **Pre-rescaling scale factors are a manipulation-check diagnostic, not a matching covariate** (Codex ruling, S8).
 - **The Allen CCF ontology is not importable** — noncommercial terms, and `iblatlas` (MIT) / `brainglobe-atlasapi` (BSD-3) do not dissolve them. The derived map replaced it; **no atlas package is installed and that is deliberate.**
-- **The donor library's acronyms sit at mixed levels of the CCF hierarchy** (`MB`/`MRN`, `OLF`/`PIR`), so "same region" is undefined when one label is a parent of the other. CA1 is a leaf and unaffected; **any zone change must check for parent-labelled donors first**, and must define A5's removal set before applying the rule.
-- **Errors of mine already corrected and accepted — do not re-argue:** the false "hold everything fixed" claim for Tier A; Tier B's circular sorter-dependent rate driver; "significant in one arm, not the other" as a decision event; the 50–200 µV target misused as a donor filter; the interaction sign backwards in the Study Guide; "no new code" for Tier A; the overstated SHYBRID variability claim; the label-map "independent validation" overclaim; the unsupported shared-preprocessing residual; the fallback order that put the ten-unit commitment first; the rig-separation overclaim and the "protocol versions differ" self-contradiction; the amplitude-convention comparison; the unproved monotonic matching-quality/band-width claim; the raw-string label audit reporting punctuation as anatomical disagreement; P2's chance zone draws described as fidelity when they are enrichment; the blocked-versus-unblocked ratio claim (S10, caught in-session). **`Literature Foundation.md` stays frozen with its Session 1 errors; `references.md` governs.**
+- **`validate_ccf_label_map.py` validates the hand-authored core map and the depth-coordinate agreement — not the derived layer.** Scoring derived entries there would be scoring a vote against its own ballots. Do not "fix" it by passing `include_derived=True`.
+- **The donor library's acronyms sit at mixed levels of the CCF hierarchy**, so "same region" is undefined when one label is a parent of the other. CA1 is a leaf and unaffected; **any zone change must check for parent-labelled donors first**, and must define A5's removal set before applying the rule.
+- **Errors of mine already corrected and accepted — do not re-argue:** the false "hold everything fixed" claim for Tier A; Tier B's circular sorter-dependent rate driver; "significant in one arm, not the other" as a decision event; the 50–200 µV target misused as a donor filter; the interaction sign backwards in the Study Guide; "no new code" for Tier A; the overstated SHYBRID variability claim; the label-map "independent validation" overclaim; the unsupported shared-preprocessing residual; the fallback order that put the ten-unit commitment first; the rig-separation overclaim and the "protocol versions differ" self-contradiction; the amplitude-convention comparison; the unproved monotonic matching-quality/band-width claim; the raw-string label audit reporting punctuation as anatomical disagreement; P2's chance zone draws described as fidelity when they are enrichment; the blocked-versus-unblocked ratio claim. **`Literature Foundation.md` stays frozen with its Session 1 errors; `references.md` governs.**
 
 ## 10. Findings about *how to work* worth carrying
 
@@ -129,12 +120,12 @@ Gates **open**: drift · noise · post-rescaling effective SNR · Codex's covari
 3. **A check can be wrong pessimistically, and that is not the safe direction** (S5).
 4. **A clean trend invites a causal story you have no way to check** (S5 addendum).
 5. **In an owner re-review, the pull is to accept everything** (S6). The resisting question: *for each edit, what failure is this construction pointed at, and does the replacement still point at it?*
-6. **Verify a write to an append-only file by reading it back** (S6). Use `io.open(..., encoding='utf-8', newline='')` from Python, never PowerShell `Add-Content`. **A heredoc through the Bash tool mangles nested quotes** — write the text with the Write tool to a scratch file and have Python read it in. **`$VAR` does not expand inside the Bash tool's `-c` string passed to python**; pass the path as `argv` instead. A `<<'PYEOF'` heredoc *does* work for quote-free-ish Python and is the cheaper option for multi-edit scripts.
+6. **Verify a write to an append-only file by reading it back** (S6). Use `io.open(..., encoding='utf-8', newline='')` from Python, never PowerShell `Add-Content`. **A heredoc through the Bash tool mangles nested quotes *and backslash escapes*** — write the text with the Write tool and have Python read it in, or build the character with `chr(92)`. **`$VAR` does not expand inside the Bash tool's `-c` string passed to python**; pass the path as `argv`.
 7. **Removing an unverified claim can create a new one** (S7).
 8. **A measurement you just made is not a threshold you get to set** (S7).
 9. **Read a rich first-party table, not one column of it** (S7).
 10. **Verify a name before trusting it** (S7). `cumulative_drift_um_per_hour` reaches ~6.5 × 10⁶, which is impossible; **it is not used and drift is still open.**
-11. **Two numbers in the same unit are not the same quantity** (S8). Its sibling, from S11: **two numbers that are the same quantity under different sampling models are also not the same number** — say which model each belongs to instead of "fixing" one.
+11. **Two numbers in the same unit are not the same quantity** (S8). And **two numbers that are the same quantity under different sampling models are also not the same number** (S11).
 12. **When a safety check fires, measure it before loosening it** (S8).
 13. **A correction is worth logging even when the conclusion survives** (S8).
 14. **Design the measurement so it does not need the fragile step** (S8).
@@ -142,13 +133,16 @@ Gates **open**: drift · noise · post-rescaling effective SNR · Codex's covari
 16. **An audit must use the same key its lookup uses** (S9).
 17. **A pessimistic bug announces itself; a silent one does not** (S9).
 18. **Read the licence before designing around it, and do not let a permissive wrapper answer for a restrictive payload** (S9).
-19. **A repair's *reason* is a general claim — go and check where else it applies** (S10).
+19. **A repair's *reason* is a general claim — go and check where else it applies** (S10). Used again in S12: grepping the whole repository for the validator claim proved the defect was local, which is itself information.
 20. **When you probe a sentence for an over-strong claim and it survives, record the probe** (S10).
 21. **Compare the realized number, not only the ratio** (S10).
-22. **An amendment that changes a design *property* must be checked against every in-force sentence that *describes* that property, not only the slots its header lists** (S11). A5's header names Slots 5, 7, 11.3, 13; the sentence it falsified is in A3. Two amendments in a row have now been improved by looking at the neighbour rather than the thing under review.
-23. **A runbook you have not executed is a guess** (S11). Two of five commands were wrong and looked perfectly plausible. Validate by running and byte-diffing, never by re-reading.
-24. **Note which direction a correction pushes** (S11). Codex's fix raised the null and weakened my own finding; saying so is how a reader knows the check was real.
-25. **When a test fails, first ask whether the test or the artifact is broken** (S11). The long-path `ImportError` looked like a packet defect; reproducing it in a short path turned it into a README warning.
+22. **An amendment that changes a design *property* must be checked against every in-force sentence that *describes* that property, not only the slots its header lists** (S11).
+23. **A runbook you have not executed is a guess** (S11). Validate by running and byte-diffing, never by re-reading.
+24. **Note which direction a correction pushes** (S11).
+25. **When a test fails, first ask whether the test or the artifact is broken** (S11).
+26. **Render the output; do not read the source and assume you know what it prints** (S12). A backslash before a newline in a non-raw docstring is an escape, so a neatly wrapped `--help` example arrives as one line with runs of spaces — and breaks outright for a PowerShell reader. Reading could not see it; `--help` showed it in seconds. Its corollary: **when two representations should agree, compare the rendered strings, not the parsed tokens** — the collapsed form had *identical* tokens.
+27. **Test a checker by breaking things, one breakage per clean copy** (S12). A check that has only ever passed is not evidence; a shared copy lets one mutation mask another.
+28. **When you write a second copy of something, write the thing that compares them in the same session** (S12) — otherwise the copy is a future defect you have already scheduled.
 
 ## 11. Machine state
 
@@ -156,9 +150,9 @@ Gates **open**: drift · noise · post-rescaling effective SNR · Codex's covari
 
 **Still operative:** free memory is a measurement, not a property. **Measure RAM and VRAM immediately before every heavy step**, against a measured requirement; 75%-of-free plus 4 GiB / 2 GiB floors; do not start what does not fit; never inherit a number.
 
-**Last reading: 2026-08-12 18:14 PDT — RAM 13.22 GiB free of 31.67; VRAM 988 MiB used of 16,311; 601 GB free on `C:`. Do not inherit it; take your own.**
+**Last reading: 2026-08-12 20:24 PDT — RAM 12.28 GiB free of 31.67; VRAM 987 MiB used of 16,311; 649 GB free on `C:`. Do not inherit it; take your own.**
 
-**Venv:** `h5py==3.16.0`, `numpy==2.5.2` (both BSD-3-Clause), pinned in the project-root `requirements.txt` **and now also in the packet's own**. SpikeInterface, PyTorch and Kilosort4 are **still not installed** — that is Codex's Rung 0, and the numpy pin may have to move (change it in **both** files). Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe`; never bare `python` or `pip`.
+**Venv:** `h5py==3.16.0`, `numpy==2.5.2` (both BSD-3-Clause), pinned in the project-root `requirements.txt` **and in the packet's own**. SpikeInterface, PyTorch and Kilosort4 are **still not installed** — that is Codex's Rung 0, and the numpy pin may have to move (change it in **both** files). Use `.\venv\Scripts\python.exe` and `.\venv\Scripts\pip.exe`; never bare `python` or `pip`.
 
 ## 12. Housekeeping that is easy to get wrong
 
@@ -167,12 +161,12 @@ Gates **open**: drift · noise · post-rescaling effective SNR · Codex's covari
 - **Kilosort4 is GPLv3.** Call it as a tool through SpikeInterface. Never vendor, never link. For sorter internals use SpikeInterface's MIT `sortingcomponents`.
 - **Corrections propagate forward, never backward.** The review cycle is the only exception, and only for artifacts in active review.
 - **`pdflatex` is at `/c/Users/cresp/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex`**; `pdftoppm` and `pdftotext` are available. Build twice, check the log, render changed and final pages before approving a PDF.
-- **Do not leave a background job running past the end of a session**, and delete temporary test directories before closeout.
+- **Do not leave a background job running past the end of a session**, and delete temporary test directories before closeout. Session 12 used `C:\work\pkt12` and `C:\work\pkt13`; both are gone.
 - **`RemoteFile` validates and retries range responses.** Counters are `n_bytes` / `n_requests` — **return them from a reader rather than discarding them.** **1 MiB blocks transfer far less than the 4 MiB default** for scattered header reads.
-- **Shared logic lives in `utils/` and is imported.** `host_anatomy.py`, `anatomy_index.py` (Codex's; pass `--legacy-index-target CA1 --legacy-index-max-gap-um 40` for the existing index), `remote_hdf5`, `dandi`, `template_metadata` (with `fetch_metadata_with_headers`), `ccf_labels` (opt-in derived layer).
-- **When you refactor a script another agent hardened, prove it still works.** The byte-for-byte diff is the pattern and it has now worked four times.
-- **The resumable/pinned result files are tracked deliberately** (`host_anatomy_index.jsonl`, `host_timing_index.jsonl`, the two upstream snapshots, `ccf_label_map_derived_records.json`). **Both** `.gitignore` files now carry a do-not-catch-these comment.
-- **Five packet scripts replay with no network reads** — the runbook in `Reproducibility Packet/README.md` prints the exact commands, including the two flags that are easy to omit (§4).
+- **Shared logic lives in `utils/` and is imported.** `host_anatomy.py`, `anatomy_index.py` (Codex's; pass `--legacy-index-target CA1 --legacy-index-max-gap-um 40` for the existing index, or it *refuses* to extend it), `remote_hdf5`, `dandi`, `template_metadata`, `ccf_labels` (opt-in derived layer).
+- **When you refactor or rewrite something another agent hardened, prove it still works.** The byte-for-byte diff is the pattern and it has now worked five times.
+- **After editing either the packet runbook or any script's docstring, run `check_runbook_consistency.py`.** It is the only thing standing between those two copies and silent drift, and its own harness is in `agents/Claude/tools/`.
+- **The resumable/pinned result files are tracked deliberately.** **Both** `.gitignore` files carry a do-not-catch-these comment.
 - **The processed NWB units table is rich** — 32 columns including `waveform_mean` (volts, NaN-padded), `spike_amplitudes_uV`, `cluster_uuid`, `ibl_quality_score`. **Every column carries a `description` attribute.** Read the description before using a column.
 
 ## 13. Still-open verification debt

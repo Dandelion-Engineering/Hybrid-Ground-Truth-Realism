@@ -26,14 +26,18 @@ gates, and a host that ranks first here can still fail them.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/survey_host_anatomy.py" \
-        --target CA1 --exclude-subjects KS042,KS043 --limit 50 \
-        --index "Reproducibility Packet/results/host_anatomy_index.jsonl" \
-        --out "Reproducibility Packet/results/host_anatomy_CA1.txt"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 6** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
 
-The current tracked index predates embedded configuration metadata. To resume
-that specific CA1/40-um index safely, also pass
-``--legacy-index-target CA1 --legacy-index-max-gap-um 40``.
+    python scripts/survey_host_anatomy.py --target CA1 --exclude-subjects KS042,KS043,KS044,KS046,KS051,KS052,KS055,KS084,KS086,KS091,KS094,KS096 --assets-cache results/dandi_000409_assets.json --index results/host_anatomy_index.jsonl --legacy-index-target CA1 --legacy-index-max-gap-um 40 --out results/host_anatomy_CA1.txt
+
+The two ``--legacy-index-*`` flags are in that command because the tracked index
+predates embedded configuration metadata: without them the resume guard cannot
+tell what target and gap tolerance produced the existing rows, and refuses to
+extend it. A fresh index does not need them.
 """
 
 import argparse

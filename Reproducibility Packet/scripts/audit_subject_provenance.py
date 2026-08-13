@@ -23,10 +23,13 @@ against files of 18-197 GB. No recording data is downloaded.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/audit_subject_provenance.py" \
-        --donor-subjects KS042,KS043 --host-subjects CSHL047,NYU-12 \
-        --assets "Reproducibility Packet/results/dandi_000409_assets.json" \
-        --out "Reproducibility Packet/results/subject_provenance.txt"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 9** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
+
+    python scripts/audit_subject_provenance.py --donor-subjects KS042,KS043,KS044,KS046,KS051,KS052,KS055,KS084,KS086,KS091,KS094,KS096 --host-subjects CSHL045,CSHL047,CSHL049,NYU-12,NYU-37,NYU-39,NYU-45,NYU-48,NYU-65 --assets results/dandi_000409_assets.json --records results/subject_provenance.json --out results/subject_provenance.txt
 """
 
 import argparse

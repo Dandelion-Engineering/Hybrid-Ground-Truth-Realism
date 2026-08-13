@@ -19,10 +19,12 @@ slightly different from a real one.
 
 Cost discipline: reading the last timestamp pulls a distant chunk, so this is
 deliberately run **only on candidates that already survived the anatomy screen**
-rather than on all 429 eligible recordings. That ordering is the reviewer ruling
-recorded in ``agents/Claude/Tier A Host and Injection Zone Selection.md`` (7.3):
-apply the remaining gates sequentially to the current candidate set rather than
-paying for a full census.
+rather than on all 429 eligible recordings. That ordering is a recorded review
+ruling: apply the remaining gates sequentially to the current candidate set
+rather than paying for a full census. The ruling and its reasoning live in the
+project's Tier A selection artifact, which is in the repository rather than in
+this packet -- see *Design documents these scripts refer to* in ``README.md``.
+Nothing here needs it in order to run.
 
 What this script does **not** do, and what still gates a host afterwards: drift
 quantification, noise measurement, post-rescaling effective SNR, covariate
@@ -31,14 +33,13 @@ that ten injected units fit the band without overcrowding.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/screen_host_timing.py" \
-        --index "Reproducibility Packet/results/host_anatomy_index.jsonl" \
-        --assets-cache "Reproducibility Packet/results/dandi_000409_assets.json" \
-        --target CA1 --anatomy-max-gap-um 40 \
-        --legacy-index-target CA1 --legacy-index-max-gap-um 40 \
-        --min-band-channels 20 --min-duration-s 600 \
-        --timing-index "Reproducibility Packet/results/host_timing_index.jsonl" \
-        --out "Reproducibility Packet/results/host_timing_CA1.txt"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 7** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
+
+    python scripts/screen_host_timing.py --index results/host_anatomy_index.jsonl --assets-cache results/dandi_000409_assets.json --target CA1 --legacy-index-target CA1 --legacy-index-max-gap-um 40 --timing-index results/host_timing_index.jsonl --out results/host_timing_CA1.txt
 """
 
 import argparse

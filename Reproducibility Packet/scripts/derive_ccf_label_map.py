@@ -49,10 +49,13 @@ is a genuine independent check of the long-name spellings nobody has run.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/derive_ccf_label_map.py" \
-        --assets-cache "Reproducibility Packet/results/dandi_000409_assets.json" \
-        --out "Reproducibility Packet/results/ccf_label_map_derived.txt" \
-        --json-out "Reproducibility Packet/scripts/utils/ccf_label_map_derived.json"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 4** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
+
+    python scripts/derive_ccf_label_map.py --from-records results/ccf_label_map_derived_records.json --out results/ccf_label_map_derived.txt --json-out scripts/utils/ccf_label_map_derived.json
 """
 
 import argparse

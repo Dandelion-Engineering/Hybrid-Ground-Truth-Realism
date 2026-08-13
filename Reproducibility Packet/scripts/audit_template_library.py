@@ -35,11 +35,19 @@ shown to reproduce the tracked report byte for byte from a live fetch.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/audit_template_library.py" --out "Reproducibility Packet/results/template_audit.txt"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 1** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
 
-Pass ``--cache`` to re-run the group-bys against a saved snapshot without a
-network request. The ETag and Last-Modified lines are then empty, because only a
-live response carries them.
+    python scripts/audit_template_library.py --cache results/templates_snapshot_2026-08-11.csv --out results/template_audit_2026-08-11.txt
+
+``--cache`` runs the group-bys against the pinned snapshot with no network
+request, which is what makes that command reproduce byte for byte. Drop it to
+fetch the live table instead; the script then reports whether its SHA-256 still
+matches the pinned snapshot and fills in the ETag and Last-Modified lines, which
+a cached read cannot carry and which are the only difference between the two.
 """
 
 import argparse

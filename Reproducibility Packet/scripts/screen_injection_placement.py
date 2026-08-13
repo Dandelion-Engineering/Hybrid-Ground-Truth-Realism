@@ -37,11 +37,13 @@ reports it as uninterpreted rather than using it as a gate.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/screen_injection_placement.py" \
-        --target CA1 --assets-cache "Reproducibility Packet/results/dandi_000409_assets.json" \
-        --index "Reproducibility Packet/results/host_anatomy_index.jsonl" \
-        --legacy-index-target CA1 --legacy-index-max-gap-um 40 \
-        --out "Reproducibility Packet/results/injection_placement_CA1.txt"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 8** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
+
+    python scripts/screen_injection_placement.py --target CA1 --from-records results/injection_placement_CA1.json --skipped-note 35 --out results/injection_placement_CA1.txt
 """
 
 import argparse

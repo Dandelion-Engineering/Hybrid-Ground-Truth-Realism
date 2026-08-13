@@ -25,9 +25,13 @@ row is a data quirk and one wrong *structure* is a broken table entry.
 
 Example
 -------
-    ./venv/Scripts/python.exe "Reproducibility Packet/scripts/validate_ccf_label_map.py" \
-        --assets-cache "Reproducibility Packet/results/dandi_000409_assets.json" \
-        --out "Reproducibility Packet/results/ccf_label_map_validation.txt"
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 5** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
+
+    python scripts/validate_ccf_label_map.py --assets-cache results/dandi_000409_assets.json --templates-cache results/templates_snapshot_2026-08-11.csv --out results/ccf_label_map_validation.txt
 """
 
 import argparse

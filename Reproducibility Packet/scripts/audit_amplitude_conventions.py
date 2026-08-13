@@ -39,6 +39,16 @@ This script settles it in three steps.
 
 Metadata only. No recording data is downloaded: the units table is read out of
 the processed NWB over HTTP byte ranges.
+
+Example
+-------
+Run from the ``Reproducibility Packet`` folder, which is the working directory
+every command in ``README.md`` assumes; ``python`` means that folder's own
+virtual environment, built in README's Setup section. This is **Step 10** of
+that runbook, which also records what the command produced and whether it has
+been re-run since:
+
+    python scripts/audit_amplitude_conventions.py --session 07dc4b76-5b93-4a03-82a0-b3d9cc73f412 --assets-cache results/dandi_000409_assets.json --records results/amplitude_conventions.json --out results/amplitude_conventions.txt
 """
 
 import argparse
