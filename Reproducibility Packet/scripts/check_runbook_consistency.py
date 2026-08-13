@@ -96,35 +96,69 @@ def parse_readme_steps(readme_path):
     body = text.split("## The runbook", 1)[1]
 
     steps = {}
+    step_numbers = {}
     current = None
     awaiting_command = False
     in_fence = False
+    command_lines = []
     for line in body.split("\n"):
         line = line.rstrip("\r")
+        if in_fence:
+            if line.startswith("```"):
+                if not command_lines:
+                    raise ValueError(f"step {current[0]}'s command fence is empty")
+                if len(command_lines) > 1:
+                    raise ValueError(
+                        f"step {current[0]}'s command fence contains "
+                        f"{len(command_lines)} non-empty lines; commands must be one line"
+                    )
+                command = command_lines[0]
+                tokens = shlex.split(command)
+                if len(tokens) < 2 or tokens[0] != "python":
+                    raise ValueError(
+                        f"step {current[0]} does not start with 'python <script>'"
+                    )
+                name = os.path.basename(tokens[1])
+                if name in steps:
+                    raise ValueError(
+                        f"{name} is claimed by steps {steps[name][0]} and {current[0]}"
+                    )
+                steps[name] = (current[0], command, current[1])
+                in_fence = False
+                awaiting_command = False
+                command_lines = []
+            elif line.strip():
+                command_lines.append(line.strip())
+            continue
+
         heading = STEP_HEADING.match(line)
         if heading:
             if awaiting_command:
                 raise ValueError(f"step {current[0]} has no fenced command")
-            current = (int(heading.group(1)), heading.group(3))
+            number = int(heading.group(1))
+            if number in step_numbers:
+                raise ValueError(
+                    f"step number {number} is used by both "
+                    f"'{step_numbers[number]}' and '{heading.group(2)}'"
+                )
+            step_numbers[number] = heading.group(2)
+            current = (number, heading.group(3))
             awaiting_command = True
             continue
         if line.startswith("```bash") and awaiting_command:
             in_fence = True
+            command_lines = []
             continue
-        if in_fence:
-            if line.startswith("```"):
-                raise ValueError(f"step {current[0]}'s command fence is empty")
-            tokens = shlex.split(line.strip())
-            if len(tokens) < 2 or tokens[0] != "python":
-                raise ValueError(f"step {current[0]} does not start with 'python <script>'")
-            name = os.path.basename(tokens[1])
-            if name in steps:
-                raise ValueError(f"{name} is claimed by steps {steps[name][0]} and {current[0]}")
-            steps[name] = (current[0], line.strip(), current[1])
-            in_fence = False
-            awaiting_command = False
+    if in_fence:
+        raise ValueError(f"step {current[0]}'s command fence is not closed")
     if awaiting_command:
         raise ValueError(f"step {current[0]} has no fenced command")
+    numbers = sorted(step_numbers)
+    expected = list(range(1, len(numbers) + 1))
+    if numbers != expected:
+        raise ValueError(
+            f"runbook step numbers are {numbers}; expected contiguous numbering {expected}"
+        )
     return steps
 
 
@@ -184,11 +218,15 @@ def main():
                         help="scripts directory to check (default: this packet's scripts/)")
     args = parser.parse_args()
 
-    for path, label in ((args.readme, "--readme"), (args.scripts, "--scripts")):
-        if not os.path.exists(path):
-            sys.exit(f"[fatal] {label} path does not exist: {path}")
+    if not os.path.isfile(args.readme):
+        sys.exit(f"[fatal] --readme is not a file: {args.readme}")
+    if not os.path.isdir(args.scripts):
+        sys.exit(f"[fatal] --scripts is not a directory: {args.scripts}")
 
-    steps = parse_readme_steps(args.readme)
+    try:
+        steps = parse_readme_steps(args.readme)
+    except (OSError, ValueError) as exc:
+        sys.exit(f"[fatal] could not parse the runbook: {exc}")
     on_disk = {name for name in sorted(os.listdir(args.scripts))
                if name.endswith(".py") and name not in NOT_A_STEP}
 
@@ -209,7 +247,7 @@ def main():
             continue
         try:
             doc_command, doc_step = parse_docstring_example(os.path.join(args.scripts, name))
-        except ValueError as exc:
+        except (SyntaxError, ValueError) as exc:
             problems.append(f"{name}: {exc}")
             print(f"{step:>5}  {name:<38}NO EXAMPLE")
             continue

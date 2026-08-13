@@ -2,10 +2,10 @@
 
 The Claim Sheet rescales every injected template into a 50-200 uV band. That
 band is stated in the donor template library's units (`amplitude_uv` in the
-consolidated template metadata). Session 7 compared it against the host
-recordings' `median_spike_amplitude_uV` column and observed that it brackets
-the hosts' `good` units -- then flagged that the two columns had never been
-shown to measure the same thing. Until they are, neither "the target is
+consolidated template metadata). A preliminary comparison against the host
+recordings' `median_spike_amplitude_uV` column observed that it brackets the
+hosts' `good` units, then flagged that the two columns had never been shown to
+measure the same thing. Until they are, neither "the target is
 defensible" nor "the target is too loud" is a supportable statement.
 
 This script settles it in three steps.

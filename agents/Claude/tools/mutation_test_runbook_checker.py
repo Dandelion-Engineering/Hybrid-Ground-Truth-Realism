@@ -50,8 +50,24 @@ def case_readme_flag(root):
         "--zone SUB --out results/zone_neighbour")
 
 
+def case_readme_second_command(root):
+    command = ZONE_CMD.strip()
+    sub(root, "README.md", command + NL + "```",
+        command + NL + "python scripts/unexpected_second_command.py" + NL + "```")
+
+
 def case_wrong_step_number(root):
     sub(root, "scripts/audit_template_library.py", "**Step 1**", "**Step 9**")
+
+
+def case_duplicate_step_number(root):
+    sub(root, "README.md", "### Step 4 —", "### Step 3 —")
+    sub(root, "scripts/derive_ccf_label_map.py", "**Step 4**", "**Step 3**")
+
+
+def case_noncontiguous_step_number(root):
+    sub(root, "README.md", "### Step 4 —", "### Step 11 —")
+    sub(root, "scripts/derive_ccf_label_map.py", "**Step 4**", "**Step 11**")
 
 
 def case_step_unnamed(root):
@@ -97,7 +113,10 @@ def case_missing_script(root):
 CASES = [
     ("docstring flag changed", case_docstring_flag),
     ("README flag changed", case_readme_flag),
+    ("README second command", case_readme_second_command),
     ("wrong step number", case_wrong_step_number),
+    ("duplicate step number", case_duplicate_step_number),
+    ("noncontiguous step number", case_noncontiguous_step_number),
     ("step number not named", case_step_unnamed),
     ("Example block deleted", case_no_example),
     ("two Example blocks", case_two_examples),
@@ -123,7 +142,7 @@ def run_checker(root):
          "--readme", os.path.join(root, "README.md"),
          "--scripts", os.path.join(root, "scripts")],
         capture_output=True, text=True)
-    return result.returncode, result.stdout
+    return result.returncode, result.stdout + result.stderr
 
 
 def main():
@@ -147,6 +166,9 @@ def main():
         for line in output.split(NL):
             if line.strip().startswith("- "):
                 reason = line.strip()[2:]
+                break
+            if line.strip().startswith("[fatal]"):
+                reason = line.strip()
                 break
         print(f"{label:<34} exit={code}  {'CAUGHT' if caught else 'MISSED'}  {reason[:88]}")
 

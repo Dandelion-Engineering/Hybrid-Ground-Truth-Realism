@@ -29,9 +29,10 @@ project should not acquire a dependency to answer it.
 
 Fetching, hashing, parsing and the caliper test live in ``utils.template_metadata``
 and are imported rather than repeated here; this script owns only the group-bys
-and the report. It was written before that module existed and carried its own
-copies until Session 10, when they were removed and the refactored script was
-shown to reproduce the tracked report byte for byte from a live fetch.
+and the report. It was written before that module existed and initially carried
+its own copies. Those copies were removed after the shared module was added, and
+the refactored script reproduced the tracked report byte for byte from a live
+fetch.
 
 Example
 -------

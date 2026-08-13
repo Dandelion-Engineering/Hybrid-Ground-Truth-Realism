@@ -1,10 +1,10 @@
 """Derive the CCF long-name to acronym bridge from first-party licensed data.
 
-`utils/ccf_labels.py` is hand-authored and, by Session 8's measurement, materially
-incomplete: 296 distinct host structure names across the screened recordings have
-no entry, and 650 donor rows name acronyms it does not define. The region-unaware
-arm needs that coverage, because its donors are drawn without conditioning on
-region and their placement still has to be evaluated against the local host label.
+`utils/ccf_labels.py` is hand-authored and materially incomplete: the recorded
+screen found 296 distinct host structure names with no entry, while 650 donor
+rows name acronyms it does not define. The region-unaware arm needs that coverage,
+because its donors are drawn without conditioning on region and their placement
+still has to be evaluated against the local host label.
 
 The obvious fix is to import the Allen CCF structure ontology. **This project may
 not.** The Allen Institute Terms of Use permit use "for research or other

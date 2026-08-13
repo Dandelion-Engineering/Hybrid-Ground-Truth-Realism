@@ -21,10 +21,8 @@ Cost discipline: reading the last timestamp pulls a distant chunk, so this is
 deliberately run **only on candidates that already survived the anatomy screen**
 rather than on all 429 eligible recordings. That ordering is a recorded review
 ruling: apply the remaining gates sequentially to the current candidate set
-rather than paying for a full census. The ruling and its reasoning live in the
-project's Tier A selection artifact, which is in the repository rather than in
-this packet -- see *Design documents these scripts refer to* in ``README.md``.
-Nothing here needs it in order to run.
+rather than paying for a full census. The operational rule and its reason are
+stated here completely; no outside document is needed to run this screen.
 
 What this script does **not** do, and what still gates a host afterwards: drift
 quantification, noise measurement, post-rescaling effective SNR, covariate

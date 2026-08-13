@@ -93,18 +93,15 @@ prints the exact number of bytes and requests it used.
 Several scripts explain a choice by naming the project's **Claim Sheet** — the
 contract that fixes the question, the method, the numerical budgets and the
 pre-declared shapes of success, failure and an inconclusive result, all before
-any measurement exists — and one names the **Tier A host-selection artifact**,
-which records why the host screens run in the order they do. Neither document is
-copied into this packet and **neither is needed to run anything here**: they are
-living documents, and a stale copy would be worse than a pointer. Both are in
-the project repository:
+any measurement exists. That living document is not copied into this packet
+and **is not needed to run anything here**; a stale copy would be worse than a
+pointer. The current contract is in the project repository:
 
 <https://github.com/Dandelion-Engineering/Hybrid-Ground-Truth-Realism>
 
-`Claim Sheet.md` is the technical contract, `Accessible Claim Sheet.md` is the
-same content in plain language, and `agents/Claude/Tier A Host and Injection
-Zone Selection.md` is the selection artifact. Everything needed to *reproduce*
-the recorded results is inside this folder.
+`Claim Sheet.md` is the technical contract and `Accessible Claim Sheet.md` is
+the same content in plain language. Everything needed to *reproduce* the
+recorded results is inside this folder.
 
 ---
 
