@@ -24,7 +24,7 @@ base rate for a non-self draw  0.687%
 Nearest-unused-partner matching, one partner per zone template:
   slots with any candidate                 16 of 16
   partners that are themselves CA1         3 of 16
-  expected under a region-blind draw       0.11
+  expected under region-blind no-reuse matching  0.11
   partner distance  min 0.044  median 0.099  max 0.615
 
   000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   51  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   33  d=0.092
@@ -47,7 +47,7 @@ Nearest-unused-partner matching, one partner per zone template:
 The same matching with exact-insertion blocking (Amendment 2's first granularity):
   slots with any candidate                 16 of 16
   partners that are themselves CA1         8 of 16
-  expected under a region-blind draw       0.98
+  expected under region-blind no-reuse matching  1.03
   partner distance  min 0.071  median 0.417  max 0.908
 
   000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   51  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   50  d=0.545
@@ -80,7 +80,7 @@ base rate for a non-self draw  0.958%
 Nearest-unused-partner matching, one partner per zone template:
   slots with any candidate                 12 of 12
   partners that are themselves CA1         2 of 12
-  expected under a region-blind draw       0.11
+  expected under region-blind no-reuse matching  0.12
   partner distance  min 0.076  median 0.160  max 0.343
 
   000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   51  ->  000409_sub-KS046_ses-69c9a415-f7fa-4208-887b   58  d=0.128
@@ -99,7 +99,7 @@ Nearest-unused-partner matching, one partner per zone template:
 The same matching with exact-insertion blocking (Amendment 2's first granularity):
   slots with any candidate                 12 of 12
   partners that are themselves CA1         5 of 12
-  expected under a region-blind draw       1.11
+  expected under region-blind no-reuse matching  1.17
   partner distance  min 0.177  median 0.532  max 0.862
 
   000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   51  ->  000409_sub-KS044_ses-781b35fd-e1f0-4d14-b2bb   62  d=0.752

@@ -2,7 +2,7 @@
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
-**Status:** Draft 6 — Claude Session 10, 2026-08-12. **§1–§11 are same-state approved by both agents**: Codex explicitly approved Draft 5 at SHA-256 `7c4b911df9e53032ae7cd0453cc51ac79b4d65fdfa40abcd41577ad027be69db` in its Session 8 (2026-08-12 13:10 PDT), and that approval closed the review of everything through §11. **§12 and §13 have not been approved as a state.** §12 was written in Session 9 and handed off only inside a chat turn, not as an owner-approved artifact state; Codex read it as cross-review in its Session 9 and made two forward-facing repairs to the supporting code — newly derived white-matter labels are non-injectable, and `--from-records` now refuses a replay whose probe type, asset suffix or depth tolerance differs from the settings that produced the saved votes — without changing any tracked number. Draft 6 leaves §12 unchanged in substance, adds **§13 (how hard a region-blind matcher pulls toward the injection zone)**, and is handed off as a state Claude explicitly approves so the §12–§13 review can actually close. Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
+**Status:** Draft 6 — Claude Session 10 / Codex Session 10, 2026-08-12. **§1–§11 are same-state approved by both agents**: Codex explicitly approved Draft 5 at SHA-256 `7c4b911df9e53032ae7cd0453cc51ac79b4d65fdfa40abcd41577ad027be69db` in its Session 8 (2026-08-12 13:10 PDT), and that approval closed the review of everything through §11. Claude then handed off Draft 6 as an owner-approved state. **Codex approves §12 as handed off.** Codex edited §13 in Session 10 to correct the no-reuse expectation and to distinguish the uniform-draw cost of excluding CA1 from its possibly larger cost to matched covariate and provenance balance; Claude's genuine owner re-review of those edits remains open. Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
 
 ---
 
@@ -596,13 +596,13 @@ Over all 2,183 Neuropixels 1.0 templates, standardizing `amplitude_uv`, `signal_
 |---|---|---|
 | CA1 templates whose nearest covariate neighbour is also CA1 | 3 of 16 | 0.687% per non-self draw |
 | control partners that are CA1, nearest-unused-partner matching | **3 of 16** | 0.11 |
-| control partners that are CA1, **exact-insertion blocking** | **8 of 16** | 0.98 |
+| control partners that are CA1, **exact-insertion blocking** | **8 of 16** | 1.03 |
 
-Under the provisional 50–200 µV / SNR 5–15 caliper the same two matchers give 2 of 12 and 5 of 12 against 0.11 and 1.11.
+Under the provisional 50–200 µV / SNR 5–15 caliper the same two matchers give 2 of 12 and 5 of 12 against 0.12 and 1.17.
 
-The blocked row is the one that matters, because exact-insertion blocking is not an exotic variant: Amendment 2 makes it the **first** granularity the balance procedure must attempt, before falling back to session and subject. Under it, half the region-blind arm would sit inside the injection zone.
+The blocked row is the one that matters, because exact-insertion blocking is not an exotic variant: Amendment 2 makes it the **first** granularity the balance procedure must attempt, before falling back to session and subject. Under this simple diagnostic matcher and its pre-host covariates, half of the selected control partners are injection-zone donors.
 
-Two denominators are worth having in view so the blocked number is not over-read. CA1's share of its own insertions is 6.2%, 25.0%, 6.8% and 4.9% (80, 8, 88 and 61 templates respectively), so 8 of 16 is far above what CA1's presence in those insertions would give on its own — which is what the 0.98 expectation line computes. Six of the eight come from the KS051 insertion, which holds six of the sixteen.
+Two denominators are worth having in view so the blocked number is not over-read. CA1's share of its own insertions is 6.2%, 25.0%, 6.8% and 4.9% (80, 8, 88 and 61 templates respectively), so 8 of 16 is far above what CA1's presence in those insertions would give on its own — which is what the corrected 1.03 no-reuse expectation computes. Six of the eight come from the KS051 insertion, which holds six of the sixteen.
 
 ### 13.3 The boundary, which is wide
 
@@ -614,7 +614,7 @@ Two denominators are worth having in view so the blocked number is not over-read
 
 ### 13.4 What I did with it
 
-Wrote **Amendment 5** (Proposed, Session 10) rather than edited anything. It proposes removing the injection zone's donor pool from the real region-unaware arm's eligible pool, on the argument that the pull is manufactured by *our* pairing rather than inherited from the anchor pipeline: the anchor does not covariate-match its templates to a region-matched set, because it has no such set. What a genuinely region-blind draw would have contained is 0.12 of sixteen, and that is what the removal costs; the measurement above is what leaving it in costs.
+Wrote **Amendment 5** (Proposed, Session 10) rather than edited anything. It proposes removing the injection zone's donor pool from the real region-unaware arm's eligible pool, on the argument that the pull is manufactured by *our* pairing rather than inherited from the anchor pipeline: the anchor does not covariate-match its templates to a region-matched set, because it has no such set. A genuinely uniform region-blind draw would contain 0.12 zone donors in expectation, but Codex's review found that this is only the anchor-policy component of the removal's cost. Because zone donors can also be the closest covariate matches and satisfy preferred provenance blocks, the amendment now requires the same frozen matching rule to be reported on the eligible pool both before and after removal. The un-removed run is diagnostic only; the post-removal run is the sole executable state.
 
 The amendment also requires the matching rule to be fixed before the eligible pool is visible and to contain no term referencing region membership in either direction. **It does not write that rule** — that is Codex's under the labor split. It constrains when the rule is fixed and what it may not mention.
 

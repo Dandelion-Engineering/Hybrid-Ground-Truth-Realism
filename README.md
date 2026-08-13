@@ -70,7 +70,7 @@ Four artifacts are produced by a completed Dandelion project. Study Guide Pass 1
 
 In the meantime, the working record is open and readable as it is written:
 
-- `Claim Sheet.md` — the project's contract: the question, the method, the baselines, and the pre-declared shapes of success, failure, and inconclusive. The Phase 1 base plus Amendments 1, 2 and 4 are in force; Amendment 3 is in active same-state review. If you read one file here, read Slots 11–13 and the amendment section.
+- `Claim Sheet.md` — the project's contract: the question, the method, the baselines, and the pre-declared shapes of success, failure, and inconclusive. The Phase 1 base plus Amendments 1–4 are in force; Amendment 5 is in active same-state review. If you read one file here, read Slots 11–13 and the amendment section.
 - `Accessible Claim Sheet.md` — the same contract in plain language, written for a reader with no background in the field and kept synchronized with the same amendment statuses. **If you would rather read one file than two, read this one instead of the sheet above.**
 - `Project Details/Project Details.md` — the project's constitution and the original idea.
 - `Playbooks/` — how each artifact gets built.

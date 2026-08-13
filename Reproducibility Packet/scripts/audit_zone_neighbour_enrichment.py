@@ -188,14 +188,53 @@ def greedy_partners(pool, zone_keys, block_insertion=False):
     return partners
 
 
-def blocked_expectation(pool, zone_keys):
-    """Expected zone partners when each draw is confined to its own insertion.
+def _injective_zone_expectation(pool_size, zone_count):
+    """Expected zone outputs in a uniform no-reuse matching block.
+
+    Each of ``zone_count`` labelled zone templates receives one distinct
+    partner from ``pool_size`` candidates, and a template cannot partner with
+    itself. Inclusion-exclusion counts the admissible injective assignments.
+    The simpler ``zone_count * (zone_count - 1) / (pool_size - 1)`` expression
+    treats the slots as independent and is therefore not the right baseline
+    for :func:`greedy_partners`, which never reuses a control partner.
+
+    Args:
+        pool_size: candidate count in the matching block.
+        zone_count: zone-template count in that block.
+
+    Returns:
+        Expected number of selected partners that belong to the zone.
+
+    Raises:
+        ValueError: if a distinct non-self partner cannot exist for every slot.
+    """
+    if zone_count == 0:
+        return 0.0
+    if pool_size < zone_count or pool_size < 2:
+        raise ValueError(
+            f"no injective non-self matching for pool={pool_size}, zone={zone_count}"
+        )
+    total = sum(
+        (-1) ** fixed * math.comb(zone_count, fixed)
+        * math.perm(pool_size - fixed, zone_count - fixed)
+        for fixed in range(zone_count + 1)
+    )
+    without_one_zone_output = sum(
+        (-1) ** fixed * math.comb(zone_count - 1, fixed)
+        * math.perm(pool_size - 1 - fixed, zone_count - fixed)
+        for fixed in range(zone_count)
+    )
+    return zone_count * (1.0 - without_one_zone_output / total)
+
+
+def region_blind_expectation(pool, zone_keys, block_insertion=False):
+    """Expected zone partners under the matcher's no-reuse constraint.
 
     Under exact-insertion blocking the comparison is not the pool-wide base
     rate: a zone template's candidates are only its insertion-mates, and zone
-    templates cluster inside a few insertions. This is the rate a region-blind
-    uniform draw would produce under the same blocking, which is what an
-    observed count has to be read against.
+    templates cluster inside a few insertions. This function applies the same
+    distinct-partner and non-self constraints as :func:`greedy_partners`,
+    either over the whole pool or separately within each insertion.
 
     Args:
         pool: (row, standardized_values) tuples for the whole eligible pool.
@@ -207,17 +246,14 @@ def blocked_expectation(pool, zone_keys):
     sizes = {}
     zone_counts = {}
     for row, _ in pool:
-        insertion = key_of(row)[0]
+        insertion = key_of(row)[0] if block_insertion else "__all__"
         sizes[insertion] = sizes.get(insertion, 0) + 1
         if key_of(row) in zone_keys:
             zone_counts[insertion] = zone_counts.get(insertion, 0) + 1
-    total = 0.0
-    for insertion, count in zone_counts.items():
-        available = sizes[insertion] - 1
-        if available <= 0:
-            continue
-        total += count * (count - 1) / available
-    return total
+    return sum(
+        _injective_zone_expectation(sizes[insertion], count)
+        for insertion, count in zone_counts.items()
+    )
 
 
 def main():
@@ -307,9 +343,10 @@ def main():
             emit(f"  slots with any candidate                 {len(matched)} of {len(partners)}")
             emit(f"  partners that are themselves {args.zone}"
                  f"{'':<{max(0, 12 - len(args.zone))}}{zone_partners} of {len(matched)}")
-            expected = (blocked_expectation(pool, zone_keys) if blocked
-                        else base_rate * len(matched))
-            emit(f"  expected under a region-blind draw       {expected:.2f}")
+            expected = region_blind_expectation(
+                pool, zone_keys, block_insertion=blocked
+            )
+            emit(f"  expected under region-blind no-reuse matching  {expected:.2f}")
             if matched:
                 distances = [item[3] for item in matched]
                 emit(f"  partner distance  min {min(distances):.3f}  "
