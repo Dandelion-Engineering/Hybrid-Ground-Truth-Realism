@@ -17,6 +17,10 @@ instead. It compares:
 2. **The command.** The step's fenced command and the docstring's example are
    the same string, character for character.
 3. **The step number.** The docstring names the same step the README puts it in.
+4. **One command on each side.** A step carries exactly one ``bash`` fence and
+   that fence exactly one line; an ``Example`` block carries exactly one
+   indented line. Anything a reader would also run has to be somewhere the
+   comparison can see it, or it is a second command nothing is checking.
 
 The docstring is read with ``ast``, so what is compared is the string
 ``argparse`` will print rather than the source text that produces it. That
@@ -87,8 +91,10 @@ def parse_readme_steps(readme_path):
         A dict from script basename to (step_number, command_string, mode).
 
     Raises:
-        ValueError: if a step's fenced command is missing or malformed, or if
-            two steps claim the same script.
+        ValueError: if a step's fenced command is missing, unclosed, empty,
+            longer than one line, duplicated by a second fence in the same
+            step, or malformed; if two steps claim the same script; or if the
+            step numbers are not unique and contiguous from 1.
     """
     text = read_text(readme_path)
     if "## The runbook" not in text:
@@ -99,6 +105,7 @@ def parse_readme_steps(readme_path):
     step_numbers = {}
     current = None
     awaiting_command = False
+    in_step = False
     in_fence = False
     command_lines = []
     for line in body.split("\n"):
@@ -131,6 +138,10 @@ def parse_readme_steps(readme_path):
                 command_lines.append(line.strip())
             continue
 
+        if line.startswith("## "):
+            # A new section ends the step region, so a fenced command below it
+            # belongs to the section rather than to the last step.
+            in_step = False
         heading = STEP_HEADING.match(line)
         if heading:
             if awaiting_command:
@@ -144,11 +155,19 @@ def parse_readme_steps(readme_path):
             step_numbers[number] = heading.group(2)
             current = (number, heading.group(3))
             awaiting_command = True
+            in_step = True
             continue
-        if line.startswith("```bash") and awaiting_command:
-            in_fence = True
-            command_lines = []
-            continue
+        if line.startswith("```bash"):
+            if awaiting_command:
+                in_fence = True
+                command_lines = []
+                continue
+            if in_step:
+                # The step's command was already read, so this fence is a second
+                # command the reader would run and nothing would be comparing.
+                raise ValueError(
+                    f"step {current[0]} has more than one ```bash command fence"
+                )
     if in_fence:
         raise ValueError(f"step {current[0]}'s command fence is not closed")
     if awaiting_command:
@@ -177,8 +196,8 @@ def parse_docstring_example(script_path):
 
     Raises:
         ValueError: if the script has no module docstring, no Example block,
-            more than one Example block, or an Example block whose command is
-            not a single indented line.
+            more than one Example block, or an Example block that does not
+            contain exactly one indented command line.
     """
     docstring = ast.get_docstring(ast.parse(read_text(script_path)), clean=False)
     if docstring is None:
@@ -190,18 +209,18 @@ def parse_docstring_example(script_path):
         raise ValueError(f"{docstring.count(marker)} 'Example' blocks in the module docstring")
     after = docstring[docstring.index(marker) + len(marker):]
 
-    command_lines = []
-    for line in after.split("\n"):
-        if line.startswith("    ") and line.strip():
-            command_lines.append(line)
-        elif command_lines:
-            break
+    # Every indented line in the block is collected, not just the first run of
+    # them: --help prints the whole block, so a second command further down is
+    # a second command the reader sees, and stopping at the first blank line
+    # would leave it uncompared.
+    command_lines = [line for line in after.split("\n")
+                     if line.startswith("    ") and line.strip()]
     if not command_lines:
         raise ValueError("'Example' block contains no indented command")
     if len(command_lines) > 1:
         raise ValueError(
-            f"'Example' block spans {len(command_lines)} lines; commands are written on one "
-            "line so that --help shows exactly what README.md shows"
+            f"'Example' block contains {len(command_lines)} indented command lines; it must "
+            "contain exactly one, because --help prints all of them and README.md carries one"
         )
 
     named = DOCSTRING_STEP.search(after)

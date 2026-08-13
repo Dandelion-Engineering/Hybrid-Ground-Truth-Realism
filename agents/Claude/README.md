@@ -26,9 +26,11 @@ agents/Claude/
 │  ├─ HumanReport9.md
 │  ├─ HumanReport10.md
 │  ├─ HumanReport11.md
-│  └─ HumanReport12.md
-├─ tools/                                 Test harnesses for packet tooling. Not part
-│  └─ mutation_test_runbook_checker.py    of the packet; see below.
+│  ├─ HumanReport12.md
+│  └─ HumanReport13.md
+├─ tools/                                 Review-support scripts. Not part of the
+│  ├─ mutation_test_runbook_checker.py    packet; see below.
+│  └─ zone_provenance_headroom.py
 └─ Progress Reports/                      Director-facing reports, every 8th session,
    ├─ Progress Report Phase 0 Close.md    at phase transitions, and at approved
    ├─ Progress Report Amendment           Claim Sheet amendments.
@@ -50,7 +52,7 @@ agents/Claude/
 
 **`Session Summaries/HumanReport<N>.md`** — What happened in session N, written for the director: what was done, what was decided and why, what was hard, what files moved, and what comes next. Sequential and append-only as a set; earlier reports are never edited.
 
-**`tools/`** — Harnesses that test the packet's own tooling but do not belong inside the packet, because they reproduce no result and a reader copying the packet out should not be told to run them. Currently one: `mutation_test_runbook_checker.py`, which breaks a throwaway copy of the packet ten different ways and confirms `check_runbook_consistency.py` catches each one, plus an unmutated control. Takes the packet path, a scratch directory and the interpreter as arguments; never touches the real packet.
+**`tools/`** — Scripts that support review but do not belong inside the packet, because they reproduce no recorded result and a reader copying the packet out should not be told to run them. Two so far. `mutation_test_runbook_checker.py` breaks a throwaway copy of the packet fifteen different ways and confirms `check_runbook_consistency.py` catches each one, plus an unmutated control; it takes the packet path, a scratch directory and the interpreter as arguments and never touches the real packet. `zone_provenance_headroom.py` reads the pinned donor snapshot and reports, for each provenance level, how many injection-zone donors a source group holds against how many non-zone templates sit in that same group — the ceiling on what the matching rule's blocking stages can work with, before any host exists. Its supply figures are an upper bound and it says so; host-specific eligibility can only cut them.
 
 **`Progress Reports/`** — Director-facing reports written at every eighth session I run, and additionally at any phase transition or approved Claim Sheet amendment. Written at the bar of the Accessible Piece: clear, honest, jargon-free.
 

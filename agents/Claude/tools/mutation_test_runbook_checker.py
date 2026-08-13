@@ -110,6 +110,29 @@ def case_missing_script(root):
     os.remove(os.path.join(root, "scripts/audit_amplitude_conventions.py"))
 
 
+def case_readme_second_fence(root):
+    """A second command fence in the same step, after the first one closed.
+
+    The fence-level form of the second-command escape: the first fence is
+    correct, so a parser that stops looking once a step has a command never
+    sees the second one a reader would also run.
+    """
+    command = ZONE_CMD.strip()
+    sub(root, "README.md", command + NL + "```",
+        command + NL + "```" + NL + NL + "```bash" + NL +
+        "python scripts/unexpected_second_fence.py" + NL + "```")
+
+
+def case_docstring_second_command(root):
+    """A second indented command in the same Example block, after a blank line.
+
+    The docstring-level form of the same escape. ``--help`` prints the whole
+    block, so the reader sees both commands.
+    """
+    sub(root, ZONE, ZONE_CMD,
+        ZONE_CMD + NL + NL + "    python scripts/unexpected_second_command.py --wrong")
+
+
 CASES = [
     ("docstring flag changed", case_docstring_flag),
     ("README flag changed", case_readme_flag),
@@ -124,6 +147,8 @@ CASES = [
     ("collapsed line continuation", case_collapsed_continuation),
     ("doubled space in command", case_doubled_space),
     ("script named by a step is gone", case_missing_script),
+    ("README second command fence", case_readme_second_fence),
+    ("docstring second command", case_docstring_second_command),
 ]
 
 

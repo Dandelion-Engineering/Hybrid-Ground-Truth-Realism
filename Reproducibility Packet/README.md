@@ -300,7 +300,10 @@ python scripts/check_runbook_consistency.py
 
 It reads every numbered step above and every script's `Example` block and
 compares them character for character, then checks that each script has exactly
-one step and names the right step number. It reads the docstring through
+one step and names the right step number. It also requires exactly one command
+on each side — one `bash` fence per step, one line inside it, one indented line
+per `Example` block — because a second command anywhere is a command a reader
+would run that nothing is comparing. It reads the docstring through
 Python's parser, so what it compares is the string `--help` will print rather
 than the source text behind it — which is not a fine distinction: a backslash
 line continuation inside an ordinary docstring is an escape, so Python deletes
