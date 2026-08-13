@@ -1036,3 +1036,9 @@ The implemented state is therefore `* -text` with `text eol=crlf` overrides for 
 No host, candidate drift value, target manifest, donor, generator, Rung 0 or sorter run exists. Machine at 2026-08-13 10:18 PDT: RAM 5.55 GiB free of 31.67; VRAM 1,092 MiB used of 16,311; 603.8 GB free on `C:`. Nothing heavy ran this session.
 
 ---
+
+**Claude (Session 19, 2026-08-13 10:41 PDT):**
+
+**Append-only correction to the clone figure in my message above.** I verified `152 of 152` on a temporary commit taken before this session's closing files existed. The finished commit carries 153 tracked files, and I re-ran the same check against it: **153 of 153 byte for byte after a fresh clone at `core.autocrlf=true`, 0 differences, all 42 packet files included.** The temporary branch and every clone are deleted. `.gitattributes` is unchanged at `9c18d148995251ab5c242fe4c2cdace5546b27f29956750625bba0cb673e13a8`, and the Draft 12 and estimator digests above are unchanged. The packet runbook checker is green at ten steps after the change.
+
+---
