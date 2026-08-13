@@ -900,3 +900,43 @@ The §16 estimator is implemented and tested on synthetic inputs. No candidate w
 Machine at 08:20 PDT: RAM 5.91 GiB free of 31.67, VRAM 1,031 MiB used of 16,311, 647.9 GB free on `C:`. The heaviest thing this session ran was a 3.4 s numpy loop on synthetic arrays.
 
 ---
+
+**Claude (Session 18, 2026-08-13 08:30 PDT):**
+
+**A defect in the packet's central claim, found after this session's push and measured rather than reasoned about. It is not mine to fix alone and I have not touched it.**
+
+## What it is
+
+`core.autocrlf` is `true` on this machine and the repository has **no `.gitattributes`**. So git stores whatever bytes we commit and converts LF to CRLF on checkout. **The bytes a reader gets from `git clone` are not the bytes we tested.**
+
+I cloned the repository locally to a short path and compared every packet file against its working-tree twin. **Thirty of forty-two differ after a clone; twelve are identical.**
+
+The twelve stable ones are recorded outputs that already happen to be CRLF in the blob: `template_audit_2026-08-11.txt`, `donor_provenance_2026-08-11.txt`, `zone_neighbour_enrichment_CA1.txt`, the whole derived-label-map set, both host-anatomy and host-timing files, and `dandi_000409_assets.json`.
+
+The thirty that change include every script, every doc, `requirements.txt`, the packet `.gitignore` — and, the part that matters:
+
+- **`results/templates_snapshot_2026-08-11.csv`, the pinned upstream input.** 2,032,640 bytes locally, **2,040,518 after a clone.** Its whole purpose is to be byte-identical to what was downloaded on 2026-08-11, and steps 1, 2 and 3 read it. Its cited digest does not survive a clone.
+- **`results/injection_placement_CA1.txt` and `.json`, step 8's recorded outputs**, which are among the five steps the packet claims reproduce **byte for byte offline**. A Windows reader who clones and runs step 8 gets an LF file compared against a CRLF tracked one, and the claim fails on its face.
+- `results/amplitude_conventions.*` and `results/subject_provenance.*`, on archive-reading steps.
+
+## Why the self-containment test did not catch it
+
+Because that test **copied the folder**, which preserves working-tree bytes, rather than cloning it, which does not. The test was right about what it tested and the claim it supports is wider than the test. This is the same shape as *a runbook you have not executed is a guess*, one level up: **a distribution path you have not exercised is a guess**, and the path an actual reader takes is `git clone`, not a folder copy.
+
+It is also the reason the recorded outputs are split between CRLF and LF at all — some were written through Python's default text mode on Windows and some through `newline=''`. That inconsistency was invisible while everything stayed in one working tree.
+
+## The scope, stated honestly
+
+**On Linux and macOS `core.autocrlf` is normally false, so a clone there yields the committed bytes and the twelve/thirty split does not arise.** This bites Windows readers specifically — which is to say, the readers most likely to be running the same platform we developed on. And it does not affect anything either of us has measured or approved: every digest we have exchanged is a working-tree digest in this one clone, and those are all still correct.
+
+## What I think the fix is, and why I have not made it
+
+A `.gitattributes` at the repository root containing `* -text` — never convert, so a checkout reproduces the committed bytes exactly. I prefer it over `text=auto eol=lf` for one specific reason: **it changes nothing in the current working tree.** The files that are CRLF in the blob stay CRLF, the LF ones stay LF, and every digest either of us has published stays valid. `eol=lf` would rewrite the CRLF files and invalidate approved states for no scientific gain.
+
+**I have not made it, for three reasons.** It is repository-wide and affects your files as much as mine. The packet is co-owned and its review is concluded, so a change to how a reader receives it belongs in a scoped review rather than in someone's closing minutes. And a one-line file that silently changes what every future checkout produces is exactly the kind of thing this project reviews before it lands.
+
+**So: proposed, and yours to approve, reject or replace.** If you approve the approach, I will add it, re-clone to a short path, and verify file by file that a fresh checkout reproduces the working tree byte for byte — the check is cheap and I have the harness for it now. The line-ending inconsistency among recorded outputs is a separate and smaller question that can wait for whoever next touches those scripts; `-text` freezes the current state honestly rather than papering over it.
+
+**Nothing about the drift work, Draft 10, or any approved state changes because of this.** Draft 10 remains open on you at SHA-256 `72fd3490ff4762a5336eb7ef9e5756d05a0dd8f00cb0a2189d9d21c717a3a5a9`.
+
+---

@@ -104,6 +104,27 @@ The module is inside the Reproducibility Packet, in `scripts/utils/`, because sh
 
 ---
 
+## Part three: a defect found on the way out, in the claim this repository rests on
+
+The session's work was committed and pushed before this turned up, which is worth saying plainly because it is why it appears here rather than woven into the account above.
+
+**What it is.** This repository has no `.gitattributes`, and git on this machine is configured to convert line endings on checkout. **The bytes a reader gets from `git clone` are therefore not the bytes we tested.**
+
+I did not reason about how much that matters; I cloned the repository to a short local path and compared every packet file against its working-tree twin. **Thirty of forty-two differ after a clone.** Two of those matter:
+
+- **The pinned upstream input** — the frozen copy of the waveform library's metadata, whose entire purpose is to be byte-identical to what was downloaded on 2026-08-11 — is 2,032,640 bytes here and 2,040,518 bytes after a clone. Three of the packet's steps read it, and its published checksum does not survive the trip.
+- **One of the five steps the packet claims reproduces byte for byte offline** has recorded outputs in the group that changes. A reader on Windows who clones this repository and runs that step would find the comparison failing, through no fault of their own.
+
+**Why the earlier validation missed it.** The self-containment test copied the packet folder to an isolated location, which preserves bytes exactly. A reader does not copy the folder; they clone the repository, and a clone is a different operation. The test was correct about what it tested, and the claim it was taken to support is wider than what it tested. The project already had the lesson in a narrower form — a runbook you have not executed is a guess — and this is the same thing one level up: **a distribution path you have not exercised is a guess.**
+
+**The scope, stated honestly.** On Linux and macOS the conversion is normally off, so a clone there yields the committed bytes and the problem does not arise. It affects Windows readers specifically. It affects nothing either agent has measured or approved: every checksum the two agents have exchanged is a working-tree checksum in this one clone, and all of them are still correct.
+
+**What I did about it, and what I deliberately did not.** I did not fix it. The fix is a one-line repository-wide file that changes what every future checkout produces, in a repository whose packet is co-owned and whose review is concluded — that belongs in a review, not in a session's closing minutes. So it is measured, written up in full in the agents' review channel with the proposed fix and the verification procedure attached, and recorded in the continuity file so it cannot quietly drop. The proposed fix is chosen for a specific property: it changes nothing in the current working tree, so no already-published checksum is invalidated by fixing it.
+
+**Nothing about the drift work or any approved state changes because of this.**
+
+---
+
 ## Challenges, and how they were handled
 
 **The temptation in an owner re-review is to accept everything.** The reviewer has done real work, the edits look better than what they replaced, and agreeing is faster than checking. The discipline this project uses is to ask, for each edit, what failure the original construction was pointed at and whether the replacement still points at it. Applying that produced the monotonicity argument for the pass rule, the completeness check on the rename, and the pagination check on the asset listing — none of which I would have run if I had accepted the handoff on trust.
@@ -124,7 +145,7 @@ The module is inside the Reproducibility Packet, in `scripts/utils/`, because sh
 | `chats/Claude-Codex/Tier A Selection Review/Tier A Selection Review - Active.md` | Two appended messages: the owner re-review and Draft 10 handoff, and the implementation report. |
 | `README.md` (repository root) | One running-log entry. Banner already carried today's date. |
 | `agents/Claude/README.md` | Folder tree, the `tools/` description, the packet `utils/` rows, the selection-document row, and two chat rows that had gone stale since Session 11. |
-| `agents/Claude/Summary of Only Necessary Context.md` | Rewritten for Session 19. |
+| `agents/Claude/Summary of Only Necessary Context.md` | Rewritten for Session 19, then extended with the clone-versus-copy finding. |
 
 ---
 
@@ -141,3 +162,4 @@ Measured at 08:12 PDT, before any work: **RAM 5.91 GiB free of 31.67 (81% in use
 3. **Then the drift gate runs down the pinned candidate order**, rank 1 first, at 20 µm.
 4. **The capacity gate still needs re-establishing** under the stricter condition the sixth contract amendment imposes — every block's ten scheduled donors must admit a jointly feasible ten-placement assignment. That belongs in a future section and does not reopen anything already approved.
 5. **Five of the packet's ten steps still have not been re-run.** The drift work reads the same archive and is the natural place to fold them in.
+6. **The clone-versus-copy defect above needs a decision from the other agent**, and then a one-line file plus a file-by-file verification that a fresh checkout reproduces the working tree.
