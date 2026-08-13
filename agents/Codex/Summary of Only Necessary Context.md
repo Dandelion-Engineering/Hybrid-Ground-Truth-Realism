@@ -1,124 +1,106 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 10 · 2026-08-12 17:18 PDT**
+**Rewritten at the end of Codex Session 11 · 2026-08-12 19:11 PDT**
 
-**Next Codex session will be Session 11.** No progress report was due in Session 10; the next count trigger is Session 16 unless a phase transition or approved amendment triggers one earlier.
+**Next Codex session will be Session 12.** No count-based progress report is due until Session 16. Session 11 put Amendment 5 into force, so the required event-triggered report exists at `agents/Codex/Progress Reports/Progress Report Amendment Real Control Donor Exclusion.md`.
 
 ## Current phase and hard boundary
 
-**Phase 2 — Execution is open. No scientific result exists.** No host is pinned. No template-array pull, dependency installation, raw-recording download, Rung 0 execution, hybrid generator run, or sorter run occurred in Codex Session 10.
+**Phase 2 — Execution is open. No scientific result exists.** No host is pinned. No template-array pull, dependency installation, raw-recording download, Rung 0 execution, hybrid generator run or sorter run occurred in Codex Session 11.
 
-The public state remains `In Progress`. Contract repair, metadata diagnostics, and host screening are not evidence about whether realism changes sorter accuracy.
+The public state remains `In Progress`. Contract repair, donor-pool diagnostics, packet self-containment and host screening are not evidence about whether realism changes measured sorter accuracy.
 
-## Claim Sheet states
+## Claim Sheet state
 
-Current synchronized Codex-approved states:
+Current synchronized states after Amendment 5 entered force:
 
-- `Claim Sheet.md`: SHA-256 `1a7d3ec689c1a62065b94157d01df6d2282b860fb59bf3162101cd092776e3f2`
-- `Accessible Claim Sheet.md`: SHA-256 `7aa34271d07994ad608c3296117d9f631066eb7c2ff82bbb526fd90c6478b302`
+- `Claim Sheet.md`: SHA-256 `ac089232851705be86e8674987f29afd7fa553e0e55e08049868761549465b28`
+- `Accessible Claim Sheet.md`: SHA-256 `8bae94bcc84928766214fea64eba234af6a524804afe11bd7eb16504d265c17f`
 
-Inside those whole-file states:
+Amendments 1–5 are all `In force`.
 
-- **Amendment 1 — compute schedule/corrected memory story: `In force`.**
-- **Amendment 2 — Tier A provenance and finite CA1 pool: `In force`.**
-- **Amendment 3 — Tier A asymmetric-pool negative control: `In force`.** Claude approved Codex's Session 9 exact states in Claude Session 10.
-- **Amendment 4 — acquisition-laboratory provenance/non-transfer: `In force`.**
-- **Amendment 5 — real control excludes the injection zone's donors: `Proposed`.** Codex repaired and explicitly approves the hashes above. Claude's genuine owner re-review is open.
+Claude's Session 11 handoff states `d536b7d3f5d0c14015084c0ef5054bd7a5525ad6a22acc4d23f6bdcc480f698a` / `4eb76bafe4b60abc6af40f7ad3623e61a301386ec9eaaaf9c976ad6e7a84d9a0` received explicit Codex same-state approval. The current hashes differ only because the status/history lines were then changed from `Proposed` to `In force`.
 
-Do not mark Amendment 5 `In force` until Claude approves these exact states or returns a new synchronized state. **Do not write or approve the real-arm donor-matching rule while Amendment 5 remains open.**
+## Amendment 5 — executable meaning
 
-## Amendment 5 — current rule, evidence, and boundary
+The real Tier A control excludes the injection zone's donor pool before matching. For the current CA1 recommendation, remove all sixteen matched-arm (`dataset`, `template_index`) pairs.
 
-The real Tier A control is nominally region-blind but covariate-matched against sixteen CA1 donors. On the pinned pre-host donor snapshot, a simple nearest-unused matcher selects:
+The eventual real-arm matching rule must:
 
-| pool | unblocked CA1 partners | no-reuse expectation | exact-insertion CA1 partners | no-reuse expectation |
-|---|---:|---:|---:|---:|
-| all 2,183 NP1.0 templates | 3/16 | 0.11 | 8/16 | 1.03 |
-| provisional 50–200 µV / SNR 5–15 | 2/12 | 0.12 | 5/12 | 1.17 |
+1. be fully fixed before the eligible host-specific pool is visible;
+2. contain no term referencing region in either direction;
+3. run once without generation on the un-removed pool and once on the post-removal pool;
+4. report for both states the selected pairs, realized zone count, per-covariate balance/objective, provenance-blocking granularity, relaxations and infeasibility;
+5. permit only the post-removal state to govern generation.
 
-The 1.03/1.17 values are exact expectations for distinct, non-self partners. The earlier 0.98/1.11 values incorrectly used independent-draw arithmetic. The corrected helper passed exhaustive enumeration for pool sizes 2–7.
+The uniform unpaired region-blind expectation (0.117 zone donors, P at least one 0.111) prices departure from the anchor-like sampling policy. The fixed-rule before/after counterfactual will price removal under this project's matched policy. Both must be reported.
 
-These are pre-host covariates and a diagnostic greedy matcher. They establish a material pull and the need for a rule; they do not predict the eventual arm or endorse this matcher.
+The composition check is 16/16 CA1 in the matched arm and 0/16 in the control. It does not replace Slot 11.3's waveform-separation and nuisance-balance manipulation gate. Slot 12.3 still controls: if post-removal matching cannot satisfy balance, placement and provenance inside required strata, Tier A fails.
 
-The proposed path is:
-
-1. Remove the injection zone's donor pool from the real region-unaware arm's eligible pool. For current CA1 this is the sixteen matched-arm (`dataset`, `template_index`) pairs.
-2. Fix the matching rule before the eligible pool is visible. The rule may not reference region membership in either direction.
-3. Run that same frozen rule once on the un-removed pool and once on the post-removal pool. Report selected pairs, realized zone count, per-covariate objective/balance, provenance-blocking granularity, relaxations, and infeasibility for both.
-4. Treat the un-removed run as a locked non-generating diagnostic. Only the post-removal state may govern generation.
-5. Report both cost dimensions: the uniform region-blind expectation measures departure from the anchor-like policy; the frozen-rule counterfactual measures the balance and feasibility cost under this project's matched policy.
-6. Report 16/16 CA1 in the matched arm and 0/16 in the control as a composition-integrity check. It does **not** replace Slot 11.3's waveform-separation and nuisance-balance manipulation check.
-7. Slot 12.3 still governs. If removal leaves no configuration satisfying balance, placement, and provenance rules, Tier A fails; aggregate pool size does not discharge host-specific or exact-source feasibility.
-
-If the injection zone changes from CA1, define the removal set before applying the rule. Donor labels occur at mixed atlas levels, so a bare acronym string match is not general enough.
+Amendment 5 explicitly supersedes only Amendment 3's now-false statement that the pseudo band does not mirror chance zone donors the real control may contain. Both the real control and pseudo-arms now use the final eligible region-unaware pool minus the zone donor pool on this property. The remainder of Amendment 3's boundary still holds, especially that the pseudo control cannot mirror the matched arm's region homogeneity.
 
 ## Tier A selection artifact
 
-Active chat:
+Active chat: `chats/Claude-Codex/Tier A Selection Review/Tier A Selection Review - Active.md`.
 
-`chats/Claude-Codex/Tier A Selection Review/Tier A Selection Review - Active.md`
+Artifact: `agents/Claude/Tier A Host and Injection Zone Selection.md`.
 
-Artifact:
+Draft 7 SHA-256 `13c192d3478ffdba35d756715ef2236d52a3cb31e6156dc818fd5c002dd19d01` has explicit same-state approval from Claude and Codex for its declared strategy/evidence scope. Sections 1–13 retain the previously reviewed strategy and diagnostics; §14 carries Claude's independent re-derivation of the no-reuse baseline, the paired-versus-unpaired expectation distinction, and the contract supersession finding.
 
-`agents/Claude/Tier A Host and Injection Zone Selection.md`
-
-Current Codex-approved Draft 6 hash:
-
-`7772f4fa65a2093dcbd7e8bb11c76305ab2c0b14d14a1b350e04d08f0652c697`
-
-Draft 6 §1–§12 are approved by Codex. §13 contains the corrected Amendment 5 evidence and interpretation at the hash above; Claude's owner re-review is open. Do not call the whole artifact same-state closed until Claude explicitly approves this hash or hands back a new one.
-
-## Amendment 3 selector retained
-
-The no-manipulation diagnostic uses one shared pseudo-base pool: final eligible region-unaware donors minus the injection-zone donor pool. P1 is the fixed selected sixteen; P2 draws from the same large pseudo-base pool and is matched to P1. Every donor is named by globally unique (`dataset`, `template_index`) pair.
-
-The selector seed is `711362139`. It standardizes post-rescaling amplitude, effective host SNR, and band depth with the final pool's float64 population statistics; minimizes the equally weighted sum of per-covariate equal-sample 1-Wasserstein distances; takes the sixteen lowest deterministic hashes as its start; and runs at most 64 complete best-improvement one-for-one swap sweeps with exact tie-breaking. No partial sweep and no global-optimum claim.
-
-A separate host-dependent configuration approval remains required before pseudo generation. It pins both pool digests/filters, removed pairs, selected pairs, achieved distances, evaluated swaps, and local-optimum versus cap stop.
-
-## CCF label-map state
-
-The derived 138-entry map uses DANDI 000409 electrode annotations plus MIT template metadata, not the Allen ontology under noncommercial terms. It reports 44/44 agreements with the hand-authored table, two name collisions withheld, and 66 of 209 observed host names still unmapped on assigned donor probes.
-
-The layer is opt-in. Derived white-matter/fibre-tract labels remain non-injectable. Saved-record replay rejects probe, suffix, or depth-tolerance mismatches. Mixed parent/descendant labels matter for any non-CA1 removal set.
-
-Codex approves Draft 6 §12 and the tracked implementation at its current state.
-
-## Host, amplitude, and placement gates retained
-
-Candidate order remains:
+This is still **not** a pinned-host selection. Candidate order remains:
 
 1. CSHL047 Probe01, session `b52182e7`;
 2. NYU-12 Probe01, session `a8a8af78`;
 3. CSHL047 Probe00, session `b52182e7`.
 
-This is an order, not a selection. Anatomy, duration, label ambiguity, and donor-lab separation are discharged or recorded. Placement remains parameterized. Drift, noise, post-rescaling effective SNR, and the covariate-balance/manipulation gate remain open.
+Drift, noise, post-rescaling effective SNR, placement calibration and the independent balance/manipulation gate remain open.
 
-Donor `amplitude_uv` is peak-to-peak on an averaged best-channel waveform; host `median_spike_amplitude_uV` is median single-sided per-spike peak. The measured one-session population conversion is about 1.2 and is not a per-unit rule. Pre-rescaling scale factor remains a reported integrity diagnostic, not a matching covariate.
+## Matching-rule and configuration gates stay separate
 
-Placement retains two distinct calibrations: donor multichannel support for edge margin, and a predeclared native-spacing/generator basis for minimum peak separation. Codex owns both during Rung 0 preparation.
+Amendment 5 approval opens the real-arm matching-rule lane. It does not approve a rule. The rule must be deterministic, provenance-aware and host-blind at the time it is fixed, with explicit objective, blocking/fallback order, tie handling, failure semantics and relaxation reporting.
 
-## Rung 0 boundary
+After a host exists, a separate exact-state configuration approval remains required for the real arms and for Amendment 3's pseudo selector. Pool digests/filters, removed pairs, selected pairs, achieved distances, evaluated swaps and stop reason must be pinned before generation. None of this is authorized by the Amendment 5 close.
+
+## Reproducibility Packet review
+
+Claude Session 11 added `Reproducibility Packet/README.md`, `DATA.md`, `requirements.txt` and `.gitignore`, then tested a copy of the packet alone in a fresh environment. Five offline steps reproduced tracked outputs; five archive-reading steps are explicitly labelled not re-run. The Slot 8 verifier is correctly described as absent because no results exist.
+
+Codex's general recent-work review found one public-boundary defect: the runbook/data guide said `validate_ccf_label_map.py` validates the newly derived map, but the code deliberately calls the hand-authored layer only. It validates the pre-existing core long-name/acronym table and the `depth_along_probe` / NWB `rel_y` coordinate agreement. Scoring derived entries against their own source votes would be circular.
+
+Codex corrected and explicitly approved:
+
+- `Reproducibility Packet/README.md`: SHA-256 `1a32418c7cd3a32ecf4f6ef2960dcbf48beae45e4cd9d3b2ea2e071fdc434cf1`
+- `Reproducibility Packet/DATA.md`: SHA-256 `f8c6ce266f368e0efe6d2ecaafbeca09813d2420acd27999433cd61c0c435e09`
+
+Claude owner re-review is open in `chats/Claude-Codex/Reproducibility Packet Review/Reproducibility Packet Review - Active.md`. The packet script docstrings still use project-root-relative examples rather than packet-root-relative commands; Claude already recorded that as a later handoff item.
+
+## Rung 0 boundary retained
 
 Rung 0 remains unrun. It must construct and pin the pre-injection host substrate, avoid phase-shifting injected templates twice, pin the exact approximately 60-second segment, finish both placement calibrations, resolve dependencies deliberately in the project venv, take fresh RAM/VRAM immediately before heavy work, and obey the 75%-of-free cap plus 4 GiB RAM / 2 GiB VRAM floors within the daytime convention.
 
-The current venv still pins only `h5py==3.16.0` and `numpy==2.5.2`. Re-run metadata utilities after any dependency change.
+The current project venv still pins only `h5py==3.16.0` and `numpy==2.5.2`. Re-run metadata utilities after any dependency change.
 
 ## Public and director state
 
-- Root `README.md` remains State A / `In Progress`; its latest log records Amendment 3 entering force and Amendment 5 being proposed.
-- The orientation footer now correctly says Amendments 1–4 are in force and Amendment 5 is in active same-state review.
-- The Phase 1 contract-review request remains open and non-blocking.
-- No new director action is needed unless Amendment 5 fails to converge.
-- No progress report was triggered in Codex Session 10.
+- Root `README.md` remains State A / `In Progress`; its latest log records Amendment 5 entering force and says the matching rule, host, generation and result remain open.
+- The Phase 1 director contract-review request remains open and non-blocking.
+- No new director action is needed.
+- The Amendment 5 event-triggered progress report is complete.
+
+## Validation record from Session 11
+
+- Exact handoff hashes matched before review.
+- Offline zone-enrichment replay reproduced 2,183/16 and 1,149/12 pool counts plus realized/expected 3/0.11, 8/1.03, 2/0.12 and 5/1.17.
+- Independent unpaired arithmetic reproduced expectation 0.117270 and P(at least one) 0.111401.
+- All 17 packet Python sources parsed.
+- The Tier A chat append preserved the 707-line prefix, added the Session 11 header exactly once after that boundary, and ended at 736 lines.
+- `git diff --check` passed before closeout.
 
 ## What Codex should do next
 
-1. Read Claude's owner response to hashes `1a7d3ec…` / `7aa34271…` and Draft 6 hash `7772f4fa…` first.
-2. Require Claude to re-derive the 1.03/1.17 no-reuse baselines and review the frozen-rule before/after-removal cost diagnostic rather than merely accept the prose.
-3. If Claude approves unchanged, confirm both sheets enter force together and that any event-triggered progress report is created by the approving turn.
-4. Keep Amendment 5 approval, the real-arm matching-rule approval, and the later exact host-dependent configuration approval as separate gates.
-5. Continue placement calibration and first-candidate drift/noise/effective-SNR/balance work only after the contract gate permits it.
-6. Do not pin a host or launch Rung 0 until all prerequisites and immediate daytime resource guards pass.
+1. Read Claude's owner response to the packet README/DATA hashes first; keep that packet review open until the same exact state is approved.
+2. Begin the real-arm matching-rule artifact only after re-reading Amendments 2 and 5 together. Fix the complete rule before inspecting any host-specific eligible pool.
+3. Keep matching-rule approval, host selection, host-dependent exact configuration, Rung 0 resource admission, manipulation/balance approval, generation and sorter execution as separate gates.
+4. Do not pin a host or launch Rung 0 until all prerequisites and immediate daytime resource guards pass.
 
-`agents/Codex/Session Summaries/HumanReport10.md` contains the full evidence, corrections, exact-state ruling, validation record, machine snapshot, and file list.
+`agents/Codex/Session Summaries/HumanReport11.md` contains the full review evidence, packet correction, validation record and file list.

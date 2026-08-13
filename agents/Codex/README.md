@@ -6,57 +6,45 @@ This directory contains Codex's work for the **Hybrid Ground Truth Realism** pro
 
 ```text
 agents/Codex/
-├─ README.md
-├─ Summary of Only Necessary Context.md
-├─ Literature Foundation.md
-├─ references.md
-├─ Session Summaries/
-│  ├─ HumanReport1.md
-│  ├─ HumanReport2.md
-│  ├─ HumanReport3.md
-│  ├─ HumanReport4.md
-│  ├─ HumanReport5.md
-│  ├─ HumanReport6.md
-│  ├─ HumanReport7.md
-│  ├─ HumanReport8.md
-│  ├─ HumanReport9.md
-│  └─ HumanReport10.md
-└─ Progress Reports/
-   ├─ Progress Report Phase 1 Close.md
-   ├─ Progress Report Amendment Compute Schedule.md
-   └─ Progress Report Session 8.md
+├── README.md
+├── Summary of Only Necessary Context.md
+├── Literature Foundation.md
+├── references.md
+├── Session Summaries/
+│  ├── HumanReport1.md … HumanReport10.md
+│  └── HumanReport11.md
+└── Progress Reports/
+   ├── Progress Report Phase 1 Close.md
+   ├── Progress Report Amendment Compute Schedule.md
+   ├── Progress Report Session 8.md
+   └── Progress Report Amendment Real Control Donor Exclusion.md
 ```
 
 ## What each file owns
 
-- **`Summary of Only Necessary Context.md`** — next-session continuity. It is rewritten at every closeout and contains only state not already owned by `AgentPrompt.md`, `Project Details/`, or the playbooks.
-- **`Literature Foundation.md`** — Codex's independent Phase 0 field survey. It is a dated evidence artifact; later corrections propagate into the living ledger and downstream artifacts rather than silently rewriting the original survey.
-- **`references.md`** — Codex's living source ledger. It records what each verified source establishes, how it changed the project, and a transferable citation.
-- **`Session Summaries/HumanReport<N>.md`** — sequential permanent session reports for the director.
-- **`Progress Reports/`** — director-facing reports at phase transitions, approved amendments, and the scheduled session cadence. `Progress Report Session 8.md` is the current plain-language state of the Tier A gates and selector review.
-
-## Authority
-
-| Path | Status |
-|---|---|
-| `Literature Foundation.md` | Authoritative Phase 0 evidence artifact; dated and frozen |
-| `references.md` | Authoritative living citation ledger |
-| `Summary of Only Necessary Context.md` | Authoritative only for the next Codex session |
-| `Session Summaries/*` | Permanent historical record |
-| `Progress Reports/*` | Permanent phase/cadence record |
+- **`Summary of Only Necessary Context.md`** — authoritative next-session continuity, rewritten at every closeout.
+- **`Literature Foundation.md`** — Codex's dated and frozen Phase 0 field survey.
+- **`references.md`** — Codex's living source ledger and transferable citations.
+- **`Session Summaries/HumanReport<N>.md`** — permanent detailed session reports for the director.
+- **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments and the eight-session cadence. The newest explains Amendment 5's real-control donor exclusion and required matched-policy cost report.
 
 ## Shared work outside this folder
 
-- `chats/Claude-Codex/Phase 0 Literature Comparison/` is the concluded append-only Phase 0 comparison channel.
-- `chats/Claude-Codex/Claim Sheet Review/` is concluded. Technical `Claim Sheet.md` SHA-256 `a5f586041b074ff4a86fec2bac88f02f76a6e79cce1d7d2a859e4c24a92c91f3` and `Accessible Claim Sheet.md` SHA-256 `73bff8f81dc2e31b47d4abbe1f61c8106a34dccb8ea6457051c3dba84a589760` have explicit same-state approval from both agents.
-- `chats/Claude-Codex/Study Guide Pass 1 Review/` is concluded. Approved source/PDF hashes are `d33e74d73c41b3ef0b4edbe6de52c0cc4e5597bae2d048618edb5c4523f99819` / `75e1423294cb3c4695c14920851825d602379d9ffca1aab6bcb93cbd10d998a3`.
-- `chats/Claude-Codex/Tier A Selection Review/` is active. Draft 6 SHA-256 `7772f4fa65a2093dcbd7e8bb11c76305ab2c0b14d14a1b350e04d08f0652c697` is Codex-approved: §1–§12 are approved and §13 carries Codex's no-reuse-baseline and matched-policy-cost corrections. Claude's same-byte owner re-review of §13 remains open. No host is pinned.
-- `chats/Claude-Codex/Compute Environment Update/` is concluded. Amendment 1 records the director's daytime/overnight allocation and corrected leaked-process explanation while preserving every live resource guard and capacity commitment.
-- `Claim Sheet.md` and `Accessible Claim Sheet.md` are synchronized Codex-approved states at SHA-256 `1a7d3ec689c1a62065b94157d01df6d2282b860fb59bf3162101cd092776e3f2` / `7aa34271d07994ad608c3296117d9f631066eb7c2ff82bbb526fd90c6478b302`. Amendments 1–4 are `In force`; Amendment 5 is `Proposed` pending Claude's genuine owner re-review of those exact bytes. Amendment 5 removes injection-zone donors from the real control pool, requires a frozen-rule before/after-removal cost diagnostic, keeps the composition count separate from the manipulation check, and preserves Slot 12.3 infeasibility. The real-arm matching rule may not be written or approved while Amendment 5 remains open.
-- `Study Guide/Pass 1 - Conceptual Foundation.tex` and its PDF are complete Phase 1 artifacts. Pass 2 remains a Phase 3 deliverable.
-- `director_requests.md` contains one open non-blocking item: the Phase-1-close contract review. The shared-memory question is resolved and retired; its answer does not authorize bypassing the live headroom gates.
-- The repository root `README.md` is the public live-run status page; its running log is append-only. Its latest entry records Amendment 3 entering force and the measured real-arm CA1 pull; its orientation now states that Amendment 5 is proposed and that no host, generator run, sorter run, or result exists.
-- Claude is the default writer for the Claim Sheet and later narrative artifacts. Codex is the required reviewer unless ownership is deliberately reassigned.
-- The Reproducibility Packet is co-owned during execution. Codex owns Rung 0, the sorter-panel decision, the inference/negative-control harness, Tier A's independent balance/manipulation gate, and the two-part placement calibration: template spatial support for edge margin plus a predeclared native-spacing/generator basis for peak separation. Rung 0 must build and pin the host injection substrate before injection because SpikeInterface 0.104.8 does not preprocess inside `generate_hybrid_recording()` and the donor templates already carry `phase_shift`. Pre-rescaling scale factor is a reported integrity diagnostic, not a matching covariate: verify finite factors, no clipping/overflow, achieved rendered amplitude, and per-arm distributions. The derived CCF label layer is opt-in; all recognized white-matter and fibre-tract labels remain non-injectable, and any non-CA1 zone change must audit parent/descendant label overlap.
+- `chats/Claude-Codex/Phase 0 Literature Comparison/`, `Claim Sheet Review/`, `Study Guide Pass 1 Review/` and `Compute Environment Update/` are concluded.
+- `chats/Claude-Codex/Tier A Selection Review/` is active. Draft 7 SHA-256 `13c192d3478ffdba35d756715ef2236d52a3cb31e6156dc818fd5c002dd19d01` has explicit same-state approval from Claude and Codex for its declared strategy/evidence scope, including §14's independent baseline re-derivation and Amendment 3 supersession finding. It is not a pinned-host approval.
+- `chats/Claude-Codex/Reproducibility Packet Review/` is active. Codex corrected the packet runbook/data guide so `validate_ccf_label_map.py` is accurately described as checking the hand-authored core map and shared depth coordinate, not circularly validating the derived map. Claude owner re-review is open at README/DATA hashes `1a32418c7cd3a32ecf4f6ef2960dcbf48beae45e4cd9d3b2ea2e071fdc434cf1` / `f8c6ce266f368e0efe6d2ecaafbeca09813d2420acd27999433cd61c0c435e09`.
+- `Claim Sheet.md` and `Accessible Claim Sheet.md` are synchronized states at SHA-256 `ac089232851705be86e8674987f29afd7fa553e0e55e08049868761549465b28` / `8bae94bcc84928766214fea64eba234af6a524804afe11bd7eb16504d265c17f`. Amendments 1–5 are `In force`. The matching-rule lane is open, while the rule, host-dependent exact configuration and manipulation gate remain separate approvals.
+- `Study Guide/Pass 1 - Conceptual Foundation.tex` and PDF are approved Phase 1 artifacts. Pass 2 remains a Phase 3 deliverable.
+- `director_requests.md` contains one open non-blocking Phase 1 contract-review item. No new director action is needed.
+- Root `README.md` is the append-only public live-run page. Its latest entry records Amendment 5 entering force while the matching rule, host, generation and result remain open.
+- The Reproducibility Packet is co-owned. Codex owns Rung 0, the sorter-panel decision, inference/negative-control harness, Tier A's independent balance/manipulation gate, and the two-part placement calibration.
 
-For resumption, read `Summary of Only Necessary Context.md`, then the latest `Session Summaries/HumanReport<N>.md`. Use `references.md` rather than memory for citations.
+## Current technical boundaries
+
+- Rung 0 must build and pin the host injection substrate before injection because donor templates already carry `phase_shift` and SpikeInterface 0.104.8 does not preprocess inside `generate_hybrid_recording()`.
+- Pre-rescaling scale factor is an integrity diagnostic, not a matching covariate.
+- The derived CCF label layer is opt-in; recognized white-matter/fibre-tract labels remain non-injectable.
+- Any non-CA1 zone change must define the removal set across parent/descendant labels before matching.
+- No host is pinned and no Rung 0, generation or sorter run has occurred.
+
+For resumption, read `Summary of Only Necessary Context.md`, then the latest human report. Use `references.md` rather than memory for citations.

@@ -106,9 +106,12 @@ licensed package does not change the terms attached to the payload.
 The bridge is therefore **derived from the two first-party sources above**, by
 matching donor acronyms to host long names at the same depth on the same probe
 insertion and taking a supermajority vote. `scripts/derive_ccf_label_map.py`
-builds it, `scripts/validate_ccf_label_map.py` checks it against the donor
-library itself, and the result is `scripts/utils/ccf_label_map_derived.json`.
-No atlas package is installed anywhere in this packet, and that is deliberate.
+builds it. Separately, `scripts/validate_ccf_label_map.py` gives a non-circular
+check of the pre-existing hand-authored core map and of the shared depth
+coordinate; it deliberately does not score derived entries against the same
+votes that created them. The derived result is
+`scripts/utils/ccf_label_map_derived.json`. No atlas package is installed
+anywhere in this packet, and that is deliberate.
 
 ## Offline replay
 

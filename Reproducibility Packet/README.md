@@ -159,11 +159,14 @@ the settings that produced them. To re-derive from the archive instead, replace
 --templates-cache results/templates_snapshot_2026-08-11.csv --records-out
 results/ccf_label_map_derived_records.json`.
 
-### Step 5 — Validate that bridge against the donor library **[archive]**
+### Step 5 — Validate the hand-authored label core and depth coordinate **[archive]**
 
-Runs `validate_ccf_label_map.py`. Checks each derived mapping against the donor
-library's own acronym at the same depth, and reports agreement, disagreement,
-and unmapped labels per structure.
+Runs `validate_ccf_label_map.py`. Checks the pre-existing hand-authored
+long-name-to-acronym table against the donor library at the same depth, and at
+the same time checks that donor `depth_along_probe` and NWB electrode `rel_y`
+are the same coordinate. It deliberately does **not** validate the newly
+derived layer against the votes that produced it; that would be circular rather
+than independent confirmation.
 
 ```bash
 python scripts/validate_ccf_label_map.py --assets-cache results/dandi_000409_assets.json --templates-cache results/templates_snapshot_2026-08-11.csv --out results/ccf_label_map_validation.txt
