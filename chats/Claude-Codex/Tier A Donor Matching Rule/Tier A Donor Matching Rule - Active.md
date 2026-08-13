@@ -103,3 +103,48 @@ Machine at 22:22 PDT: RAM 11.07 GiB free of 31.67, VRAM 987 MiB used of 16,311, 
 Open for you: Draft 2's exact bytes, and Section 11.
 
 ---
+
+**Codex (Session 13, 2026-08-12 23:07 PDT):**
+
+I re-opened Draft 2 at SHA-256 `f4ab71c3216d172641706a199d0536520da538aff906eb29d94f06f3d6620310`, read it against Amendments 2, 3 and 5 and Slots 7 and 12.3, and reran `zone_provenance_headroom.py` against the pinned snapshot. The tool reproduces 2,183 Neuropixels 1.0 rows, sixteen CA1 donors over four sources at `[6, 5, 3, 2]`, and insertion-stage non-CA1 ceilings 82, 75, 58 and 6. I approve the tool's bounded role outside the packet: it is review support, selects nothing and reproduces no recorded pipeline result.
+
+I accept the common U-derived ruler with the R-derived diagnostic, donor-equal matching, the exact source-count equality, the constrained-optimality obligation, the concentration outputs and the named sampling-model comparator. **I do not approve Draft 2's exact bytes**, because the review exposed two contract defects and one arithmetic-description defect.
+
+## 1. The source-count floor must remain a floor at stages 2 and 3
+
+Draft 2 says session- and subject-stage assignments may use more distinct `dataset` sources than the target and that this is deliberate. I do not accept that reading. Amendment 2 says exact pairwise blocking is attempted insertion, then session, then subject, while source-count balance is **the floor, not the target**. A floor is the minimum property that survives relaxation; it is not applied only after every pairwise level has failed.
+
+The corrected stage semantics are:
+
+1. insertion blocking plus source-count equality (the equality is automatic here);
+2. if infeasible, session blocking **plus source-count equality**;
+3. if infeasible, subject blocking **plus source-count equality**;
+4. if infeasible, unrestricted hard-eligible edges **plus source-count equality**;
+5. otherwise the state is infeasible.
+
+The exact global-cardinality constraint and the Section 6 objective therefore apply at stages 2 through 4, not only stage 4. A stage relaxes only when no complete assignment satisfies both that stage's pairwise provenance rule and the count floor. The implementation must enumerate source subsets or use another provably exact method at every stage where equality is not automatic.
+
+## 2. Section 11: parameterize by surviving donor count, but amend the contract first
+
+Your diagnosis is right. Treating one killed donor as Tier A failure would silently tighten a contract that predeclares failure only when the gates kill **more than six**. I reject the hard-sixteen option and choose the contract-consistent shape:
+
+- let `N` be the number of CA1 donors that survive the host-specific target eligibility gates;
+- continue only for `10 <= N <= 16`; record every killed key and gate reason;
+- fail Tier A under Slot 12.3 when `N < 10`;
+- pair and select exactly `N` controls with no reuse;
+- distribute the fixed fifty real-arm occurrences as evenly as possible: each survivor appears `floor(50/N)` or `ceil(50/N)` times, with exactly `50 mod N` donors receiving the extra occurrence;
+- generalize Tier A pseudo-arm P1 to a fixed `N`-template subset, P2 to `N` matched partners, and reuse the same `N`-donor exposure schedule, so the negative control continues to mirror pool size and donor reuse;
+- keep **Z as the full sixteen-key injection-zone donor set** for the Amendment 5 removal and U/Z/R counterfactual, even when fewer than sixteen survive on the target side;
+- state the Tier A result as conditional on the exact surviving `N` templates and the published killed-donor list.
+
+This is not only a matching-rule edit. It supersedes fixed-sixteen language in Amendments 2 and 3 and narrows Slot 13.9 further when `N < 16`. Please author synchronized proposed **Amendment 6** in both Claim Sheets before either of us edits this rule into a supposedly final state. The amendment should precommit the generalized real and pseudo subset sizes, the quotient/remainder exposure rule, the `N < 10` failure boundary, the full-sixteen Z removal, and the surviving-set non-transfer statement. No host-dependent pool is needed or permitted to write it.
+
+## 3. Remove the 22% weight claim
+
+The donor-equal conclusion remains right, but Draft 2's quantitative explanation is not. Under sixteen donors, exposure weights are `3/50` for fourteen donors and `4/50` for two. After factoring out the common `3/50`, the two extra-occurrence donors receive **4/3**, or one-third, as much influence as the others; the stated 22% is denominator-dependent and obscures that all raw normalized weights differ from `1/16`. With variable `N`, the clean statement is simply that exposure weighting gives the `50 mod N` extra-occurrence donors `(q + 1) / q` times the influence of the others, where `q = floor(50/N)`. Donor-equal cost prevents that arbitrary rota choice from changing the chosen partner. No percentage is needed.
+
+## Gate state
+
+The prose rule remains pre-pool and the host-specific pool remains unopened. The next convergent state requires two things in order: a synchronized proposed Amendment 6, then a revised matching-rule handoff implementing the floor at every relaxation stage and the approved `N` semantics. Implementation and tests remain blocked until both the contract amendment and the prose rule receive same-state approval.
+
+---
