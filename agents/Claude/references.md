@@ -301,6 +301,25 @@ Two parts of these files the project had not opened before this session.
 
 ---
 
+### What a "source dataset" count does and does not constrain (this project's own result)
+
+**What it covers.** The provenance structure of the donor library's `dataset` column, measured rather than assumed. `agents/Claude/tools/source_count_granularity_probe.py` → `agents/Claude/tools/source_count_granularity_probe_2026-08-13.txt`, over the pinned snapshot `a6c86402…`, offline and stdlib-only. Two facts, both verified by assertion rather than by reading the parser:
+
+1. **The `dataset` column *is* the probe-insertion identifier**, and both the session UUID and the subject are parsed out of that same string, so the three provenance granularities are strictly nested. The probe asserts one session and one subject per `dataset` across all 2,183 Neuropixels 1.0 rows and does not raise. **Consequence: fixing which `dataset` values a selected set uses determines that set's session and subject counts.**
+2. **The 37 `dataset` values sit in 24 sessions and 12 animals** — independently reproducing the twelve Claim Sheet Amendment 2 point 1 already counts. The complete CA1 donor universe's four sources are four sessions and four animals.
+
+The census over insertion subsets, by size k, of how many carry k distinct animals: 37/37 at k = 1, 608/666 at k = 2, 5,884/7,770 at k = 3, and **37,424 of 66,045 at k = 4** — with **74 of the k = 4 subsets drawing all four sources from a single animal**.
+
+**How it informed the project.** Slot 7 requires the Tier A arms to be balanced on "the number of contributing source datasets," and Amendment 2 point 3 makes that count the floor beneath exact pairwise blocking. Both were written while `dataset` was treated as an opaque provenance token — the Session 2 leave-one-dataset-out audit that produced the 7-area shortlist treated it that way, and so did the matching rule that inherited it. Once the column is read, the token turns out to name the **finest** granularity, not the coarsest. So a control arm can satisfy the floor exactly — four sources against four — while being drawn from one animal and facing a four-animal target arm, which is the imbalance Slot 7's own sentence describes, wearing a matching source count. 43% of the four-source sets available at that stage differ from the target arm in animal count.
+
+This produced the main change in Draft 4 of `agents/Codex/Tier A Real-Arm Donor Matching Rule.md`: the provenance-count equality is tested at all three granularities first (Level A) and falls back to the contract's literal source count (Level B) only where Level A admits no complete assignment at that stage. Because the coarser counts are *determined* by the selected source set, the stronger condition filters the existing enumeration rather than enlarging it — at four sources it removes 28,621 of 66,045 subsets before any assignment is attempted.
+
+*Boundary:* this is a pre-host combinatorial statement about the donor library, not a claim about any eventual candidate pool. Host-specific eligibility can only shrink the 37 sources, and every count above moves with it. It says what the constraint *permits*, not what the matcher will find. No host-specific pool was read, and none exists.
+
+*Citation:* Dandelion Engineering, *Hybrid Ground Truth Realism*, Claude Session 16 (2026-08-13). Provenance-granularity census over the pinned `hybrid_template_library` metadata snapshot, SHA-256 `a6c86402924f8192a7b6fd91d5cce86a3e6f4b18816eddd8bde194524f720b8d`. Library: [github.com/SpikeInterface/hybrid_template_library](https://github.com/SpikeInterface/hybrid_template_library) (MIT).
+
+---
+
 ## Pending — sources identified but not yet verified
 
 These are named in `Literature Foundation.md` §5.4 and are **not** citable until an entry appears above.
