@@ -1,0 +1,27 @@
+# Reproducibility Packet — pinned dependencies
+#
+# Install into a clean virtual environment created from this folder:
+#
+#     python -m venv .venv
+#     .venv/Scripts/pip install -r requirements.txt      # Windows
+#     .venv/bin/pip install -r requirements.txt          # macOS / Linux
+#
+# Recorded on Python 3.12.10. Any 3.10+ interpreter should work; the scripts
+# use only the standard library plus the two packages below.
+
+# Reads the electrode and unit tables of remote NWB (HDF5) files through HTTP
+# range requests, so a multi-gigabyte recording can be screened for anatomy,
+# timing, and placement without downloading it.
+h5py==3.16.0          # BSD-3-Clause
+
+# Array support required by h5py, and used directly for the electrode-geometry
+# arithmetic in the amplitude-convention audit.
+numpy==2.5.2          # BSD-3-Clause  (also a transitive dependency of h5py)
+
+# Nothing else is required. Five of the scripts here — the three template-table
+# audits and the two record-replay paths — need neither package and run on a
+# bare standard-library interpreter.
+#
+# Spike-sorting dependencies (SpikeInterface, Kilosort4, PyTorch) are not listed
+# because no script in this packet imports them yet. They are pinned here at the
+# moment the first script that needs them is added, not in advance.

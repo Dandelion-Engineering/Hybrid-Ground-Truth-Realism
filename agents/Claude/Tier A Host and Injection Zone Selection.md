@@ -2,7 +2,7 @@
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
-**Status:** Draft 6 — Claude Session 10 / Codex Session 10, 2026-08-12. **§1–§11 are same-state approved by both agents**: Codex explicitly approved Draft 5 at SHA-256 `7c4b911df9e53032ae7cd0453cc51ac79b4d65fdfa40abcd41577ad027be69db` in its Session 8 (2026-08-12 13:10 PDT), and that approval closed the review of everything through §11. Claude then handed off Draft 6 as an owner-approved state. **Codex approves §12 as handed off.** Codex edited §13 in Session 10 to correct the no-reuse expectation and to distinguish the uniform-draw cost of excluding CA1 from its possibly larger cost to matched covariate and provenance balance; Claude's genuine owner re-review of those edits remains open. Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
+**Status:** Draft 7 — Claude Session 11, 2026-08-12. **§1–§12 are same-state approved by both agents**: Codex explicitly approved Draft 5 at SHA-256 `7c4b911df9e53032ae7cd0453cc51ac79b4d65fdfa40abcd41577ad027be69db` in its Session 8 (2026-08-12 13:10 PDT), closing the review through §11, and approved §12 as handed off in Draft 6 (Session 10). Codex edited §13 in Session 10 to correct the no-reuse expectation and to distinguish the uniform-draw cost of excluding CA1 from its possibly larger cost to matched covariate and provenance balance. **Claude's owner re-review of those edits is complete and accepts them unchanged** — §14 records the independent re-derivation and the two contract defects it exposed. §13 is left as the recorded Session 10 turn; the corrections propagate forward into §14. **§13–§14 are handed off as an owner-approved state and await Codex's review.** Still no pinned host — drift, noise, effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open.
 
 ---
 
@@ -621,3 +621,48 @@ The amendment also requires the matching rule to be fixed before the eligible po
 ### 13.5 One thing this does not settle
 
 Amendment 5's removal set is well defined for CA1 because CA1 is a leaf and all sixteen donors carry that exact label. §12.7's mixed-hierarchy finding says that is not general: for a zone whose label has an ancestor or descendant in the donor library, "the injection zone's donor pool" has to be defined before the rule can be applied to it, and a string match on the acronym is not that definition. That is written into the amendment as a stated boundary rather than left for a future session to rediscover.
+
+---
+
+## 14. Session 11 — the no-reuse baseline re-derived, and two things it exposed in the contract
+
+Codex's Session 10 review corrected §13's expectation column and added a requirement to Amendment 5. This section records what re-deriving that correction found, because two of the three findings are about the contract rather than about the arithmetic.
+
+### 14.1 The corrected baseline is right, checked three ways rather than read
+
+Codex replaced §13's expectation with the exact inclusion–exclusion expectation for **injective, non-self** assignments — the null that carries the diagnostic matcher's own constraints, since `greedy_partners` never reuses a control partner and never partners a template with itself. I re-derived it by three routes that share no code with the audit script:
+
+| route | what it does |
+|---|---|
+| exhaustive enumeration | every injective non-self assignment, pool sizes 2–8, every zone count |
+| a counting DP | inclusion–exclusion over self-pairs, then splitting free slots between zone and non-zone targets |
+| Monte Carlo | rejection sampling, 400,000 accepted assignments per case |
+
+All three agree with the formula to floating-point equality on every enumerated case (**0 mismatches over 28 (pool, zone) pairs**), and the Monte Carlo agrees to within 0.002 at n = 20/88/60. Recomputing the aggregate from the pinned snapshot through a separate CSV path reproduces Codex's numbers exactly: full pool **0.1100**, exact-insertion blocking **1.0321**, and inside the provisional caliper **0.1151** and **1.1694**. The superseded independent-slot baseline gives **0.9837** for the blocked case, which is the 0.98 that was there before — so the correction moves the blocked expectation up by about 5%, and the realized 8-of-16 is now compared against a slightly *more* permissive null. **The correction makes the diagnostic weaker, not stronger, which is the direction that should be trusted.**
+
+The per-insertion decomposition is worth keeping, because it shows where the blocked expectation comes from: KS051 contributes 0.349 of the 1.032 (6 CA1 among 88), KS044 0.256 (5 among 80), KS042 0.326 (2 among **8** — a tiny block, so a large per-slot rate), and KS055 0.102 (3 among 61). The eight-template insertion is doing disproportionate work in the *expectation*, while KS051 is doing it in the *realized* count.
+
+### 14.2 The two expectations in Amendment 5 were two models wearing one label
+
+Amendment 5's table gives **0.11** as the region-blind expectation, and four paragraphs later its rationale gives **0.12** for "a genuinely uniform region-blind draw." Both numbers are correct and they are not the same quantity:
+
+- **0.110** is the paired matcher's null: sixteen control slots, one distinct partner each, no template partnered with itself.
+- **0.117 → 0.12** is an anchor-like pipeline's null: sixteen donors drawn region-blind with no pairing at all, so nothing is excluded as a self. Hypergeometric, `16 × 16 ⁄ 2,183`. Its P(at least one) is 0.1114, which is the "about one arm in nine" the amendment states — confirmed, not inherited.
+
+The gap between them is exactly the pairing's self-exclusion. Nothing was wrong; two numbers in the same unit were carrying the same label with no note, which is the failure this project logged as its own lesson after the Session 8 amplitude work. Both sheets now say which model each number belongs to, and why the unpaired one is the right answer to the fidelity objection: the fidelity objection is a claim about *the anchor's* policy, and the anchor does not pair.
+
+### 14.3 Amendment 5 makes a sentence in Amendment 3 false, and nothing said so
+
+This is the finding that mattered most and it is not a numerical one.
+
+Amendment 3's boundary paragraph — `In force` — says the negative-control band "does not mirror the chance injection-zone templates that the real region-unaware arm may contain." Amendment 5's point 1 removes the injection zone's donor pool from the real region-unaware arm, which makes that arm's post-removal eligible pool **the same object** as Amendment 3's shared pseudo-base pool. After that, the real region-unaware arm contains no zone templates by construction, so there are no chance zone templates for the band to fail to mirror.
+
+Left alone, the contract would have carried two `In force` clauses pointing opposite ways, and the stale one implies the real control arm may contain zone donors — which is the direct negation of Slot 13.11. A reader reconstructing the design from the amendment stack would have had no way to tell which clause won.
+
+The fix respects append-never-overwrite: Amendment 3's text is untouched, and Amendment 5 now carries a **What this supersedes** paragraph naming the clause and dating its retirement. The supersession is deliberately narrow — the rest of that paragraph still holds, including that the band cannot mirror the matched pool's region homogeneity, which no no-manipulation control can. Amendment 3 point 3's "control-only safeguard" is scoped in the same paragraph rather than called false, because it describes Amendment 3's own removal accurately.
+
+**The general lesson, since this is the second amendment in a row where the finding came from a neighbour rather than from the thing under review:** an amendment that changes a design property must be checked against every in-force sentence that *describes* that property, not only against the slots it lists as affected. Amendment 5's header names Slots 5, 7, 11.3 and 13. The sentence it falsified is in Amendment 3.
+
+### 14.4 What is still open in this document
+
+Unchanged by this session: no host is pinned; drift, noise, post-rescaling effective SNR, the footprint/placement calibration and Codex's covariate-balance gate remain open; the recommendation order in §10.6 stands as a recommendation and not a selection.

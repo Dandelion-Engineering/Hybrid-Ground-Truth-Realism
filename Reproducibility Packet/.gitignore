@@ -1,0 +1,56 @@
+# Reproducibility Packet — its own ignore rules.
+#
+# This file exists so the packet folder stays correct when it is copied out on
+# its own and tracked separately. It is intentionally narrower than a whole
+# project's ignore file: everything a reader needs to reproduce a result is
+# meant to be tracked here.
+
+# Virtual environments created by the setup step in README.md
+.venv/
+venv/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Recording data and sorter output. Nothing in this packet downloads these, but
+# a reader who fetches the dandiset locally will land them next to the scripts.
+*.nwb
+*.dat
+*.bin
+*.zarr/
+sorter_output/
+kilosort4/
+.kilosort/
+phy/
+
+# Large rebuildable arrays
+*.npy
+*.npz
+*.h5
+*.hdf5
+
+# Logs and OS noise
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Deliberately NOT ignored — do not add a rule that catches these:
+#
+#   results/*.txt, results/*.json     the recorded reports and their inputs
+#   results/templates_snapshot_*.csv  the pinned upstream donor table (~2 MB),
+#                                     which is what makes offline replay
+#                                     byte-for-byte rather than approximate
+#   results/dandi_000409_assets.json  the archive asset listing (~0.7 MB)
+#   results/*_index.jsonl             resumable per-asset survey indexes
+#   results/ccf_label_map_derived_records.json
+#                                     the per-asset votes that let the label
+#                                     map be rebuilt with no network reads
+#   scripts/utils/ccf_label_map_derived.json
+#                                     the derived map itself, imported at run
+#                                     time rather than regenerated
+#
+# The upstream sources these came from are mutable, so "re-download it" is not
+# equivalent to having the pinned copy.
