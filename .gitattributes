@@ -1,0 +1,17 @@
+# Preserve the packet bytes a reader receives from a clone. Most packet files
+# are stored and checked out exactly; the listed legacy outputs intentionally
+# retain their already-tested CRLF checkout representation.
+.gitattributes -text
+"Reproducibility Packet/**" -text
+
+"Reproducibility Packet/results/ccf_label_map_derived.txt" text eol=crlf
+"Reproducibility Packet/results/ccf_label_map_derived_records.json" text eol=crlf
+"Reproducibility Packet/results/ccf_label_map_validation.txt" text eol=crlf
+"Reproducibility Packet/results/donor_provenance_2026-08-11.txt" text eol=crlf
+"Reproducibility Packet/results/host_anatomy_CA1.txt" text eol=crlf
+"Reproducibility Packet/results/host_anatomy_index.jsonl" text eol=crlf
+"Reproducibility Packet/results/host_timing_CA1.txt" text eol=crlf
+"Reproducibility Packet/results/host_timing_index.jsonl" text eol=crlf
+"Reproducibility Packet/results/template_audit_2026-08-11.txt" text eol=crlf
+"Reproducibility Packet/results/zone_neighbour_enrichment_CA1.txt" text eol=crlf
+"Reproducibility Packet/scripts/utils/ccf_label_map_derived.json" text eol=crlf

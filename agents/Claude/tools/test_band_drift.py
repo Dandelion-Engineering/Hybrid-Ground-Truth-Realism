@@ -284,6 +284,50 @@ def case_malformed_input_raises():
         check("mismatched array lengths raise", False)
     except ValueError as exc:
         check("mismatched array lengths raise", "spike times" in str(exc))
+    times3, depths3, _ = make_band(n_units=6, duration_s=duration, seed=FIXTURE_SEED + 9)
+    try:
+        bd.measure_band_drift(times3, depths3[:-1], duration)
+        check("mismatched unit-array counts raise", False)
+    except ValueError as exc:
+        check("mismatched unit-array counts raise", "unit spike-time arrays" in str(exc))
+    try:
+        bd.permutation_null(times3, depths3, duration, "asset", "probe",
+                            [0, 1, 2, 3, 4, 4], {"n_permutations": 1})
+        check("duplicate unit row indices raise", False)
+    except ValueError as exc:
+        check("duplicate unit row indices raise", "distinct" in str(exc))
+
+
+def case_partial_bin_is_discarded_from_null(n_permutations):
+    """Depths in the discarded final partial bin cannot change the null."""
+    print("partial bin exclusion")
+    duration = 605.0
+    times, ordinary, extreme = [], [], []
+    for u in range(6):
+        complete = np.concatenate([
+            np.linspace(b * 60.0 + 1.0, b * 60.0 + 59.0, 10)
+            for b in range(10)
+        ])
+        partial = np.linspace(600.05, 604.95, 50)
+        times.append(np.concatenate([complete, partial]))
+        baseline = np.full(150, 1000.0 + 20.0 * u)
+        altered = baseline.copy()
+        altered[100:] = 10000.0 + 20.0 * u
+        ordinary.append(baseline)
+        extreme.append(altered)
+
+    params = {"n_permutations": n_permutations}
+    obs_a = bd.measure_band_drift(times, ordinary, duration)
+    obs_b = bd.measure_band_drift(times, extreme, duration)
+    null_a = bd.permutation_null(times, ordinary, duration, "asset", "probe",
+                                 list(range(6)), params)
+    null_b = bd.permutation_null(times, extreme, duration, "asset", "probe",
+                                 list(range(6)), params)
+    check("partial-bin depths do not change the observed statistic",
+          obs_a["delta_window"] == obs_b["delta_window"])
+    check("partial-bin depths do not change the null",
+          null_a["values"] == null_b["values"],
+          "Q95 %.2f um in both" % null_a["q95"])
 
 
 def case_null_and_quiet_host(n_permutations):
@@ -353,9 +397,9 @@ def case_gate_quadrants():
           v["passed"] is True)
 
 
-def case_null_bias_direction(n_permutations):
-    """The null is drawn from real depths, so drift can only widen it."""
-    print("null bias direction")
+def case_null_contamination_fixture(n_permutations):
+    """One additive-ramp fixture demonstrates that drift can widen the null."""
+    print("null contamination fixture")
     duration = 3660.0
     quiet = make_band(n_units=14, duration_s=duration, rate_hz=8.0,
                       depth_noise_um=18.0, seed=FIXTURE_SEED + 8)
@@ -366,7 +410,7 @@ def case_null_bias_direction(n_permutations):
     q_null = bd.permutation_null(quiet[0], quiet[1], duration, "a", "p", quiet[2], params)
     d_null = bd.permutation_null(drifting[0], drifting[1], duration, "a", "p",
                                  drifting[2], params)
-    check("real movement widens the candidate's own null",
+    check("real movement widens this fixture's own null",
           d_null["q95"] > q_null["q95"],
           "quiet Q95 %.2f um, drifting Q95 %.2f um" % (q_null["q95"], d_null["q95"]))
     d_obs = bd.measure_band_drift(drifting[0], drifting[1], duration)
@@ -398,9 +442,10 @@ def main():
     case_invalid_bin_rejects()
     case_too_few_units()
     case_malformed_input_raises()
+    case_partial_bin_is_discarded_from_null(args.permutations)
     case_null_and_quiet_host(args.permutations)
     case_gate_quadrants()
-    case_null_bias_direction(args.permutations)
+    case_null_contamination_fixture(args.permutations)
 
     failed = [name for name, ok, _ in RESULTS if not ok]
     print("")

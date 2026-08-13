@@ -41,18 +41,18 @@ For one probe, one anatomical band and one recording:
 
 The null
 --------
-Holding every spike time fixed and permuting a unit's depth values among its own
-spikes destroys the depth/time ordering while preserving every depth value,
-every spike time and every per-bin spike count. The resulting ``Delta_10``
-distribution is what this estimator returns on this recording with no time
-ordering, and its nearest-rank empirical 95th percentile ``Q95_null`` is the
-declared summary. Because the permuted values are the recording's real depths,
-any genuine movement is inside the pool the null draws from, so ``Q95_null`` is
-an upper bound on the no-drift noise floor rather than a clean estimate of it.
-That bias can only push a candidate toward an unmeasurable rejection and never
-toward a pass, and can only push a failing candidate's label from resolved drift
-toward noise-limited. Correcting it would require removing drift from the values
-before building the null against which drift is judged, which is circular.
+Within the complete bins, holding every spike time fixed and permuting a unit's
+depth values among its own analysed spikes destroys the depth/time ordering
+while preserving every analysed depth value, spike time and per-bin spike
+count. Spikes in the discarded final partial bin enter neither the observed
+statistic nor the null. The resulting ``Delta_10`` distribution is what this
+estimator returns on this recording with no time ordering, and its nearest-rank
+empirical 95th percentile ``Q95_null`` is the declared summary. Genuine movement
+is present in the pool the null draws from and, under an additive common-motion
+model, can widen this resolution diagnostic. That direction is demonstrated by
+a synthetic ramp fixture, not assumed to be a general monotonic guarantee.
+Removing an estimated movement trajectory before building the null would make
+the diagnostic depend on the drift estimate it is meant to grade.
 
 The permutations are deterministic rather than redrawable. Each unit and
 replicate draws a 64-bit seed from a hash of the master seed, the asset, the
@@ -263,6 +263,11 @@ def _unit_tables(spike_times, depths, n_bins, bin_seconds, min_spikes_per_bin):
         ValueError: if a unit's arrays disagree in length or hold non-finite
             depths.
     """
+    if len(spike_times) != len(depths):
+        raise ValueError(
+            "%d unit spike-time arrays and %d unit depth arrays"
+            % (len(spike_times), len(depths))
+        )
     offsets, medians = [], []
     for u, (times, depth) in enumerate(zip(spike_times, depths)):
         times = np.asarray(times, dtype=np.float64)
@@ -340,7 +345,7 @@ def measure_band_drift(spike_times, depths, duration_s, params=None):
     n_bins, discarded_s = complete_bins(duration_s, p["bin_seconds"])
     result = {"n_bins": n_bins, "discarded_s": discarded_s, "n_units_in_band": len(spike_times)}
 
-    if not spike_times:
+    if len(spike_times) == 0:
         result.update(measurable=False, reason="no units in the band")
         return result
 
@@ -404,10 +409,11 @@ def permutation_null(spike_times, depths, duration_s, asset_id, probe,
                      unit_row_indices, params=None):
     """Build the deterministic within-unit permutation null for ``Delta_10``.
 
-    Every spike time -- and therefore every per-bin spike count -- is held
-    fixed while each unit's depth values are permuted among its own spikes, so
-    the null preserves bin validity exactly: no replicate can be invalid where
-    the observation is valid.
+    Every spike time in a complete bin -- and therefore every complete-bin
+    spike count -- is held fixed while each unit's analysed depth values are
+    permuted among those times. Spikes in the discarded final partial bin do
+    not enter the pool. The null therefore preserves bin validity exactly: no
+    replicate can be invalid where the observation is valid.
 
     Args:
         spike_times: list of per-unit ascending spike-time arrays, in seconds.
@@ -435,12 +441,43 @@ def permutation_null(spike_times, depths, duration_s, asset_id, probe,
         raise ValueError(
             "%d row indices for %d units" % (len(unit_row_indices), len(spike_times))
         )
+    normalized_rows = [int(row) for row in unit_row_indices]
+    if any(row != normalized or normalized < 0
+           for row, normalized in zip(unit_row_indices, normalized_rows)):
+        raise ValueError("unit_row_indices must be distinct non-negative integers")
+    if len(set(normalized_rows)) != len(normalized_rows):
+        raise ValueError("unit_row_indices must be distinct non-negative integers")
+    if len(depths) != len(spike_times):
+        raise ValueError(
+            "%d unit spike-time arrays and %d unit depth arrays"
+            % (len(spike_times), len(depths))
+        )
     n_bins, _ = complete_bins(duration_s, p["bin_seconds"])
     offsets, medians = _unit_tables(
         spike_times, depths, n_bins, p["bin_seconds"], p["min_spikes_per_bin"]
     )
     defined = np.array([np.isfinite(m).sum() for m in medians], dtype=np.float64)
     included = defined >= p["min_bin_fraction"] * n_bins
+
+    if included.sum() < p["min_units_per_bin"]:
+        raise ValueError(
+            "the observation is unmeasurable: only %d included units, need at least %d"
+            % (int(included.sum()), p["min_units_per_bin"])
+        )
+    observed_trace, _, observed_invalid = _trace_from_medians(
+        medians, included, p["min_units_per_bin"]
+    )
+    if observed_invalid.size:
+        raise ValueError(
+            "the observation is unmeasurable: %d complete bins are invalid"
+            % observed_invalid.size
+        )
+    _, observed_window, _ = excursions(observed_trace, p["window_bins"])
+    if observed_window is None:
+        raise ValueError(
+            "the observation is unmeasurable: %d complete bins is shorter than the %d-bin "
+            "gate window" % (n_bins, p["window_bins"])
+        )
 
     pools = [np.asarray(d, dtype=np.float64) for d in depths]
     values = np.empty(p["n_permutations"], dtype=np.float64)
@@ -451,10 +488,13 @@ def permutation_null(spike_times, depths, duration_s, asset_id, probe,
                 replicate.append(medians[u])
                 continue
             seed = derive_permutation_seed(
-                asset_id, probe, unit_row_indices[u], k, p["master_seed"]
+                asset_id, probe, normalized_rows[u], k, p["master_seed"]
             )
             rng = np.random.Generator(np.random.PCG64(seed))
-            shuffled = pools[u][rng.permutation(pools[u].size)]
+            shuffled = pools[u].copy()
+            first, stop = int(offsets[u][0]), int(offsets[u][-1])
+            analysed = pools[u][first:stop]
+            shuffled[first:stop] = analysed[rng.permutation(analysed.size)]
             replicate.append(bin_medians(shuffled, offsets[u], p["min_spikes_per_bin"]))
         trace, _, invalid = _trace_from_medians(
             replicate, included, p["min_units_per_bin"]
@@ -503,8 +543,12 @@ def apply_gate(observed, null, threshold_um):
             "reason": observed.get("reason", "unmeasurable"),
             "threshold_um": float(threshold_um),
         }
+    if null is None or "q95" not in null:
+        raise ValueError("a measurable observation requires a permutation-null q95")
     delta = observed["delta_window"]
     q95 = null["q95"]
+    if not all(np.isfinite(value) for value in (delta, q95, threshold_um)):
+        raise ValueError("delta_window, q95 and threshold_um must all be finite")
     inside_null = delta <= q95
     verdict = {
         "delta_window": delta,
