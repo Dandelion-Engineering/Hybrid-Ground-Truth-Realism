@@ -1,9 +1,32 @@
-# Preserve the packet bytes a reader receives from a clone. Most packet files
-# are stored and checked out exactly; the listed legacy outputs intentionally
-# retain their already-tested CRLF checkout representation.
-.gitattributes -text
-"Reproducibility Packet/**" -text
+# Preserve the exact bytes a reader receives from a clone, on every platform.
+# Git's default heuristic rewrites line endings on checkout, so a Windows
+# clone with core.autocrlf=true did not reproduce the bytes this project
+# tested and published SHA-256 digests for. Every path is therefore stored
+# and checked out as-is; the listed files are checked out CRLF because that
+# is the representation their already-tested bytes carry.
 
+* -text
+
+# --- outside the packet: framework inputs and one workspace README ---
+"AgentPrompt.md" text eol=crlf
+"LICENSE" text eol=crlf
+"LICENSE-docs" text eol=crlf
+"LICENSING.md" text eol=crlf
+"Playbooks/accessible-claim-sheet.md" text eol=crlf
+"Playbooks/accessible-piece.md" text eol=crlf
+"Playbooks/claim-sheet.md" text eol=crlf
+"Playbooks/director-requests.md" text eol=crlf
+"Playbooks/literature-foundation.md" text eol=crlf
+"Playbooks/live-run-readme.md" text eol=crlf
+"Playbooks/reproducibility-packet.md" text eol=crlf
+"Playbooks/research-progress-report.md" text eol=crlf
+"Playbooks/review-cycle.md" text eol=crlf
+"Playbooks/study-guide.md" text eol=crlf
+"Playbooks/technical-report.md" text eol=crlf
+"Project Details/Project Details.md" text eol=crlf
+"agents/Claude/README.md" text eol=crlf
+
+# --- inside the packet: legacy recorded outputs ---
 "Reproducibility Packet/results/ccf_label_map_derived.txt" text eol=crlf
 "Reproducibility Packet/results/ccf_label_map_derived_records.json" text eol=crlf
 "Reproducibility Packet/results/ccf_label_map_validation.txt" text eol=crlf
