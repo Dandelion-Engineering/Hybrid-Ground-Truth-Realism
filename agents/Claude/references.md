@@ -281,6 +281,26 @@ Two parts of these files the project had not opened before this session.
 
 ---
 
+### DANDI 000409's own description of `cumulative_drift_um_per_hour` — the drift column, read rather than inferred
+
+**What it covers.** The `description` attribute the processed IBL NWB units table carries on its drift column, on `sub-KS042/ses-07dc4b76`. It was already captured, unread, in `Reproducibility Packet/results/amplitude_conventions.json` under `descriptions/`; no new download was needed to read it. Verbatim:
+
+> "Sum of absolute depth changes between consecutive spikes, normalized to um/hour. Formula: sum(abs(diff(spike_depths)))/duration*3600. High values indicate either electrode drift or depth estimation noise. Scales with spike count (~0.79 correlation). NOT actual electrode displacement."
+
+**How it informed the project.** Three things, one of them new.
+
+1. **It confirms the project's existing decision not to use the column, and replaces the reason with a better one.** The packet's recorded note reaches the right conclusion by inference — the values reach millions of micrometres per hour, so they cannot be net displacement. IBL says so directly, in their own documentation, in capitals. An inference from an implausible magnitude is now a first-party statement.
+2. **It explains the magnitude exactly.** The quantity is the total absolute path length of the per-spike depth estimate, summed over every consecutive spike pair and normalized by duration. Over the millions of spikes in a full recording, an estimate that jitters by a micrometre per spike accumulates metres per hour without the probe having moved at all.
+3. **It is confounded with firing rate by construction — ~0.79 with spike count — and this is the new fact.** That makes the column *actively misleading* as a host gate rather than merely uninformative. A drift gate built on it would preferentially reject high-firing-rate units and, by extension, high-rate zones. Firing rate is not a nuisance this experiment can afford to select on: Tier B's whole manipulation is population-rate coupling, and a host chosen partly for being quiet would bias that tier before it started.
+
+**What it constrains for the still-open drift gate.** A usable drift quantity must be **net displacement over time, not accumulated absolute step**, and must not scale with spike count. The description also names the confound any depth-derived measure inherits: electrode movement and depth-estimation noise enter this column identically, so a replacement built from the same `spike_depths` substrate has to state how it separates them, or declare that it does not and carry that as a limitation. This entry rules a measure out and names two properties a replacement needs; it does not provide one.
+
+*Boundary:* one column's attribute on one session, and it is IBL's documentation of their own pipeline rather than a measurement of it. The `~0.79` correlation is their reported figure, not one this project has reproduced, and it should be cited as theirs unless and until it is.
+
+*Citation:* International Brain Laboratory. *Brain Wide Map* (DANDI:000409), processed NWB units table, `cumulative_drift_um_per_hour` column `description` attribute. https://dandiarchive.org/dandiset/000409 (read 2026-08-13).
+
+---
+
 ## Pending — sources identified but not yet verified
 
 These are named in `Literature Foundation.md` §5.4 and are **not** citable until an entry appears above.

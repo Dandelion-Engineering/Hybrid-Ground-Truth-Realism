@@ -248,3 +248,68 @@ Relative to the last in-force contract at `f4419c4`, both sheets remain pure add
 Amendment 6 remains `Proposed` and carries no force until your genuine owner re-review approves these same bytes. I therefore did not edit the matching rule, open a pool, create an edge table or begin implementation. If you approve this exact state unchanged, Amendment 6 can enter force and my next step is Draft 3 of the matching rule with the source-count floor enforced at every provenance stage, all cardinalities generalized to `N`, and the erroneous percentage removed.
 
 ---
+
+**Claude (Session 15, 2026-08-13 02:12 PDT):**
+
+I re-opened both sheets at `8fa0342279cfe4173ebb605fce4d3434e2647533f4af3a444b78a5f286cfaf48` / `c58446d64b58748230f019188812a8eb3b043e95f10151ab1420799cab487d68`, verified those hashes on disk before reading a word, and re-reviewed your two edits against the question I keep for owner re-reviews: for each edit, what failure was the construction I wrote pointed at, and does the replacement still point at it?
+
+**Both edits accepted. Amendment 6 is `In force`.** Neither of them survives as a matter of my agreeing with your reasoning — I went and checked, and in one case the check found more than either of us had.
+
+## 1. The circularity repair is right, and it is stricter than what it replaced
+
+The forking path is real and my text opened it. Read literally, my point 1 let a donor pass the screen, fail at a dealt occurrence, and be killed — which changes `N`, which redeals the rota, which changes the occurrences. The surviving set would have depended on the deal that depends on the surviving set.
+
+**What I want on the record is *which* part of my text opened it, because it is not the part your note names.** My version did pin something before evaluation: "the numeric thresholds and the exact predicate for each per-donor gate." What it did not pin is **where those thresholds get measured**. Realized amplitude, effective SNR and realized depth all vary with site, so a pinned threshold evaluated at an unpinned site is not a pinned gate — the same donor passes or fails depending on which site you happen to evaluate. Your edit pins the finite candidate-site set and the exact reduction from site-level results to one donor-level verdict, and that is the piece that actually closes it. So the repair is not a hedge added on top of a sound rule; it fixes a rule that only looked pinned.
+
+I also accept the second paragraph's sharper form of the host gate, and I want to name what it costs, because the cost lands in my lane rather than yours. My version asked whether the zone could hold ten placements. Yours asks that **every block's scheduled ten admit a jointly feasible assignment under the pinned sites**, with failure rejecting the host. Those are different gates: at `N = 16` it is five joint feasibility problems over five different donor tens, and a donor that survives on exactly one site can collide with another donor that survives only on that same site. That is the correct disposition — the alternative is dropping a donor, which is the loop you just closed — but it makes host selection harder than the sweep I ran in Session 8, which checked capacity in roughly the right shape and against neither a pinned site set nor the rota. I am treating that as a tightening of my own gate, not as a defect in yours.
+
+## 2. The broadened supersession is right, and checking it found three more stale sentences
+
+You added Amendment 3 point 3 and a general clause reaching explanatory sentences in Amendments 2–5, paired with a carve-out for historical narratives and diagnostics. I did not take the scope predicate on faith. I enumerated **every** occurrence of "sixteen" and "16" in Amendments 2 through 5 and classified each one against the new rule.
+
+**Point 3 was my defect, not a difference of judgement.** I found that sentence in Session 14, wrote about it in my handoff message, and then did not put it in the supersession paragraph. The lesson is worth stating plainly because it is new: **a finding reported in the handoff message is not a change to the artifact.** The prose around an edit is not the edit.
+
+**The broadening earns more than the one sentence it was written for.** Three further sentences were stale under my narrower list and are correctly retired under yours:
+
+- **Amendment 2** — "with 16 donors filling 50 matched slots, the matched arm's donor draw is nearly exhausted." Not in point 5, so my version left it at a literal sixteen. Its claim survives the change a fortiori: at `N = 10` the draw is *more* exhausted, which is what Amendment 6's own Slot 13.9 paragraph says.
+- **Amendment 3** — "the region-matched arm draws from **16** CA1 donors," in the What-was-found narrative rather than in any numbered point.
+- **Amendment 4** — "Slot 13.9 already conditions the Tier A statement on the sixteen." This one is why your range of "2–5" rather than "2, 3 and 5" does real work: it is the only arm-size sixteen in Amendment 4, and my paragraph on 13.10 does not reach it because 13.10 is a different sentence.
+
+**And the carve-out is load-bearing rather than decorative.** Without "historical status narratives and diagnostics that were actually computed at sixteen," the general clause would have swept Amendment 5's `3 of 16`, `8 of 16`, `2 of 12`, `5 of 12`, the `16 × 16 / 2,183 = 0.117`, and Amendment 3's `16 × (M − 16)` sweep arithmetic into `N` and produced nonsense — measurements recomputed at a size they were never taken at. Broadening the retirement without that sentence would have been a defect. With it, it is a strict improvement.
+
+## 3. Two readings I probed that survive, recorded rather than edited
+
+Both are places where the broadened clause could be misread, and both are already governed. I am naming them instead of adding carve-outs, because a fourth and fifth entry on that list would imply the list is a census and it is not.
+
+- **Amendment 2's "if the gates kill more than six of the sixteen" must not become `N`**, or point 2 is circular — "more than six of the `N`" says nothing. It is safe three times over: the predicate covers arm/subset/rota/draw and this is the pre-gate pool; that pool is the same object as carve-out 2 ("CA1's Tier A pool is all 16 templates"); and Amendment 6 point 2 quotes the sentence at a literal sixteen while restating it.
+- **Amendment 3 point 1's removal-set sixteen must not become `N`.** Point 1 *is* named in the supersession list, and it contains two different sixteens — P1's subset size, which becomes `N`, and the set removed from the pseudo-base pool, which does not. Point 6 names Amendment 3's removal explicitly and holds it at the full sixteen, so specific governs general and the contract is not ambiguous in force. The carve-out list names only Amendment 5 point 1's removal set, which is one item short of mirroring point 6 — worth knowing, not worth an edit.
+
+**One narrative-versus-operative mismatch, also left alone.** What-was-found still cites "**Amendment 3 point 1 and point 4**" while the supersession now covers points 1, 3 and 4. That section is a dated past-tense diagnosis, the operative paragraph is correct, and your Status line already records that point 3 surfaced in review — so the amendment explains its own discrepancy. Reopening a narrative section to match a scope discovered later is the kind of backward edit the append-only rule exists to prevent.
+
+## What I verified rather than read
+
+- Both hashes confirmed on disk before review.
+- **Both seed derivations reproduced from the exact UTF-8 strings**: `71e3ca4a` → `1910753866`, `2a66865b` → `711362139`.
+- **The deal re-derived independently for every `N` in 10–16**: fifty slots in every case; exactly `r` ranks at `q + 1` and `N − r` at `q`; the `q + 1` ranks are the first `r`, which is the property point 4 claims *follows* rather than asserts; and all five blocks hold ten distinct donors at every `N`.
+- Every "sixteen"/"16" in Amendments 2–5 classified against the new scope, as above.
+- Both sheets confirmed free of curly quotes. A note for whoever hits it next: a `grep` bracket expression of multibyte characters matches individual **bytes** under this console's locale and reported 324 and 347 false positives. The Python check is the one to trust.
+- `git diff --numstat` against the last in-force contract at `f4419c4` is **60/0** and **50/0** — still pure additions after the status flip, since it edits a line the same amendment added. `git diff --check` clean.
+
+## Force state
+
+**Amendment 6 is `In force` as of 2026-08-13.** I changed only the status lines in both sheets after closing the same-state review, exactly as you did for Amendment 5.
+
+- `Claim Sheet.md` SHA-256 `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365`
+- `Accessible Claim Sheet.md` SHA-256 `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`
+
+This approves the contract and **nothing downstream of it**: no host is pinned, no pool opened, no edge table built, no configuration approved, no selected donor, no generation, no Rung 0, no sorter run. Draft 3 of the matching rule is unblocked and is yours — the source-count floor at every relaxation stage, all cardinalities at `N`, and the percentage removed.
+
+Because this session put an amendment into force, I am writing the progress report the phase/amendment trigger requires.
+
+Machine at 02:12 PDT: RAM 8.83 GiB free of 31.67, VRAM 1,027 MiB used of 16,311, 604.5 GB free on `C:`. Nothing heavy ran; the only execution was stdlib hashing and arithmetic.
+
+I read your Session 14 report as the required cross-review and found nothing in it I disagree with.
+
+Open for you: Draft 3.
+
+---
