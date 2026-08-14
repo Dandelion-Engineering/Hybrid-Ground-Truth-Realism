@@ -449,17 +449,19 @@ def case_per_unit_audit_values():
           moving["delta_window"] > 20.0 and diluted["delta_window"] == 0.0,
           "five moving %.3f um, plus six flat %.3f um"
           % (moving["delta_window"], diluted["delta_window"]))
-    check("but the per-unit values still carry it",
-          abs(max(diluted["unit_delta_window"]) - moving["delta_window"]) < 1e-9,
+    check("but each unit's own worst window still carries it",
+          abs(max(diluted["unit_delta_max_window"]) - moving["delta_window"]) < 1e-9,
           "largest per-unit window excursion %.12f um against the undiluted "
-          "band's %.12f um" % (max(diluted["unit_delta_window"]),
+          "band's %.12f um" % (max(diluted["unit_delta_max_window"]),
                                moving["delta_window"]))
     check("and they separate the movers from the rest",
-          sum(1 for v in diluted["unit_delta_window"] if v > 20.0) == 5
-          and sum(1 for v in diluted["unit_delta_window"] if v == 0.0) == 6)
-    check("one value per included unit, both quantities",
-          len(diluted["unit_delta_full"]) == len(diluted["included"])
-          and len(diluted["unit_delta_window"]) == len(diluted["included"]) == 11)
+          sum(1 for v in diluted["unit_delta_max_window"] if v > 20.0) == 5
+          and sum(1 for v in diluted["unit_delta_max_window"] if v == 0.0) == 6)
+    check("all per-unit audit lists align with the included units",
+          all(len(diluted[key]) == len(diluted["included"]) == 11 for key in (
+              "unit_delta_full", "unit_delta_max_window", "unit_max_window_start",
+              "unit_max_window_defined_bins", "unit_delta_band_window",
+              "unit_band_window_defined_bins")))
     check("the audit values do not reach the verdict",
           bd.apply_gate(diluted, {"q95": 0.0}, 20.0)["passed"] is True)
 
@@ -473,12 +475,43 @@ def case_per_unit_audit_values():
           max(abs(np.median(r[np.isfinite(r)])) for r in stack) < 1e-9)
     check("no per-unit excursion is below its own window excursion",
           all(f >= w - 1e-9 for f, w in zip(obs["unit_delta_full"],
-                                            obs["unit_delta_window"])))
+                                            obs["unit_delta_max_window"])))
+
+    # A flat band trace makes its selected window an arbitrary earliest tie.
+    # Movement confined to a later window must remain visible at the same
+    # ten-bin scale rather than only in the whole-recording range.
+    late_levels = np.concatenate([np.zeros(10), np.linspace(0.0, 30.0, 10)])
+    late_movement = np.repeat(late_levels, per_bin)
+    late_times = np.concatenate(
+        [b * 60.0 + np.linspace(1.0, 50.0, per_bin) for b in range(20)])
+    localized = bd.measure_band_drift(
+        [late_times] * 11,
+        [late_movement] * 5 + [np.zeros(20 * per_bin)] * 6,
+        20 * 60.0,
+    )
+    check("the flat band selects the earliest tied window",
+          localized["delta_window"] == 0.0 and localized["window_start"] == 0)
+    check("the band-aligned unit windows can therefore miss late movement",
+          all(v == 0.0 for v in localized["unit_delta_band_window"]))
+    check("each unit's own worst window exposes the late movement",
+          sum(v > 20.0 for v in localized["unit_delta_max_window"]) == 5
+          and sum(v == 0.0 for v in localized["unit_delta_max_window"]) == 6)
+    check("the per-unit starts locate the late moving windows",
+          all(start >= 9 for start in localized["unit_max_window_start"][:5])
+          and localized["unit_max_window_start"][5:] == [0] * 6)
+    check("the selected audit windows report their defined-bin support",
+          localized["unit_max_window_defined_bins"] == [10] * 11
+          and localized["unit_band_window_defined_bins"] == [10] * 11)
     try:
         bd.unit_traces([np.zeros(3)], np.array([True, False]))
         check("a mask that does not match the units raises", False)
     except ValueError:
         check("a mask that does not match the units raises", True)
+    try:
+        bd.unit_excursions(np.zeros((2, 12)), band_window_start=3.5)
+        check("a non-integer band-window start raises", False)
+    except ValueError:
+        check("a non-integer band-window start raises", True)
 
 
 def main():

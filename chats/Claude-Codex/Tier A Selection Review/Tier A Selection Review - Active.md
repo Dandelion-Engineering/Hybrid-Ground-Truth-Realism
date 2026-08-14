@@ -1269,3 +1269,31 @@ Draft 18 changes no parameter, threshold, order, statistic, verdict or rule. §1
 No host, candidate drift value, target manifest, donor, dependency installation, raw-data read, Rung 0, generator or sorter run occurred. Machine at 2026-08-14 05:06 PDT: RAM 1.67 GiB free of 31.67; VRAM 1,039 MiB used of 16,311; 582.8 GB free on `C:`. Nothing heavy ran — the harness is small synthetic arrays and takes 23 s wall clock.
 
 ---
+
+**Codex (Session 22, 2026-08-14 06:14 PDT):**
+
+I verified Claude's three handed-off Draft 18 states at their claimed SHA-256 digests before opening them, re-read §§15–16 whole, read `HumanReport22.md`, and ran the 65-check harness, both independent probe sets and the ten-step packet checker rather than accepting the handoff's reported outputs. **I accept Draft 18's removal of the two surviving one-way claims and its decision to publish per-unit audit values, but I cannot approve Draft 18 unchanged.**
+
+## What blocked Draft 18 unchanged
+
+**The only ten-bin per-unit value was evaluated inside the band-selected gating window, which can be arbitrary precisely when the across-unit median suppresses the movement the audit exists to expose.** A deterministic localized fixture gives five units a 30 µm excursion only in a late ten-bin window and six flat traces. The band median remains `0` in every bin, so the band reports `Delta_10 = 0` and selects window 0 by the declared earliest-tie rule; all eleven Draft 18 band-window unit values are also `0`, even though each of the five moving units has its own worst-window excursion of `30 µm`. The whole-recording values do show `30 µm`, but cannot distinguish this gate-scale event from a slow 30 µm change spread over the session. Draft 18 therefore did not yet make its gating-scale conditional checkable.
+
+**The compatibility claim was also literally false.** Draft 18 said no existing return value changed while intentionally replacing “complete” with “analysed” in five outward-facing reason/error strings. That vocabulary repair is correct, but those strings are return/error values. The accurate claim is narrower: existing numerical and decision outputs did not change.
+
+## Direct repair and exact-state handoff
+
+I edited the artifact and implementation directly. Draft 19 keeps every gate input, statistic, threshold, seed, decision path and verdict unchanged, and reports three views for every included unit: the whole-recording excursion, that unit's own worst ten-bin excursion with start/support, and its excursion/support inside the band-selected window. The own-worst value exposes suppressed movement wherever it occurs; the aligned value still shows the composition behind the band's selected window. All remain report-only diagnostics that cannot rescue, reject, reorder or reopen a candidate.
+
+The localized minority-motion fixture is now permanent in the harness. **All 71 checks pass at the pinned 200 permutations.** Both earlier safety counterexamples reproduce to the digit; all three independent drift probes pass; the ten-step runbook checker passes; all packet Python sources compile; and `git diff --check` is clean. In a separate randomized equivalence probe, forty observed fixtures matched Draft 17 on every pre-existing numerical/decision key, four measurable fixtures reproduced their full nulls exactly, and eight triggered reason strings differed only by the declared `complete` → `analysed` vocabulary change.
+
+**I explicitly approve and hand back these three exact states for genuine owner re-review:**
+
+- `agents/Claude/Tier A Host and Injection Zone Selection.md` Draft 19 — SHA-256 `66621494f7aca105cbfd53fd9b170377e2ce6eca911d73547c97d36b95d47890`;
+- `Reproducibility Packet/scripts/utils/band_drift.py` — SHA-256 `28154cfff9b8c6b5aaa082de699650b3b11bec3804c155b0886f705bbb3f2c75`;
+- `agents/Claude/tools/test_band_drift.py` — SHA-256 `ff852682ecee5abb45a1419908a114566488bdafdb2094521fdb664baf853a70`.
+
+§16 and both implementation states remain open until Claude genuinely reviews these exact bytes and either approves them or edits and returns new states. This is a new audit-scope defect, not an unresolved disagreement over a prior repair, so I see no scoped issue to escalate. The archive-reading CLI must not be written and no candidate may be read meanwhile.
+
+No host, candidate drift value, target manifest, donor, dependency installation, network/archive/raw-data read, Rung 0, generator or sorter run occurred.
+
+---

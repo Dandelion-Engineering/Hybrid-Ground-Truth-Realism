@@ -40,9 +40,11 @@ For one probe, one anatomical band and one recording:
    depth-estimation noise is not. The assumption is not self-verifying: a
    majority of movement-insensitive traces can hold the across-unit median flat
    while a minority moves. ``measure_band_drift`` therefore returns each
-   included unit's own excursion beside the band statistic, so the composition
-   behind ``D(b)`` is auditable. Those per-unit values are reported and never
-   consumed by the gate.
+   included unit's whole-recording excursion, its own worst-window excursion,
+   and its excursion inside the band-selected window. The first two expose
+   movement that the across-unit median can suppress; the third shows the
+   composition aligned to the window that produced ``Delta_10``. Those
+   per-unit values are reported and never consumed by the gate.
 6. ``Delta_full = max_b D(b) - min_b D(b)`` over the whole recording, and
    ``Delta_10`` is the largest such range over any window of
    ``window_bins`` consecutive analysed bins. Both are peak-to-peak excursions,
@@ -275,42 +277,94 @@ def unit_traces(medians, included):
     return stack
 
 
-def unit_excursions(stack, window_start=None, window_bins=None):
-    """Per-unit peak-to-peak excursions, whole and inside the band's window.
+def unit_excursions(stack, band_window_start=None, window_bins=None):
+    """Report each unit's whole, own-worst and band-window excursions.
 
     These are audit quantities. They expose the composition behind the
-    across-unit median ``D(b)`` -- in particular the case where a minority of
-    units moves and the median does not follow -- and no gate consumes them.
+    across-unit median ``D(b)`` -- including a minority that moves in a window
+    other than the one selected from a flat or differently moving band trace --
+    and no gate consumes them.
 
     Args:
         stack: centred per-unit series from :func:`unit_traces`.
-        window_start: first bin of the band's gating window, or None to report
-            the whole-recording excursion only.
+        band_window_start: first bin of the band's gating window, or None when
+            no aligned band-window value is requested.
         window_bins: window length in bins; defaults to ``PARAMS``.
 
     Returns:
-        tuple: ``(delta_full, delta_window)``, both lists with one entry per row
-        of ``stack``. An entry is None where that unit has no defined median in
-        the relevant span; ``delta_window`` is None throughout when
-        ``window_start`` is None.
+        dict: six lists, each aligned with the rows of ``stack``:
+        ``delta_full``; ``delta_max_window`` and ``max_window_start`` for each
+        unit's own worst window; ``max_window_n_defined`` for that window;
+        ``delta_band_window`` inside the band-selected window; and
+        ``band_window_n_defined`` for that window. An excursion is None when
+        fewer than two defined bin medians are present in its span.
+
+    Raises:
+        ValueError: if ``stack`` is not two-dimensional, ``window_bins`` is not
+            a positive integer, or ``band_window_start`` does not identify a
+            complete window inside ``stack``.
     """
     if window_bins is None:
         window_bins = PARAMS["window_bins"]
     stack = np.asarray(stack, dtype=np.float64)
+    if stack.ndim != 2:
+        raise ValueError("stack must be a two-dimensional unit-by-bin array")
+    if isinstance(window_bins, (bool, np.bool_)) or int(window_bins) != window_bins \
+            or int(window_bins) <= 0:
+        raise ValueError("window_bins must be a positive integer")
+    window_bins = int(window_bins)
+    n_units, n_bins = stack.shape
 
-    def spans(block):
-        """Peak-to-peak range of each row, or None where the row is all NaN."""
-        out = []
-        for row in block:
-            valid = row[np.isfinite(row)]
-            out.append(float(valid.max() - valid.min()) if valid.size else None)
-        return out
+    def span(row):
+        """Return a range and defined count; one point cannot define motion."""
+        valid = row[np.isfinite(row)]
+        return (
+            float(valid.max() - valid.min()) if valid.size >= 2 else None,
+            int(valid.size),
+        )
 
-    delta_full = spans(stack)
-    if window_start is None:
-        return delta_full, [None] * stack.shape[0]
-    window = stack[:, int(window_start):int(window_start) + window_bins]
-    return delta_full, spans(window)
+    delta_full = [span(row)[0] for row in stack]
+    delta_max_window = [None] * n_units
+    max_window_start = [None] * n_units
+    max_window_n_defined = [0] * n_units
+    if n_bins >= window_bins:
+        for u, row in enumerate(stack):
+            for start in range(n_bins - window_bins + 1):
+                value, count = span(row[start:start + window_bins])
+                if value is None:
+                    continue
+                if delta_max_window[u] is None or value > delta_max_window[u]:
+                    delta_max_window[u] = value
+                    max_window_start[u] = start
+                    max_window_n_defined[u] = count
+
+    delta_band_window = [None] * n_units
+    band_window_n_defined = [0] * n_units
+    if band_window_start is not None:
+        if isinstance(band_window_start, (bool, np.bool_)) \
+                or int(band_window_start) != band_window_start:
+            raise ValueError("band_window_start must be an integer")
+        band_window_start = int(band_window_start)
+        if band_window_start < 0 or band_window_start + window_bins > n_bins:
+            raise ValueError(
+                "band window [%d, %d) falls outside %d bins"
+                % (band_window_start, band_window_start + window_bins, n_bins)
+            )
+        for u, row in enumerate(stack):
+            value, count = span(
+                row[band_window_start:band_window_start + window_bins]
+            )
+            delta_band_window[u] = value
+            band_window_n_defined[u] = count
+
+    return {
+        "delta_full": delta_full,
+        "delta_max_window": delta_max_window,
+        "max_window_start": max_window_start,
+        "max_window_n_defined": max_window_n_defined,
+        "delta_band_window": delta_band_window,
+        "band_window_n_defined": band_window_n_defined,
+    }
 
 
 def excursions(trace, window_bins=None):
@@ -428,10 +482,13 @@ def measure_band_drift(spike_times, depths, extent_s, params=None):
         ``units_per_bin``, ``min_units_per_bin_observed``, ``invalid_bins``,
         ``window_start``, and ``trace``, the across-unit band trace ``D(b)``
         built from the centred per-unit series. When it is measurable it also
-        carries ``unit_delta_full`` and ``unit_delta_window``, each included
-        unit's own excursion over the whole recording and inside the band's
-        gating window, aligned with ``included``. Those two are audit
-        quantities: the gate reads ``delta_window`` and never them.
+        carries six per-unit audit lists aligned with ``included``:
+        ``unit_delta_full``; ``unit_delta_max_window`` and
+        ``unit_max_window_start`` for each unit's own worst window;
+        ``unit_max_window_defined_bins`` for its support; and
+        ``unit_delta_band_window`` / ``unit_band_window_defined_bins`` inside
+        the band-selected window. The gate reads ``delta_window`` and never
+        these audit values.
 
     Raises:
         ValueError: if the inputs are malformed -- mismatched array lengths,
@@ -494,7 +551,7 @@ def measure_band_drift(spike_times, depths, extent_s, params=None):
         )
         return result
 
-    unit_full, unit_window = unit_excursions(
+    unit_audit = unit_excursions(
         unit_traces(medians, included), window_start, p["window_bins"]
     )
     result.update(
@@ -503,8 +560,12 @@ def measure_band_drift(spike_times, depths, extent_s, params=None):
         delta_window=delta_window,
         window_start=int(window_start),
         trace=trace.tolist(),
-        unit_delta_full=unit_full,
-        unit_delta_window=unit_window,
+        unit_delta_full=unit_audit["delta_full"],
+        unit_delta_max_window=unit_audit["delta_max_window"],
+        unit_max_window_start=unit_audit["max_window_start"],
+        unit_max_window_defined_bins=unit_audit["max_window_n_defined"],
+        unit_delta_band_window=unit_audit["delta_band_window"],
+        unit_band_window_defined_bins=unit_audit["band_window_n_defined"],
     )
     return result
 
