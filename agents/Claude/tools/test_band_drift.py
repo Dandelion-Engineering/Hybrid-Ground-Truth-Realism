@@ -7,7 +7,7 @@ answer is known in advance: a ramp of a stated size, a trajectory that returns
 to where it started, a trace whose worst window is deliberately not its first,
 a band deliberately one unit short in one bin.
 
-Five of the cases exist because of specific defects the specification passed
+Six of the cases exist because of specific defects the specification passed
 through in review, and they are the ones most worth keeping:
 
 * ``quiet_host_passes`` -- an earlier draft rejected a candidate whose observed
@@ -30,6 +30,13 @@ through in review, and they are the ones most worth keeping:
   homogeneous no-movement fixture puts every per-unit excursion above the
   band's own null, while a heterogeneous quiet fixture puts a flat unit below
   it; a genuine common ramp also shows the per-unit worst windows scattering.
+* ``per_unit_audit_absence_proves_nothing`` -- with the last yardstick gone,
+  the only signal left in those values is a subset separated in magnitude from
+  the rest, and the specification leaned on that separation to call the
+  label-blind conditional checkable. The separation can be absent while the
+  failure shape is present: ten of twenty-one units move 30 um, the candidate
+  passes both gate numbers, and their own-worst excursions overlap the
+  stationary ones.
 
 The permutation determinism cases check the property the specification actually
 depends on: the same inputs replay the same null, and different assets, probes,
@@ -578,6 +585,22 @@ def case_per_unit_audit_has_no_null(n_permutations):
           "flat unit %.3f um against Q95_null %.3f um"
           % (quiet_obs["unit_delta_max_window"][0], quiet_null["q95"]))
 
+    # The reversal is produced by heterogeneity, not by the exact flatness of
+    # that first unit, and saying so keeps the counterexample from being read
+    # as a degenerate construction. A unit merely three times quieter than its
+    # neighbours still sits below the band null.
+    quieter_depths = [
+        1000.0 + np.random.default_rng(9099).normal(0.0, 6.0, size=regular_times.size)
+    ] + quiet_depths[1:]
+    quieter_obs = bd.measure_band_drift(quiet_times, quieter_depths, duration)
+    quieter_null = bd.permutation_null(
+        quiet_times, quieter_depths, duration, "quieter-heterogeneous", "probe01",
+        list(range(5)), {"n_permutations": n_permutations})
+    check("and it survives without the exactly-flat unit",
+          0.0 < quieter_obs["unit_delta_max_window"][0] < quieter_null["q95"],
+          "6 um unit %.3f um against Q95_null %.3f um from 18 um neighbours"
+          % (quieter_obs["unit_delta_max_window"][0], quieter_null["q95"]))
+
     times, depths, _ = make_band(n_units=14, duration_s=duration,
                                  seed=FIXTURE_SEED + 22,
                                  trajectory=lambda t: 30.0 * t / duration)
@@ -593,6 +616,108 @@ def case_per_unit_audit_has_no_null(n_permutations):
     audit = bd.unit_excursions(tied.reshape(1, 20))
     check("a unit's tied worst windows resolve to the earliest",
           audit["delta_max_window"][0] == 10.0 and audit["max_window_start"][0] == 0)
+
+
+def make_masking_band(n_units, n_moving, per_bin=12, n_bins=61, noise_um=20.0,
+                      move_um=30.0, move_lo=45, move_hi=54, seed=7700):
+    """Build a band whose moving minority is hidden by per-unit depth noise.
+
+    Every unit fires on the same regular within-bin grid, so temporal support
+    is identical and every unit clears the inclusion rule. The first
+    ``n_moving`` units ramp by ``move_um`` inside one ten-bin window; the rest
+    are stationary. All of them carry the same per-spike depth noise.
+
+    Args:
+        n_units: units in the band.
+        n_moving: how many of them move; a minority, so the across-unit median
+            stays in the stationary group.
+        per_bin: spikes per unit per bin, just above the inclusion floor of 10.
+        n_bins: analysed bins.
+        noise_um: per-spike depth-estimation noise, Gaussian.
+        move_um: the moving units' excursion.
+        move_lo: first bin of the movement window.
+        move_hi: last bin of the movement window.
+        seed: fixture seed for the synthetic data.
+
+    Returns:
+        tuple: ``(spike_times, depths, row_indices)`` ready for the estimator.
+    """
+    grid = np.concatenate([
+        b * 60.0 + np.linspace(1.0, 50.0, per_bin) for b in range(n_bins)
+    ])
+    bin_index = np.floor(grid / 60.0).astype(int)
+    ramp = np.clip((bin_index - move_lo) / float(move_hi - move_lo), 0.0, 1.0)
+    times, depths = [], []
+    for u in range(n_units):
+        rng = np.random.default_rng(seed + u)
+        d = 1000.0 + 40.0 * u + rng.normal(0.0, noise_um, size=grid.size)
+        if u < n_moving:
+            d = d + move_um * ramp
+        times.append(grid.copy())
+        depths.append(d)
+    return times, depths, list(range(n_units))
+
+
+def case_per_unit_audit_absence_proves_nothing(n_permutations):
+    """Absence of the audit's magnitude separation licenses nothing.
+
+    The specification reports per-unit excursions so the label-blind
+    conditional -- that movement is expressed in enough traces for the
+    across-unit median to carry it -- is checkable from the published record.
+    The one signal left to read is a subset separated in magnitude from the
+    rest. That signature is visible only when per-unit depth noise is small
+    against the movement, which is a property of the earlier noiseless fixture
+    rather than a guarantee.
+
+    Here ten of twenty-one units genuinely move 30 um inside a ten-bin window,
+    every unit sits just above the inclusion floor the parameters admit, and
+    the candidate passes both gate numbers while the moving units' own-worst
+    excursions overlap the stationary ones. The masking gets easier as the band
+    grows, because the across-unit median suppresses a moving minority and its
+    noise together while a single trace keeps both.
+    """
+    print("absence of separation is not evidence")
+    n_bins = 61
+    duration = n_bins * 60.0
+    n_units, n_moving = 21, 10
+    times, depths, rows = make_masking_band(n_units, n_moving)
+    obs = bd.measure_band_drift(times, depths, duration)
+    if not check("the masking band is measurable", obs["measurable"],
+                 obs.get("reason", "")):
+        return
+    null = bd.permutation_null(times, depths, duration, "masking", "probe01",
+                               rows, {"n_permutations": n_permutations})
+    gate = bd.apply_gate(obs, null, bd.PARAMS["threshold_strict_um"])
+    own = np.asarray(obs["unit_delta_max_window"], dtype=float)
+    moving, still = own[:n_moving], own[n_moving:]
+
+    check("a band with a genuinely moving minority still passes the gate",
+          gate["passed"],
+          "Delta_10 %.3f um, Q95_null %.3f um, both under %.0f um"
+          % (obs["delta_window"], null["q95"],
+             bd.PARAMS["threshold_strict_um"]))
+    check("the movement is real and above the gate's own scale",
+          moving.min() > bd.PARAMS["threshold_strict_um"],
+          "smallest moving own-worst %.1f um against a 30 um injected step"
+          % moving.min())
+    check("yet the moving units are not separated in magnitude",
+          moving.min() <= still.max(),
+          "moving [%.1f, %.1f] overlaps stationary [%.1f, %.1f]"
+          % (moving.min(), moving.max(), still.min(), still.max()))
+    check("several moving units sit inside the stationary range",
+          int(((moving >= still.min()) & (moving <= still.max())).sum()) >= 2,
+          "%d of %d moving units are indistinguishable by magnitude"
+          % (int(((moving >= still.min()) & (moving <= still.max())).sum()),
+             n_moving))
+
+    band_values = []
+    for total, movers in ((11, 5), (21, 10), (41, 20)):
+        t, d, _ = make_masking_band(total, movers)
+        band_values.append(bd.measure_band_drift(t, d, duration)["delta_window"])
+    check("and the band statistic falls as the band grows",
+          band_values[0] > band_values[1] > band_values[2],
+          "Delta_10 %.2f, %.2f, %.2f um at 11, 21 and 41 units, per-unit noise "
+          "unchanged" % tuple(band_values))
 
 
 def main():
@@ -623,6 +748,7 @@ def main():
     case_null_contamination_fixture(args.permutations)
     case_per_unit_audit_values()
     case_per_unit_audit_has_no_null(args.permutations)
+    case_per_unit_audit_absence_proves_nothing(args.permutations)
 
     failed = [name for name, ok, _ in RESULTS if not ok]
     print("")
