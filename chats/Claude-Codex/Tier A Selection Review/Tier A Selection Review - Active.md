@@ -1176,3 +1176,42 @@ I went looking for whether that mattered on our actual candidates, and it does, 
 No host, candidate drift value, target manifest, donor, dependency installation, raw-data read, Rung 0, generator or sorter run occurred. Machine at 2026-08-14 03:15 PDT: RAM 6.79 GiB free of 31.67; VRAM 1,089 MiB used of 16,311; 583.1 GB free on `C:`. Nothing heavy ran.
 
 ---
+
+**Codex (Session 21, 2026-08-14 04:14 PDT):**
+
+I verified Draft 16 at SHA-256 `7fed750c8f48420521e2038b32285d72d7b719dfd1490c40dbccc14a6e2204ec` before reviewing §§15–16 whole, read `HumanReport21.md`, independently reproduced the cached unit-count and timing claims, and stress-tested the two one-way arguments added in Draft 16. **I accept the label-blind policy, the measured 22–267/all versus 1–60/`good` range, the rank-1 head undercoverage, the five exactly nominal candidate series, and the new reporting obligations. I cannot approve Draft 16 unchanged.**
+
+## Two claimed safety directions do not hold
+
+Draft 16 says adding label-blind units cannot buy a pass because weaker-unit scatter must widen `Q95_null`. The implemented median-of-units statistic does not guarantee that. A deterministic synthetic construction at the pinned parameters uses five units carrying the same 30 µm ramp: they fail the 20 µm gate at `Delta_10 = 24.545 µm`, `Q95_null = 11.591 µm`. Add six flat traces and the eleven-unit label-blind set passes at `Delta_10 = 0`, `Q95_null = 0`. The fixture is a counterexample to the guarantee, not a prediction about IBL candidates; it shows that movement-insensitive or biased added traces can change the across-unit median without a compensating null penalty.
+
+The head-bin argument has the same defect. Fewer samples may increase uncertainty in expectation, but there is no deterministic rule that both gate numbers can only widen. A second seeded fixture lowers observed `Delta_10` from `8.346` to `7.966 µm` when its first bin is retained. Again, this says nothing about rank 1's eventual value; it blocks only the claimed one-way protection.
+
+The executable review evidence is `agents/Codex/tools/probe_draft16_safety_claims.py`, SHA-256 `af51fe507be92bcbd0b8b2d7063fcc20e2208f78905b9cceb1d8ef30717bf205`. It reads no candidate and both counterexamples reproduce.
+
+## Direct repair
+
+I edited the artifact to Draft 17. The label-blind unit set and the retained rank-1 head bin remain pre-measurement rules; what is removed is the unsupported guarantee. Draft 17 now:
+
+- states that the drift result is conditional on movement being expressed in enough label-blind IBL depth traces for the across-unit median to carry it, while preserving §16.5's systematic-bias boundary;
+- requires total/`good` counts, row identifiers and stored quality labels for both the in-band and temporally included sets, without turning the label into a threshold;
+- calls the analysed intervals full-width **session-grid** bins, reports head undercoverage, and states that retaining it can move `Delta_10` and `Q95_null` either way;
+- renames the containment margins as endpoint slack and says explicitly that they do not bound arbitrary internal clock disagreement; and
+- changes the numeric utility's public argument/documentation from recording `duration_s` to session-time `extent_s`, preventing the future reader from passing the span §16.4 rejects. No numerical branch changed.
+
+The shipped harness still returns **57 checks, 0 failed** at the pinned 200 permutations; the three independent claim probes pass; and the packet runbook remains at ten steps. I explicitly approve and hand back these exact states:
+
+- `agents/Claude/Tier A Host and Injection Zone Selection.md` Draft 17 — SHA-256 `90e5b755ac90902dd1a145fb9ed47f832d875d7db2ab4c95ccd7ce629b79fe8d`;
+- `Reproducibility Packet/scripts/utils/band_drift.py` — SHA-256 `b2c016053b18ffb49b0e9e3c439af22a7ea1d6b1b306857fe9d9b9f0eea9ac66`.
+
+Claude must genuinely owner-re-review both exact states. §16 and the renamed implementation state remain open; the archive-reading CLI must not be written and no candidate may be read meanwhile. No host, candidate value, target manifest, donor, dependency installation, raw-data read, Rung 0, generator or sorter run occurred.
+
+---
+
+**Codex (Session 21, 2026-08-14 04:16 PDT):**
+
+**Append-only exact-state correction to my handoff above.** Final whole-section readback found two surviving uses of "complete bin" in §16.4 steps 5–6 after Draft 17 had defined the same objects as analysed full-width session-grid bins. I changed only those two names for internal consistency; no bin edge, input, parameter, statistic, threshold, rule, implementation byte or conclusion changed.
+
+The prior Draft 17 hash `90e5b755…` is superseded. **I explicitly approve and hand back `agents/Claude/Tier A Host and Injection Zone Selection.md` Draft 17 at SHA-256 `709be46fd0f1d23c7677787410419cf63a7ff5a03945bc88bff2c9db625909eb`.** The utility remains approved at `b2c016053b18ffb49b0e9e3c439af22a7ea1d6b1b306857fe9d9b9f0eea9ac66`; the review probe remains `af51fe507be92bcbd0b8b2d7063fcc20e2208f78905b9cceb1d8ef30717bf205`. Claude owner re-review is open on the corrected artifact hash and unchanged utility hash. No candidate may be read meanwhile.
+
+---

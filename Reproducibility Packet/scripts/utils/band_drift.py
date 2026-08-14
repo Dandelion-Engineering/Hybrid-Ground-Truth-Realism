@@ -24,9 +24,13 @@ The quantity
 ------------
 For one probe, one anatomical band and one recording:
 
-1. Keep the units whose depth falls inside the band.
-2. Partition the recording into complete fixed-length bins from t = 0. A final
-   partial bin is discarded and its duration is reported.
+1. Accept the caller-supplied band units. The archive reader, not this numeric
+   utility, applies the label-blind ``max_electrode -> rel_y`` membership rule.
+2. Partition the session-time extent into full-width fixed bins from ``t = 0``.
+   A final underlength grid interval is discarded and its duration is reported.
+   When the AP stream starts after session zero, the first full-width grid bin
+   has less than a full bin of recording coverage; that coverage is reported by
+   the archive reader and the bin is retained by the predeclared specification.
 3. ``d_u(b)`` is the median per-spike depth of unit ``u`` in bin ``b``, defined
    only where the unit has at least ``min_spikes_per_bin`` spikes in that bin.
 4. ``delta_u(b) = d_u(b) - median_b' d_u(b')`` centres each unit on its own
@@ -35,13 +39,14 @@ For one probe, one anatomical band and one recording:
    is common to the band; depth-estimation noise is not.
 6. ``Delta_full = max_b D(b) - min_b D(b)`` over the whole recording, and
    ``Delta_10`` is the largest such range over any window of
-   ``window_bins`` consecutive complete bins. Both are peak-to-peak excursions,
+   ``window_bins`` consecutive analysed bins. Both are peak-to-peak excursions,
    not endpoint-to-endpoint net motion: a down-and-back trajectory stays
    visible. ``Delta_10`` is the gating quantity.
 
 The null
 --------
-Within the complete bins, holding every spike time fixed and permuting a unit's
+Within the analysed full-width grid bins, holding every spike time fixed and
+permuting a unit's
 depth values among its own analysed spikes destroys the depth/time ordering
 while preserving every analysed depth value, spike time and per-bin spike
 count. Spikes in the discarded final partial bin enter neither the observed
@@ -64,7 +69,7 @@ The pass rule
 At threshold ``L``, a candidate passes only when ``Delta_10 <= L`` **and**
 ``Q95_null <= L``. Lying inside the null is not a failure: a genuinely quiet
 host should often do so. A noise floor wider than the tolerance is the
-unmeasurable failure, and so are too few qualifying units, any invalid complete
+unmeasurable failure, and so are too few qualifying units, any invalid analysed
 bin, and non-finite data. An absent measurement is never read as a pass.
 
 Every gate parameter lives in ``PARAMS`` so that a caller reports the values it
@@ -136,11 +141,11 @@ def derive_permutation_seed(asset_id, probe, unit_row_index, permutation_index,
     return int(digest[:16], 16)
 
 
-def complete_bins(duration_s, bin_seconds=None):
-    """Count the complete bins in a recording and the remainder they leave.
+def complete_bins(extent_s, bin_seconds=None):
+    """Count full-width session-grid bins and the final remainder they leave.
 
     Args:
-        duration_s: the recording duration in seconds.
+        extent_s: the final timestamp on the session-time grid, in seconds.
         bin_seconds: bin length in seconds; defaults to ``PARAMS``.
 
     Returns:
@@ -152,14 +157,15 @@ def complete_bins(duration_s, bin_seconds=None):
     """
     if bin_seconds is None:
         bin_seconds = PARAMS["bin_seconds"]
-    if not np.isfinite(duration_s) or duration_s <= 0:
-        raise ValueError("duration_s must be a positive finite number, got %r" % (duration_s,))
-    n_bins = int(np.floor(duration_s / bin_seconds))
+    if not np.isfinite(extent_s) or extent_s <= 0:
+        raise ValueError("extent_s must be a positive finite number, got %r" % (extent_s,))
+    n_bins = int(np.floor(extent_s / bin_seconds))
     if n_bins < 1:
         raise ValueError(
-            "recording of %.3f s holds no complete %.1f s bin" % (duration_s, bin_seconds)
+            "session-time extent of %.3f s holds no full-width %.1f s grid bin"
+            % (extent_s, bin_seconds)
         )
-    return n_bins, float(duration_s - n_bins * bin_seconds)
+    return n_bins, float(extent_s - n_bins * bin_seconds)
 
 
 def bin_offsets(spike_times, n_bins, bin_seconds=None):
@@ -316,7 +322,7 @@ def _trace_from_medians(medians, included, min_units_per_bin):
     return trace, units_per_bin, invalid_bins
 
 
-def measure_band_drift(spike_times, depths, duration_s, params=None):
+def measure_band_drift(spike_times, depths, extent_s, params=None):
     """Compute the observed band excursions and the diagnostics behind them.
 
     Args:
@@ -324,7 +330,10 @@ def measure_band_drift(spike_times, depths, duration_s, params=None):
             for the band's units only.
         depths: list of per-unit per-spike depth arrays in micrometres, aligned
             elementwise with ``spike_times``.
-        duration_s: the recording duration in seconds.
+        extent_s: the raw AP stream's final aligned timestamp on the shared
+            session-time grid, in seconds. This is ``t_last_s``, not the
+            ``t_last_s - t_first_s`` span recorded as ``duration_s`` by the
+            timing screen.
         params: parameter overrides; defaults to ``PARAMS``.
 
     Returns:
@@ -342,7 +351,7 @@ def measure_band_drift(spike_times, depths, duration_s, params=None):
     p = dict(PARAMS)
     if params:
         p.update(params)
-    n_bins, discarded_s = complete_bins(duration_s, p["bin_seconds"])
+    n_bins, discarded_s = complete_bins(extent_s, p["bin_seconds"])
     result = {"n_bins": n_bins, "discarded_s": discarded_s, "n_units_in_band": len(spike_times)}
 
     if len(spike_times) == 0:
@@ -405,7 +414,7 @@ def measure_band_drift(spike_times, depths, duration_s, params=None):
     return result
 
 
-def permutation_null(spike_times, depths, duration_s, asset_id, probe,
+def permutation_null(spike_times, depths, extent_s, asset_id, probe,
                      unit_row_indices, params=None):
     """Build the deterministic within-unit permutation null for ``Delta_10``.
 
@@ -418,7 +427,9 @@ def permutation_null(spike_times, depths, duration_s, asset_id, probe,
     Args:
         spike_times: list of per-unit ascending spike-time arrays, in seconds.
         depths: list of per-unit depth arrays aligned with ``spike_times``.
-        duration_s: the recording duration in seconds.
+        extent_s: the raw AP stream's final aligned timestamp on the shared
+            session-time grid, in seconds (``t_last_s``, not the timing
+            screen's ``duration_s`` span).
         asset_id: the processed asset's exact stored identifier string.
         probe: the probe's exact stored name string.
         unit_row_indices: each unit's row index in the units table, in the same
@@ -452,7 +463,7 @@ def permutation_null(spike_times, depths, duration_s, asset_id, probe,
             "%d unit spike-time arrays and %d unit depth arrays"
             % (len(spike_times), len(depths))
         )
-    n_bins, _ = complete_bins(duration_s, p["bin_seconds"])
+    n_bins, _ = complete_bins(extent_s, p["bin_seconds"])
     offsets, medians = _unit_tables(
         spike_times, depths, n_bins, p["bin_seconds"], p["min_spikes_per_bin"]
     )
