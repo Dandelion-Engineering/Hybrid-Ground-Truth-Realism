@@ -110,11 +110,11 @@ The IBL library builder combines DANDI raw recordings with IBL sorting data and 
 
 ### DANDI 000409 — IBL Brain Wide Map
 
-**International Brain Laboratory et al. IBL — Brain Wide Map. DANDI:000409.** CC-BY-4.0. [https://dandiarchive.org/dandiset/000409/draft](https://dandiarchive.org/dandiset/000409/draft)
+**International Brain Laboratory et al. IBL — Brain Wide Map. DANDI:000409.** CC-BY-4.0. [DANDI record](https://dandiarchive.org/dandiset/000409/draft) · [pinned IBL-to-NWB sorting documentation](https://github.com/catalystneuro/IBL-to-nwb/blob/54030ac4eb40a74978ac1f6ef6e966278b9d3f34/documentation/conversion/sorting_interface.md) · [pinned sorting extractor](https://github.com/catalystneuro/IBL-to-nwb/blob/54030ac4eb40a74978ac1f6ef6e966278b9d3f34/src/ibl_to_nwb/datainterfaces/_ibl_sorting_extractor.py) · [pinned raw timestamp alignment](https://github.com/catalystneuro/IBL-to-nwb/blob/54030ac4eb40a74978ac1f6ef6e966278b9d3f34/src/ibl_to_nwb/converters/_ibl_spikeglx_converter.py)
 
 Open NWB host-recording collection with 2,048 assets, approximately 49.7 TB, and 139 subjects.
 
-*How it informed the project:* Defines the host-data universe, license/attribution obligation, and need for a small identifier-pinned subset rather than bulk download.
+*How it informed the project:* Defines the host-data universe, license/attribution obligation, and need for a small identifier-pinned subset rather than bulk download. The DANDI record identifies `catalystneuro/IBL-to-nwb` as the conversion repository. At pinned repository commit `54030ac4eb40a74978ac1f6ef6e966278b9d3f34`, the conversion documentation defines exported `spike_times` as IBL `spikes.times.npy` in seconds from session start, while the raw converter aligns AP samples through `SpikeSortingLoader.samples2times`. This fixes the drift screen's grid on one session-time coordinate and makes endpoint containment a consistency check rather than a method for choosing between clock hypotheses.
 
 ## Pending verification
 
