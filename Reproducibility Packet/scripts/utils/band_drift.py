@@ -35,8 +35,14 @@ For one probe, one anatomical band and one recording:
    only where the unit has at least ``min_spikes_per_bin`` spikes in that bin.
 4. ``delta_u(b) = d_u(b) - median_b' d_u(b')`` centres each unit on its own
    typical depth so units at different depths can be pooled.
-5. ``D(b)`` is the median of ``delta_u(b)`` across included units. Real movement
-   is common to the band; depth-estimation noise is not.
+5. ``D(b)`` is the median of ``delta_u(b)`` across included units, under the
+   modelling assumption that real movement is common to the band while
+   depth-estimation noise is not. The assumption is not self-verifying: a
+   majority of movement-insensitive traces can hold the across-unit median flat
+   while a minority moves. ``measure_band_drift`` therefore returns each
+   included unit's own excursion beside the band statistic, so the composition
+   behind ``D(b)`` is auditable. Those per-unit values are reported and never
+   consumed by the gate.
 6. ``Delta_full = max_b D(b) - min_b D(b)`` over the whole recording, and
    ``Delta_10`` is the largest such range over any window of
    ``window_bins`` consecutive analysed bins. Both are peak-to-peak excursions,
@@ -46,12 +52,12 @@ For one probe, one anatomical band and one recording:
 The null
 --------
 Within the analysed full-width grid bins, holding every spike time fixed and
-permuting a unit's
-depth values among its own analysed spikes destroys the depth/time ordering
-while preserving every analysed depth value, spike time and per-bin spike
-count. Spikes in the discarded final partial bin enter neither the observed
-statistic nor the null. The resulting ``Delta_10`` distribution is what this
-estimator returns on this recording with no time ordering, and its nearest-rank
+permuting a unit's depth values among its own analysed spikes destroys the
+depth/time ordering while preserving every analysed depth value, spike time and
+per-bin spike count. Spikes before the grid origin, and spikes in the discarded
+final underlength interval, enter neither the observed statistic nor the null.
+The resulting ``Delta_10`` distribution is what this estimator returns on this
+recording with no time ordering, and its nearest-rank
 empirical 95th percentile ``Q95_null`` is the declared summary. Genuine movement
 is present in the pool the null draws from and, under an additive common-motion
 model, can widen this resolution diagnostic. That direction is demonstrated by
@@ -149,8 +155,13 @@ def complete_bins(extent_s, bin_seconds=None):
         bin_seconds: bin length in seconds; defaults to ``PARAMS``.
 
     Returns:
-        tuple: ``(n_bins, discarded_s)`` -- the number of complete bins from
-        ``t = 0`` and the duration of the discarded final partial bin.
+        tuple: ``(n_bins, discarded_s)`` -- the number of full-width grid
+        bins from ``t = 0`` and the duration of the discarded final underlength
+        interval. Throughout this module a "complete" bin means full-width on
+        the session grid, which is what this function counts; it does not mean
+        full recording coverage. A stream starting after session zero leaves
+        bin 0 undercovered and the specification retains it, so the reader
+        reports that coverage rather than inferring it from ``n_bins``.
 
     Raises:
         ValueError: if the recording is shorter than one bin.
@@ -218,6 +229,88 @@ def bin_medians(depths, offsets, min_spikes_per_bin=None):
         if counts[b] >= min_spikes_per_bin:
             out[b] = np.median(depths[offsets[b]:offsets[b + 1]])
     return out
+
+
+def unit_traces(medians, included):
+    """Centre each included unit on its own across-bin median.
+
+    This is the single definition of the centring step ``delta_u(b) = d_u(b) -
+    median_b' d_u(b')``. The band trace and the per-unit audit values are both
+    built from it, so a caller reporting per-unit excursions never restates the
+    centring rule.
+
+    Args:
+        medians: list of per-unit bin-median arrays, one entry per band unit.
+        included: boolean mask over ``medians`` marking the included units.
+
+    Returns:
+        numpy.ndarray: an ``(n_included, n_bins)`` array of centred series, in
+        ascending order of the unit's index in ``medians``. NaN marks a bin
+        where that unit has no defined median.
+
+    Raises:
+        ValueError: if the mask does not match ``medians``, or if an included
+            unit has no defined bin median to centre on. Neither is reachable
+            through :func:`measure_band_drift`, whose inclusion rule requires a
+            defined median in at least ``min_bin_fraction`` of the bins.
+    """
+    included = np.asarray(included, dtype=bool)
+    if included.size != len(medians):
+        raise ValueError(
+            "%d unit median arrays and a mask of length %d"
+            % (len(medians), included.size)
+        )
+    n_bins = medians[0].size if len(medians) else 0
+    stack = np.full((int(included.sum()), n_bins), np.nan, dtype=np.float64)
+    row = 0
+    for u, keep in enumerate(included):
+        if not keep:
+            continue
+        series = np.asarray(medians[u], dtype=np.float64)
+        valid = np.isfinite(series)
+        if not valid.any():
+            raise ValueError("included unit %d has no defined bin median" % u)
+        stack[row] = series - np.median(series[valid])
+        row += 1
+    return stack
+
+
+def unit_excursions(stack, window_start=None, window_bins=None):
+    """Per-unit peak-to-peak excursions, whole and inside the band's window.
+
+    These are audit quantities. They expose the composition behind the
+    across-unit median ``D(b)`` -- in particular the case where a minority of
+    units moves and the median does not follow -- and no gate consumes them.
+
+    Args:
+        stack: centred per-unit series from :func:`unit_traces`.
+        window_start: first bin of the band's gating window, or None to report
+            the whole-recording excursion only.
+        window_bins: window length in bins; defaults to ``PARAMS``.
+
+    Returns:
+        tuple: ``(delta_full, delta_window)``, both lists with one entry per row
+        of ``stack``. An entry is None where that unit has no defined median in
+        the relevant span; ``delta_window`` is None throughout when
+        ``window_start`` is None.
+    """
+    if window_bins is None:
+        window_bins = PARAMS["window_bins"]
+    stack = np.asarray(stack, dtype=np.float64)
+
+    def spans(block):
+        """Peak-to-peak range of each row, or None where the row is all NaN."""
+        out = []
+        for row in block:
+            valid = row[np.isfinite(row)]
+            out.append(float(valid.max() - valid.min()) if valid.size else None)
+        return out
+
+    delta_full = spans(stack)
+    if window_start is None:
+        return delta_full, [None] * stack.shape[0]
+    window = stack[:, int(window_start):int(window_start) + window_bins]
+    return delta_full, spans(window)
 
 
 def excursions(trace, window_bins=None):
@@ -303,15 +396,7 @@ def _trace_from_medians(medians, included, min_units_per_bin):
         any invalid bin; the caller decides what an invalid bin means.
     """
     n_bins = medians[0].size if medians else 0
-    stack = np.full((int(included.sum()), n_bins), np.nan, dtype=np.float64)
-    row = 0
-    for u, keep in enumerate(included):
-        if not keep:
-            continue
-        series = medians[u]
-        valid = np.isfinite(series)
-        stack[row] = series - np.median(series[valid])
-        row += 1
+    stack = unit_traces(medians, included)
     units_per_bin = np.isfinite(stack).sum(axis=0)
     trace = np.full(n_bins, np.nan, dtype=np.float64)
     usable = units_per_bin >= min_units_per_bin
@@ -341,7 +426,12 @@ def measure_band_drift(spike_times, depths, extent_s, params=None):
         ``delta_full`` and ``delta_window`` in micrometres when it is True; plus
         ``n_bins``, ``discarded_s``, ``included`` unit indices,
         ``units_per_bin``, ``min_units_per_bin_observed``, ``invalid_bins``,
-        ``window_start`` and the centred per-unit ``trace``.
+        ``window_start``, and ``trace``, the across-unit band trace ``D(b)``
+        built from the centred per-unit series. When it is measurable it also
+        carries ``unit_delta_full`` and ``unit_delta_window``, each included
+        unit's own excursion over the whole recording and inside the band's
+        gating window, aligned with ``included``. Those two are audit
+        quantities: the gate reads ``delta_window`` and never them.
 
     Raises:
         ValueError: if the inputs are malformed -- mismatched array lengths,
@@ -369,7 +459,7 @@ def measure_band_drift(spike_times, depths, extent_s, params=None):
     if included.sum() < p["min_units_per_bin"]:
         result.update(
             measurable=False,
-            reason="only %d of %d band units span >= %.0f%% of the %d complete bins with >= %d "
+            reason="only %d of %d band units span >= %.0f%% of the %d analysed bins with >= %d "
                    "spikes; the gate needs at least %d"
                    % (int(included.sum()), len(spike_times), 100 * p["min_bin_fraction"],
                       n_bins, p["min_spikes_per_bin"], p["min_units_per_bin"]),
@@ -386,7 +476,7 @@ def measure_band_drift(spike_times, depths, extent_s, params=None):
     if invalid.size:
         result.update(
             measurable=False,
-            reason="%d of %d complete bins hold fewer than %d included units with a defined "
+            reason="%d of %d analysed bins hold fewer than %d included units with a defined "
                    "median (first offenders: bins %s with %s units); an invalid bin inside a "
                    "window could hide that window's maximum, so it rejects rather than being "
                    "omitted"
@@ -399,17 +489,22 @@ def measure_band_drift(spike_times, depths, extent_s, params=None):
     if delta_window is None:
         result.update(
             measurable=False,
-            reason="%d complete bins is shorter than the %d-bin gate window"
+            reason="%d analysed bins is shorter than the %d-bin gate window"
                    % (n_bins, p["window_bins"]),
         )
         return result
 
+    unit_full, unit_window = unit_excursions(
+        unit_traces(medians, included), window_start, p["window_bins"]
+    )
     result.update(
         measurable=True,
         delta_full=delta_full,
         delta_window=delta_window,
         window_start=int(window_start),
         trace=trace.tolist(),
+        unit_delta_full=unit_full,
+        unit_delta_window=unit_window,
     )
     return result
 
@@ -480,13 +575,13 @@ def permutation_null(spike_times, depths, extent_s, asset_id, probe,
     )
     if observed_invalid.size:
         raise ValueError(
-            "the observation is unmeasurable: %d complete bins are invalid"
+            "the observation is unmeasurable: %d analysed bins are invalid"
             % observed_invalid.size
         )
     _, observed_window, _ = excursions(observed_trace, p["window_bins"])
     if observed_window is None:
         raise ValueError(
-            "the observation is unmeasurable: %d complete bins is shorter than the %d-bin "
+            "the observation is unmeasurable: %d analysed bins is shorter than the %d-bin "
             "gate window" % (n_bins, p["window_bins"])
         )
 

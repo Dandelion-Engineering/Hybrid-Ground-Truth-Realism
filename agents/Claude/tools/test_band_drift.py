@@ -7,7 +7,7 @@ answer is known in advance: a ramp of a stated size, a trajectory that returns
 to where it started, a trace whose worst window is deliberately not its first,
 a band deliberately one unit short in one bin.
 
-Three of the cases exist because of specific defects the specification passed
+Four of the cases exist because of specific defects the specification passed
 through in review, and they are the ones most worth keeping:
 
 * ``quiet_host_passes`` -- an earlier draft rejected a candidate whose observed
@@ -20,6 +20,11 @@ through in review, and they are the ones most worth keeping:
 * ``invalid_bin_rejects`` -- an invalid bin rejects the candidate rather than
   being omitted from a window, because omitting it could hide that window's
   maximum. The rejection must name the offending bins.
+* ``per_unit_audit_values`` -- an earlier draft claimed that adding units to the
+  label-blind set could not turn a failure into a pass. It can: a majority of
+  movement-insensitive traces holds the across-unit median flat. The case keeps
+  that counterexample and checks that the reported per-unit excursions still
+  show the movement the band statistic does not.
 
 The permutation determinism cases check the property the specification actually
 depends on: the same inputs replay the same null, and different assets, probes,
@@ -420,6 +425,62 @@ def case_null_contamination_fixture(n_permutations):
           "observed %.2f um" % gate["delta_window"])
 
 
+def case_per_unit_audit_values():
+    """The per-unit audit values expose composition the band median hides.
+
+    The dilution fixture is Codex's Session 21 review counterexample, kept here
+    as a permanent case: five units share a 30 um ramp and six flat traces are
+    added, after which the across-unit median reports no excursion at all. The
+    gate's verdict is unchanged by this case -- what is tested is that the
+    reported per-unit values make the composition behind that verdict visible.
+    """
+    print("per-unit audit values")
+    n_bins, per_bin = 12, 10
+    times = np.concatenate(
+        [b * 60.0 + np.linspace(1.0, 50.0, per_bin) for b in range(n_bins)])
+    ramp = np.repeat(np.linspace(0.0, 30.0, n_bins), per_bin)
+    flat = np.zeros(n_bins * per_bin, dtype=np.float64)
+    extent = n_bins * 60.0
+
+    moving = bd.measure_band_drift([times] * 5, [ramp] * 5, extent)
+    diluted = bd.measure_band_drift([times] * 11, [ramp] * 5 + [flat] * 6, extent)
+
+    check("the diluted band median reports no excursion",
+          moving["delta_window"] > 20.0 and diluted["delta_window"] == 0.0,
+          "five moving %.3f um, plus six flat %.3f um"
+          % (moving["delta_window"], diluted["delta_window"]))
+    check("but the per-unit values still carry it",
+          abs(max(diluted["unit_delta_window"]) - moving["delta_window"]) < 1e-9,
+          "largest per-unit window excursion %.12f um against the undiluted "
+          "band's %.12f um" % (max(diluted["unit_delta_window"]),
+                               moving["delta_window"]))
+    check("and they separate the movers from the rest",
+          sum(1 for v in diluted["unit_delta_window"] if v > 20.0) == 5
+          and sum(1 for v in diluted["unit_delta_window"] if v == 0.0) == 6)
+    check("one value per included unit, both quantities",
+          len(diluted["unit_delta_full"]) == len(diluted["included"])
+          and len(diluted["unit_delta_window"]) == len(diluted["included"]) == 11)
+    check("the audit values do not reach the verdict",
+          bd.apply_gate(diluted, {"q95": 0.0}, 20.0)["passed"] is True)
+
+    times4, depths4, _ = make_band(n_units=9, duration_s=3660.0, seed=FIXTURE_SEED + 11)
+    obs = bd.measure_band_drift(times4, depths4, 3660.0)
+    stack = bd.unit_traces(
+        [bd.bin_medians(d, bd.bin_offsets(t, obs["n_bins"]))
+         for t, d in zip(times4, depths4)],
+        np.isin(np.arange(9), obs["included"]))
+    check("every centred unit series has median zero",
+          max(abs(np.median(r[np.isfinite(r)])) for r in stack) < 1e-9)
+    check("no per-unit excursion is below its own window excursion",
+          all(f >= w - 1e-9 for f, w in zip(obs["unit_delta_full"],
+                                            obs["unit_delta_window"])))
+    try:
+        bd.unit_traces([np.zeros(3)], np.array([True, False]))
+        check("a mask that does not match the units raises", False)
+    except ValueError:
+        check("a mask that does not match the units raises", True)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -446,6 +507,7 @@ def main():
     case_null_and_quiet_host(args.permutations)
     case_gate_quadrants()
     case_null_contamination_fixture(args.permutations)
+    case_per_unit_audit_values()
 
     failed = [name for name, ok, _ in RESULTS if not ok]
     print("")
