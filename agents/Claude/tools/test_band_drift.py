@@ -25,6 +25,11 @@ through in review, and they are the ones most worth keeping:
   movement-insensitive traces holds the across-unit median flat. The case keeps
   that counterexample and checks that the reported per-unit excursions still
   show the movement the band statistic does not.
+* ``per_unit_audit_has_no_null`` -- those reported per-unit values arrived with
+  no rule for reading them, and the two obvious readings are both wrong. A
+  no-movement fixture shows every per-unit excursion above the band's own null,
+  and a genuine common ramp shows the per-unit worst windows scattering exactly
+  as noise does.
 
 The permutation determinism cases check the property the specification actually
 depends on: the same inputs replay the same null, and different assets, probes,
@@ -514,6 +519,56 @@ def case_per_unit_audit_values():
         check("a non-integer band-window start raises", True)
 
 
+def case_per_unit_audit_has_no_null(n_permutations):
+    """The audit values are not on the band null's scale, in either direction.
+
+    The specification requires per-unit excursions to be reported, and the two
+    natural ways to read them are both wrong. ``Q95_null`` is the noise floor of
+    a median *across* units, so it is systematically narrower than one unit's;
+    comparing a per-unit value against it -- or against the gate threshold --
+    reads pure estimation noise as suppressed movement. And the scatter of the
+    per-unit worst-window starts is not evidence of a quiet band: a genuine
+    common ramp scatters them too, because a near-linear trajectory leaves many
+    windows nearly tied. Both halves are fixtures here so the reading rule in
+    the specification stays checkable rather than asserted.
+    """
+    print("per-unit audit values carry no null")
+    duration = 3660.0
+    ratios = []
+    for n_units in (9, 14, 25):
+        times, depths, rows = make_band(n_units=n_units, duration_s=duration,
+                                        seed=FIXTURE_SEED + 21)
+        obs = bd.measure_band_drift(times, depths, duration)
+        null = bd.permutation_null(times, depths, duration, "a", "p", rows,
+                                   {"n_permutations": n_permutations})
+        own = obs["unit_delta_max_window"]
+        check("with no movement at all, every %2d-unit per-unit window "
+              "excursion still exceeds the band null" % n_units,
+              all(v > null["q95"] for v in own),
+              "smallest per-unit %.3f um against Q95_null %.3f um"
+              % (min(own), null["q95"]))
+        ratios.append(min(own) / null["q95"])
+    check("and the gap widens with the unit count",
+          ratios[0] < ratios[1] < ratios[2],
+          "smallest-to-Q95 ratio %.2f, %.2f, %.2f at 9, 14, 25 units" % tuple(ratios))
+
+    times, depths, _ = make_band(n_units=14, duration_s=duration,
+                                 seed=FIXTURE_SEED + 22,
+                                 trajectory=lambda t: 30.0 * t / duration)
+    ramp = bd.measure_band_drift(times, depths, duration)
+    starts = ramp["unit_max_window_start"]
+    check("a genuine common ramp scatters the per-unit worst windows too",
+          len(set(starts)) >= 10,
+          "%d distinct starts among %d units, spanning bins %d to %d"
+          % (len(set(starts)), len(starts), min(starts), max(starts)))
+
+    tied = np.zeros(20, dtype=np.float64)
+    tied[9] = tied[19] = 10.0
+    audit = bd.unit_excursions(tied.reshape(1, 20))
+    check("a unit's tied worst windows resolve to the earliest",
+          audit["delta_max_window"][0] == 10.0 and audit["max_window_start"][0] == 0)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -541,6 +596,7 @@ def main():
     case_gate_quadrants()
     case_null_contamination_fixture(args.permutations)
     case_per_unit_audit_values()
+    case_per_unit_audit_has_no_null(args.permutations)
 
     failed = [name for name, ok, _ in RESULTS if not ok]
     print("")

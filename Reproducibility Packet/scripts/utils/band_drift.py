@@ -41,9 +41,12 @@ For one probe, one anatomical band and one recording:
    majority of movement-insensitive traces can hold the across-unit median flat
    while a minority moves. ``measure_band_drift`` therefore returns each
    included unit's whole-recording excursion, its own worst-window excursion,
-   and its excursion inside the band-selected window. The first two expose
-   movement that the across-unit median can suppress; the third shows the
-   composition aligned to the window that produced ``Delta_10``. Those
+   and its excursion inside the band-selected window. The first two carry
+   movement the across-unit median can suppress; the third shows the
+   composition aligned to the window that produced ``Delta_10``. All three
+   carry that unit's own depth-estimation noise along with any movement and
+   have no null: ``Q95_null`` is the floor of a median across units and is
+   systematically narrower than one trace's, so it does not grade them. Those
    per-unit values are reported and never consumed by the gate.
 6. ``Delta_full = max_b D(b) - min_b D(b)`` over the whole recording, and
    ``Delta_10`` is the largest such range over any window of
@@ -283,7 +286,12 @@ def unit_excursions(stack, band_window_start=None, window_bins=None):
     These are audit quantities. They expose the composition behind the
     across-unit median ``D(b)`` -- including a minority that moves in a window
     other than the one selected from a flat or differently moving band trace --
-    and no gate consumes them.
+    and no gate consumes them. Each carries its unit's own depth-estimation
+    noise along with any movement and has no null of its own; this module's
+    ``permutation_null`` grades the band statistic only, and its ``q95`` is
+    systematically narrower than a single trace's noise floor. A tie for a
+    unit's own worst window is broken by the earliest window, as in
+    :func:`excursions`.
 
     Args:
         stack: centred per-unit series from :func:`unit_traces`.
