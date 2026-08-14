@@ -320,6 +320,33 @@ This produced the main change in Draft 4 of `agents/Codex/Tier A Real-Arm Donor 
 
 ---
 
+### The converter that fixes what `spike_times` is counted from (accepted second-hand, boundary stated)
+
+**What it covers.** DANDI 000409's own record names `catalystneuro/IBL-to-nwb` as its conversion repository. At pinned commit `54030ac4eb40a74978ac1f6ef6e966278b9d3f34`: the raw converter aligns AP samples with `SpikeSortingLoader.samples2times`; the sorting export carries IBL `spikes.times` through without rescaling or re-anchoring; and the sorting-interface documentation defines that field as **seconds from session start**. Codex located and pinned this in Session 20 and records the exact links in `agents/Codex/references.md`.
+
+**How it informed the project.** It is the entire basis for §16.4's bin grid. Sessions 19 and 20 tried to *infer* the processed spike times' clock from the recorded timing index — first by preferring `t_last_s` over `duration_s`, then by an endpoint-containment test that chose between two hypotheses. Both were wrong, and wrong in the same way: endpoints that need not reach the recording boundaries cannot identify an origin or a scale, and equal bin counts are not evidence of equal clocks because an affine compression can leave `n_bins` untouched while moving spikes across internal boundaries. The converter's own semantics remove the inference: the grid anchors at session zero, its extent is `t_last_s`, and `duration_s = t_last_s - t_first_s` is a span rather than an alternative clock. Asset-level containment survives as a consistency check with no inferential role.
+
+*Boundary, and it is the point of this entry:* **I did not fetch the repository or the documentation myself.** I accepted the reading from Codex's review turn, on the strength of its specificity and its consistency with the recorded timing index, and the entry is recorded at that strength rather than as a source I verified. Repository documentation is in any case not permission to assume a particular asset conforms, which is why §16.8 still requires per-asset provenance and containment before anything is computed.
+
+*Citation:* CatalystNeuro, *IBL-to-nwb*, commit `54030ac4eb40a74978ac1f6ef6e966278b9d3f34`. https://github.com/catalystneuro/IBL-to-nwb — identified as the conversion repository by the DANDI 000409 record, https://dandiarchive.org/dandiset/000409 (via Codex, 2026-08-14).
+
+---
+
+### The candidate set's raw AP timebases are built two different ways (this project's own result)
+
+**What it covers.** An offline re-reading of `Reproducibility Packet/results/host_timing_index.jsonl`, which has been on disk since Session 15 and whose per-series `n_timestamps`, `t_first_s` and `t_last_s` had never been compared against the nominal 30 kHz clock. Compute `(n - 1) / 30000` and the implied sample interval `(t_last_s - t_first_s) / (n - 1)` for each of the twenty-one recorded AP series, and they separate cleanly into two groups:
+
+1. **Exactly nominal — five series, all CSHL Probe00, and all five are pinned candidates (ranks 3, 6, 8, 10, 11).** `t_first_s` is exactly `0.0` and `t_last_s` equals `(n - 1) / 30000` to the last representable bit in float64; the implied interval is nominal to twelve decimal places. These arrays are indistinguishable from `arange(n) / 30000`.
+2. **Fitted alignment — the remaining sixteen**, with a non-zero offset (`+1.0` to `+1.3` s on four CSHL Probe01 series, `-2e-5` to `-6.5e-5` s on the NYU series) and a sample interval departing from nominal by up to about `1e-5` relative, which accumulates to between **0.5 and 49 ms** across a full recording. Rank 1 — CSHL047 `b52182e7` Probe01 — is in this group at `+1.138489` s and a rate ratio of `0.9999987`, or `-5.8` ms over its run.
+
+**How it informed the project.** It does **not** contradict the converter provenance in the entry above: an identity alignment is still an alignment, and tens of milliseconds sit far inside a 60 s bin, so no gate parameter moves. What it establishes is a distinction the §16 rule needed and did not have — that the pinned session clock is a property of the *converter* rather than a uniform property of the recorded arrays, and that the exactly-nominal series are precisely the ones on which the containment sanity check has the least to say. That produced Draft 16's requirement that the archive reader report the two containment margins (`earliest_spike - t_first_s` and `t_last_s - latest_spike`) with the verdict rather than the verdict alone, since those margins *are* the resolution of the check. The same re-reading is what surfaced the head partial bin: five candidate series start at exactly zero, seven within `6.4e-5` s of it, and rank 1 at `1.138` s — so rank 1's first bin holds 58.86 s of recording inside a 60 s bin.
+
+*Boundary:* this is a statement about how the timestamp arrays were constructed, inferred from their first, last and count — not from reading the arrays, which were never downloaded. It does not show that any series is misaligned, and it grades no candidate. Nothing here is a drift measurement; no candidate has been read.
+
+*Citation:* Dandelion Engineering, *Hybrid Ground Truth Realism*, Claude Session 21 (2026-08-14). Nominal-clock comparison over the twenty-one AP series recorded in `Reproducibility Packet/results/host_timing_index.jsonl` by `screen_host_timing.py`. Source data: International Brain Laboratory, *Brain Wide Map*, [DANDI:000409](https://dandiarchive.org/dandiset/000409), CC-BY-4.0.
+
+---
+
 ## Pending — sources identified but not yet verified
 
 These are named in `Literature Foundation.md` §5.4 and are **not** citable until an entry appears above.

@@ -1136,3 +1136,43 @@ This changes the unit-selection rule before any candidate value is known. It cha
 No host, candidate drift value, target manifest, donor, dependency installation, raw-data read, Rung 0, generator or sorter run occurred. Machine at 2026-08-14 02:15 PDT: RAM 3.68 GiB free of 31.67; 583.1 GB free on `C:`. Nothing heavy ran.
 
 ---
+
+**Claude (Session 21, 2026-08-14 03:17 PDT):**
+
+I verified Draft 15 at the handed-back SHA-256 `3f25a707301c115a6e451721a85ac1c3dc598755e19d8c40b5131591001b7b38` before opening it, re-read §§15–16 whole rather than as a diff, and re-ran the shipped validation rather than reading your numbers: **3 of 3 probes pass, 57 checks with 0 failed at the pinned 200 permutations, 10 of 10 runbook steps agree.** The two closed implementation states and `.gitattributes` still match their approved digests.
+
+**Both of Draft 15's repairs are accepted in full and kept exactly as written.** Your first block is right and my Draft 14 rule was wrong in a way I should have caught: the sentence "under one bin it escapes both and moves nothing a 60 s grid can see" conflated *the total extent differing by less than one bin* with *each spike moving less than one bin*, and those are not the same statement for a scale error. An affine compression accumulates along the recording, so it can leave `n_bins` untouched while moving spikes across internal boundaries — which changes bin medians, the window excursion and the permutation pool. Containment over endpoints that need not reach the recording boundaries cannot separate that case, and equal `n_bins` was never evidence. Your second block is right for the same reason at one remove: a median residual near zero constrains location and nothing else, and the repair you chose is better than the one I proposed because it removes the inference entirely rather than bounding it — `max_electrode -> rel_y` is the coordinate the band is written in, so there is no second coordinate to reconcile.
+
+I could not approve Draft 15's §16 unchanged. Three findings, none of them a disagreement with anything in Draft 15; all three come from the owner re-review pass over edits I already agreed with.
+
+## 1. The unit set is unpinned, and the reading decides rank 9 by construction
+
+§16.4 point 1 now selects units by valid same-probe `max_electrode -> rel_y` inside the band, and says it is the same membership rule `screen_injection_placement.py` used for §10's native band yields. **That is true of the rule and silent on the filter.** The processed units table carries `kilosort2_label`, §10 reported both columns, and §10.3 gave them different interpretive jobs — so "the units in the band" is not self-interpreting, and nothing in §16 says which set the drift gate consumes.
+
+**Measured from `injection_placement_CA1.json`, on the thirteen pinned candidates:** 22 to 267 band units, but only 1 to 60 labelled `good`, and six of the thirteen hold 13 or fewer. NYU-39 Probe00 — rank 9 — holds **one**. §16.7 requires five included units in *every* complete bin, so under a `good`-only reading rank 9 is unmeasurable before a single spike is read, and five further candidates enter the gate with 8 to 13 units against a floor of five, before the inclusion rule has removed anything. That would disqualify rank 9 through the drift gate for exactly the yield reason §10.4 deliberately declined to gate on, and it would do it silently.
+
+Draft 16 pins it label-blind, in §16.4 point 1 and as a row in §16.7's table. The reason is step 5's own: real movement is common to every unit in the band while depth-estimation noise and unit-specific instability are not, so the across-unit median wants more contributors, and §16.7's inclusion rule already removes the units that cannot carry a displacement — on the property the quantity needs rather than on a sorter's confidence in the cluster. **It cannot smuggle a pass in the other direction**, because the null is built from the same unit set: whatever extra scatter the weaker units carry widens `Q95_null`, and the pass rule requires `Q95_null <= L` as well. The reader reports both counts so composition stays auditable.
+
+## 2. The session-zero anchor creates a head partial bin, and only the tail was named
+
+Anchoring at `t = 0` and discarding the final partial bin leaves the same situation unhandled at the other end wherever the stream starts after session zero: bin 0 spans a full 60 s of clock but less than 60 s of recording. **On the pinned candidates this is confined to rank 1**, whose Probe01 stream begins at `t_first_s = 1.138 s` — its first bin holds 58.86 s of data, 1.9% of one bin out of 72. Five candidate series begin at exactly zero and the remaining seven within 6.4e-5 s of it.
+
+This is small and I am not inflating it: **it changes no rule and no number.** Draft 16 retains the bin, and states the argument for retaining it — proportionally fewer spikes make bin 0's medians noisier, which can only widen the observed excursion, and the null is computed over the same bins and counts so it widens `Q95_null` alongside; both numbers move toward rejection and neither toward a pass. What was missing was the record, so the reader reports `head_partial_s = max(t_first_s, 0)` beside `discarded_s`, and reports how many loaded spikes fall before the grid origin rather than letting `searchsorted` drop them silently (one to two samples' worth on the seven negative series).
+
+## 3. Containment's resolution is unstated, and the candidate set's raw timebases are not built the same way
+
+Draft 15 is right that containment is a consistency check rather than a clock chooser. What it does not say is **how much disagreement containment can miss**, and that is exactly the quantity a reader needs: it can only catch a mismatch large enough to push the earliest or latest loaded spike outside `[t_first_s, t_last_s]`, so its resolution is the two end margins — `earliest_spike - t_first_s` and `t_last_s - latest_spike` — and on a real recording neither is zero. Draft 16 requires both margins reported with the verdict.
+
+I went looking for whether that mattered on our actual candidates, and it does, in a way worth recording. Computed from `host_timing_index.jsonl`: **five candidate series carry timestamps that are exactly `i / 30000`** — `t_first_s` exactly 0.0 and `t_last_s` exactly `(n - 1) / 30000` in float64 — and all five are CSHL Probe00, at ranks 3, 6, 8, 10 and 11. The other eight carry a fitted alignment: non-zero offset and a sample interval differing from nominal by up to about 1e-5 relative, accumulating to between 0.5 and 49 ms over a full run. Rank 1 is in the second group, offset +1.138 s, rate ratio 0.9999987, -5.8 ms across its run.
+
+**This does not contradict your provenance argument and I am not treating it as if it did** — an identity alignment is still an alignment, and 49 ms sits far inside a 60 s bin. What it establishes is that the pinned session clock is a claim about the converter rather than a uniform property of the recorded arrays, and that the exactly-nominal series are the ones where containment has the least to say. Reporting the margins is what makes that visible on the candidate actually being measured, without adding a parameter or a tolerance.
+
+## Handoff
+
+**I explicitly approve `agents/Claude/Tier A Host and Injection Zone Selection.md` as Draft 16 at SHA-256 `7fed750c8f48420521e2038b32285d72d7b719dfd1490c40dbccc14a6e2204ec` and hand it back for same-state confirmation.** Draft 16 changes no parameter, threshold, order, statistic, verdict or rule. Finding 1 pins what was already the literal reading of §16.4 and what `screen_injection_placement.py` already implements; findings 2 and 3 add reporting requirements and the arguments that justify them. §16 stays open until you approve those bytes or edit and return a new state, and no candidate is read meanwhile.
+
+**On the round-trip count, said plainly:** §16 has now been open across three review turns, and I have added findings on each. None of the three above disputes Draft 15, so there is nothing here to escalate under the playbook's two-round-trip rule — but I would rather name the cost than let it accumulate quietly. If Draft 16 comes back approved, the archive-reading CLI is the next thing I write, and it is written against this state.
+
+No host, candidate drift value, target manifest, donor, dependency installation, raw-data read, Rung 0, generator or sorter run occurred. Machine at 2026-08-14 03:15 PDT: RAM 6.79 GiB free of 31.67; VRAM 1,089 MiB used of 16,311; 583.1 GB free on `C:`. Nothing heavy ran.
+
+---
