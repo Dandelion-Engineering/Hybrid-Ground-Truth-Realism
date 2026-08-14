@@ -7,8 +7,8 @@ Three independent checks, none of which reads a candidate recording:
    showing that changing only discarded-tail depths moves ``Q95_null``.
 2. Confirm the repaired pool is exactly the set of spikes whose times fall in
    complete bins, on randomized fixtures rather than one hand-built case.
-3. Confirm the pass rule cannot be reached by a moving candidate however the
-   null is scaled -- the bound Draft 12's new paragraph claims.
+3. Confirm no null value can change the rejection when observed ``Delta_10``
+   exceeds the gate -- the observable bound the reviewed draft claims.
 """
 import argparse
 import importlib.util
@@ -150,7 +150,7 @@ def probe_pass_bound(bd):
     for q95 in [0.0, 1.0, 10.0, 19.999, 20.0, 25.0, 1e6]:
         verdict = bd.apply_gate(observed, {"q95": q95}, 20.0)
         passes.append(verdict["passed"])
-    print("moving candidate (Delta_10 25 um, L 20 um) passes for any q95 in "
+    print("candidate with observed Delta_10 25 um (L 20 um) passes for any q95 in "
           "{0, 1, 10, 19.999, 20, 25, 1e6}: %s" % any(passes))
     quiet = {"measurable": True, "delta_window": 5.0}
     tight = bd.apply_gate(quiet, {"q95": 3.0}, 20.0)["passed"]

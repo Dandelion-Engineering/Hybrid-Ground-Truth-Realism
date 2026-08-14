@@ -1,9 +1,9 @@
 # Preserve the exact bytes a reader receives from a clone, on every platform.
 # Git's default heuristic rewrites line endings on checkout, so a Windows
 # clone with core.autocrlf=true did not reproduce the bytes this project
-# tested and published SHA-256 digests for. Every path is therefore stored
-# and checked out as-is; the listed files are checked out CRLF because that
-# is the representation their already-tested bytes carry.
+# tested and published SHA-256 digests for. All paths therefore default to
+# byte-preserving checkout; the listed files intentionally opt into text
+# normalization and CRLF checkout because CRLF is their tested representation.
 
 * -text
 
