@@ -45,9 +45,10 @@ For one probe, one anatomical band and one recording:
    movement the across-unit median can suppress; the third shows the
    composition aligned to the window that produced ``Delta_10``. All three
    carry that unit's own depth-estimation noise along with any movement and
-   have no null: ``Q95_null`` is the floor of a median across units and is
-   systematically narrower than one trace's, so it does not grade them. Those
-   per-unit values are reported and never consumed by the gate.
+   have no null: ``Q95_null`` grades the median-across-units band statistic,
+   and its ordering against any one unit's excursion is not fixed. It therefore
+   does not grade the per-unit values, which are reported and never consumed by
+   the gate.
 6. ``Delta_full = max_b D(b) - min_b D(b)`` over the whole recording, and
    ``Delta_10`` is the largest such range over any window of
    ``window_bins`` consecutive analysed bins. Both are peak-to-peak excursions,
@@ -288,10 +289,10 @@ def unit_excursions(stack, band_window_start=None, window_bins=None):
     other than the one selected from a flat or differently moving band trace --
     and no gate consumes them. Each carries its unit's own depth-estimation
     noise along with any movement and has no null of its own; this module's
-    ``permutation_null`` grades the band statistic only, and its ``q95`` is
-    systematically narrower than a single trace's noise floor. A tie for a
-    unit's own worst window is broken by the earliest window, as in
-    :func:`excursions`.
+    ``permutation_null`` grades the band statistic only, and its ``q95`` can
+    sit below or above a particular unit's audit value as unit composition and
+    noise differ. A tie for a unit's own worst window is broken by the earliest
+    window, as in :func:`excursions`.
 
     Args:
         stack: centred per-unit series from :func:`unit_traces`.

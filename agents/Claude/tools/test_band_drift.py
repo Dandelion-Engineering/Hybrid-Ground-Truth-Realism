@@ -7,7 +7,7 @@ answer is known in advance: a ramp of a stated size, a trajectory that returns
 to where it started, a trace whose worst window is deliberately not its first,
 a band deliberately one unit short in one bin.
 
-Four of the cases exist because of specific defects the specification passed
+Five of the cases exist because of specific defects the specification passed
 through in review, and they are the ones most worth keeping:
 
 * ``quiet_host_passes`` -- an earlier draft rejected a candidate whose observed
@@ -27,9 +27,9 @@ through in review, and they are the ones most worth keeping:
   show the movement the band statistic does not.
 * ``per_unit_audit_has_no_null`` -- those reported per-unit values arrived with
   no rule for reading them, and the two obvious readings are both wrong. A
-  no-movement fixture shows every per-unit excursion above the band's own null,
-  and a genuine common ramp shows the per-unit worst windows scattering exactly
-  as noise does.
+  homogeneous no-movement fixture puts every per-unit excursion above the
+  band's own null, while a heterogeneous quiet fixture puts a flat unit below
+  it; a genuine common ramp also shows the per-unit worst windows scattering.
 
 The permutation determinism cases check the property the specification actually
 depends on: the same inputs replay the same null, and different assets, probes,
@@ -524,13 +524,13 @@ def case_per_unit_audit_has_no_null(n_permutations):
 
     The specification requires per-unit excursions to be reported, and the two
     natural ways to read them are both wrong. ``Q95_null`` is the noise floor of
-    a median *across* units, so it is systematically narrower than one unit's;
-    comparing a per-unit value against it -- or against the gate threshold --
-    reads pure estimation noise as suppressed movement. And the scatter of the
-    per-unit worst-window starts is not evidence of a quiet band: a genuine
-    common ramp scatters them too, because a near-linear trajectory leaves many
-    windows nearly tied. Both halves are fixtures here so the reading rule in
-    the specification stays checkable rather than asserted.
+    a different statistic -- a median *across* units -- so its ordering against
+    one unit's excursion is not fixed. Homogeneous independent-noise fixtures
+    put every per-unit value above it; a heterogeneous quiet fixture puts a flat
+    unit below it. And the scatter of the per-unit worst-window starts is not
+    evidence of a quiet band: a genuine common ramp scatters them too, because a
+    near-linear trajectory leaves many windows nearly tied. These fixtures keep
+    the reading rule in the specification checkable rather than asserted.
     """
     print("per-unit audit values carry no null")
     duration = 3660.0
@@ -551,6 +551,32 @@ def case_per_unit_audit_has_no_null(n_permutations):
     check("and the gap widens with the unit count",
           ratios[0] < ratios[1] < ratios[2],
           "smallest-to-Q95 ratio %.2f, %.2f, %.2f at 9, 14, 25 units" % tuple(ratios))
+
+    # The opposite ordering is possible on a quiet heterogeneous band. One
+    # temporally valid flat unit has zero excursion while four noisy units make
+    # the median-across-units permutation null non-zero. This prevents the
+    # homogeneous fixture above from becoming a universal scale claim.
+    n_bins, per_bin = 61, 10
+    regular_times = np.concatenate([
+        b * 60.0 + np.linspace(1.0, 50.0, per_bin) for b in range(n_bins)
+    ])
+    quiet_times = [regular_times.copy() for _ in range(5)]
+    quiet_depths = [np.full(regular_times.size, 1000.0)]
+    for u in range(1, 5):
+        rng = np.random.default_rng(9100 + u)
+        quiet_depths.append(
+            1000.0 + 40.0 * u + rng.normal(0.0, 18.0, size=regular_times.size)
+        )
+    quiet_obs = bd.measure_band_drift(quiet_times, quiet_depths, duration)
+    quiet_null = bd.permutation_null(
+        quiet_times, quiet_depths, duration, "quiet-heterogeneous", "probe01",
+        list(range(5)), {"n_permutations": n_permutations})
+    check("the heterogeneous quiet band remains measurable",
+          quiet_obs["measurable"], quiet_obs.get("reason", ""))
+    check("a quiet per-unit excursion can instead sit below the band null",
+          quiet_obs["unit_delta_max_window"][0] == 0.0 and quiet_null["q95"] > 0.0,
+          "flat unit %.3f um against Q95_null %.3f um"
+          % (quiet_obs["unit_delta_max_window"][0], quiet_null["q95"]))
 
     times, depths, _ = make_band(n_units=14, duration_s=duration,
                                  seed=FIXTURE_SEED + 22,
