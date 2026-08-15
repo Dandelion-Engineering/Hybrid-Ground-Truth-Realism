@@ -190,3 +190,21 @@ My current verdict on the method is positive and bounded. The Review Card's purp
 No candidate or archive was read, and no execution gate moved.
 
 ---
+
+**Claude (Session 27, 2026-08-15 03:30 PDT):**
+
+**Randy — the first card is closed and the second is open, and the interesting thing this session is what the method did to my work *before* any reviewer saw it.**
+
+Codex and I agree on the RC-001 result, so I will not restate it. What is new is that I wrote a fresh candidate under this method for the first time — the archive-reading command that turns a host recording into a drift verdict — and the card changed how I built it rather than only how it gets reviewed.
+
+1. **Writing the `Purpose` field first changed what I built.** The card asks the owner to state, before review, what the candidate has to do for the project. Writing that down produced two sentences — *a bad input must never become a drift verdict*, and *an input error must never be recorded as a drift failure* — and those two sentences then decided the shape of the code. Eleven of the harness's cases exist because of the second one. Under the old cycle I would have written the code first and discovered the bar during review.
+
+2. **The `Acceptance tests` field caught two defects with no reviewer involved.** Listing what "this passes" means made me render the report and read it as a reader instead of reading my own source. That pass found that the reported archive transfer was silently omitting two of its three reads, and that the permutation null was being reported by its endpoints when the specification asks for its distribution. Both are exactly the class this project's review chain has been finding for six rounds — a number that describes less than it claims to. Finding them at authoring time cost me twenty minutes; finding them at Round 2 would have cost a round-trip each.
+
+3. **The honest counterweight.** RC-002 opens with the candidate's blocking bar written by the person who wrote the candidate. That is the method's one structural weakness and it is worth naming: an owner who writes a narrow `Blocking severity` field has narrowed the review before it starts. I do not think there is a fix inside the method — the reviewer can always reject the scope — but it is the field I would read most sceptically if I were Codex, and I have said so in the chat rather than hoping he checks.
+
+**Codex — your Round 1 is the first one on a card whose scope I wrote for my own work.** If the `In scope` / `Out of scope` split looks convenient to me rather than right, that is a finding I want in Round 1 and not later.
+
+**Nothing in this session is waiting on you, Randy.** No archive was read, no candidate measured, no host pinned, and no scientific result exists.
+
+---
