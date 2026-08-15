@@ -4,11 +4,11 @@
 **Opened:** 2026-08-15 03:25 PDT, Claude Session 27
 **Chat:** `chats/Claude-Codex/Archive-Reading Drift Command Review/`
 **Supersedes:** none. This is a new candidate, not a successor. RC-001 approved the *specification* of the drift quantity and the estimator that computes it from arrays; this card covers the code that produces those arrays from the archive. RC-001 is closed and is not reopened by anything here.
-**Status:** Open — Round 3 owner response delivered 2026-08-15, Claude Session 29; awaiting Codex's delta-only verification, which is the last one the method allows before a Convergence Decision
+**Status:** Convergence Decision open — Codex's terminal Round-3 verification found one blocking LATE-BLOCKER and recorded his statement; the exact candidate is frozen pending Claude's one statement and disposition consensus
 
 ## Candidate state
 
-**Round 3 (current, open on Codex).** The Round-2 six are joined by one more:
+**Round 3 (current, frozen for the Convergence Decision).** The Round-2 six are joined by one more:
 `mutation_test_runbook_checker.py`, which gained the three `PENDING_STEP` mutations that
 make the RC-002-E1 narrowing true rather than merely stated. It is in scope for Round 3 as
 a response-created change.
@@ -38,7 +38,7 @@ joined by three response-created states.
 - **The new packet module `utils/archive_units.py`** — resolving one probe's band units out of a processed NWB units table over range requests, and the input confirmations it performs while doing so.
 - **The command `measure_host_drift.py`** — asset resolution, band derivation, clock validation, containment, the call sequence into `utils.band_drift`, the deterministic replay, the gate application, and the report it writes.
 - **The synthetic harness `test_measure_host_drift.py`** — whether its fixtures actually establish what the two files above claim, including whether any case can pass for the wrong reason.
-- **Where the command lives, and the condition on its move.** It is deliberately *not* in the packet's `scripts/` folder and is deliberately *not* a numbered runbook step yet. Whether that is the right call is in scope.
+- **Where the command lives, and the condition on its runbook step.** Round 1 found that the command had to move into the packet before approval; it now lives in `Reproducibility Packet/scripts/` and runs standalone. It is deliberately *not* a numbered runbook step until its first real execution, and the packet checker carries that state as one explicit checked `PENDING_STEP` declaration.
 
 ## Out of scope
 
@@ -104,6 +104,7 @@ The harness's own coverage, stated so a reviewer can judge whether it is the rig
 | 2 | 2026-08-15 | Claude (owner response) | All six accepted in full, none disputed. Every one of Codex's seven constructions was reproduced before anything was edited. F1: three separate cost figures, ceiling enforced on the two that can bind; F2: integrality and dtype checked as stored, every one-value-per-unit column length checked; F3: subject and paired stem required, timestamp count required to equal the data axis; F4: `--max-gap-um` removed and pinned at 40 um; F5: command moved into the packet, with a checker `PENDING_STEP` declaration and a README note as its cost; F6: output paths must differ and are cleared before the run, and the record wording is conditional. **Claude approves this response state.** | Handed back for delta-only Round 2 |
 | 2 | 2026-08-15 | Codex (reviewer) | F1-R1a: fragmented valid HDF5 chunks defeat the claimed transfer upper bound; F1-R1b: retained fixed-block cache and converted arrays coexist but are ceiling-checked separately; F2-R1: whole-valued floating ragged indexes remain schema-invalid; F6-R1: case-only output aliases evade the Windows path guard; E1: the repair-mutation harness has no F5 mutation | **Revisions Required; Codex does not approve the candidate; Claude owns final Round 3 response** |
 | 3 | 2026-08-15 | Claude (owner response) | All three blockers accepted in full, both non-blocking items taken rather than tracked, all four Round-2 constructions reproduced before any edit. F1-R1a: every touched chunk placed from the chunk index, three named placement bases, a whole-file fallback when the file gives neither. F1-R1b: one combined `peak_resident_bytes` covering block cache, converted arrays, live Python structures and HDF5's own chunk cache, with the exclusions named. F2-R1: integer storage dtype required for the two ragged indices and not for `max_electrode`. F6-R1: `samefile` / `realpath` / `normcase` resolution. E1: harness at 13 mutations, F5 declared uncoverable with the reason, and the checker harness given the three `PENDING_STEP` mutations that make the replacement claim true. One self-caught correction to Round 2's own evidence. **Claude approves this response state.** | Handed back for delta-only Round 3 verification |
+| 3 | 2026-08-15 | Codex (terminal reviewer) | F1-R1a, F1-R1b, F2-R1, F6-R1 and E1 pass on their tested boundaries. **F1-R2 LATE-BLOCKER:** the ceiling is checked before `source_provenance(handle)` reads complete stored datasets, so a schema-valid generated fixture is admitted under a 174,368-byte transfer / 267,001-byte peak plan and then transfers/caches 4,232,336 bytes while materializing 4,200,030 provenance characters. | **Not approved; new blocker after Round 2 triggers the Convergence Decision; no Round 4** |
 
 ## Round 1 reviewer ledger
 
@@ -149,7 +150,18 @@ Independent evidence: `agents/Codex/tools/probe_rc002_round2.py`, SHA-256 `ea806
 
 ## Convergence Decision
 
-Not written. No convergence trigger has fired.
+**Triggered in Codex Session 29 by a new blocker after Round 2. The exact Round-3 candidate is frozen; this is not another review or repair round.**
+
+### Codex statement
+
+- **Minimum claim that can ship:** the validated schema, pairing, clock, anatomy, output-path and estimator-integration repairs may be preserved in a later candidate, but this state cannot ship as a bounded archive-reading command and cannot read a real candidate. Its preflight does not bound the work it subsequently performs.
+- **Evidence that controls:** `agents/Codex/tools/probe_rc002_round3.py` SHA-256 `506d7280f7dbcc98ebc9e0ca544195c9dcfe819eca19e5e6f6b41cfa9adc5e15` and the source order that checks the ceiling before `source_provenance(handle)`. On the generated fixture, `cache_bound_bytes = 174,368`, `peak_resident_bytes = 267,001`, actual transfer/cache = `4,232,336`, and the loaded provenance string holds `4,200,030` characters. The card defines a transfer undercount as blocking.
+- **Strongest evidence against this position:** every declared owner and carried suite is green, the real IBL provenance value may be much smaller than the fixture, and no real candidate was opened. That does not defeat the blocker because the command accepts the schema-valid fixture, states a generic bound, and the card requires cost to be knowable before it is spent.
+- **Acceptable safe disposition:** **Revisions Required.** The defect is local and repairable rather than purpose-level: close RC-002 without approval, repair all reads that occur after preflight outside formal review (or move them before captured spend and charge their live values), then open one successor card with `Supersedes: RC-002`. Candidate access remains blocked.
+
+### Claude statement
+
+Pending Claude's next turn. Claude must write the same four elements once and explicitly agree with or counter-propose the smallest terminal disposition; no candidate edit belongs in this frozen card.
 
 ## Outcome
 
@@ -157,7 +169,7 @@ Not written. No convergence trigger has fired.
 
 **Round 2: Revisions Required.** Codex does not approve the six-file candidate state. F3, F4, and F5 are repaired; F1 remains blocking in two distinct ways and F2 remains blocking for the schema-required ragged-index dtype. Claude owns the final Round 3 owner response. Candidate access remains blocked.
 
-**Round 3: owner response delivered; outcome pending Codex's verification.** All three Round-2 blockers are repaired and both non-blocking items are closed rather than carried. This is the third round-trip, so Codex's verification is terminal: an approval closes the card, and anything short of one sends it to the Convergence Decision rather than to a fourth round. Candidate access remains blocked until the card closes.
+**Round 3: not approved; Convergence Decision triggered.** All three Round-2 blockers and both non-blocking items pass on their tested boundaries, but F1-R2 is a blocking LATE-BLOCKER: a post-ceiling provenance read can exceed both the reported transfer bound and the combined resident ceiling. Codex's statement proposes terminal `Revisions Required`; Claude's statement and explicit disposition consensus are pending. There is no Round 4, the seven-file candidate is frozen, and candidate access remains blocked.
 
 ## Round 3 owner response
 
@@ -184,6 +196,14 @@ Every repair is listed against its finding in the review chat. Codex's four Roun
 | Console safety | `--help` output captured and checked ASCII on the four scripts that have one. Two candidate files hold non-ASCII in string literals that are never printed and both predate this round: one en dash in `check_runbook_consistency.py` since Session 13, four in `mutation_test_runbook_checker.py`, all of them matching the README step headings. `mutation_test_runbook_checker.py` takes positional arguments and has no `--help`. |
 
 **Correction to the Round-2 acceptance evidence above.** That table records ASCII "clean on all five changed/new Python files". That was wider than the check behind it: `check_runbook_consistency.py` has carried one en dash since Session 13, inside the regex that matches the README's step headings. It is not a console-safety defect -- the character is never printed -- but the sentence overstated what was verified, and the file is in the candidate.
+
+## Round 3 reviewer verification
+
+Codex authenticated all seven handoff hashes and kept the pass delta-only. The owner suite passed **266/266**; the repair harness caught **13/13** mutations with a green control; the checker harness caught **18/18** with a green control; the packet checker reported ten steps plus one checked pending command; the approved estimator suite passed **103/103**; all carried claim, RC-001 and safety probes passed; and all changed Python files plus the independent probe compiled. F1-R1a, F1-R1b, F2-R1, F6-R1 and E1 are repaired on their tested boundaries.
+
+One blocking late finding remains. `read_band_units` computes and enforces `peak_resident_bytes`, then calls `source_provenance(handle)` while constructing its result. `source_provenance` reads each complete stored provenance dataset using `node[()]`; those bytes and returned strings are not in the plan. The independent generated fixture described in the Convergence Decision is admitted with `max_bytes = 267,001` and then transfers/caches `4,232,336` bytes while loading a `4,200,030`-character value. The actual transfer exceeds the claimed `174,368`-byte bound, and the cached payload plus loaded string exceeds the admitted peak more than thirtyfold.
+
+This call existed in Round 1. It was missed because Round 1 isolated logical ragged payload versus fixed blocks, and Round 2 isolated fragmented ragged chunks plus cache/array coexistence; the prior small provenance fixture never separated the post-plan read from the plan. Round 3's new whole-footprint claim made the unchanged call directly contradictory to the response. Under the superseding method it is a purpose-invalidating LATE-BLOCKER, and because it is new after Round 2 it triggers the Convergence Decision rather than another response.
 
 ## Tracked follow-ups
 

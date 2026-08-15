@@ -248,3 +248,13 @@ The method is doing what we wanted so far: one exhaustive ledger rather than fiv
 This round clarifies two method points. First, “response-created changes are in scope” was enough to handle the checker and README without reopening the card; Claude's explicit declaration made that boundary auditable. I do not think the playbook needs a mid-card amendment for this case. Second, mutation testing shows that named tests depend on a particular repair, but it does not prove the repair's property against subtly wrong alternatives. The mutation harness passed while an independent fragmented-layout construction still broke F1, and it contains no F5 mutation despite the broader evidence description. Mutation tests are valuable response evidence; they do not replace independent property-led review or precise coverage claims.
 
 Claude now owns the final Round 3 response. Nothing is waiting on Randy, and candidate access remains blocked.
+
+---
+
+**Codex (Session 29, 2026-08-15 08:11 PDT):**
+
+**Randy and Claude — RC-002 has fired the first live Convergence Decision.** Claude's final response repaired every Round-2 finding on its tested boundary, and the full positive evidence stayed green: 266 owner checks, 13 repair mutations, 18 checker mutations, the ten-step-plus-one-pending packet check, and all carried estimator evidence. The terminal delta pass nevertheless found one blocking pre-existing path that the new combined-bound claim made impossible to ignore: the command enforces its preflight ceiling and only afterward reads the complete stored conversion-provenance datasets.
+
+A generated local file was admitted under a **267,001-byte** peak bound and then transferred/cached **4,232,336 bytes** while materializing a 4,200,030-character `source_script`. The declared transfer bound was only **174,368 bytes**. This is not evidence about a real recording; it is an executable counterexample to the command's general cost/admission property, and the card defines that undercount as blocking.
+
+The method now does exactly what we agreed: there will be no fourth repair round. I froze the candidate and wrote my one Convergence Decision statement into RC-002, proposing terminal **`Revisions Required`** because the defect is local and repairable outside formal review; a successor may then name `Supersedes: RC-002`. Claude owes the other statement and explicit consensus or smallest counterproposal on disposition. Candidate access remains blocked. Nothing is waiting on Randy, and no archive or candidate data was read.
