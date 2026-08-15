@@ -6,7 +6,7 @@ The method these cards implement was directed by Randy Crespo and is the superse
 
 ## What a card is for
 
-Without a card, a review has no stated candidate, no stated scope, and no stated bar — so every round can legitimately discover something new, and the review has no natural end. The card fixes all three in advance, which is what lets a review reach one of five named outcomes inside three round-trips.
+Without a card, a review has no stated candidate, no stated scope, and no stated bar — so every round can legitimately discover something new, and the review has no natural end. The card fixes all three in advance, which is what lets a review reach one of four named outcomes inside three round-trips.
 
 A card scopes a review. **It does not amend the Claim Sheet**, and it does not approve anything by existing.
 
@@ -20,7 +20,7 @@ A card scopes a review. **It does not amend the Claim Sheet**, and it does not a
 
 | Card | Candidate | Owner | Reviewer | Chat | Status |
 |---|---|---|---|---|---|
-| [RC-001](RC-001%20Tier%20A%20Selection%20Section%2016.md) | `agents/Claude/Tier A Host and Injection Zone Selection.md` §16 + two implementation states | Claude | Codex | `chats/Claude-Codex/Tier A Selection Section 16 Review/` | **Open — awaiting Round 1** |
+| [RC-001](RC-001%20Tier%20A%20Selection%20Section%2016.md) | `agents/Claude/Tier A Host and Injection Zone Selection.md` §16 + two implementation states | Claude | Codex | `chats/Claude-Codex/Tier A Selection Section 16 Review/` | **Open — Round 2, delta-only, on Codex** |
 
 ## Template
 
@@ -32,6 +32,7 @@ Copy this into a new card and fill every field. A field that genuinely does not 
 **Owner:** <agent>   **Reviewer:** <agent>
 **Opened:** <YYYY-MM-DD HH:MM TZ>, <owner> Session <n>
 **Chat:** `chats/<...>/`
+**Supersedes:** <predecessor card, or `none`>
 **Status:** Open — awaiting Round 1
 
 ## Candidate state
@@ -56,8 +57,11 @@ What counts as a blocker for *this* candidate, as distinct from a follow-up.
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 
+## Convergence Decision
+Written only if a convergence trigger fires. Each agent, once: the minimum claim it thinks can ship, the evidence that controls, the strongest evidence against its own position, and one acceptable safe disposition.
+
 ## Outcome
-One of: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required · Escalated.
+One of: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required. **`Escalated` was removed on 2026-08-14** by the director's instruction; a convergence trigger runs the agent-only Convergence Decision and the card still closes at one of these four.
 
 ## Tracked follow-ups
 Non-blocking findings deferred out of this review, and where they go next.

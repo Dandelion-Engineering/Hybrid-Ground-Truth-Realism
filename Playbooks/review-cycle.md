@@ -64,6 +64,34 @@
 
 **Transition rule, also directed:** *any artifact currently under review preserves its current state and starts the new review cycle with that state.* An in-flight review is not rewound and its candidate is not re-drafted; the state on disk at the moment of transition becomes the Round 1 candidate on a fresh Review Card, and the old review's chat is concluded with a `Summary.md` so its trail is preserved.
 
+## Convergence in place of escalation
+
+**Directed by Randy Crespo on 2026-08-14 and agreed by both agents at Codex Session 24 / Claude Session 25.** His instruction:
+
+> Claude brought up a good point. I am asynchronous. Even though I do check in periodically, a few sessions with an escalated not being resolved would be wasted time. I want both of you to come to a consensus on what to do instead of escalating. When you have arrived at a consensus for that, write it into the review cycle playbook.
+>
+> Remember we want to maintain rigor without having endless reviewing.
+
+**`Escalated` is removed as an outcome of ordinary review, and human triage is removed as a trigger.** The five clauses below are Codex's proposal, agreed by Claude and binding from the sessions named above. They replace the word *Escalated* wherever the directed method above uses it, and they replace *triggers human triage or a split* with *triggers the Convergence Decision*.
+
+1. **At either escalation trigger, freeze the disputed state and run one agent-only Convergence Decision.** Each agent writes, once: the minimum claim it thinks can ship, the evidence that controls, the strongest evidence against its own position, and one acceptable safe disposition. This is not another full review round and it introduces no new candidate edits. The two triggers are the ones the directed method already names: a second LATE-BLOCKER or any new blocker after Round 2, and the review reaching its third round-trip without both approvals.
+2. **Evidence determines what may ship; consensus determines what happens next.** An in-scope executable counterexample defeats a universal or one-way safety claim. An unsupported blocker-bearing claim cannot ship. Where the evidence remains underdetermined, the uncertainty is **not** resolved in favour of approval.
+3. **The safe dispositions are the ones the method already has.** A local, repairable blocker ends the card as **Revisions Required**; a purpose-level or architectural blocker ends it as **Split/Redesign Required**; a genuinely non-blocking issue ends it as **Approved with Follow-ups**. Both agents explicitly approve the terminal *disposition*, even where they still disagree about the underlying proposition. That is consensus on action, not forced consensus on belief.
+4. **Close the card at that disposition and keep working.** The owner does the repair or redesign **outside** formal review, and may then open one successor card whose `Supersedes:` field names the predecessor and whose stability section identifies the material pre-review change. A blocked card never consumes later sessions, and an unapproved candidate still never ships.
+5. **The reset loophole is closed.** If a successor card on the same scoped purpose also reaches a non-approval disposition, **no second like-for-like successor is allowed**: the work must be split or redesigned before a new card can open, with the changed boundary named. The three-round-trip limit is therefore cumulative enough to matter without converting agent time into director time.
+
+### Two applications of existing notes, recorded here so both agents read them the same way
+
+Neither changes any of the five clauses; each applies a rule this playbook already carries. **Either may be struck by the other agent or by the director.**
+
+- **The Convergence Decision is written into the Review Card**, both agents' statements and the terminal disposition, because *Outcomes are recorded on the Review Card* already requires the card to be readable as the review's whole history without the transcript.
+- **A finding that is director-only by its nature is not a review outcome and never was.** A licence question, contact with anyone outside Dandelion, a spend, or a change to the Claim Sheet reaches Randy through `director_requests.md` with a fallback, exactly as `Project Details.md` requires, **while the card still closes at one of the four dispositions**. Removing `Escalated` removes a review outcome, not the director's channel.
+
+### What this does to the precedence question
+
+`Project Details.md`'s *Cross-review* paragraph escalates a **specific disagreement** that has not converged in about two round-trips. That escalation target is now the **Convergence Decision** rather than the director, by the director's own instruction above. The review as a whole still ends within three round-trips. Both bounds bind, and neither is a licence to exceed the other.
+
+
 ## Operating notes
 
 These do not add rules. They record how the directed method was read on implementation, so both agents read it the same way. **Any of them may be corrected by the director**, and a disagreement about one of them belongs in the three-way chat rather than in a review.
@@ -75,8 +103,8 @@ These do not add rules. They record how the directed method was read on implemen
 - **"Mechanical" means the correction cannot change what any consumer of the artifact does** — typography, formatting, a stale digest, a cross-reference, a name with no reader-visible consequence. When a correction's mechanical status is arguable, the project's existing proof habits settle it rather than an assertion: a stripped-docstring syntax-tree comparison, a re-run of the other agent's probe, or an explicit statement that no numerical branch was touched. Anything that survives that test as substantive is a finding, not an edit.
 - **An unchanged sentence that a change elsewhere has made false is a regression introduced by the response**, and is therefore in scope in Round 2 and later. It is not "previously reviewed material re-audited from scratch." This reading matters here: it is the single most productive finding class in this project's history, and the narrow reading would rule it out.
 - **A LATE-BLOCKER that was created by an earlier repair rather than missed says so**, in those terms, in its "why it was missed" statement. "It was not a defect when Round 1 read it" is an accurate answer to that question, not an evasion of it.
-- **Outcomes are recorded on the Review Card**, not only in the chat, so the card is readable as the review's whole history without the transcript.
-- **Precedence against `Project Details.md`.** The constitution's *Cross-review* paragraph escalates a disagreement that has not converged in about two round-trips. This section sets a limit of three round-trips for the review as a whole. The two are compatible and both bind: a **specific disagreement** that has not converged in ~2 round-trips still escalates on its own, while the **review** ends at 3 round-trips with one of the five named outcomes. Neither is a licence to exceed the other.
+- **Outcomes are recorded on the Review Card**, not only in the chat, so the card is readable as the review's whole history without the transcript. This now includes the Convergence Decision when one is run.
+- **Precedence against `Project Details.md`.** The constitution's *Cross-review* paragraph escalates a disagreement that has not converged in about two round-trips. This section sets a limit of three round-trips for the review as a whole. Both bind, and since 2026-08-14 the escalation **target** for a specific disagreement is the agent-only Convergence Decision rather than the director — see *Convergence in place of escalation*. Neither bound is a licence to exceed the other.
 - **The amendment protocol is untouched.** Changes to the Claim Sheet still run through `Playbooks/claim-sheet.md`'s amendment protocol, appended and dated, never overwritten. A Review Card scopes a review; it does not amend the contract.
 
 ## Quality checklist (superseding)
@@ -87,7 +115,9 @@ These do not add rules. They record how the directed method was read on implemen
 - [ ] Rounds 2+ are delta-only: recorded findings and regressions introduced by the response.
 - [ ] Any post-Round-1 pre-existing blocker is marked **LATE-BLOCKER**, is genuinely purpose-invalidating, and states why it was missed.
 - [ ] A second late blocker, or any new blocker after Round 2, went to human triage or a split rather than another round.
-- [ ] The review closed within **three** owner-reviewer round-trips, with a named outcome: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required · Escalated.
+- [ ] The review closed within **three** owner-reviewer round-trips, with a named outcome: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required. **`Escalated` is no longer an outcome** — see *Convergence in place of escalation*.
+- [ ] Where a convergence trigger fired, the agent-only Convergence Decision was run **once**, both statements were written into the Review Card, and both agents explicitly approved the terminal disposition.
+- [ ] A successor card on the same scoped purpose names its predecessor in `Supersedes:`, and no second like-for-like successor was opened.
 - [ ] Both approvals name the **same** scoped candidate state, explicitly.
 - [ ] Non-blocking late findings were recorded as tracked follow-ups rather than absorbed silently.
 - [ ] Reviewer edits were mechanical only, or ownership was explicitly transferred in the chat.
@@ -96,6 +126,7 @@ These do not add rules. They record how the directed method was read on implemen
 ## Failure modes this method is pointed at
 
 - **Unbounded review.** A candidate re-opened round after round, each round finding something real, with no boundary that says when the artifact is done being reviewed. Costs compound and the artifact never reaches execution.
+- **Parking a review on an asynchronous director.** An escalated review that waits days for a reply spends sessions rather than saving them, which is why `Escalated` was removed and the Convergence Decision put in its place.
 - **Serial blocking.** A reviewer stopping at the first blocker, so the owner repairs one thing and the next round produces the second — turning one review into many.
 - **Co-design wearing review's clothes.** Using the review loop to design the artifact, which has no natural stopping point because there is no fixed candidate to accept or reject.
 - **Scope drift.** A review that started on one section quietly expanding to the whole document, so no one can say what was approved.

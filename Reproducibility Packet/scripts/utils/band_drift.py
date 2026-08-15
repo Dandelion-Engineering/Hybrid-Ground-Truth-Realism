@@ -3,7 +3,8 @@
 This module implements one specification and nothing else: the drift quantity
 used to screen candidate host recordings. It computes a band displacement trace
 from per-spike depths, reports the peak-to-peak excursion over the whole
-recording and over the worst ten-consecutive-bin window, builds a deterministic
+recording and over the worst eleven-consecutive-bin window -- the span of a
+ten-minute segment wherever it lands on the bin grid -- builds a deterministic
 within-unit permutation null for that worst-window statistic, and applies the
 pass rule that uses both numbers.
 
@@ -43,17 +44,45 @@ For one probe, one anatomical band and one recording:
    included unit's whole-recording excursion, its own worst-window excursion,
    and its excursion inside the band-selected window. The first two carry
    movement the across-unit median can suppress; the third shows the
-   composition aligned to the window that produced ``Delta_10``. All three
+   composition aligned to the window that produced ``Delta_10min``. All three
    carry that unit's own depth-estimation noise along with any movement and
    have no null: ``Q95_null`` grades the median-across-units band statistic,
    and its ordering against any one unit's excursion is not fixed. It therefore
    does not grade the per-unit values, which are reported and never consumed by
    the gate.
 6. ``Delta_full = max_b D(b) - min_b D(b)`` over the whole recording, and
-   ``Delta_10`` is the largest such range over any window of
+   ``Delta_10min`` is the largest such range over any window of
    ``window_bins`` consecutive analysed bins. Both are peak-to-peak excursions,
    not endpoint-to-endpoint net motion: a down-and-back trajectory stays
-   visible. ``Delta_10`` is the gating quantity.
+   visible. ``Delta_10min`` is the gating quantity.
+
+   ``window_bins`` is **eleven**, not ten, and the two reasons for that both
+   cost exactly one bin. A bin median is a point summary, so ten of them span
+   only nine minutes between the extremes: a common 2.1 um/min ramp displaces
+   21.0 um in ten minutes and returns 19.145 um over ten bins, under a 20 um
+   tolerance. And a 600-second segment that does not begin on a bin edge
+   touches eleven session bins rather than ten, so an excursion split across
+   that boundary can exceed every aligned ten-bin range: bin levels
+   ``[0, 15 x 9, 30, ...]`` report 15.000 um over ten bins while ``[30 s,
+   630 s)`` spans 30.000 um. Eleven consecutive bins contain every bin any
+   ten-minute segment can touch, so the reported value bounds the range of the
+   bin-median levels over that segment wherever it lands, and both fixtures
+   report 21.258 um and 30.000 um and fail the gate at eleven. Widening the
+   window can only raise the statistic -- every ten-bin window sits inside an
+   eleven-bin one -- so it can turn a pass into a rejection but never the
+   reverse.
+
+   What the quantity does not bound is motion the bin medians do not express.
+   A displacement that moves fewer than half of a bin's spikes leaves that
+   bin's median exactly where it was. Measured on a 30 um episode confined
+   inside one bin: the reported excursion is 0.000 um at every displaced
+   fraction below one half, 15.000 um at exactly one half, and 30.000 um above
+   it. That boundary is a property of the median the whole quantity rests on
+   and it is permissive -- it can only understate drift, never invent it. It is
+   declared rather than repaired because the inclusion floor is ten spikes per
+   bin, so any sub-bin statistic would rest on five or fewer center-of-mass
+   depths for a marginal unit and would reintroduce the per-spike noise the bin
+   median exists to remove.
 
 The null
 --------
@@ -62,7 +91,7 @@ permuting a unit's depth values among its own analysed spikes destroys the
 depth/time ordering while preserving every analysed depth value, spike time and
 per-bin spike count. Spikes before the grid origin, and spikes in the discarded
 final underlength interval, enter neither the observed statistic nor the null.
-The resulting ``Delta_10`` distribution is what this estimator returns on this
+The resulting ``Delta_10min`` distribution is what this estimator returns on this
 recording with no time ordering, and its nearest-rank
 empirical 95th percentile ``Q95_null`` is the declared summary. Genuine movement
 is present in the pool the null draws from and, under an additive common-motion
@@ -78,7 +107,7 @@ replays byte for byte from the same inputs.
 
 The pass rule
 -------------
-At threshold ``L``, a candidate passes only when ``Delta_10 <= L`` **and**
+At threshold ``L``, a candidate passes only when ``Delta_10min <= L`` **and**
 ``Q95_null <= L``. Lying inside the null is not a failure: a genuinely quiet
 host should often do so. A noise floor wider than the tolerance is the
 unmeasurable failure, and so are too few qualifying units, any invalid analysed
@@ -99,7 +128,7 @@ PARAMS = {
     "min_spikes_per_bin": 10,
     "min_bin_fraction": 0.8,
     "min_units_per_bin": 5,
-    "window_bins": 10,
+    "window_bins": 11,
     "n_permutations": 200,
     "null_percentile": 95,
     "master_seed": 3175830281,
@@ -581,7 +610,7 @@ def measure_band_drift(spike_times, depths, extent_s, params=None):
 
 def permutation_null(spike_times, depths, extent_s, asset_id, probe,
                      unit_row_indices, params=None):
-    """Build the deterministic within-unit permutation null for ``Delta_10``.
+    """Build the deterministic within-unit permutation null for ``Delta_10min``.
 
     Every spike time in a complete bin -- and therefore every complete-bin
     spike count -- is held fixed while each unit's analysed depth values are
@@ -602,7 +631,7 @@ def permutation_null(spike_times, depths, extent_s, asset_id, probe,
         params: parameter overrides; defaults to ``PARAMS``.
 
     Returns:
-        dict: ``values`` (the replicate ``Delta_10`` values, ascending),
+        dict: ``values`` (the replicate ``Delta_10min`` values, ascending),
         ``q95`` (the nearest-rank empirical percentile), ``rank`` (the
         one-based rank taken) and ``n_permutations``.
 

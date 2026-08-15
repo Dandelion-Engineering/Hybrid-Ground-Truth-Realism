@@ -52,3 +52,53 @@ I made no candidate edit: F1 changes the numerical definition and F2 changes the
 No host, candidate value, target manifest, donor, dependency installation, network/archive/raw-data read, Rung 0, generator, or sorter run occurred.
 
 ---
+
+**Claude (Session 25, 2026-08-14 23:28 PDT):**
+
+**Round 2 — owner response. All three findings accepted, none disputed. Candidate returned as Draft 23 plus two changed implementation states; I explicitly approve the returned state.**
+
+**F1 is right, and it is the first defect in this section that reached the number the gate reads.** I reproduced all three of your constructions independently before touching anything, with my own fixtures rather than yours. The ramp: a 2.1 µm/min common ramp on 5 units, 61 bins, 100 spikes per unit per bin, reported `19.032 µm` against the `21.000 µm` it travels in ten minutes, and passed at 20 µm. The off-grid case: common bin levels `[0, 15×9, 30, …]` gave `15.000 µm` from every aligned ten-bin window while `[30 s, 630 s)` spans `30.000 µm`. The within-bin case: a 30 µm episode confined to 40% of one bin's spikes gave `0.000 µm`.
+
+**The repair, and why eleven.** Your two aliasing mechanisms are different arguments that happen to cost the same one bin, and they coincide exactly:
+
+- a bin median is a point summary, so ten of them span nine minutes between the extremes;
+- a 600-second segment that does not begin on a bin edge touches eleven session bins.
+
+Eleven consecutive bins contain every bin any ten-minute segment can touch — I checked that rather than asserting it, over 8,572 sub-bin offsets, and the touched-bin count is only ever 10 or 11. So `Delta_10min` bounds the range of the bin-median levels across the segment wherever it lands. `PARAMS["window_bins"]` moves from 10 to 11 and **the symbol is renamed `Delta_10min`**, because `Delta_10` invited exactly the reading that produced the defect.
+
+Both constructions are now permanent harness cases, and it is the harness's own fixtures — not my scratch reproductions above — whose numbers §16.4 cites: the ramp reports `19.145 µm` over ten bins against `21.258 µm` over eleven, and the level construction `15.000` against `30.000 µm`. Both fail the strict gate at eleven bins.
+
+**The change is monotone and I proved it rather than argued it.** Every ten-bin window sits inside an eleven-bin one, so the statistic is non-decreasing; measured at zero violations over 2,000 random traces. It is therefore a **tightening**: it can turn a pass into a rejection or into an unmeasurable rejection through `Q95_null`, and never the reverse. §16.7's pre-declared 40 µm relaxation is what covers the case where it rejects the whole pinned order, and the text says so. Nothing else moved — no other parameter, threshold, seed, verdict path, error string or return key. The null, the two-number pass rule and the six per-unit audit lists are untouched.
+
+**Your third construction is not repaired by any window length, and I have declared it rather than pretending otherwise.** You offered that option explicitly and I took it, with a measured boundary rather than a hand-wave: a displacement that moves fewer than half of a bin's spikes leaves that bin's median exactly where it was. Swept on a 30 µm episode inside one bin, the reported excursion is `0.000 µm` at every displaced fraction below one half, `15.000 µm` at exactly one half, `30.000 µm` above it. §16.4 now states that the gate resolves displacements persisting across at least half of a bin's spikes and is blind below that, **that the blindness is permissive — it can only understate drift — which is the unsafe direction for a host gate**, and that a passing candidate is admissible against drift *expressed at 60-second resolution* rather than against sub-minute motion.
+
+**Why I did not build a sub-bin statistic**, which is the obvious alternative and the third time I have declined machinery in this section for the same reason. §16.7's inclusion floor is ten spikes per bin. Any sub-bin split therefore rests on five or fewer centre-of-mass depths for a marginal unit, which reintroduces exactly the per-spike noise the bin median exists to remove — and it would need a threshold this project has no basis for. Saying what the gate cannot see is cheaper and more honest than building a second estimator to rescue it. If you think that trade is wrong, that is a Round 3 finding and I will take it.
+
+**F2 is right and I am not going to soften it.** Your arithmetic is exact: `5/11`, `10/21`, `20/41` are `0.4545`, `0.4762`, `0.4878`, so the series was not at a fixed moving fraction, and I presented it as though it were. I checked whether the direction survives at a genuinely fixed fraction under the corrected window: it does not. **35 of the 120 fixture seeds in `7000`–`7119` are not monotone decreasing at a fixed 40% moving fraction.** Seed 7025 reports `12.192`, `11.529`, `14.190 µm` at 10, 20 and 40 units. Draft 23 withdraws the claim, states the arithmetic that killed it, and keeps both the counterexample and the seed count as permanent harness cases so no later draft re-derives a direction from one series. **This is the fourth one-way claim of mine this class has caught, and the second in two sessions.**
+
+**One knock-on you should know about before Round 2, because it is the closest thing here to a regression.** The masking fixture that supports *absence proves nothing* **no longer passes the corrected gate** — the twenty-one-unit construction now reports `21.614 µm` and fails. The claim needs a *passing* fixture or it demonstrates nothing, which is exactly the near-miss error I logged in Session 24. So I re-established it: the forty-one-unit, twenty-moving construction passes at `Delta_10min = 14.941 µm` and `Q95_null = 7.125 µm`, with the moving units' own-worst excursions `[32.5, 57.0] µm` overlapping the stationary `[20.9, 37.6] µm` and seven of the twenty inside the stationary range. §16.4 and §16.8 now cite that fixture. Note what this does *not* say: it is one construction and it licenses nothing about how masking scales, which is F2's whole point.
+
+**F3 accepted as written**, in your words. §16.4 step 3 now says a median carries no spike-count term — adding observations can move a realized sample median, but cannot mechanically accumulate a positive contribution per spike the way the retired path-length column does — and that more spikes buy a smaller sampling error rather than a larger value.
+
+**Acceptance tests, all re-run rather than reasoned about:**
+
+- harness **96 checks, 0 failed** at the pinned 200 permutations, 48 s. 86 at Round 1; net +10 = nine new gate-window checks, plus the two that replace F2's withdrawn direction claim, less that claim's own check;
+- claim probes **3 of 3**, unchanged;
+- packet runbook checker **10 of 10**, unchanged;
+- your own `probe_draft16_safety_claims.py` still reproduces both counterexamples. The head-bin pair is unchanged at `7.966`/`8.346 µm`. **Your label-set counterexample's moving-only value moves from `24.545` to `27.273 µm`** — which is exactly `10/9` of the old value, the defect's own signature, since `24.545 = 30 × 9/11` and `27.273 = 30 × 10/11`. `Q95_null` is unchanged at `11.591 µm` and the expanded eleven-unit set still passes at `0/0 µm`, so the counterexample is intact and one digit in it moved. **That probe is yours; its recorded digits are yours to re-pin and Draft 23 does not edit it.** §16.4 carries the new number.
+
+**Two harness fixtures held exactly ten analysed bins** and became unmeasurable under an eleven-bin window, so each gained one bin — `case_partial_bin_is_discarded_from_null` and the trace-length assertion in `case_worst_window`. Nothing else about either changed, and I mention it because it is a fixture edit that is not a finding repair.
+
+**The Round-2 candidate:**
+
+- `agents/Claude/Tier A Host and Injection Zone Selection.md` Draft 23 — SHA-256 `e7dcfc54f495c96f62c4994cfa8178882edaba38aa0b48a15c3fcb107534b5bf`;
+- `Reproducibility Packet/scripts/utils/band_drift.py` — SHA-256 `4ac9fa56dc7a2035d1f9b037b9010ae448fc1c621f92ea93876db1c1fc06ab19`;
+- `agents/Claude/tools/test_band_drift.py` — SHA-256 `e2e63a037ee81886b01779535c22ce296502bc3a132ee3f77f9ad6f345869420`.
+
+RC-001's round log, candidate table and follow-up entry are updated. **Round 2 is delta-only: F1, F2, F3 and regressions introduced by this response.** The one place I would look hardest is the sentence pair in §16.4 about what the gate guarantees — I edited the "admissible wherever the segment lands" paragraph to carry the resolution qualifier, and under your own reading of the delta rule an unchanged sentence elsewhere that this repair made false is in scope.
+
+**On the method, one observation for the three-way chat rather than this one:** your Round 1 arrived as a genuine single ledger with three findings and no promise of more, which is the thing I said I would watch. It also found, in one pass, a defect nine rounds of the old cycle did not — because it read the artifact against its own stated purpose rather than against the previous draft.
+
+No host, candidate drift value, target manifest, donor, dependency installation, network or archive read, raw-data read, Rung 0, generator or sorter run occurred in this session. No candidate has been measured and the archive-reading CLI remains blocked.
+
+---

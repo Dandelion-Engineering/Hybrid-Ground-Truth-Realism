@@ -186,11 +186,11 @@ def case_known_ramp():
         return
     n_bins = obs["n_bins"]
     expect_full = ramp_um * (n_bins - 1) / n_bins
-    expect_win = ramp_um * 9.0 / n_bins
+    expect_win = ramp_um * 10.0 / n_bins
     check("Delta_full recovers the ramp",
           abs(obs["delta_full"] - expect_full) < 3.0,
           "%.2f um, expected about %.2f" % (obs["delta_full"], expect_full))
-    check("Delta_10 recovers the in-window fraction",
+    check("Delta_10min recovers the ten-minute fraction",
           abs(obs["delta_window"] - expect_win) < 2.0,
           "%.2f um, expected about %.2f" % (obs["delta_window"], expect_win))
     check("all units included", len(obs["included"]) == 12)
@@ -223,8 +223,9 @@ def case_worst_window():
     trace[30:33] = 25.0       # the real one, late
     delta_full, delta_win, start = bd.excursions(trace)
     check("Delta_full spans the largest step", abs(delta_full - 25.0) < 1e-9)
-    check("Delta_10 finds the late window", abs(delta_win - 25.0) < 1e-9)
-    check("the window reported contains the late step", 21 <= start <= 32, "start=%d" % start)
+    check("Delta_10min finds the late window", abs(delta_win - 25.0) < 1e-9)
+    check("the window reported contains the late step",
+          start <= 32 and start + bd.PARAMS["window_bins"] > 30, "start=%d" % start)
     short = np.zeros(6)
     _, win, st = bd.excursions(short)
     check("a trace shorter than the window returns no window", win is None and st is None)
@@ -318,18 +319,18 @@ def case_malformed_input_raises():
 def case_partial_bin_is_discarded_from_null(n_permutations):
     """Depths in the discarded final partial bin cannot change the null."""
     print("partial bin exclusion")
-    duration = 605.0
+    duration = 665.0
     times, ordinary, extreme = [], [], []
     for u in range(6):
         complete = np.concatenate([
             np.linspace(b * 60.0 + 1.0, b * 60.0 + 59.0, 10)
-            for b in range(10)
+            for b in range(11)
         ])
-        partial = np.linspace(600.05, 604.95, 50)
+        partial = np.linspace(660.05, 664.95, 50)
         times.append(np.concatenate([complete, partial]))
-        baseline = np.full(150, 1000.0 + 20.0 * u)
+        baseline = np.full(160, 1000.0 + 20.0 * u)
         altered = baseline.copy()
-        altered[100:] = 10000.0 + 20.0 * u
+        altered[110:] = 10000.0 + 20.0 * u
         ordinary.append(baseline)
         extreme.append(altered)
 
@@ -491,7 +492,7 @@ def case_per_unit_audit_values():
 
     # A flat band trace makes its selected window an arbitrary earliest tie.
     # Movement confined to a later window must remain visible at the same
-    # ten-bin scale rather than only in the whole-recording range.
+    # gate-window scale rather than only in the whole-recording range.
     late_levels = np.concatenate([np.zeros(10), np.linspace(0.0, 30.0, 10)])
     late_movement = np.repeat(late_levels, per_bin)
     late_times = np.concatenate(
@@ -512,8 +513,8 @@ def case_per_unit_audit_values():
           all(start >= 9 for start in localized["unit_max_window_start"][:5])
           and localized["unit_max_window_start"][5:] == [0] * 6)
     check("the selected audit windows report their defined-bin support",
-          localized["unit_max_window_defined_bins"] == [10] * 11
-          and localized["unit_band_window_defined_bins"] == [10] * 11)
+          localized["unit_max_window_defined_bins"] == [11] * 11
+          and localized["unit_band_window_defined_bins"] == [11] * 11)
     try:
         bd.unit_traces([np.zeros(3)], np.array([True, False]))
         check("a mask that does not match the units raises", False)
@@ -669,17 +670,18 @@ def case_per_unit_audit_absence_proves_nothing(n_permutations):
     against the movement, which is a property of the earlier noiseless fixture
     rather than a guarantee.
 
-    Here ten of twenty-one units genuinely move 30 um inside a ten-bin window,
-    every unit sits just above the inclusion floor the parameters admit, and
-    the candidate passes both gate numbers while the moving units' own-worst
-    excursions overlap the stationary ones. The masking gets easier as the band
-    grows, because the across-unit median suppresses a moving minority and its
-    noise together while a single trace keeps both.
+    Here twenty of forty-one units genuinely move 30 um inside one gate
+    window, every unit sits just above the inclusion floor the parameters
+    admit, and the candidate passes both gate numbers while the moving units'
+    own-worst excursions overlap the stationary ones. The fixture pins that
+    one construction and nothing more: the band statistic does not vary with
+    unit count in a fixed direction, and the counterexample below is kept so no
+    later draft re-derives a direction from a single series.
     """
     print("absence of separation is not evidence")
     n_bins = 61
     duration = n_bins * 60.0
-    n_units, n_moving = 21, 10
+    n_units, n_moving = 41, 20
     times, depths, rows = make_masking_band(n_units, n_moving)
     obs = bd.measure_band_drift(times, depths, duration)
     if not check("the masking band is measurable", obs["measurable"],
@@ -693,7 +695,7 @@ def case_per_unit_audit_absence_proves_nothing(n_permutations):
 
     check("a band with a genuinely moving minority still passes the gate",
           gate["passed"],
-          "Delta_10 %.3f um, Q95_null %.3f um, both under %.0f um"
+          "Delta_10min %.3f um, Q95_null %.3f um, both under %.0f um"
           % (obs["delta_window"], null["q95"],
              bd.PARAMS["threshold_strict_um"]))
     check("the movement is real and above the gate's own scale",
@@ -710,14 +712,151 @@ def case_per_unit_audit_absence_proves_nothing(n_permutations):
           % (int(((moving >= still.min()) & (moving <= still.max())).sum()),
              n_moving))
 
-    band_values = []
-    for total, movers in ((11, 5), (21, 10), (41, 20)):
-        t, d, _ = make_masking_band(total, movers)
-        band_values.append(bd.measure_band_drift(t, d, duration)["delta_window"])
-    check("and the band statistic falls as the band grows",
-          band_values[0] > band_values[1] > band_values[2],
-          "Delta_10 %.2f, %.2f, %.2f um at 11, 21 and 41 units, per-unit noise "
-          "unchanged" % tuple(band_values))
+    # RC-001-F2. Draft 22 read one near-half-minority series as evidence that
+    # masking gets easier as the band grows. The series was not at a fixed
+    # moving fraction, and at a fixed fraction the direction is not general.
+    counter = []
+    for total, movers in ((10, 4), (20, 8), (40, 16)):
+        t, d, _ = make_masking_band(total, movers, seed=7025)
+        counter.append(bd.measure_band_drift(t, d, duration)["delta_window"])
+    check("the band statistic has no fixed direction in the unit count",
+          not (counter[0] > counter[1] > counter[2]),
+          "Delta_10min %.3f, %.3f, %.3f um at 10, 20 and 40 units, seed 7025, "
+          "moving fraction fixed at 40 percent" % tuple(counter))
+    breaks = 0
+    for seed in range(7000, 7120):
+        series = []
+        for total, movers in ((10, 4), (20, 8), (40, 16)):
+            t, d, _ = make_masking_band(total, movers, seed=seed)
+            series.append(bd.measure_band_drift(t, d, duration)["delta_window"])
+        if not (series[0] > series[1] > series[2]):
+            breaks += 1
+    check("and the counterexample is not one unlucky seed",
+          breaks >= 20,
+          "%d of 120 fixture seeds are not monotone decreasing at a fixed "
+          "40 percent moving fraction" % breaks)
+
+
+def common_signal_band(levels=None, ramp_um_per_min=None, n_bins=31, n_units=5,
+                       spikes_per_bin=100, episode=None, seed=6100):
+    """Build a band carrying a common depth signal and no per-unit noise.
+
+    Exactly one of ``levels`` (piecewise-constant per-bin depth) and
+    ``ramp_um_per_min`` (a linear ramp) describes the signal. Every unit
+    carries it identically, so nothing here depends on the across-unit median
+    doing anything but pass the signal through.
+
+    Args:
+        levels: per-bin common depth in micrometres, or None for a ramp.
+        ramp_um_per_min: ramp rate in micrometres per minute, or None.
+        n_bins: analysed bins when a ramp is used.
+        n_units: units in the band.
+        spikes_per_bin: spikes per unit per bin, well above the inclusion floor.
+        episode: ``(bin_index, fraction, offset_um)`` displacing that fraction
+            of one bin's spikes, or None.
+        seed: fixture seed for the within-bin spike times.
+
+    Returns:
+        tuple: ``(spike_times, depths, extent_s)``.
+    """
+    if (levels is None) == (ramp_um_per_min is None):
+        raise ValueError("give exactly one of levels and ramp_um_per_min")
+    rng = np.random.default_rng(seed)
+    bin_s = bd.PARAMS["bin_seconds"]
+    if levels is not None:
+        n_bins = len(levels)
+    times, depths = [], []
+    for u in range(n_units):
+        unit_t, unit_d = [], []
+        for b in range(n_bins):
+            ts = np.sort(rng.uniform(b * bin_s, (b + 1) * bin_s, spikes_per_bin))
+            if levels is not None:
+                dd = np.full(spikes_per_bin, levels[b] + 100.0 * u)
+            else:
+                dd = ts / 60.0 * ramp_um_per_min + 100.0 * u
+            if episode is not None and b == episode[0]:
+                k = int(round(episode[1] * spikes_per_bin))
+                dd = dd.copy()
+                dd[:k] += episode[2]
+            unit_t.append(ts)
+            unit_d.append(dd)
+        times.append(np.concatenate(unit_t))
+        depths.append(np.concatenate(unit_d))
+    return times, depths, n_bins * bin_s
+
+
+def case_gate_window_covers_the_segment():
+    """The gate window must span the ten-minute segment it is named for.
+
+    RC-001-F1. Ten consecutive one-minute bin medians are ten point summaries
+    spanning only nine minutes between the extremes, and a 600-second segment
+    that does not start on a bin edge touches eleven session bins rather than
+    ten. Both errors cost exactly one bin and both are permissive, so the
+    ten-bin window passed motion above the tolerance in two different ways.
+    Eleven bins contain every bin any ten-minute segment can touch.
+
+    The third construction is not repaired by the window at all and is kept
+    because it is the declared boundary: a displacement moving fewer than half
+    of a bin's spikes leaves that bin's median exactly where it was.
+    """
+    print("gate window covers the ten-minute segment")
+    check("the pinned gate window is eleven bins",
+          bd.PARAMS["window_bins"] == 11, "%d" % bd.PARAMS["window_bins"])
+
+    # (a) a common linear ramp: 2.1 um/min is 21.0 um in ten minutes.
+    times, depths, extent = common_signal_band(ramp_um_per_min=2.1, n_bins=61,
+                                               seed=6101)
+    obs = bd.measure_band_drift(times, depths, extent)
+    ten = bd.excursions(obs["trace"], 10)[1]
+    check("ten bin medians span only nine minutes and understate the ramp",
+          ten < 20.0, "%.3f um against the 21.0 um the ramp travels" % ten)
+    check("eleven bin medians recover it and the candidate fails the gate",
+          obs["delta_window"] >= 21.0
+          and obs["delta_window"] > bd.PARAMS["threshold_strict_um"],
+          "%.3f um" % obs["delta_window"])
+
+    # (b) off-grid aliasing: the excursion straddles an eleventh bin.
+    levels = [0.0] + [15.0] * 9 + [30.0] + [15.0] * 20
+    times, depths, extent = common_signal_band(levels=levels, seed=6102)
+    obs = bd.measure_band_drift(times, depths, extent)
+    ten = bd.excursions(obs["trace"], 10)[1]
+    check("no aligned ten-bin window sees the off-grid excursion",
+          abs(ten - 15.0) < 1e-9, "%.3f um" % ten)
+    check("the eleven-bin window sees all 30 um of it",
+          abs(obs["delta_window"] - 30.0) < 1e-9, "%.3f um" % obs["delta_window"])
+
+    # (c) the declared boundary: half of a bin's spikes.
+    boundary = []
+    for fraction in (0.30, 0.49, 0.50, 0.51, 0.90):
+        times, depths, extent = common_signal_band(
+            levels=[0.0] * 31, episode=(15, fraction, 30.0), seed=6103)
+        boundary.append(bd.measure_band_drift(times, depths, extent)["delta_window"])
+    check("a within-bin excursion below half the bin's spikes is invisible",
+          boundary[0] == 0.0 and boundary[1] == 0.0,
+          "0.000 um at 30 and 49 percent of a 30 um episode")
+    check("exactly half registers half of it, and above half all of it",
+          abs(boundary[2] - 15.0) < 1e-9 and abs(boundary[3] - 30.0) < 1e-9
+          and abs(boundary[4] - 30.0) < 1e-9,
+          "%.3f, %.3f, %.3f um at 50, 51 and 90 percent" % tuple(boundary[2:]))
+
+    # (d) widening the window can only raise the statistic.
+    rng = np.random.default_rng(6104)
+    worst = 0.0
+    for _ in range(2000):
+        trace = rng.normal(0.0, 10.0, int(rng.integers(11, 90)))
+        worst = min(worst, bd.excursions(trace, 11)[1] - bd.excursions(trace, 10)[1])
+    check("eleven-bin windows dominate ten-bin windows, so the change only tightens",
+          worst >= 0.0, "worst difference %.6f um over 2000 random traces" % worst)
+
+    # (e) the covering property the repair rests on, checked rather than argued.
+    touched = set()
+    for offset_ms in range(0, 60000, 7):
+        start = offset_ms / 1000.0
+        first = int(np.floor(start / 60.0))
+        last = int(np.ceil((start + 600.0) / 60.0)) - 1
+        touched.add(last - first + 1)
+    check("a 600 s segment touches at most eleven session bins",
+          max(touched) == 11, "counts observed: %s" % sorted(touched))
 
 
 def main():
@@ -738,6 +877,7 @@ def main():
     case_known_ramp()
     case_down_and_back()
     case_worst_window()
+    case_gate_window_covers_the_segment()
     case_unit_inclusion()
     case_invalid_bin_rejects()
     case_too_few_units()

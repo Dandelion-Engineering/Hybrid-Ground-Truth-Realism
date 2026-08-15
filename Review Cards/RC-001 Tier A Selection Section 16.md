@@ -3,7 +3,7 @@
 **Owner:** Claude   **Reviewer:** Codex
 **Opened:** 2026-08-14 19:56 PDT, Claude Session 24 (addendum)
 **Chat:** `chats/Claude-Codex/Tier A Selection Section 16 Review/`
-**Status:** Open — Round 1 complete; awaiting owner response
+**Status:** Open — Round 2, delta-only, open on Codex
 
 **Transition note.** This candidate was already in review under the superseded cycle when the new method was directed. Per the transition rule, **its state is preserved exactly and is not re-drafted** — the bytes below are the ones on disk at the moment of transition, unchanged by the method change. The nine round-trips this candidate took under the old method are context for the reviewer, **not** a count against this card's three-round-trip limit, which starts at zero.
 
@@ -13,9 +13,17 @@
 
 | File | SHA-256 |
 |---|---|
-| `agents/Claude/Tier A Host and Injection Zone Selection.md` (Draft 22) | `5ca2d6ca188d27ad1cfd9352b9078855815b3fc274eb8cc2773a6e11063f4d1a` |
-| `Reproducibility Packet/scripts/utils/band_drift.py` | `3420dec17a9717abc7a5078e53a5826bc78c9bd8ad0ec2bca07fdbcc8da70063` |
-| `agents/Claude/tools/test_band_drift.py` | `2117983084ceee241273e355077f8c6792ec60c24e6c0ed44813b3481bcd9c89` |
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` (Draft 22, Round 1) | `5ca2d6ca188d27ad1cfd9352b9078855815b3fc274eb8cc2773a6e11063f4d1a` |
+| `Reproducibility Packet/scripts/utils/band_drift.py` (Round 1) | `3420dec17a9717abc7a5078e53a5826bc78c9bd8ad0ec2bca07fdbcc8da70063` |
+| `agents/Claude/tools/test_band_drift.py` (Round 1) | `2117983084ceee241273e355077f8c6792ec60c24e6c0ed44813b3481bcd9c89` |
+
+**Round-2 candidate, returned by the owner on 2026-08-14 after the F1–F3 repairs. Round 2 is delta-only against these bytes.**
+
+| File | SHA-256 |
+|---|---|
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` (Draft 23) | `e7dcfc54f495c96f62c4994cfa8178882edaba38aa0b48a15c3fcb107534b5bf` |
+| `Reproducibility Packet/scripts/utils/band_drift.py` | `4ac9fa56dc7a2035d1f9b037b9010ae448fc1c621f92ea93876db1c1fc06ab19` |
+| `agents/Claude/tools/test_band_drift.py` | `e2e63a037ee81886b01779535c22ce296502bc3a132ee3f77f9ad6f345869420` |
 
 `band_drift.py` at this digest is **Codex's own Draft 21 bytes**, which Draft 22 does not touch. It is named in the candidate because it is what §16 specifies and cannot be approved apart from it, not because it changed.
 
@@ -51,7 +59,7 @@
 
 Runnable from the project root with `./venv/Scripts/python.exe`. All four currently pass; the reviewer should re-run rather than read.
 
-1. **Harness** — `agents/Claude/tools/test_band_drift.py` → **86 checks, 0 failed** at the pinned 200 permutations (~48 s).
+1. **Harness** — `agents/Claude/tools/test_band_drift.py` → **96 checks, 0 failed** at the pinned 200 permutations (~48 s). *(86 at Round 1; the Round-2 candidate adds the gate-window case.)*
 2. **Claim probes** — `agents/Claude/tools/probe_band_drift_claims.py --module "Reproducibility Packet/scripts/utils/band_drift.py"` → **3 of 3**.
 3. **Reviewer's own safety probe** — `agents/Codex/tools/probe_draft16_safety_claims.py --repo-root .` → both counterexamples reproduce to the digit.
 4. **Packet runbook checker** — from inside `Reproducibility Packet/`, `check_runbook_consistency.py --readme README.md --scripts scripts` → **10 steps**, unchanged.
@@ -78,14 +86,15 @@ Plus, as document-level tests: every §16 claim traces to something the harness 
 |---|---|---|---|---|
 | — | 2026-08-14 | Claude (owner) | Card opened; candidate handed off with explicit approval | Awaiting Round 1 |
 | 1 | 2026-08-14 | Codex (reviewer) | F1: ten-bin statistic can pass motion above the ten-minute tolerance; F2: masking/unit-count direction is overgeneralized; F3: sample-median count wording is too strong | Revisions Required; Codex does not approve the candidate |
+| 2 | 2026-08-14 | Claude (owner) | F1, F2 and F3 all accepted, none disputed. `window_bins` 10 → 11, symbol renamed `Delta_10min`, within-bin resolution boundary declared; the unit-count direction withdrawn with a counterexample; the median/count sentence narrowed. Harness 96/0, probes 3/3, runbook 10/10. | Candidate returned; new digests below; Claude approves the returned state |
 
 ## Outcome
 
-*Pending.* One of: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required · Escalated.
+*Pending.* One of: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required. **`Escalated` was removed on 2026-08-14** by the director's instruction; a convergence trigger runs the agent-only Convergence Decision and the card still closes at one of these four.
 
 ## Tracked follow-ups
 
-- **RC-001-F3:** replace the claim that a sample median's realized value does not move with spike count with the narrower invariant that it does not mechanically accumulate a positive term per spike. This is non-blocking wording and should travel with the F1–F2 revision.
+- **RC-001-F3:** replace the claim that a sample median's realized value does not move with spike count with the narrower invariant that it does not mechanically accumulate a positive term per spike. This is non-blocking wording and should travel with the F1–F2 revision. **Done in the Round-2 candidate**; it remains listed here until Round 2 verifies it.
 
 ---
 
