@@ -1,7 +1,18 @@
 # Summary of Only Necessary Context — Claude
 
 **Rewritten at the end of Claude Session 24 · 2026-08-14 09:30 PDT**
+**Extended by the Session 24 addendum · 2026-08-14 20:12 PDT**
 **Next session is Claude Session 25. No count-based progress report is due** (the next is Session 32). A phase transition or an approved amendment written in your session would trigger one anyway.
+
+## 0. ⚠️ THE REVIEW METHOD CHANGED — read this before you review anything
+
+**Randy directed a new review method after Session 24 closed. It is appended to `Playbooks/review-cycle.md` as a superseding section and supersedes the rest of that playbook. Implemented at Claude Session 24 and Codex Session 24. Read that section in full — the old cycle you may remember from prior sessions no longer binds.**
+
+The shape: the **owner** writes a **Review Card** in `Review Cards/` *before* review begins, naming candidate state, scope, purpose, acceptance tests, blocking severity and exclusions; the candidate must be stable enough to accept, reject or return, and **open-ended co-design happens before review, not inside it**. **Round 1 is the only full-artifact pass**, with one numbered ledger of all reasonably discoverable findings — no stopping at the first blocker. Rounds 2+ are delta-only. A pre-existing blocker found later is a **LATE-BLOCKER** and must say why it was missed; a second one, or any new blocker after Round 2, goes to human triage or a split. **At most three owner-reviewer round-trips**, ending in Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required · Escalated. Reviewers apply **mechanical** corrections directly; substantive ones are findings for the owner. A closed review stays closed — later work gets a **new card and a new chat**.
+
+**Three readings are recorded in the playbook's operating notes and are mine, not Randy's** — he may overrule any of them: approval stays explicit and state-specific; an unchanged sentence made false by a change elsewhere **is** a regression introduced by the response and so is in scope after Round 1; and a LATE-BLOCKER created by an earlier repair says so rather than pretending to have been missed. **The second is the one that matters most to this project** — S24's own finding was exactly that shape, and the narrow reading would have shipped it.
+
+**Feedback on the method is an open obligation**, in `chats/Claude-Codex-Human/Review Method Change/` — Randy asked for it and asked that the chat stay active. What I said I would watch: whether Round 1 really arrives as one exhaustive ledger; whether the regression reading holds up when the agent invoking it benefits; whether three round-trips suffice for a candidate that took nine; and whether "Approved with Follow-ups" gets used honestly. **Report back there as evidence arrives.**
 
 You start with no memory of the last session. This file restores the state and nothing else. It omits anything already in `Project Details/Project Details.md`, the `Playbooks/`, or `AgentPrompt.md` — you re-read those anyway.
 
@@ -31,15 +42,16 @@ You start with no memory of the last session. This file restores the state and n
 
 ## 2. The first thing to do next session
 
-**Check the active chat before assuming anything. As of writing, everything open is open on Codex and nothing is open on you.**
+**Check the active chats before assuming anything. As of writing, everything open is open on Codex and nothing is open on you.**
 
-- `chats/Claude-Codex/Tier A Selection Review/` — **open on Codex:** Draft 22 plus the two implementation states, all three named by digest in the handoff. Nothing else is open in it.
-- `chats/Claude-Codex/Tier A Donor Matching Rule/` — **concluded.** Implementation review starts a new scoped chat.
-- `chats/Claude-Codex/Reproducibility Packet Review/` — **concluded.** Later packet additions start a new scoped chat.
+- `chats/Claude-Codex/Tier A Selection Section 16 Review/` — **the live review, governed by `Review Cards/RC-001 Tier A Selection Section 16.md`.** Open on Codex for **Round 1**, a full-artifact pass with one numbered ledger. Candidate = Draft 22 plus the two implementation states, all three named by digest and **unchanged by the method change**.
+- `chats/Claude-Codex-Human/Review Method Change/` — **active and stays active.** Randy's method, my assessment, and the running feedback he asked for. Codex has not answered yet.
+- `chats/Claude-Codex/Tier A Selection Review/` — **concluded** by the transition rule, with a `Summary.md` that is worth reading once: it records what nineteen corrections settled and the defect class that dominated them.
+- `chats/Claude-Codex/Tier A Donor Matching Rule/` · `chats/Claude-Codex/Reproducibility Packet Review/` — **concluded.** Later work starts a new card and a new chat.
 
-**If Draft 22 has come back approved, your lane is the archive-reading drift script** (§5.2) — write it, review it, and only then measure rank 1. **If it has not, do not measure a candidate and do not read one.** You may write, but not run, the archive reader.
+**If RC-001 closes as Approved, your lane is the archive-reading drift script** (§5.2) — and under the new method it gets **its own Review Card** before Codex reviews it. **Until RC-001 closes, do not measure a candidate and do not read one.** You may write, but not run, the archive reader.
 
-**§16 has now taken nine review round-trips.** Not one has been a repeated disagreement: every session since 19 accepted the other agent's corrections in full and then produced a *new* finding from the owner re-review pass. **Both agents have now said in writing where the end is.** I said in the Session 24 handoff why I think this one bottoms out: after Draft 22 the section makes no claim about what the per-unit values show in either direction, and a claim that says "this supports nothing on its own" has no next layer to be over-strong in. **If what comes back is a disagreement rather than a finding, take the playbook's escalation to the director rather than a tenth turn.**
+**§16 took nine round-trips under the old method** and every one produced a new finding rather than repeating a disagreement. **That history is context for Codex's Round 1, not a count against RC-001's three-round-trip limit, which starts at zero.** Both agents had independently written that they believed the chain had bottomed out; Round 1 is the test of that.
 
 ## 3. What Session 24 did
 
@@ -230,9 +242,11 @@ Amendment 6 point 1 requires **every block's ten scheduled donors to admit a joi
 
 ## 11. Housekeeping that is easy to get wrong
 
+- **Review Cards live in `Review Cards/` at the root**, `RC-<nnn> <short title>.md`, with the template and index in that folder's `README.md`. **The owner writes the card before review begins** and both agents append the round log and the outcome to it. A card scopes a review; **it does not amend the Claim Sheet** — the amendment protocol still governs that. The public root README carries one orientation line for the folder.
+- **`Playbooks/review-cycle.md` is now two documents in one file:** a superseding method at the top and the retained superseded cycle below it. **Read the top section; do not reach below it to fill a gap** without saying so in the review's own chat.
 - **`Accessible Claim Sheet.md` must stay in sync with `Claim Sheet.md` forever**, including amendment status flips, in the same session. **Their wording may legitimately differ where their own texts differ.** Sync is of content, not of words.
 - **This run is agent-selected**, so the run-provenance block on the public README is required and survives unchanged into State B. Never move it below the result.
-- **The root README's running log is lean and append-only** — entries only for a finished artifact, a phase close, or something genuinely noteworthy. The banner's "Last updated" is the one line that may be overwritten. **Session 24 added one entry** (46 total) on the safeguard's blind spot and its unit-count direction; the banner stayed at 2026-08-14. **Four consecutive entries now describe this one review chain — check the bar deliberately before adding a fifth.**
+- **The root README's running log is lean and append-only** — entries only for a finished artifact, a phase close, or something genuinely noteworthy. The banner's "Last updated" is the one line that may be overwritten. **Session 24 added one entry** (46) on the safeguard's blind spot, **and its addendum a second** (47) on the review-method change; the banner stayed at 2026-08-14. **Four consecutive entries describe the §16 review chain — check the bar deliberately before adding a fifth on it.**
 - **Kilosort4 is GPLv3.** Call it as a tool through SpikeInterface. Never vendor, never link. For sorter internals use SpikeInterface's MIT `sortingcomponents`.
 - **Corrections propagate forward, never backward.** The review cycle is the only exception, and only for artifacts in active review.
 - **`pdflatex` is at `/c/Users/cresp/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex`**; `pdftoppm` and `pdftotext` are available. Build twice, check the log, render changed and final pages before approving a PDF.

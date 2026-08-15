@@ -165,3 +165,59 @@ Measured at **2026-08-14 09:07 PDT**, immediately before any work: **RAM 4.47 Gi
 2. **If it comes back approved, my lane is the archive-reading CLI** — packet step 11, targeted range reads over the ragged `spike_times` and `spike_distances_from_probe_tip_um` slices for band units only, with the four §16.8 confirmations before it computes anything. Only then does rank 1 get measured.
 3. **If it comes back as a disagreement rather than a finding, escalate to the director** per the review-cycle playbook rather than taking a tenth turn.
 4. Still open and unowned by this session: the capacity gate under Amendment 6's stricter ten-placement condition (Codex owns the footprint calibration it depends on), the preprocessing half of the amplitude question (Rung 0), and the 66 unmapped host long names (a licence question, not a coding one).
+
+---
+
+# Addendum — the review method changed after this session closed
+
+**Date and time:** 2026-08-14 20:10 PDT
+**Type:** Director-directed process change, implemented as an addendum to Session 24 rather than as a new session.
+
+## What happened
+
+After Session 24 closed and the turn had been handed to Codex, Randy directed a new review method and asked that it be relayed to both agents, appended to the review-cycle playbook as superseding text, and tracked for feedback in a three-way chat. Because this is an addendum rather than a new session, I re-took `.agent-session.lock` before doing anything — Codex had not started, and `.agent-turn` was left reading `Codex` throughout, so the handoff from the main session stands.
+
+**No project work occurred and no candidate state changed by a byte.** No host, drift value, manifest, donor, dependency install, network or archive read, Rung 0, generator or sorter run.
+
+## The method, in one paragraph
+
+The owner writes a **Review Card** before review begins, naming the candidate state, scope, purpose, acceptance tests, blocking-severity definition and explicit exclusions; the candidate must be stable enough to accept, reject or return, and open-ended co-design happens *before* review rather than inside it. **Round 1 is the only full-artifact pass** and records every reasonably discoverable finding in one numbered ledger rather than stopping at the first blocker. Rounds 2+ are delta-only. A pre-existing blocker found after Round 1 is marked **LATE-BLOCKER**, must be genuinely purpose-invalidating, and must say why it was missed; a second one, or any new blocker after Round 2, goes to human triage or a split. A review has **at most three owner-reviewer round-trips**, and at the limit the outcome is one of Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required · Escalated — the limit never forces approval. Reviewers may apply mechanical corrections directly; substantive changes are proposed as findings for the owner to integrate.
+
+**Implemented at Claude Session 24 and Codex Session 24.** Transition rule, also directed: an artifact currently under review preserves its exact state and restarts the cycle with it.
+
+## What was built
+
+| File | What it is |
+|---|---|
+| `Playbooks/review-cycle.md` | The method appended as a **superseding section**, with a pointer at the top. Everything below it is explicitly retained as the superseded record, not as binding text. Carries operating notes recording the three readings I had to make, and a superseding quality checklist. |
+| `Review Cards/README.md` | New root folder. Card template, `RC-<nnn> <short title>.md` naming, and the index. |
+| `Review Cards/RC-001 Tier A Selection Section 16.md` | The first card, for the one artifact that was mid-review. Candidate digests unchanged; scope, exclusions, purpose, four runnable acceptance tests, blocking-severity definition, round log, outcome, follow-ups. |
+| `chats/Claude-Codex/Tier A Selection Review/` | **Concluded**, with a `Summary.md` recording what the chat settled, the dominant defect class across its nineteen corrections, and the carried-forward state. |
+| `chats/Claude-Codex/Tier A Selection Section 16 Review/` | New chat for RC-001, opened with the owner handoff for Codex's Round 1. |
+| `chats/Claude-Codex-Human/Review Method Change/` | New three-way chat. Randy's instruction verbatim, what was implemented, my assessment, and the feedback he asked to be kept running. **Stays active.** |
+| `README.md` | One orientation line for `Review Cards/`, one running-log entry on the method change. |
+
+## Judgement calls I made, and flagged as mine
+
+1. **I concluded a chat Codex shares, unilaterally.** The transition rule makes the old cycle inapplicable, but concluding a shared chat is normally mutual. Recorded as a unilateral call in both the closing message and the three-way chat, with the venue for objecting named.
+2. **Approval stays explicit and state-specific.** The method says "once both agents approve" without saying how. Dropping the superseded playbook's one non-negotiable would have been a real loosening, so I preserved it and flagged the reading for Randy to overrule.
+3. **An unchanged sentence made false by a change elsewhere is a regression introduced by the response**, and so is in scope after Round 1. This is the reading I most want confirmed: it is the single most productive finding class in this project's history, and the narrow reading of "unchanged material is not re-audited" would have ruled out this very session's finding.
+4. **A LATE-BLOCKER created by an earlier repair says so** rather than pretending to have been missed.
+5. **A test for "mechanical"** — a correction is mechanical only if it cannot change what any consumer of the artifact does, settled by the proof habits already in use rather than by assertion.
+6. **Precedence against the constitution.** `Project Details.md` escalates a *specific disagreement* at ~2 round-trips; the method caps the *review* at 3. I read both as binding on different objects and wrote that down.
+
+## The problems I raised with Randy
+
+- **The limit converts agent time into director time**, and those are not interchangeable — he is asynchronous by design. Rounds 4–9 on §16 caught two one-way safety claims that would otherwise have shipped into the gate deciding this experiment's host recording. Under the new limit those become Escalated or follow-ups. I said plainly that I expect the stable-candidate clause to prevent most such rounds from ever being needed, so this is a thing to watch rather than an objection.
+- **"Revisions Required" plus "new versions get new cards" is a potential loophole in the limit** — an unbounded review could be carded as RC-007, -008, -009 on the same candidate and satisfy the rule three round-trips at a time. Suggested a cheap guard (a `Supersedes:` line naming predecessor cards) but did **not** adopt it unilaterally, because it would be adding to his method.
+- **Ownership is undefined for co-owned artifacts.** The Reproducibility Packet is co-owned; the method says *the owner* writes the card. Not urgent now, but it needs an answer before Phase 3 puts three deliverables under review at once.
+
+## Assessment, honestly
+
+The method diagnoses the real problem, and the evidence is my own work. §16 took nine round-trips not because it was hard but because **we were co-designing inside the review loop** — there was never a fixed candidate, so every round could legitimately find something and nothing could ever declare the review finished. The clause I expect to do the most work is not the round-trip limit but *"the candidate must be stable enough to accept, reject, or return."* The exhaustive-Round-1 rule fixes a second real failure: several of those nine rounds were serial blocking, one blocker at a time.
+
+The thing I will be watching, and reporting in the three-way chat: whether Codex's Round 1 on RC-001 actually arrives as one exhaustive ledger; whether reading (3) above holds up when the agent invoking it is the one who benefits; whether three round-trips suffice for a candidate that took nine; and whether "Approved with Follow-ups" is used honestly rather than as a way to close over unresolved findings.
+
+## State at the end of the addendum
+
+`.agent-session.lock` deleted; `.agent-turn` left reading `Codex`, unchanged from the main session's handoff. Committed as **`Claude Session 24 addendum`**.
