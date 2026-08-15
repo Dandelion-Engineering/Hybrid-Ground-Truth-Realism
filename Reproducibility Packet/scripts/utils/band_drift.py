@@ -72,17 +72,34 @@ For one probe, one anatomical band and one recording:
    eleven-bin one -- so it can turn a pass into a rejection but never the
    reverse.
 
-   What the quantity does not bound is motion the bin medians do not express.
-   A displacement that moves fewer than half of a bin's spikes leaves that
-   bin's median exactly where it was. Measured on a 30 um episode confined
-   inside one bin: the reported excursion is 0.000 um at every displaced
-   fraction below one half, 15.000 um at exactly one half, and 30.000 um above
-   it. That boundary is a property of the median the whole quantity rests on
-   and it is permissive -- it can only understate drift, never invent it. It is
-   declared rather than repaired because the inclusion floor is ten spikes per
-   bin, so any sub-bin statistic would rest on five or fewer center-of-mass
-   depths for a marginal unit and would reintroduce the per-spike noise the bin
-   median exists to remove.
+   What the quantity does not bound is motion confined below the bin width,
+   and how much of such a displacement reaches a bin median is not fixed. A
+   median tracks rank, so displacing k of a bin's n spikes upward carries that
+   bin's median toward the depths sitting k ranks above it, and how far away
+   those are belongs to the within-bin depth distribution rather than to
+   medians. A downward displacement is the same statement read the other way,
+   because negating every depth negates the median. Where
+   every spike in a bin shares a depth, a 30 um episode confined to one bin
+   reports 0.000 um at every displaced fraction below one half, 15.000 um at
+   exactly one half and 30.000 um above it. Where the depths are spread -- 49
+   at one level, two just above them, 49 far above -- the same episode reports
+   29.000 um at a displaced fraction as low as one fiftieth and fails the
+   strict gate, and a single displaced spike in a hundred already moves that
+   bin's median 14.500 um. Where the episode falls on the bin grid matters for the same reason,
+   because the grid fixes k: the same displaced spikes report 30.000 um inside
+   one bin and 0.000 um split across two. What holds across all of them is a
+   bound and not a cutoff -- a bin median moves by at most the offset itself
+   and at most the distance to the depth k ranks above it, at zero violations
+   over 4,000 random cases across four depth families -- and the
+   equal-baseline sweep is the corner where that distance is zero. So this
+   quantity has no guaranteed resolution below the bin width in either
+   direction: it neither bounds sub-minute motion nor is reliably deaf to it,
+   and none of these per-bin numbers bounds Delta_10min itself, which composes
+   a second median across units on top of them. The boundary is declared
+   rather than repaired because the inclusion floor is ten spikes per bin, so
+   any sub-bin statistic would rest on five or fewer center-of-mass depths for
+   a marginal unit and would reintroduce the per-spike noise the bin median
+   exists to remove.
 
 The null
 --------

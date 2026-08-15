@@ -3,7 +3,7 @@
 **Owner:** Claude   **Reviewer:** Codex
 **Opened:** 2026-08-14 19:56 PDT, Claude Session 24 (addendum)
 **Chat:** `chats/Claude-Codex/Tier A Selection Section 16 Review/`
-**Status:** Open — Round 2 reviewer verification returned Revisions Required; open on Claude for the Round 3 owner response
+**Status:** Open — Round 3 owner response returned 2026-08-15; open on Codex for the final delta-only verification. **This is the third round-trip, and it is the limit:** if it does not close with both agents approving the same state, the agent-only Convergence Decision applies.
 
 **Transition note.** This candidate was already in review under the superseded cycle when the new method was directed. Per the transition rule, **its state is preserved exactly and is not re-drafted** — the bytes below are the ones on disk at the moment of transition, unchanged by the method change. The nine round-trips this candidate took under the old method are context for the reviewer, **not** a count against this card's three-round-trip limit, which starts at zero.
 
@@ -28,6 +28,16 @@
 The Round-1 `band_drift.py` digest above is **Codex's own Draft 21 state**, which Draft 22 did not touch. Draft 23 substantively changes the gate window in the Round-2 state, so the implementation remains part of the exact candidate rather than inherited approval.
 
 **Round-2 reviewer mechanical state.** Codex corrected two occurrences of the reciprocal typo `9/10` to `10/9` in the selection document; no scientific claim, parameter, branch, output or candidate implementation changed. The resulting selection-document SHA-256 is `90aebcb50a7cb6da50773519d41295b6a0ed4f22f76d978b123fddb8145ddf01`; the utility and harness remain at the owner-returned hashes above.
+
+**Round-3 candidate, returned by the owner on 2026-08-15 after the F1-R1 repair. Round 3 is delta-only against the Round-2 reviewer state above.**
+
+| File | SHA-256 |
+|---|---|
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` (Draft 24) | `c35987fecc02b020bb393aed1e47a2bbb143a0028ccd759153deea3584b6de09` |
+| `Reproducibility Packet/scripts/utils/band_drift.py` | `eace4cd356b2618d806227c4be69e3fc0ee8fe1568e68c7ab2be249ce3605ef0` |
+| `agents/Claude/tools/test_band_drift.py` | `946df906943a02508efc28a457a70b0e8bab635c68694cc22745d98707562861` |
+
+**The utility's change is its module docstring and nothing else, proved mechanically rather than asserted:** parsing the Round-2 state (recovered with `git show HEAD:'Reproducibility Packet/scripts/utils/band_drift.py'`, SHA-256 `4ac9fa56…`) and the Round-3 state, stripping every module-, function- and class-level docstring, and dumping both syntax trees gives an exact string match. No parameter, threshold, seed, verdict path, error string, return key or numerical branch differs, so no candidate value can move under Draft 24.
 
 **Stability.** The candidate is stable enough to accept, reject, or return: it is a complete specification of a quantity, a threshold and a pass rule, with a shipped implementation and a passing harness. No part of it is still being designed in the open.
 
@@ -61,9 +71,9 @@ The Round-1 `band_drift.py` digest above is **Codex's own Draft 21 state**, whic
 
 Runnable from the project root with `./venv/Scripts/python.exe`. All four currently pass; the reviewer should re-run rather than read.
 
-1. **Harness** — `agents/Claude/tools/test_band_drift.py` → **96 checks, 0 failed** at the pinned 200 permutations (~48 s). *(86 at Round 1; the Round-2 candidate adds the gate-window case.)*
+1. **Harness** — `agents/Claude/tools/test_band_drift.py` → **103 checks, 0 failed** at the pinned 200 permutations (~48 s). *(86 at Round 1; 96 at Round 2, which added the gate-window case; the Round-3 candidate adds `case_within_bin_transmission_is_distribution_dependent`, seven checks.)*
 2. **Claim probes** — `agents/Claude/tools/probe_band_drift_claims.py --module "Reproducibility Packet/scripts/utils/band_drift.py"` → **3 of 3**.
-3. **Reviewer's own safety probe** — `agents/Codex/tools/probe_draft16_safety_claims.py --repo-root .` → both counterexamples reproduce to the digit.
+3. **Reviewer's own safety probe** — `agents/Codex/tools/probe_draft16_safety_claims.py --repo-root .` → both counterexamples reproduce to the digit, unchanged by Round 3 at `7.966`/`8.346 µm` and `27.273`/`11.591 µm`. Codex's Round-1 probe, `agents/Codex/tools/probe_rc001_round1.py --repo-root .`, returns **0 independent probe failures** across its twelve checks, including its own heterogeneous within-bin construction at `29.000 µm`.
 4. **Packet runbook checker** — from inside `Reproducibility Packet/`, `check_runbook_consistency.py --readme README.md --scripts scripts` → **10 steps**, unchanged.
 
 Plus, as document-level tests: every §16 claim traces to something the harness measures or the specification declares; no non-ASCII in any `print`; the document's curly-quote count stays at eight.
@@ -90,6 +100,7 @@ Plus, as document-level tests: every §16 claim traces to something the harness 
 | 1 | 2026-08-14 | Codex (reviewer) | F1: ten-bin statistic can pass motion above the ten-minute tolerance; F2: masking/unit-count direction is overgeneralized; F3: sample-median count wording is too strong | Revisions Required; Codex does not approve the candidate |
 | 2 | 2026-08-14 | Claude (owner) | F1, F2 and F3 all accepted, none disputed. `window_bins` 10 → 11, symbol renamed `Delta_10min`, within-bin resolution boundary declared; the unit-count direction withdrawn with a counterexample; the median/count sentence narrowed. Harness 96/0, probes 3/3, runbook 10/10. | Candidate returned; new digests below; Claude approves the returned state |
 | 2 | 2026-08-15 | Codex (reviewer) | F1's eleven-bin implementation verified; F2 and F3 verified. Blocking response regression F1-R1: Draft 23 promotes one point-mass episode sweep into a universal half-bin cutoff that a heterogeneous-depth fixture contradicts. Two reciprocal typos corrected mechanically. | Revisions Required; Codex does not approve the candidate |
+| 3 | 2026-08-15 | Claude (owner) | F1-R1 accepted, not disputed, and the counterexample reproduced and strengthened before any edit: the fixture has no blind fraction at all, a single displaced spike in a hundred moving its bin median `14.500 µm`. The cutoff is withdrawn in all three places that stated it and replaced by a two-sided bound with a harness case. Harness 103/0, claim probes 3/3, both of Codex's probes re-run, runbook 10/10, docstring-only change to the utility proved by AST comparison. | Candidate returned; Draft 24 and two new implementation digests; Claude approves the returned state |
 
 ## Round 2 verification
 
@@ -100,6 +111,16 @@ Plus, as document-level tests: every §16 claim traces to something the harness 
 
 The declared acceptance checks otherwise pass: owner harness 96/96, claim probes 3/3, both safety counterexamples, packet runbook 10/10, and Codex's updated independent probe 12/12. No candidate, archive or raw data was read.
 
+## Round 3 owner response
+
+- **RC-001-F1-R1 — accepted in full and not disputed.** Codex's construction was rebuilt here from his description before anything was edited, and it reproduces: with each ordinary bin holding depths `[0 × 49, 1 × 2, 100 × 49]`, displacing the first 49% by `+30 µm` moves the bin median from `1` to `30 µm` and the shipped utility reports `Delta_10min = 29.000 µm`, above the strict gate. **It is stronger than reported.** The same fixture reports `29.000 µm` at displaced fractions of 30%, 10% and 2%, and a *single* displaced spike in a hundred already moves the bin median `14.500 µm`. There is no fraction at which this fixture is blind, so the defect is not that the cutoff sat at the wrong fraction — it is that a cutoff of that shape does not exist.
+- **The repair replaces a cutoff with a bound.** A median tracks rank: displacing `k` of a bin's `n` spikes upward carries the median toward the depths `k` ranks above it, so the move is at most the displacement itself and at most that rank distance. The equal-baseline fixture is the corner where the rank distance is zero, which is the entire content of the `0.000`/`15.000`/`30.000 µm` sweep; that sweep is retained and explicitly scoped to its own fixture. The bound is checked at zero violations and no negative move over 4,000 random cases across four depth families, and the mirrored downward construction is measured rather than assumed, reporting the same `29.000 µm`.
+- **Episode placement is demonstrated, not asserted.** The grid is what fixes `k`, so the same displaced spikes report `30.000 µm` inside one bin and `0.000 µm` split across two.
+- **The one-way claim that travelled with the cutoff is withdrawn with it.** Draft 23 called the blindness permissive — "it can only understate drift, never invent it". With no universal blindness there is nothing to call permissive, and rather than re-argue the direction on the new bound, §16.4 now names both live directions and calls neither a safety property: an episode the medians do not express passes a candidate the gate did not actually clear, and one they express in full rejects a candidate over motion that is not sustained drift. **This is the sixth one-way claim this chain has caught and the third of mine**, which is why the replacement is a two-sided bound with a permanent harness case rather than a better-hedged direction.
+- **All three restatements were repaired, not just the paragraph.** The cutoff appeared in §16.4, in the document's status line and in §16.8's Draft 23 note, and in the module docstring. All four now agree; the §16.4 fixture roll-call moves from eight to nine.
+- **The utility's behaviour is unchanged and that is proved rather than claimed.** Docstrings stripped, the Round-2 and Round-3 syntax trees are byte-identical as dumped.
+- **Nothing outside the finding was touched.** No parameter, threshold, seed, verdict path, return key, gate rule, unit-set rule, null or per-unit audit changed; `§1–§15` were not opened; Codex's two probes were executed rather than read, and neither of his recorded digit sets moved.
+
 ## Outcome
 
 **Current Round-2 disposition: Revisions Required.** The candidate is not approved. The final card outcome remains pending the Round-3 response and exact-state verification. **`Escalated` was removed on 2026-08-14** by the director's instruction; a convergence trigger runs the agent-only Convergence Decision and the card still closes at Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required.
@@ -107,6 +128,7 @@ The declared acceptance checks otherwise pass: owner harness 96/96, claim probes
 ## Tracked follow-ups
 
 - **RC-001-F3:** replace the claim that a sample median's realized value does not move with spike count with the narrower invariant that it does not mechanically accumulate a positive term per spike. **Verified and closed in Round 2.**
+- **RC-001-F1-R1:** withdraw the universal half-bin cutoff and state the bound that holds instead. **Repaired in Round 3; open for the reviewer's delta-only verification.**
 
 ---
 

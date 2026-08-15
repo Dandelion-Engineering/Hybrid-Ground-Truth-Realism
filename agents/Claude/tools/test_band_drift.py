@@ -738,7 +738,8 @@ def case_per_unit_audit_absence_proves_nothing(n_permutations):
 
 
 def common_signal_band(levels=None, ramp_um_per_min=None, n_bins=31, n_units=5,
-                       spikes_per_bin=100, episode=None, seed=6100):
+                       spikes_per_bin=100, episode=None, episodes=None,
+                       within_bin_offsets=None, seed=6100):
     """Build a band carrying a common depth signal and no per-unit noise.
 
     Exactly one of ``levels`` (piecewise-constant per-bin depth) and
@@ -754,6 +755,11 @@ def common_signal_band(levels=None, ramp_um_per_min=None, n_bins=31, n_units=5,
         spikes_per_bin: spikes per unit per bin, well above the inclusion floor.
         episode: ``(bin_index, fraction, offset_um)`` displacing that fraction
             of one bin's spikes, or None.
+        episodes: a list of such tuples, when an episode has to be split across
+            bins. Mutually exclusive with ``episode``.
+        within_bin_offsets: ``spikes_per_bin`` depth offsets in micrometres,
+            added to every bin of every unit in spike-time order, or None for
+            the equal-baseline case where every spike in a bin shares a depth.
         seed: fixture seed for the within-bin spike times.
 
     Returns:
@@ -761,6 +767,14 @@ def common_signal_band(levels=None, ramp_um_per_min=None, n_bins=31, n_units=5,
     """
     if (levels is None) == (ramp_um_per_min is None):
         raise ValueError("give exactly one of levels and ramp_um_per_min")
+    if episode is not None and episodes is not None:
+        raise ValueError("give at most one of episode and episodes")
+    if episodes is None:
+        episodes = [episode] if episode is not None else []
+    if within_bin_offsets is not None:
+        within_bin_offsets = np.asarray(within_bin_offsets, dtype=float)
+        if within_bin_offsets.size != spikes_per_bin:
+            raise ValueError("within_bin_offsets must hold spikes_per_bin values")
     rng = np.random.default_rng(seed)
     bin_s = bd.PARAMS["bin_seconds"]
     if levels is not None:
@@ -774,15 +788,146 @@ def common_signal_band(levels=None, ramp_um_per_min=None, n_bins=31, n_units=5,
                 dd = np.full(spikes_per_bin, levels[b] + 100.0 * u)
             else:
                 dd = ts / 60.0 * ramp_um_per_min + 100.0 * u
-            if episode is not None and b == episode[0]:
-                k = int(round(episode[1] * spikes_per_bin))
-                dd = dd.copy()
-                dd[:k] += episode[2]
+            if within_bin_offsets is not None:
+                dd = dd + within_bin_offsets
+            for bin_index, fraction, offset_um in episodes:
+                if b == bin_index:
+                    k = int(round(fraction * spikes_per_bin))
+                    dd = dd.copy()
+                    dd[:k] += offset_um
             unit_t.append(ts)
             unit_d.append(dd)
         times.append(np.concatenate(unit_t))
         depths.append(np.concatenate(unit_d))
     return times, depths, n_bins * bin_s
+
+
+def _median_shift_bound(sorted_depths, k, offset_um):
+    """Bound how far a bin median moves when k of its depths rise by an offset.
+
+    Each order statistic of the displaced sample is at most its own value plus
+    ``offset_um``, and -- while there are still that many ranks left -- at most
+    the value ``k`` ranks above it, because the ``j + k`` smallest original
+    depths contain at least ``j`` that did not move. The median of those
+    elementwise caps therefore bounds the displaced median.
+
+    Args:
+        sorted_depths: the bin's original depths, ascending.
+        k: how many of them are displaced upward.
+        offset_um: the displacement in micrometres.
+
+    Returns:
+        float: the largest move the bin median can make, in micrometres.
+    """
+    n = sorted_depths.size
+    j = np.arange(n)
+    ahead = np.where(j + k <= n - 1,
+                     sorted_depths[np.minimum(j + k, n - 1)], np.inf)
+    caps = np.minimum(sorted_depths + offset_um, ahead)
+    return float(np.median(caps) - np.median(sorted_depths))
+
+
+def case_within_bin_transmission_is_distribution_dependent():
+    """How much of a sub-minute displacement reaches a bin median is not fixed.
+
+    RC-001-F1-R1. Draft 23 promoted the equal-baseline sweep in
+    ``case_gate_window_covers_the_segment`` into a general property of sample
+    medians: that a displacement moving fewer than half of a bin's spikes
+    leaves that bin's median exactly where it was. It is not general. A median
+    tracks rank, so moving ``k`` of a bin's ``n`` spikes upward carries the
+    median toward the depths sitting ``k`` ranks above it, and how far away
+    those are is a property of the within-bin depth distribution. The
+    equal-baseline fixture puts them at zero distance; a spread distribution
+    puts them far away. Both fixtures are kept, along with the bound that
+    covers every case between them and the demonstration that where the
+    episode falls on the bin grid matters too.
+    """
+    print("within-bin transmission depends on the depth distribution")
+    heterogeneous = [0.0] * 49 + [1.0] * 2 + [100.0] * 49
+
+    # (a) the reviewer's counterexample, and far below its stated fraction.
+    transmitted = []
+    for fraction in (0.02, 0.10, 0.30, 0.49):
+        times, depths, extent = common_signal_band(
+            levels=[0.0] * 31, within_bin_offsets=heterogeneous,
+            episode=(15, fraction, 30.0), seed=6105)
+        transmitted.append(
+            bd.measure_band_drift(times, depths, extent)["delta_window"])
+    check("a spread within-bin distribution passes a sub-half episode through",
+          all(abs(value - 29.0) < 1e-9 for value in transmitted),
+          "%.3f, %.3f, %.3f, %.3f um at 2, 10, 30 and 49 percent of a 30 um "
+          "episode" % tuple(transmitted))
+    check("and it fails the gate the equal-baseline fixture passes at 0 um",
+          transmitted[-1] > bd.PARAMS["threshold_strict_um"],
+          "%.3f um against the %.1f um strict threshold"
+          % (transmitted[-1], bd.PARAMS["threshold_strict_um"]))
+    times, depths, extent = common_signal_band(
+        levels=[0.0] * 31, within_bin_offsets=heterogeneous,
+        episode=(15, 0.01, 30.0), seed=6105)
+    single = bd.measure_band_drift(times, depths, extent)["delta_window"]
+    check("even one displaced spike in a hundred moves that bin's median",
+          abs(single - 14.5) < 1e-9,
+          "%.3f um from a single spike, so the fixture has no blind fraction"
+          % single)
+
+    # (b) the same displaced spikes, placed differently on the bin grid.
+    times, depths, extent = common_signal_band(
+        levels=[0.0] * 31, episode=(15, 0.60, 30.0), seed=6106)
+    whole = bd.measure_band_drift(times, depths, extent)["delta_window"]
+    times, depths, extent = common_signal_band(
+        levels=[0.0] * 31, episodes=[(15, 0.30, 30.0), (16, 0.30, 30.0)],
+        seed=6106)
+    split = bd.measure_band_drift(times, depths, extent)["delta_window"]
+    check("the same displaced spikes split across a bin boundary read lower",
+          abs(whole - 30.0) < 1e-9 and split == 0.0,
+          "%.3f um inside one bin against %.3f um split across two"
+          % (whole, split))
+
+    # (c) the bound that covers both fixtures, checked rather than argued.
+    rng = np.random.default_rng(6107)
+    worst_excess = -np.inf
+    worst_negative = np.inf
+    for _ in range(4000):
+        n = int(rng.integers(10, 201))
+        family = int(rng.integers(0, 4))
+        if family == 0:
+            depths_in_bin = rng.normal(0.0, 40.0, n)
+        elif family == 1:
+            depths_in_bin = np.zeros(n)
+        elif family == 2:
+            depths_in_bin = np.where(rng.random(n) < 0.5, 0.0, 100.0)
+        else:
+            depths_in_bin = np.concatenate(
+                [np.zeros(n // 2), np.ones(2), np.full(n - n // 2 - 2, 100.0)])
+        k = int(rng.integers(0, n + 1))
+        offset_um = float(rng.uniform(0.0, 80.0))
+        moved = np.zeros(n, dtype=bool)
+        moved[rng.choice(n, size=k, replace=False)] = True
+        shift = (float(np.median(depths_in_bin + moved * offset_um))
+                 - float(np.median(depths_in_bin)))
+        bound = _median_shift_bound(np.sort(depths_in_bin), k, offset_um)
+        worst_excess = max(worst_excess, shift - bound)
+        worst_negative = min(worst_negative, shift)
+    check("the bin median's move stays inside its rank-and-offset bound",
+          worst_excess <= 1e-9 and worst_negative >= -1e-9,
+          "worst excess %.3e um, most negative move %.3e um over 4000 cases"
+          % (worst_excess, worst_negative))
+    mirrored = [-value for value in heterogeneous]
+    times, depths, extent = common_signal_band(
+        levels=[0.0] * 31, within_bin_offsets=mirrored,
+        episode=(15, 0.49, -30.0), seed=6105)
+    mirror = bd.measure_band_drift(times, depths, extent)["delta_window"]
+    check("the mirrored downward construction reports the same magnitude",
+          abs(mirror - 29.0) < 1e-9,
+          "%.3f um downward against %.3f um upward"
+          % (mirror, transmitted[-1]))
+
+    check("the equal-baseline sweep is the corner of that bound that is zero",
+          _median_shift_bound(np.zeros(100), 49, 30.0) == 0.0
+          and _median_shift_bound(np.array(sorted(heterogeneous)), 49, 30.0)
+          >= 29.0,
+          "0.000 um flat against %.3f um spread"
+          % _median_shift_bound(np.array(sorted(heterogeneous)), 49, 30.0))
 
 
 def case_gate_window_covers_the_segment():
@@ -795,9 +940,12 @@ def case_gate_window_covers_the_segment():
     ten-bin window passed motion above the tolerance in two different ways.
     Eleven bins contain every bin any ten-minute segment can touch.
 
-    The third construction is not repaired by the window at all and is kept
-    because it is the declared boundary: a displacement moving fewer than half
-    of a bin's spikes leaves that bin's median exactly where it was.
+    The third construction is not repaired by the window at all and is kept as
+    one fixture's behaviour: in an equal-baseline bin, where every spike shares
+    a depth, a displacement moving fewer than half of that bin's spikes leaves
+    its median where it was. That is a property of this fixture and not of
+    medians in general -- see
+    ``case_within_bin_transmission_is_distribution_dependent``.
     """
     print("gate window covers the ten-minute segment")
     check("the pinned gate window is eleven bins",
@@ -825,16 +973,16 @@ def case_gate_window_covers_the_segment():
     check("the eleven-bin window sees all 30 um of it",
           abs(obs["delta_window"] - 30.0) < 1e-9, "%.3f um" % obs["delta_window"])
 
-    # (c) the declared boundary: half of a bin's spikes.
+    # (c) one fixture's within-bin behaviour: equal baseline depths.
     boundary = []
     for fraction in (0.30, 0.49, 0.50, 0.51, 0.90):
         times, depths, extent = common_signal_band(
             levels=[0.0] * 31, episode=(15, fraction, 30.0), seed=6103)
         boundary.append(bd.measure_band_drift(times, depths, extent)["delta_window"])
-    check("a within-bin excursion below half the bin's spikes is invisible",
+    check("in an equal-baseline bin, a sub-half episode is invisible",
           boundary[0] == 0.0 and boundary[1] == 0.0,
           "0.000 um at 30 and 49 percent of a 30 um episode")
-    check("exactly half registers half of it, and above half all of it",
+    check("in that fixture, half registers half of it and above half all of it",
           abs(boundary[2] - 15.0) < 1e-9 and abs(boundary[3] - 30.0) < 1e-9
           and abs(boundary[4] - 30.0) < 1e-9,
           "%.3f, %.3f, %.3f um at 50, 51 and 90 percent" % tuple(boundary[2:]))
@@ -878,6 +1026,7 @@ def main():
     case_down_and_back()
     case_worst_window()
     case_gate_window_covers_the_segment()
+    case_within_bin_transmission_is_distribution_dependent()
     case_unit_inclusion()
     case_invalid_bin_rejects()
     case_too_few_units()
