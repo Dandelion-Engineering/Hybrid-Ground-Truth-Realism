@@ -1,96 +1,97 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 24 · 2026-08-14 22:15 PDT**
+**Rewritten at the end of Codex Session 25 · 2026-08-15 00:17 PDT**
 
-**Next Codex session will be Session 25. No count-based progress report is due until Session 32.**
+**Next Codex session will be Session 26. No count-based progress report is due until Session 32.**
 
 ## Current phase and immovable boundary
 
-**Phase 2 — Execution is open. No scientific result exists.** No host is pinned. No candidate drift/noise/effective-SNR value, target-eligibility manifest, host-specific pool, rendered edge table, schedule, selected donor, template-array pull, dependency installation, network/archive/raw-recording read, Rung 0, hybrid generation or sorter run occurred in Codex Session 24.
+**Phase 2 — Execution is open. No scientific result exists.** No host is pinned. No candidate archive, drift/noise/effective-SNR value, target-eligibility manifest, host-specific pool, rendered edge table, exposure schedule, selected donor, template array, Rung 0, hybrid generation or sorter run exists.
 
-The public state remains `In Progress`. The next executable step is still blocked on pre-measurement design approval.
+The public state remains `In Progress`. The next executable step is still blocked on exact pre-measurement design approval.
 
 ## Review method now governing
 
-`Playbooks/review-cycle.md` begins with the director's superseding method, implemented at Claude Session 24 addendum and Codex Session 24:
+`Playbooks/review-cycle.md` opens with the director's superseding Review Card method:
 
-- the owner opens a Review Card around one stable candidate;
-- Round 1 is the only full-artifact pass and records every reasonably discoverable finding in one numbered ledger;
-- later rounds are delta-only: recorded findings and regressions introduced by the response;
-- the review ends within three owner-reviewer round-trips with a named outcome;
-- substantive reviewer edits are findings unless ownership was transferred; approval stays explicit and state-specific.
+- one stable candidate and written purpose/scope/acceptance boundary;
+- Round 1 is the only full-artifact pass and records one complete numbered ledger;
+- later rounds are delta-only: recorded findings and response-created regressions;
+- at most three owner-reviewer round-trips;
+- explicit state-specific approval is required.
 
-The old cycle remains in the file only as history.
+Randy directed the agents to replace ordinary human escalation because he is asynchronous. Codex's five-clause agent-only **Convergence Decision** is now accepted by Claude and written into the playbook:
 
-Randy then asked Claude and Codex to replace human escalation because his asynchronous schedule could strand later sessions. In `chats/Claude-Codex-Human/Review Method Change/Review Method Change - Active.md`, Codex proposed a bounded **agent-only Convergence Decision**:
-
-1. each agent records a minimum shippable claim, controlling evidence, strongest contrary evidence and acceptable safe disposition;
+1. at a trigger, each agent writes the minimum shippable claim, controlling evidence, strongest contrary evidence and one acceptable safe disposition;
 2. evidence controls what may ship; uncertainty on a blocker never becomes approval;
-3. both agents explicitly agree on `Revisions Required`, `Split/Redesign Required`, or `Approved with Follow-ups`, even if they retain different substantive beliefs;
+3. both agents explicitly agree on `Revisions Required`, `Split/Redesign Required`, or `Approved with Follow-ups` even if beliefs differ;
 4. one successor card names `Supersedes:` and the material pre-review change;
 5. a repeated same-purpose non-approval forces a real split/redesign rather than another card reset.
 
-Claude's acceptance or smallest counterproposal is pending. **Do not edit the playbook until consensus is recorded.** Codex agrees with Claude's existing operating readings: explicit same-state approval, response-created regressions in scope, repair-created LATE-BLOCKER language, the evidence test for mechanical edits, and the transition closure of the old chat.
+Claude's two applications are accepted: both statements and the terminal disposition live in the Review Card, and director-only questions keep the non-blocking `director_requests.md` route. Codex Session 25 mechanically corrected one stale quality-checklist reference from human triage to the Convergence Decision.
 
-## RC-001 — Round 1 complete, candidate not approved
+## RC-001 — Round 2 complete, candidate not approved
 
 - **Card:** `Review Cards/RC-001 Tier A Selection Section 16.md`
 - **Chat:** `chats/Claude-Codex/Tier A Selection Section 16 Review/Tier A Selection Section 16 Review - Active.md`
+- **Current disposition:** **Revisions Required; open on Claude for the Round-3 owner response.**
 
-Candidate hashes verified before review and unchanged afterward:
+Owner-returned Round-2 hashes:
 
-- `agents/Claude/Tier A Host and Injection Zone Selection.md` Draft 22 — `5ca2d6ca188d27ad1cfd9352b9078855815b3fc274eb8cc2773a6e11063f4d1a`
-- `Reproducibility Packet/scripts/utils/band_drift.py` — `3420dec17a9717abc7a5078e53a5826bc78c9bd8ad0ec2bca07fdbcc8da70063`
-- `agents/Claude/tools/test_band_drift.py` — `2117983084ceee241273e355077f8c6792ec60c24e6c0ed44813b3481bcd9c89`
+- `agents/Claude/Tier A Host and Injection Zone Selection.md` Draft 23 — `e7dcfc54f495c96f62c4994cfa8178882edaba38aa0b48a15c3fcb107534b5bf`
+- `Reproducibility Packet/scripts/utils/band_drift.py` — `4ac9fa56dc7a2035d1f9b037b9010ae448fc1c621f92ea93876db1c1fc06ab19`
+- `agents/Claude/tools/test_band_drift.py` — `e2e63a037ee81886b01779535c22ce296502bc3a132ee3f77f9ad6f345869420`
 
-Round-1 outcome: **Revisions Required. Codex does not approve the candidate.**
+Codex mechanically corrected two reciprocal typos, `9/10` → `10/9`, in the selection document. Its current reviewer-state SHA-256 is `90aebcb50a7cb6da50773519d41295b6a0ed4f22f76d978b123fddb8145ddf01`; utility and harness are unchanged.
 
-### RC-001-F1 — blocking temporal aggregation mismatch
+### F1 — eleven-bin implementation verified
 
-Ten consecutive 60-second bin medians span only nine minutes between their centres, yet §16 calls their peak-to-peak range the worst movement inside a ten-minute experiment segment and says the host is protected wherever the segment lands.
+The repaired statistic uses eleven consecutive one-minute bin medians:
 
-Permanent independent evidence in `agents/Codex/tools/probe_rc001_round1.py`:
+- smooth common 2.1 µm/min ramp: `Delta_10min = 21.000 µm`, `Q95_null = 18.717 µm`; strict gate fails;
+- off-grid level construction: `Delta_10min = 30.000 µm`, `Q95_null = 0`; strict gate fails;
+- forty randomized observations and a nine-permutation null match an independent reference;
+- owner harness passes 96/96.
 
-- five units, 61 bins, 100 spikes/unit/bin, common `2.1 µm/min` ramp: true ten-minute movement `21.000 µm`, utility `Delta_10 = 18.900 µm`, deterministic `Q95_null = 18.682 µm`, strict gate **passes**;
-- common 30 µm episode occupying fewer than half the spikes in one minute: `Delta_10 = 0`, `Q95_null = 0`, all five per-unit audit values zero, gate **passes**;
-- common bin levels `[0, 15 × 9, 30, 15]`: an off-grid segment `[30 s, 630 s)` contains 0 and 30 µm, every aligned ten-bin window is at most 15 µm, null is zero, gate **passes**.
+The eleven-bin change is a tightening relative to ten bins. The original point-mass within-bin fixture remains valid at `0/0 µm`.
 
-These are not the label-blind conditional: every included unit moves. They are not IBL estimator bias: the movement exists in the utility input and is lost through the utility's own binning/windowing. The response must align the time object with the actual 600-second segment and cover within-bin/off-grid aliasing, or place those cases under another justified pre-measurement gate. Wording alone cannot repair the smooth-ramp wrong verdict.
+### F1-R1 — blocking response regression
 
-### RC-001-F2 — blocking unit-count overgeneralization
+Draft 23 promotes the point-mass fixture into a universal rule: any displacement affecting fewer than half of a bin's spikes allegedly leaves the median exactly fixed, so the gate is blind below half.
 
-Draft 22 says masking gets easier with more units at a fixed moving fraction, citing 5/11, 10/21 and 20/41. Those fractions are `0.4545`, `0.4762`, `0.4878`, not fixed. At a genuinely fixed 40% moving fraction and seed 7013, the admitted construction gives `Delta_10 = 14.891`, `15.532`, `8.182 µm` at 10, 20, 40 units; the first transition reverses the claimed direction.
+Counterexample in `agents/Codex/tools/probe_rc001_round1.py`:
 
-The valid limitation is that a moving minority can be suppressed. The evidence does not order candidate recordings by unit count. The owner must constrain the claim to the one pinned fixture or support a conditioned probabilistic/expected claim.
+- five units, 31 full bins, 100 spikes per unit/bin;
+- each unaffected bin has depths `[0 × 49, 1 × 2, 100 × 49]`, offset per unit;
+- in one bin, the first 49% are shifted by `+30 µm`;
+- median moves from `1` to `30 µm`;
+- shipped utility reports `Delta_10min = 29.000 µm`, above the strict gate.
 
-### RC-001-F3 — non-blocking tracked follow-up
+The hard cutoff is therefore not a general property of sample medians. This is a response-created regression, not a pre-existing LATE-BLOCKER. The local repair must constrain the `0/15/30 µm` result to its equal-baseline fixture and state the actual general boundary without a new direction claim: sub-minute motion has no guaranteed detectability under bin medians, and its transmission depends on the within-bin depth distribution and episode timing. `Delta_10min` remains not a bound on sub-minute motion.
 
-Replace the sentence that a sample median's realized value cannot move with spike count. The valid invariant is that it does not mechanically accumulate a positive term per spike like the retired path length.
+### F2 and F3 verified
 
-### Round-2 boundary
+- F2: the unit-count direction is withdrawn. At fixed 40% moving fraction, seed 7025 reports `12.192`, `11.529`, `14.190 µm` at 10/20/40 units. The replacement 41-unit masking fixture passes at `14.941/7.125 µm` without claiming a direction.
+- F3: the text now gives the valid sample-median invariant — observations can move a realized median, but the statistic does not mechanically accumulate a positive term per spike.
 
-Round 2 is delta-only. Verify F1–F3 and regressions introduced by the response; do not re-audit unchanged §16 from scratch. Any unchanged sentence made false by the repair counts as a response regression. The archive reader and candidate measurement remain blocked until both agents explicitly approve the same exact state.
+### Validation state
 
-## Validation state
+- owner harness: 96/96;
+- claim probes: 3/3;
+- both safety counterexamples reproduce;
+- packet runbook checker: 10/10;
+- updated Codex independent probe: 12/12, SHA-256 `a29144e247ec5a845bb67699b9e8f5d6a4c89ab3d5458743254e2f223dae33cc`;
+- renamed safety probe: SHA-256 `d1c9220dc0f0890744d920638210f501abdc9b53b84256ef89afbc59e6bca6ac`.
 
-All RC-001 declared acceptance tests passed:
+## Round-3 boundary
 
-- 86/86 synthetic harness checks at 200 permutations;
-- 3/3 claim probes;
-- both prior safety counterexamples to the digit;
-- 10/10 packet runbook steps;
-- eight document curly quotes, ASCII harness, candidate Python compilation.
+Round 3 is the final exact-state opportunity. Review only the F1-R1 repair and regressions introduced by that repair; do not re-audit unchanged §16 from scratch.
 
-New independent probe also passed:
+If the exact returned state resolves the regression, Codex may approve it explicitly and close RC-001 with Claude's matching approval. If Round 3 does not close, run the agent-only Convergence Decision; do not park on Randy.
 
-- forty randomized observations against a separate reference implementation;
-- one nine-permutation null replayed byte-for-byte against a separate seed/binning implementation;
-- exact grid-edge exclusion, caller-array immutability, and every gate boundary;
-- all F1/F2 counterexamples.
+The archive-reading CLI and every candidate measurement remain blocked until RC-001 closes.
 
-The implementation matches its written ten-bin algorithm. The blocker is the algorithm's interpretation and purpose, not an accidental code divergence.
-
-## Contract and other approved state
+## Contract and approved state
 
 Amendments 1–6 remain in force. Current synchronized hashes:
 
@@ -101,11 +102,11 @@ The real-arm donor-matching prose remains closed and same-state approved:
 
 - `agents/Codex/Tier A Real-Arm Donor Matching Rule.md` Draft 6 — `51adae4bd19ffc2ef72445e474371b56eee04d93883c6da1d59fedbca553f282`
 
-§1–§15 of Claude's host-selection document remain outside RC-001 and same-state approved. The thirteen-candidate order remains pinned. The packet's earlier design-stage review remains closed at ten steps; the archive-reading CLI/Step 11 does not exist.
+§1–§15 of Claude's host-selection document remain outside RC-001 and same-state approved. The thirteen-candidate order remains pinned. The packet's current design-stage review remains closed at ten steps; the archive-reading CLI/Step 11 does not exist.
 
 ## Separate gates — do not collapse
 
-1. Claude's response to RC-001 F1–F3 and Codex's delta-only verification;
+1. Claude's Round-3 F1-R1 response and Codex's final delta-only exact-state verification;
 2. archive-reading drift CLI, its own Review Card/packet step, then candidate measurement down the pinned order;
 3. exposure-schedule/placement specification, implementation, synthetic tests and same-state approval;
 4. matcher implementation, exhaustive/mutation tests and same-state approval;
@@ -120,16 +121,15 @@ Reviewer edits, commits, downstream use and silence are not same-state approval.
 
 ## Public and director state
 
-- Root `README.md` remains State A / `In Progress`. Session 24 appended the temporal-alias blocker and withdrew forward the unsupported claim that larger candidate bands are necessarily easier to fool.
-- `agents/Codex/Progress Reports/Progress Report Session 24.md` is the count-based director report. The next cadence report is Session 32.
+- Root `README.md` remains State A / `In Progress`. Codex Session 25 appended a forward correction: the eleven-summary repair holds, but the universal half-minute cutoff does not.
 - The Phase 1 director contract-review request remains open and non-blocking.
-- Randy's new method request is active in the three-way chat; no separate `director_requests.md` entry is needed.
+- Randy's method request is satisfied and the three-way chat stays active by his instruction.
 - No Slot 8 verification-artifact update exists because there is no result.
+- `agents/Codex/Progress Reports/Progress Report Session 24.md` is the latest count-based report; the next cadence report is Session 32.
 
 ## Append-only evidence
 
-- RC-001 transcript pre-write: 3,757 bytes, SHA-256 `ac11eeb075fc3e3458eda9d4a1685e476f9d6d0c195290eda58c47c93f5368ef`; the new file's exact first 3,757 bytes match and one Codex Session 24 header exists.
-- Three-way transcript pre-write: 11,295 bytes, SHA-256 `6fc8a3850b6bdff5bb1a2c8c96ed7fe61fb9a20e1a6408cb12d12f0d0be0b96f`; the new file's exact first 11,295 bytes match and one Codex Session 24 header exists. Randy's user-authored append is preserved.
-- Root README pre-entry SHA-256 `9bd3e40a63753416b280f748762964904c9fe2ac8ab97891c19b4d4241162996`; removing exactly the one new running-log entry and its insertion newline reconstructs that hash.
+- RC-001 transcript pre-write: 17,708 bytes, SHA-256 `f16b356ac1f22264b4e6e653711ad16c970880fac847c23018cc16c81a23a4bf`; the new file preserves that exact prefix and contains one Codex Session 25 header after the prior 104 lines.
+- Three-way transcript pre-write: 20,453 bytes, SHA-256 `3606c6fd1c36a3bc3774a073eed6ceba1ed88f794ed387be6dd99e71d58857b0`; the new file preserves that exact prefix and contains one Codex Session 25 header after the prior 154 lines.
 
-`agents/Codex/Session Summaries/HumanReport24.md` contains the full work and reasoning.
+`agents/Codex/Session Summaries/HumanReport25.md` contains the full work and reasoning.

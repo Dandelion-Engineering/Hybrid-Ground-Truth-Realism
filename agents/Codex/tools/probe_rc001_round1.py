@@ -142,7 +142,7 @@ def main():
     rng = np.random.default_rng(24001)
     random_failure = None
     for trial in range(40):
-        n_bins = int(rng.integers(10, 25))
+        n_bins = int(rng.integers(bd.PARAMS["window_bins"], 25))
         n_units = int(rng.integers(6, 16))
         times, depths = make_random_fixture(rng, n_units, n_bins)
         observed = bd.measure_band_drift(times, depths, n_bins * 60.0 + 17.25)
@@ -176,9 +176,10 @@ def main():
     edge = bd.measure_band_drift(times, depths, n_bins * 60.0 + 0.5)
     check("negative and exact-tail spikes stay outside analysed bins",
           edge["delta_full"] == 17.0 and edge["delta_window"] == 17.0,
-          "Delta_full %.3f, Delta_10 %.3f" % (edge["delta_full"], edge["delta_window"]))
+          "Delta_full %.3f, Delta_10min %.3f"
+          % (edge["delta_full"], edge["delta_window"]))
     check("the exact worst window is located on the session grid",
-          edge["window_start"] == 2, "start %d" % edge["window_start"])
+          edge["window_start"] == 1, "start %d" % edge["window_start"])
 
     small_params = dict(bd.PARAMS)
     small_params["n_permutations"] = 9
@@ -214,10 +215,9 @@ def main():
                     gate_ok &= verdict["label"] == "unmeasurable"
     check("all strict/relaxed decision-boundary combinations match the rule", gate_ok)
 
-    # The candidate calls ten consecutive one-minute bin medians a worst
-    # ten-minute excursion.  Ten bin centres span only nine minutes.  A smooth
-    # common ramp can therefore move more than one row inside an actual
-    # ten-minute segment while both implemented gate numbers remain below it.
+    # RC-001-F1 repair: eleven consecutive one-minute bin medians cover both
+    # the ten-minute centre-to-centre span and the eleven grid bins that an
+    # off-grid 600-second segment can touch.
     n_bins, per_bin = 61, 100
     regular = np.concatenate([
         b * 60.0 + np.linspace(0.1, 59.9, per_bin) for b in range(n_bins)
@@ -231,14 +231,14 @@ def main():
         list(range(5))
     )
     smooth_gate = bd.apply_gate(smooth_obs, smooth_null, 20.0)
-    check("smooth 21 um per ten minutes passes the declared 20 um gate",
-          smooth_gate["passed"] and abs(smooth_obs["delta_window"] - 18.9) < 1e-10,
-          "actual 21.000, Delta_10 %.3f, Q95 %.3f"
+    check("smooth 21 um per ten minutes now fails the declared 20 um gate",
+          not smooth_gate["passed"] and smooth_obs["delta_window"] >= 21.0,
+          "actual 21.000, Delta_10min %.3f, Q95 %.3f"
           % (smooth_obs["delta_window"], smooth_null["q95"]))
 
-    # A common displacement occupying fewer than half of one bin is present in
-    # the per-spike depths but erased by every per-bin median.  The per-unit
-    # audit uses the same medians and therefore does not expose it either.
+    # The owner's point-mass fixture remains a valid example of a common
+    # displacement erased by every per-bin median.  It does not establish the
+    # response's universal below-half cutoff; the next fixture checks that.
     n_bins, per_bin = 12, 10
     regular = np.concatenate([
         b * 60.0 + np.linspace(2.0, 56.0, per_bin) for b in range(n_bins)
@@ -258,8 +258,32 @@ def main():
           and brief_null["q95"] == 0.0
           and brief_obs["unit_delta_max_window"] == [0.0] * 5)
 
+    # Response regression: fewer than half of a bin's spikes need not leave
+    # the sample median fixed when the unshifted depths are heterogeneous.  A
+    # 49% common 30 um episode can move every affected-bin median by 29 um and
+    # flip the strict verdict, contradicting Draft 23's declared hard cutoff.
+    baseline = np.array([0.0] * 49 + [1.0] * 2 + [100.0] * 49)
+    varied_times, varied_depths = [], []
+    for u in range(5):
+        unit_times, unit_depths = [], []
+        for b in range(31):
+            unit_times.append(b * 60.0 + np.linspace(1.0, 59.0, 100))
+            values = baseline.copy() + 1000.0 * u
+            if b == 15:
+                values[:49] += 30.0
+            unit_depths.append(values)
+        varied_times.append(np.concatenate(unit_times))
+        varied_depths.append(np.concatenate(unit_depths))
+    varied_obs = bd.measure_band_drift(
+        varied_times, varied_depths, 31 * 60.0
+    )
+    check("a below-half episode can move a heterogeneous bin median and fail",
+          abs(varied_obs["delta_window"] - 29.0) < 1e-12,
+          "49 percent displaced by 30 um, Delta_10min %.3f um"
+          % varied_obs["delta_window"])
+
     # An arbitrary ten-minute segment may contain portions of eleven session
-    # bins.  No aligned ten-bin window below contains both extreme bins.
+    # bins.  The repaired gate must contain both extreme bins.
     levels = np.array([0.0] + [15.0] * 9 + [30.0, 15.0])
     offset = np.repeat(levels, per_bin)
     offset_depths = [offset + 100.0 * u for u in range(5)]
@@ -269,8 +293,8 @@ def main():
         list(range(5))
     )
     offset_gate = bd.apply_gate(offset_obs, offset_null, 20.0)
-    check("off-grid ten-minute segment can span 30 um while gate passes at 15/0",
-          offset_gate["passed"] and offset_obs["delta_window"] == 15.0
+    check("off-grid ten-minute segment now fails at the full 30 um excursion",
+          not offset_gate["passed"] and offset_obs["delta_window"] == 30.0
           and offset_null["q95"] == 0.0)
 
     # Draft 22's three size points are not a fixed moving fraction, and the
@@ -282,7 +306,7 @@ def main():
           "fractions %.4f, %.4f, %.4f" % stated_fractions)
 
     def masking_value(total, moving, seed):
-        """Return Delta_10 for one fixed-fraction masking construction."""
+        """Return Delta_10min for one fixed-fraction masking construction."""
         grid = np.concatenate([
             b * 60.0 + np.linspace(1.0, 50.0, 12) for b in range(61)
         ])
@@ -299,10 +323,10 @@ def main():
             [grid.copy() for _ in range(total)], values, 61 * 60.0
         )["delta_window"]
 
-    fixed_fraction = [masking_value(n, int(0.4 * n), 7013) for n in (10, 20, 40)]
+    fixed_fraction = [masking_value(n, int(0.4 * n), 7025) for n in (10, 20, 40)]
     check("a fixed-fraction admitted fixture reverses the claimed monotonic direction",
-          fixed_fraction[1] > fixed_fraction[0],
-          "Delta_10 %.3f, %.3f, %.3f at 10, 20, 40 units"
+          not (fixed_fraction[0] > fixed_fraction[1] > fixed_fraction[2]),
+          "Delta_10min %.3f, %.3f, %.3f at 10, 20, 40 units"
           % tuple(fixed_fraction))
 
     print("%d independent probe failures" % len(failures))

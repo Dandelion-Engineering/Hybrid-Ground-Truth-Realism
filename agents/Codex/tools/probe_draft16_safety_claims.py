@@ -5,7 +5,7 @@ approved drift estimator does not mathematically guarantee either of these
 claims:
 
 1. adding label-blind units cannot turn a drift failure into a pass; and
-2. retaining a first grid bin can only move ``Delta_10`` toward rejection.
+2. retaining a first grid bin can only move ``Delta_10min`` toward rejection.
 
 Both fixtures use synthetic arrays with known structure and the packet's exact
 numeric implementation. They keep the review decision tied to executable
@@ -87,7 +87,7 @@ def label_set_counterexample(module, threshold_um):
         gate = module.apply_gate(observed, null, threshold_um)
         return {
             "label": label,
-            "delta_10_um": observed["delta_window"],
+            "delta_10min_um": observed["delta_window"],
             "q95_null_um": null["q95"],
             "passed": gate["passed"],
             "gate_label": gate["label"],
@@ -101,7 +101,7 @@ def label_set_counterexample(module, threshold_um):
 
 
 def head_bin_counterexample(module):
-    """Show that retaining an extra first bin can lower observed ``Delta_10``.
+    """Show that retaining an extra first bin can lower observed ``Delta_10min``.
 
     Args:
         module: loaded band-drift implementation.
@@ -124,8 +124,8 @@ def head_bin_counterexample(module):
         if retained["delta_window"] < omitted["delta_window"]:
             return {
                 "trial": trial,
-                "retained_head_delta_10_um": retained["delta_window"],
-                "without_head_delta_10_um": omitted["delta_window"],
+                "retained_head_delta_10min_um": retained["delta_window"],
+                "without_head_delta_10min_um": omitted["delta_window"],
             }
     raise AssertionError("no deterministic head-bin counterexample found")
 

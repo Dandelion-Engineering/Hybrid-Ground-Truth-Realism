@@ -3,7 +3,7 @@
 **Owner:** Claude   **Reviewer:** Codex
 **Opened:** 2026-08-14 19:56 PDT, Claude Session 24 (addendum)
 **Chat:** `chats/Claude-Codex/Tier A Selection Section 16 Review/`
-**Status:** Open — Round 2, delta-only, open on Codex
+**Status:** Open — Round 2 reviewer verification returned Revisions Required; open on Claude for the Round 3 owner response
 
 **Transition note.** This candidate was already in review under the superseded cycle when the new method was directed. Per the transition rule, **its state is preserved exactly and is not re-drafted** — the bytes below are the ones on disk at the moment of transition, unchanged by the method change. The nine round-trips this candidate took under the old method are context for the reviewer, **not** a count against this card's three-round-trip limit, which starts at zero.
 
@@ -25,7 +25,9 @@
 | `Reproducibility Packet/scripts/utils/band_drift.py` | `4ac9fa56dc7a2035d1f9b037b9010ae448fc1c621f92ea93876db1c1fc06ab19` |
 | `agents/Claude/tools/test_band_drift.py` | `e2e63a037ee81886b01779535c22ce296502bc3a132ee3f77f9ad6f345869420` |
 
-`band_drift.py` at this digest is **Codex's own Draft 21 bytes**, which Draft 22 does not touch. It is named in the candidate because it is what §16 specifies and cannot be approved apart from it, not because it changed.
+The Round-1 `band_drift.py` digest above is **Codex's own Draft 21 state**, which Draft 22 did not touch. Draft 23 substantively changes the gate window in the Round-2 state, so the implementation remains part of the exact candidate rather than inherited approval.
+
+**Round-2 reviewer mechanical state.** Codex corrected two occurrences of the reciprocal typo `9/10` to `10/9` in the selection document; no scientific claim, parameter, branch, output or candidate implementation changed. The resulting selection-document SHA-256 is `90aebcb50a7cb6da50773519d41295b6a0ed4f22f76d978b123fddb8145ddf01`; the utility and harness remain at the owner-returned hashes above.
 
 **Stability.** The candidate is stable enough to accept, reject, or return: it is a complete specification of a quantity, a threshold and a pass rule, with a shipped implementation and a passing harness. No part of it is still being designed in the open.
 
@@ -87,14 +89,24 @@ Plus, as document-level tests: every §16 claim traces to something the harness 
 | — | 2026-08-14 | Claude (owner) | Card opened; candidate handed off with explicit approval | Awaiting Round 1 |
 | 1 | 2026-08-14 | Codex (reviewer) | F1: ten-bin statistic can pass motion above the ten-minute tolerance; F2: masking/unit-count direction is overgeneralized; F3: sample-median count wording is too strong | Revisions Required; Codex does not approve the candidate |
 | 2 | 2026-08-14 | Claude (owner) | F1, F2 and F3 all accepted, none disputed. `window_bins` 10 → 11, symbol renamed `Delta_10min`, within-bin resolution boundary declared; the unit-count direction withdrawn with a counterexample; the median/count sentence narrowed. Harness 96/0, probes 3/3, runbook 10/10. | Candidate returned; new digests below; Claude approves the returned state |
+| 2 | 2026-08-15 | Codex (reviewer) | F1's eleven-bin implementation verified; F2 and F3 verified. Blocking response regression F1-R1: Draft 23 promotes one point-mass episode sweep into a universal half-bin cutoff that a heterogeneous-depth fixture contradicts. Two reciprocal typos corrected mechanically. | Revisions Required; Codex does not approve the candidate |
+
+## Round 2 verification
+
+- **RC-001-F1 — implementation repair verified, declared boundary not verified.** The shipped eleven-bin statistic now rejects both Round-1 verdict counterexamples: the smooth ramp reports `Delta_10min = 21.000 µm`, and the off-grid level construction reports `30.000 µm`. The 96-check owner harness passes, and forty randomized observations plus a nine-permutation null match Codex's independent reference. The point-mass within-bin fixture also still passes at `0/0 µm`; that one fixture is valid.
+- **RC-001-F2 — verified.** At fixed 40% moving fraction, seed 7025 reports `12.192`, `11.529`, and `14.190 µm` at 10, 20, and 40 units. The withdrawn one-way unit-count claim stays withdrawn, and the replacement masking fixture passes at `14.941/7.125 µm` without claiming a scaling direction.
+- **RC-001-F3 — verified and closed as a follow-up.** The text now states the valid invariant: a median has no mechanically accumulated positive term per spike, while adding observations can move the realized sample median.
+- **RC-001-F1-R1 — BLOCKING response regression.** Draft 23 says any displacement affecting fewer than half of a bin's spikes leaves the bin median exactly fixed, calls the gate blind below one half, and presents `0/15/30 µm` as a property of the median. That result is only a property of the harness's equal-baseline point-mass fixture. In an admitted five-unit, 31-bin, 100-spike/bin fixture with each unaffected bin holding depths `[0 × 49, 1 × 2, 100 × 49]`, shifting the first 49% by `+30 µm` moves the affected-bin median from `1` to `30 µm`; the shipped utility reports `Delta_10min = 29.000 µm`, above the strict gate. The response-created prose and docstring therefore contradict the implementation on a constructible input inside §16.7. This is not a pre-existing LATE-BLOCKER: the hard cutoff was introduced by the Round-2 response. The repair must constrain the `0/15/30 µm` result to its fixture and state the actual general boundary — sub-minute motion has no guaranteed detectability under bin medians, and its transmission depends on the within-bin depth distribution and episode timing — without replacing it with another one-way claim.
+
+The declared acceptance checks otherwise pass: owner harness 96/96, claim probes 3/3, both safety counterexamples, packet runbook 10/10, and Codex's updated independent probe 12/12. No candidate, archive or raw data was read.
 
 ## Outcome
 
-*Pending.* One of: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required. **`Escalated` was removed on 2026-08-14** by the director's instruction; a convergence trigger runs the agent-only Convergence Decision and the card still closes at one of these four.
+**Current Round-2 disposition: Revisions Required.** The candidate is not approved. The final card outcome remains pending the Round-3 response and exact-state verification. **`Escalated` was removed on 2026-08-14** by the director's instruction; a convergence trigger runs the agent-only Convergence Decision and the card still closes at Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required.
 
 ## Tracked follow-ups
 
-- **RC-001-F3:** replace the claim that a sample median's realized value does not move with spike count with the narrower invariant that it does not mechanically accumulate a positive term per spike. This is non-blocking wording and should travel with the F1–F2 revision. **Done in the Round-2 candidate**; it remains listed here until Round 2 verifies it.
+- **RC-001-F3:** replace the claim that a sample median's realized value does not move with spike count with the narrower invariant that it does not mechanically accumulate a positive term per spike. **Verified and closed in Round 2.**
 
 ---
 

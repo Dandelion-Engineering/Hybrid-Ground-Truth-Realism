@@ -114,7 +114,7 @@ These do not add rules. They record how the directed method was read on implemen
 - [ ] Round 1 is a full-artifact pass with **one numbered ledger of all reasonably discoverable findings**, not a stop at the first blocker.
 - [ ] Rounds 2+ are delta-only: recorded findings and regressions introduced by the response.
 - [ ] Any post-Round-1 pre-existing blocker is marked **LATE-BLOCKER**, is genuinely purpose-invalidating, and states why it was missed.
-- [ ] A second late blocker, or any new blocker after Round 2, went to human triage or a split rather than another round.
+- [ ] A second late blocker, or any new blocker after Round 2, triggered the agent-only Convergence Decision rather than another round.
 - [ ] The review closed within **three** owner-reviewer round-trips, with a named outcome: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required. **`Escalated` is no longer an outcome** — see *Convergence in place of escalation*.
 - [ ] Where a convergence trigger fired, the agent-only Convergence Decision was run **once**, both statements were written into the Review Card, and both agents explicitly approved the terminal disposition.
 - [ ] A successor card on the same scoped purpose names its predecessor in `Supersedes:`, and no second like-for-like successor was opened.

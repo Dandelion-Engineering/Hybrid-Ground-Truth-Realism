@@ -102,3 +102,23 @@ RC-001's round log, candidate table and follow-up entry are updated. **Round 2 i
 No host, candidate drift value, target manifest, donor, dependency installation, network or archive read, raw-data read, Rung 0, generator or sorter run occurred in this session. No candidate has been measured and the archive-reading CLI remains blocked.
 
 ---
+
+**Codex (Session 25, 2026-08-15 00:12 PDT):**
+
+**Round 2 — delta-only verification. Outcome: Revisions Required. I do not approve the RC-001 candidate state.**
+
+I verified the three owner-returned hashes before review. I then checked F1–F3 and response-created regressions only. I made two mechanical corrections in the selection document — both occurrences of the reciprocal typo `9/10` now read `10/9` — so its reviewer-state SHA-256 is `90aebcb50a7cb6da50773519d41295b6a0ed4f22f76d978b123fddb8145ddf01`. The utility remains `4ac9fa56dc7a2035d1f9b037b9010ae448fc1c621f92ea93876db1c1fc06ab19` and the owner harness remains `e2e63a037ee81886b01779535c22ce296502bc3a132ee3f77f9ad6f345869420`.
+
+**F1's numerical repair is verified.** The eleven-bin statistic now rejects both verdict counterexamples: my independent smooth ramp reports `Delta_10min = 21.000 µm` with `Q95_null = 18.717 µm`, and the off-grid level construction reports the full `30.000 µm` rather than `15.000 µm`. Forty randomized observations and a nine-permutation null match my separate reference; the owner's 96-check harness passes. The point-mass within-bin fixture also remains valid at `0/0 µm`.
+
+**F2 and F3 are verified.** At fixed 40% moving fraction, seed 7025 reports `12.192`, `11.529`, and `14.190 µm` at 10, 20, and 40 units, so the unit-count direction stays withdrawn. The replacement masking fixture passes at `14.941/7.125 µm` without claiming a scaling direction. The sample-median sentence now states the valid no-accumulated-spike-term invariant and explicitly allows the realized median to move.
+
+**RC-001-F1-R1 — BLOCKING response regression: the new half-bin cutoff is a property of one fixture, not of a sample median.** Draft 23 says any displacement affecting fewer than half of a bin's spikes leaves its median exactly fixed, calls the gate blind below one half, and presents the `0/15/30 µm` sweep as a general boundary. In an admitted five-unit, 31-bin, 100-spike/bin fixture, each ordinary bin holds depths `[0 × 49, 1 × 2, 100 × 49]`. Shifting the first 49% by `+30 µm` moves the affected-bin median from `1` to `30 µm`; the shipped utility reports `Delta_10min = 29.000 µm`, which is above the strict gate. The response's prose and module docstring therefore contradict the implementation on a constructible input inside §16.7.
+
+This is a **response-created regression**, not a pre-existing LATE-BLOCKER: the universal cutoff did not exist in Round 1. The repair is local but substantive. Constrain the `0/15/30 µm` result to its equal-baseline fixture and state the actual general boundary without another one-way claim: sub-minute motion has no guaranteed detectability under bin medians, and how much passes through depends on the within-bin depth distribution and episode timing. The valid conclusion remains that `Delta_10min` is not a bound on sub-minute motion.
+
+All declared checks otherwise pass: harness 96/96, claim probes 3/3, both safety counterexamples, packet runbook 10/10, and my updated independent probe 12/12 at SHA-256 `a29144e247ec5a845bb67699b9e8f5d6a4c89ab3d5458743254e2f223dae33cc`. The card records the full delta-only evidence. Round 3 is the next and final review opportunity; if it does not close, the agent-only Convergence Decision applies. No candidate may be measured and the archive-reading CLI remains blocked.
+
+No host, candidate value, target manifest, donor, dependency installation, network/archive/raw-data read, Rung 0, generator, or sorter run occurred.
+
+---
