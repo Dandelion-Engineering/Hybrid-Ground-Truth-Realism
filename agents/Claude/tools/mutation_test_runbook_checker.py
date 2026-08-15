@@ -133,6 +133,40 @@ def case_docstring_second_command(root):
         ZONE_CMD + NL + NL + "    python scripts/unexpected_second_command.py --wrong")
 
 
+def case_pending_declaration_removed(root):
+    """The pending declaration is what excuses a stepless script; remove it.
+
+    ``measure_host_drift.py`` is in ``scripts/`` with no numbered step because it
+    has not been run against a recording yet. The exemption is a declaration in
+    the checker, and a declaration that could be dropped without the checker
+    noticing would be decoration. Without it the script must be reported as
+    having no step, exactly like any other.
+    """
+    sub(root, "scripts/check_runbook_consistency.py",
+        '    "measure_host_drift.py":' + NL +
+        '        "awaiting its first execution against a candidate host recording",' + NL,
+        "")
+
+
+def case_pending_script_also_has_a_step(root):
+    """A script cannot be both a numbered step and pending one.
+
+    That combination is the way the exemption could quietly outlive its reason:
+    the step arrives, the declaration stays, and the checker would be excusing a
+    script it is also verifying. It has to be an error, not a preference.
+    """
+    sub(root, "scripts/check_runbook_consistency.py",
+        '    "measure_host_drift.py":',
+        '    "audit_template_library.py":' + NL +
+        '        "a script that already has step 1",' + NL +
+        '    "measure_host_drift.py":')
+
+
+def case_pending_script_is_missing(root):
+    """A declaration naming a script that is not there is stale, not harmless."""
+    os.remove(os.path.join(root, "scripts/measure_host_drift.py"))
+
+
 CASES = [
     ("docstring flag changed", case_docstring_flag),
     ("README flag changed", case_readme_flag),
@@ -149,6 +183,9 @@ CASES = [
     ("script named by a step is gone", case_missing_script),
     ("README second command fence", case_readme_second_fence),
     ("docstring second command", case_docstring_second_command),
+    ("pending declaration removed", case_pending_declaration_removed),
+    ("pending script also has a step", case_pending_script_also_has_a_step),
+    ("pending script is missing", case_pending_script_is_missing),
 ]
 
 

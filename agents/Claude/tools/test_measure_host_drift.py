@@ -340,6 +340,57 @@ def replace_dataset(path, edits):
                 dataset.attrs[key] = value
 
 
+def fragment_ragged_columns(path, chunk_elements=64, filler_elements=8192):
+    """Rewrite the two ragged columns so their chunks are not contiguous.
+
+    HDF5 allocates a chunk where it can, and a file written incrementally
+    alongside other growing datasets ends up with each column's chunks
+    interleaved with unrelated data. This reproduces that: it appends one chunk
+    of each column and then a much larger filler block, over and over, so
+    successive chunks of one column end up thousands of bytes apart with other
+    allocations in between. The file stays entirely valid.
+
+    This is the construction Codex used to show that treating the
+    first-to-last-chunk span as one contiguous region under-bounds a
+    fixed-block read, and it stays here as a fixture for the repair.
+
+    Args:
+        path: a processed fixture written with ``chunk_elements=None``.
+        chunk_elements: chunk length for the two rewritten columns.
+        filler_elements: how much unrelated data to allocate between them.
+    """
+    columns = (archive_units.TIME_COLUMN, archive_units.DEPTH_COLUMN)
+    with h5py.File(path, "r+") as handle:
+        node = handle[archive_units.UNITS_PATH]
+        originals = {name: node[name][:] for name in columns}
+        descriptions = {name: node[name].attrs.get("description") for name in columns}
+        replacements = {}
+        for name in columns:
+            replacements[name] = node.create_dataset(
+                name + "_fragmented", shape=(0,), maxshape=(None,),
+                chunks=(chunk_elements,), dtype=originals[name].dtype)
+            if descriptions[name] is not None:
+                replacements[name].attrs["description"] = descriptions[name]
+        filler = node.create_dataset("fragment_filler", shape=(0,), maxshape=(None,),
+                                     chunks=(filler_elements,), dtype=np.uint8)
+        block = np.arange(filler_elements, dtype=np.uint8)
+        n_values = len(originals[columns[0]])
+        for start in range(0, n_values, chunk_elements):
+            stop = min(start + chunk_elements, n_values)
+            for name in columns:
+                dataset = replacements[name]
+                dataset.resize((stop,))
+                dataset[start:stop] = originals[name][start:stop]
+                old = len(filler)
+                filler.resize((old + filler_elements,))
+                filler[old:] = block
+            handle.flush()
+        for name in columns:
+            del node[name]
+            node.move(name + "_fragmented", name)
+        handle.flush()
+
+
 def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
                     depth_dtype=np.float64, index_mutator=None, provenance=None,
                     time_dtype=np.float64, chunk_elements=None):
@@ -1253,6 +1304,13 @@ def case_fractional_ragged_offsets_are_refused(h, tmp):
     Two offsets 0.75 apart describe no partition at all, but ``int()`` turns
     them into an equal pair and the file reads as well-formed. The check has to
     happen on the stored values.
+
+    The refusal now names the storage dtype rather than the fractional value,
+    because a ``VectorIndex`` must be stored as an integer and that rule fires
+    before anything looks at the values. The case is kept as the construction it
+    always was: this file must not reach a verdict. What it no longer proves on
+    its own is the integrality check, which ``case_fractional_electrode_is_refused``
+    covers on the column where integrality is the only rule available.
     """
     rows = default_electrodes()
     units = band_units()
@@ -1271,12 +1329,53 @@ def case_fractional_ragged_offsets_are_refused(h, tmp):
     result = run_case(
         tmp, "fractional_offsets",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S), write)
-    h.check("fractional_offsets/refused", "not a whole number" in str(result["status"]),
+    h.check("fractional_offsets/refused", "integer storage" in str(result["status"]),
             str(result["status"]))
     h.check("fractional_offsets/named as input error",
             "input error" in str(result["status"]))
     h.check("fractional_offsets/no report", result["text"] is None)
     h.check("fractional_offsets/no record", result["record"] is None)
+
+
+def case_float_ragged_index_is_refused_even_when_whole(h, tmp):
+    """A floating-point ragged index is malformed however round its values are.
+
+    ``spike_times_index`` is an HDMF ``VectorIndex`` and the common schema
+    specifies integer storage for it, so a float column is a malformed file and
+    not a permissible encoding of the same partition. Accepting it because the
+    conversion happens to be lossless would be this project inventing a laxer
+    schema than the one the format has, on the dataset that decides which spikes
+    belong to which unit.
+
+    The contrast is deliberate and is asserted in the same run:
+    ``max_electrode`` is a custom IBL column with no such specification, and the
+    identical float encoding is accepted there and reported.
+    """
+    rows = default_electrodes()
+    units = band_units()
+
+    def write(path):
+        write_processed(path, rows, units)
+        with h5py.File(path, "r") as handle:
+            times = handle["units/spike_times_index"][:].astype(np.float64)
+            depths = handle["units/spike_distances_from_probe_tip_um_index"][:].astype(
+                np.float64)
+        h.check("float_index/values_are_whole",
+                bool(np.all(times == np.floor(times))
+                     and np.all(depths == np.floor(depths))))
+        replace_dataset(path, {"units/spike_times_index": times,
+                               "units/spike_distances_from_probe_tip_um_index": depths})
+
+    result = run_case(
+        tmp, "float_index",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S), write)
+    status = str(result["status"])
+    h.check("float_index/refused", "integer storage" in status, status)
+    h.check("float_index/names_column", "spike_times_index" in status, status)
+    h.check("float_index/names_schema", "VectorIndex" in status, status)
+    h.check("float_index/input_error", "input error" in status)
+    h.check("float_index/no_report", result["text"] is None)
+    h.check("float_index/no_record", result["record"] is None)
 
 
 def case_fractional_electrode_is_refused(h, tmp):
@@ -1534,8 +1633,12 @@ def case_ceiling_bounds_the_block_transfer(h, tmp):
         h.check("ceiling_blocks/a ceiling above the payload is refused",
                 refused is not None and "above the declared ceiling" in refused,
                 repr(refused))
-        h.check("ceiling_blocks/refusal names which quantity bound",
-                refused is not None and "cache_bound_bytes is above" in refused,
+        h.check("ceiling_blocks/refusal_names_combined",
+                refused is not None and "peak_resident_bytes is above" in refused,
+                repr(refused))
+        h.check("ceiling_blocks/refusal_names_parts",
+                refused is not None and "retained block cache" in refused
+                and "converted arrays" in refused and "Python structures" in refused,
                 repr(refused))
         h.equal("ceiling_blocks/plan matches the planning read",
                 planned["plan"]["cache_bound_bytes"], plan["cache_bound_bytes"])
@@ -1544,10 +1647,13 @@ def case_ceiling_bounds_the_block_transfer(h, tmp):
 
 
 def case_ceiling_can_bind_on_resident_memory(h, tmp):
-    """The ceiling also stops a read whose arrays would not fit, not only its transfer.
+    """The array term can be the one that drives the ceiling, not only the transfer.
 
-    Stored float32 becomes float64 in memory, so the resident arrays are the
-    larger quantity here and a transfer-only ceiling would not see them.
+    Stored float32 becomes float64 in memory, so the converted arrays are the
+    larger term here and a transfer-only ceiling would not see them. The
+    refusal is on the combined figure, so what this case establishes is that a
+    ceiling sitting between the transfer bound and the arrays -- one the
+    transfer alone would have cleared -- still refuses.
     """
     rows = default_electrodes()
     units = band_units()
@@ -1568,33 +1674,104 @@ def case_ceiling_can_bind_on_resident_memory(h, tmp):
                 plan["resident_bytes"] > plan["logical_bytes"],
                 "resident %d, payload %d" % (plan["resident_bytes"],
                                              plan["logical_bytes"]))
-        h.check("ceiling_resident/resident is the binding one",
+        h.check("ceiling_resident/array_term_is_larger",
                 plan["resident_bytes"] > plan["cache_bound_bytes"],
                 "resident %d, bound %d" % (plan["resident_bytes"],
                                            plan["cache_bound_bytes"]))
+        between = (plan["cache_bound_bytes"] + plan["resident_bytes"]) // 2
+        h.check("ceiling_resident/ceiling_clears_transfer",
+                between > plan["cache_bound_bytes"])
         refused = None
         try:
-            archive_units.read_band_units(
-                processed, size, block, PROBES[0], lo, hi,
-                max_bytes=(plan["cache_bound_bytes"] + plan["resident_bytes"]) // 2)
+            archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                          max_bytes=between)
         except ValueError as exc:
             refused = str(exc)
-        h.check("ceiling_resident/refused on resident bytes",
-                refused is not None and "resident_bytes is above" in refused, repr(refused))
-        h.check("ceiling_resident/did not name the transfer",
-                refused is not None and "cache_bound_bytes" not in refused.split(";")[-1],
+        h.check("ceiling_resident/refused_anyway",
+                refused is not None and "peak_resident_bytes is above" in refused,
                 repr(refused))
+        h.check("ceiling_resident/refusal_names_arrays",
+                refused is not None and "%d bytes of converted arrays"
+                % plan["resident_bytes"] in refused, repr(refused))
     finally:
         archive_units.RemoteFile = LocalFile
 
 
-def case_chunked_columns_fall_back_to_the_worst_case_bound(h, tmp):
-    """A chunked column has no file offset, so the bound is taken the safe way.
+def case_ceiling_covers_cache_and_arrays_together(h, tmp):
+    """The cache and the converted arrays are live at once, so the ceiling sums them.
 
-    A chunked read fetches whole chunks, and where the chunks sit is not
-    something h5py will say. The bound rounds each slice out to chunk boundaries
-    and then places it at the worst alignment the block grid allows -- looser
-    than the exact one, and still a bound.
+    The block reader keeps every block it fetched until the read returns, and
+    the per-unit arrays accumulate while it does. Checking the two figures
+    separately admitted a ceiling that neither exceeded on its own and both
+    exceeded together: this measures the two coexisting quantities directly and
+    requires that exact ceiling to be refused.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    case_dir = os.path.join(tmp, "combined_resident")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    write_processed(processed, rows, units)
+    size = os.path.getsize(processed)
+    block = 16 * 1024
+
+    class InspectingBlockFile(BlockLocalFile):
+        """Remember the reader so its retained cache can be weighed afterwards."""
+
+        last = None
+
+        def __init__(self, *args, **kwargs):
+            BlockLocalFile.__init__(self, *args, **kwargs)
+            InspectingBlockFile.last = self
+
+    archive_units.RemoteFile = InspectingBlockFile
+    try:
+        planned = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                                plan_only=True)
+        plan = planned["plan"]
+        h.equal("combined/total_is_the_sum", plan["peak_resident_bytes"],
+                plan["cache_bound_bytes"] + plan["resident_bytes"]
+                + plan["structures_bytes"] + plan["library_cache_bytes"])
+        h.check("combined/structures_charged", plan["structures_bytes"] > 0)
+        # The ceiling the separate checks admitted: above each part, below the sum.
+        admitted_before = max(plan["cache_bound_bytes"], plan["resident_bytes"]) + 1
+        h.check("combined/old_ceiling_below_total",
+                admitted_before < plan["peak_resident_bytes"],
+                "ceiling %d, total %d" % (admitted_before,
+                                          plan["peak_resident_bytes"]))
+        refused = None
+        try:
+            archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                          max_bytes=admitted_before)
+        except ValueError as exc:
+            refused = str(exc)
+        h.check("combined/refused_where_admitted",
+                refused is not None and "peak_resident_bytes is above" in refused,
+                repr(refused))
+        full = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi)
+        cached = sum(len(payload) for payload
+                     in InspectingBlockFile.last._blocks.values())
+        converted = sum(unit["times"].nbytes + unit["depths"].nbytes
+                        for unit in full["band_units"])
+        h.check("combined/cache_coexists",
+                cached > 0 and converted > 0 and cached + converted > admitted_before,
+                "cached %d, converted %d, ceiling %d" % (cached, converted,
+                                                         admitted_before))
+        h.check("combined/bound_covers_coexistence",
+                full["plan"]["peak_resident_bytes"] >= cached + converted,
+                "bound %d, measured %d" % (full["plan"]["peak_resident_bytes"],
+                                           cached + converted))
+    finally:
+        archive_units.RemoteFile = LocalFile
+
+
+def case_chunked_columns_are_placed_from_the_chunk_index(h, tmp):
+    """A chunked column has no dataset offset, so every chunk is located instead.
+
+    A chunked read fetches whole chunks. Where those chunks sit is not something
+    the dataset offset will say -- h5py gives None for a chunked dataset -- but
+    the chunk index will say it per chunk, and that is what the plan asks.
     """
     rows = default_electrodes()
     units = band_units()
@@ -1611,20 +1788,143 @@ def case_chunked_columns_fall_back_to_the_worst_case_bound(h, tmp):
     finally:
         archive_units.RemoteFile = LocalFile
     plan = full["plan"]
-    h.equal("chunked/basis is worst case", plan["bound_basis"], "worst-case alignment")
+    h.equal("chunked/basis_is_chunk_index", plan["bound_basis"], "chunk offsets")
     h.equal("chunked/layout reports the chunk",
             plan["time_layout"]["chunk_elements"], 64)
-    h.equal("chunked/layout reports no offset", plan["time_layout"]["offset"], None)
+    h.equal("chunked/no_dataset_offset",
+            plan["time_layout"]["offset"], None)
+    h.check("chunked/all_chunks_located",
+            plan["time_layout"]["chunk_map"]
+            and all(entry is not None
+                    for entry in plan["time_layout"]["chunk_map"].values()))
     h.check("chunked/bound covers the actual transfer",
             plan["cache_bound_bytes"] >= full["io"]["bytes"],
             "bound %d, actual %d" % (plan["cache_bound_bytes"], full["io"]["bytes"]))
     h.check("chunked/bound never exceeds the file",
             plan["cache_bound_bytes"] <= size,
             "bound %d, size %d" % (plan["cache_bound_bytes"], size))
+    # A chunked column is the only case where HDF5 keeps a raw-data chunk cache
+    # of its own, so it is the only case that can show the term is in the sum.
+    h.check("chunked/library_cache_is_charged", plan["library_cache_bytes"] > 0,
+            "library cache %d" % plan["library_cache_bytes"])
+    h.equal("chunked/peak_includes_library_cache", plan["peak_resident_bytes"],
+            plan["cache_bound_bytes"] + plan["resident_bytes"]
+            + plan["structures_bytes"] + plan["library_cache_bytes"])
 
 
-def case_plan_separates_the_three_costs(h, tmp):
-    """The plan reports payload, bounded transfer and peak memory as three numbers."""
+def case_fragmented_chunks_are_still_bounded(h, tmp):
+    """Chunks scattered through the file are counted where they are, not as one span.
+
+    HDF5 does not promise that a dataset's successive chunks occupy one
+    contiguous region, and a file written incrementally beside other growing
+    datasets does not. Rounding the first-to-last-chunk element range out to
+    chunk boundaries and paying block alignment once therefore under-counted a
+    fixed-block read by a quarter on this fixture, and a ceiling between the two
+    numbers was admitted and then exceeded. Codex's construction, kept.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    case_dir = os.path.join(tmp, "fragmented")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    write_processed(processed, rows, units)
+    fragment_ragged_columns(processed)
+    size = os.path.getsize(processed)
+    block = 4096
+    archive_units.RemoteFile = BlockLocalFile
+    try:
+        full = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi)
+        plan = full["plan"]
+        offsets = sorted(entry[0] for entry in plan["time_layout"]["chunk_map"].values()
+                         if entry is not None)
+        gaps = [b - a for a, b in zip(offsets, offsets[1:])]
+        h.check("fragmented/fixture_is_fragmented",
+                len(offsets) > 2 and min(gaps) > plan["time_layout"]["itemsize"]
+                * plan["time_layout"]["chunk_elements"],
+                "smallest gap %r, chunk %r bytes"
+                % (min(gaps) if gaps else None,
+                   plan["time_layout"]["itemsize"]
+                   * plan["time_layout"]["chunk_elements"]))
+        h.check("fragmented/bound_covers_actual",
+                plan["cache_bound_bytes"] >= full["io"]["bytes"],
+                "bound %d, actual %d" % (plan["cache_bound_bytes"],
+                                         full["io"]["bytes"]))
+        h.check("fragmented/span_bound_would_not",
+                _contiguous_span_bound(plan, block) < full["io"]["bytes"],
+                "span bound %d, actual %d" % (_contiguous_span_bound(plan, block),
+                                              full["io"]["bytes"]))
+        ceiling = (plan["cache_bound_bytes"] + full["io"]["bytes"]) // 2
+        refused = None
+        try:
+            archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                          max_bytes=ceiling)
+        except ValueError as exc:
+            refused = str(exc)
+        h.check("fragmented/ceiling_refused",
+                refused is not None and "peak_resident_bytes is above" in refused,
+                repr(refused))
+    finally:
+        archive_units.RemoteFile = LocalFile
+
+
+def _contiguous_span_bound(plan, block_bytes):
+    """Recompute what the superseded span-based chunk bound would have said.
+
+    Kept as a function rather than a number so the comparison in the fragmented
+    case is against the old rule applied to this fixture, not against a digit
+    copied out of a review message.
+    """
+    total = 0
+    for layout in (plan["time_layout"], plan["depth_layout"]):
+        chunk = layout["chunk_elements"]
+        column = 0
+        for _, n_spikes in plan["per_unit"]:
+            if n_spikes <= 0:
+                continue
+            elements = ((n_spikes + chunk - 1) // chunk + 1) * chunk
+            span = elements * layout["itemsize"]
+            column += (span // block_bytes + 2) * block_bytes
+        total += column + block_bytes
+    return total + plan["spent_bytes"]
+
+
+def case_unplaceable_columns_fall_back_to_the_whole_file(h, tmp):
+    """When neither route locates the bytes, the bound is the only true one left.
+
+    A contiguous dataset is placed from its offset and a chunked one from its
+    chunk index. If a file gives neither -- an old library, a virtual or
+    external dataset -- there is nothing left to say except that a reader cannot
+    fetch more distinct bytes than the file holds. Loose, and still a bound; the
+    basis says so rather than leaving a reader to assume the tight case.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    case_dir = os.path.join(tmp, "unplaceable")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    write_processed(processed, rows, units, chunk_elements=64)
+    size = os.path.getsize(processed)
+    block = 16 * 1024
+    original = archive_units.chunk_byte_ranges
+    archive_units.chunk_byte_ranges = lambda dataset, slices: None
+    archive_units.RemoteFile = BlockLocalFile
+    try:
+        full = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi)
+    finally:
+        archive_units.chunk_byte_ranges = original
+        archive_units.RemoteFile = LocalFile
+    plan = full["plan"]
+    h.equal("unplaceable/basis_whole_file", plan["bound_basis"], "whole file")
+    h.equal("unplaceable/bound_is_file_size", plan["cache_bound_bytes"], size)
+    h.check("unplaceable/bound_covers_actual",
+            plan["cache_bound_bytes"] >= full["io"]["bytes"],
+            "bound %d, actual %d" % (plan["cache_bound_bytes"], full["io"]["bytes"]))
+
+
+def case_plan_separates_the_costs(h, tmp):
+    """The plan reports payload, bounded transfer and the memory terms separately."""
     rows = default_electrodes()
     units = band_units()
     lo, hi = band_bounds()
@@ -1640,6 +1940,10 @@ def case_plan_separates_the_three_costs(h, tmp):
     h.equal("three_costs/payload is the stored size", plan["logical_bytes"], spikes * 12)
     h.equal("three_costs/resident is float64 plus one slice",
             plan["resident_bytes"], spikes * 16 + largest * 12)
+    h.equal("three_costs/peak_is_the_sum",
+            plan["peak_resident_bytes"],
+            plan["cache_bound_bytes"] + plan["resident_bytes"]
+            + plan["structures_bytes"] + plan["library_cache_bytes"])
     h.check("three_costs/no key called bytes", "bytes" not in plan)
     h.equal("three_costs/block size recorded", plan["block_bytes"], 1024 * 1024)
     h.check("three_costs/metadata already spent is included",
@@ -1667,6 +1971,89 @@ def case_output_paths_must_differ(h, tmp):
         status = str(exc.code)
     h.check("same_path/refused", "same path" in str(status), str(status))
     h.check("same_path/nothing written", not os.path.exists(out))
+
+
+def case_output_aliases_are_resolved_not_compared_as_strings(h, tmp):
+    """Two spellings of one file are one file, and the guard has to know it.
+
+    Comparing absolute-path strings misses every alias the filesystem itself
+    resolves. Two are checked here: a path with a redundant ``..`` segment,
+    which aliases everywhere, and a case-only difference, which aliases on the
+    normally case-insensitive Windows filesystem this project runs on and does
+    not on a case-sensitive one. The case-only assertion follows what the
+    filesystem under the fixture actually does, measured rather than assumed,
+    because a guard that rejected two genuinely distinct files would be a
+    different bug of the same size.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    case_dir = os.path.join(tmp, "aliases")
+    nested = os.path.join(case_dir, "nested")
+    os.makedirs(nested, exist_ok=True)
+    raw_path = os.path.join(case_dir, "raw.nwb")
+    processed_path = os.path.join(case_dir, "processed.nwb")
+    write_raw(raw_path, rows, 0.0, EXTENT_S)
+    write_processed(processed_path, rows, units)
+    session = session_id("aliases")
+    install_local_assets([(session, raw_path, processed_path)])
+
+    def attempt(out, records):
+        """Return the SystemExit message, or None when the pair was accepted."""
+        try:
+            CLI.parse_args(["--session", session, "--probe", PROBES[0],
+                            "--target", TARGET, "--assets-cache",
+                            os.path.join(case_dir, "assets.json"),
+                            "--out", out, "--records", records])
+        except SystemExit as exc:
+            return str(exc.code)
+        return None
+
+    plain = os.path.join(case_dir, "verdict.txt")
+    detoured = os.path.join(nested, "..", "verdict.txt")
+    h.check("aliases/detour_caught",
+            "same path" in str(attempt(plain, detoured)), str(attempt(plain, detoured)))
+
+    upper = os.path.join(case_dir, "Verdict.txt")
+    lower = os.path.join(case_dir, "verdict.txt")
+    with open(upper, "w", encoding="utf-8") as handle:
+        handle.write("an earlier verdict\n")
+    try:
+        case_insensitive = os.path.samefile(upper, lower)
+    except OSError:
+        case_insensitive = False
+    refused = attempt(upper, lower)
+    if case_insensitive:
+        h.check("aliases/case_alias_caught",
+                refused is not None and "same path" in refused, repr(refused))
+    else:
+        h.check("aliases/case_distinct_kept", refused is None,
+                repr(refused))
+    h.check("aliases/two_real_paths_allowed",
+            attempt(plain, os.path.join(case_dir, "record.json")) is None)
+    os.remove(upper)
+
+
+def case_the_packet_command_runs_standalone(h, tmp):
+    """The command works from the packet with nothing injected into its path.
+
+    Everything else in this harness imports the command by path with the
+    packet's ``scripts/`` folder already on ``sys.path``, which is exactly the
+    condition that hid the command being unrunnable on its own before it moved
+    into the packet. A reader running it from the packet has no such help, so
+    this runs it as a subprocess with ``PYTHONPATH`` cleared and requires it to
+    reach its own ``--help``.
+    """
+    import subprocess
+    command = os.path.join(PACKET_SCRIPTS, "measure_host_drift.py")
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    result = subprocess.run([sys.executable, command, "--help"],
+                            capture_output=True, text=True, cwd=tmp, env=env)
+    h.equal("standalone/help_exits_cleanly", result.returncode, 0)
+    h.check("standalone/help_describes_gate", "--gate" in result.stdout,
+            result.stdout[-200:] + result.stderr[-200:])
+    h.check("standalone/help_is_ascii",
+            all(ord(char) < 128 for char in result.stdout), result.stdout[-200:])
 
 
 def case_input_error_clears_the_earlier_verdict(h, tmp):
@@ -1732,7 +2119,9 @@ def case_report_names_the_new_confirmations(h, tmp):
     h.equal("confirmations/status", result["status"], 0)
     for required in ("structural columns", "asset pair identity",
                      "AP timestamp coverage", "stored payload", "block transfer",
-                     "peak resident arrays", "pinned at 40 um"):
+                     "peak resident arrays", "live python structures",
+                     "hdf5 chunk cache", "combined peak resident",
+                     "pinned at 40 um"):
         h.check("confirmations/report carries %r" % required, required in text)
     h.check("confirmations/report is ascii", all(ord(char) < 128 for char in text))
 
@@ -1774,6 +2163,7 @@ CASES = (
     case_provenance_is_recorded_not_required,
     case_null_distribution_is_reported,
     case_fractional_ragged_offsets_are_refused,
+    case_float_ragged_index_is_refused_even_when_whole,
     case_fractional_electrode_is_refused,
     case_integral_float_column_is_accepted_and_named,
     case_short_unit_column_is_refused,
@@ -1783,9 +2173,14 @@ CASES = (
     case_band_gap_is_pinned,
     case_ceiling_bounds_the_block_transfer,
     case_ceiling_can_bind_on_resident_memory,
-    case_chunked_columns_fall_back_to_the_worst_case_bound,
-    case_plan_separates_the_three_costs,
+    case_ceiling_covers_cache_and_arrays_together,
+    case_chunked_columns_are_placed_from_the_chunk_index,
+    case_fragmented_chunks_are_still_bounded,
+    case_unplaceable_columns_fall_back_to_the_whole_file,
+    case_plan_separates_the_costs,
     case_output_paths_must_differ,
+    case_output_aliases_are_resolved_not_compared_as_strings,
+    case_the_packet_command_runs_standalone,
     case_input_error_clears_the_earlier_verdict,
     case_records_wording_is_conditional,
     case_report_names_the_new_confirmations,

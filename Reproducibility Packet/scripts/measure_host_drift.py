@@ -31,14 +31,17 @@ recorded as having failed the gate, because the selection rule is
 first-admissible in a fixed order and a rejection recorded for the wrong reason
 hands the host to the next rank irrecoverably.
 
-**Cost is sized before it is spent, in the three units it is actually paid in.**
+**Cost is sized before it is spent, in the units it is actually paid in.**
 The ragged columns' index arrays are one integer per unit, so the band's slices
 are known before a single spike is read. ``--plan-only`` prints the stored
-payload, an upper bound on the block transfer and the peak resident arrays, then
-stops; ``--max-mib`` refuses the read when either of the two that can bind
-exceeds it. All of that exists so the machine's free memory can be compared
-against a measurement rather than against a guess -- and so that the number
-compared is the one that will actually be spent.
+payload, an upper bound on the block transfer, the converted arrays and one
+combined peak-resident bound, then stops; ``--max-mib`` refuses the read when
+that combined bound exceeds it. The combined one is the number to compare
+against free RAM, because the range reader's block cache is not released while
+the arrays it fed are being accumulated -- the parts are live together, and a
+ceiling that checked them one at a time admitted a read that needed their sum.
+All of that exists so the machine's free memory can be compared against a
+measurement rather than against a guess.
 
 Example
 -------
@@ -390,14 +393,28 @@ def build_report(record):
     add("  stored payload            %d bytes (exact)" % plan["logical_bytes"])
     add("  block transfer            at most %d bytes over %d KiB blocks, by %s"
         % (plan["cache_bound_bytes"], plan["block_bytes"] // 1024, plan["bound_basis"]))
-    add("  peak resident arrays      %d bytes (exact)" % plan["resident_bytes"])
+    add("  peak resident arrays      %d bytes (the converted arrays alone)"
+        % plan["resident_bytes"])
+    add("  live python structures    %d bytes (measured)" % plan["structures_bytes"])
+    add("  hdf5 chunk cache          %d bytes (the library's own ceiling; 0 when neither"
+        % plan["library_cache_bytes"])
+    add("                            ragged column is chunked)")
+    add("  combined peak resident    at most %d bytes -- the ceiling is enforced on this"
+        % plan["peak_resident_bytes"])
     add("")
-    add("  Those three are different questions and the ceiling is enforced on the two that")
-    add("  can bind. The transfer figure bounds the processed-units read alone -- the line")
-    add("  to compare it against is processed_units above, not the total -- and it bounds")
-    add("  the distinct block bytes a range reader fetches, including what that read had")
-    add("  already spent on metadata before the band was known. A retried range request")
-    add("  re-fetches its block and is outside the bound.")
+    add("  Those are different questions and only the last is a memory figure to compare")
+    add("  against free RAM: the range reader's block cache is not released while the")
+    add("  arrays it fed accumulate, so the memory terms are live together and the")
+    add("  ceiling is enforced on their sum. Its declared scope is this read's own")
+    add("  footprint -- block cache, arrays, structures, HDF5 chunk cache -- and not the")
+    add("  interpreter baseline, allocator overhead or transient h5py allocations outside")
+    add("  a chunk cache.")
+    add("")
+    add("  The transfer figure bounds the processed-units read alone -- the line to compare")
+    add("  it against is processed_units above, not the total -- and it bounds the distinct")
+    add("  block bytes a range reader fetches, including what that read had already spent")
+    add("  on metadata before the band was known. A retried range request re-fetches its")
+    add("  block and is outside it, so processed_units can exceed the bound by the retries.")
     add("")
     add("  The band set is selected by valid same-probe max_electrode -> rel_y inside the")
     add("  band and is blind to kilosort2_label. The labels are recorded so composition is")
@@ -520,6 +537,36 @@ def clear_outputs(paths):
             raise SystemExit("[fatal] could not clear the earlier %s: %s" % (path, exc))
 
 
+def same_output_path(first, second):
+    """Decide whether two output arguments name one file on this filesystem.
+
+    Comparing ``abspath`` strings is not enough. Windows filesystems are
+    normally case-insensitive, so ``Verdict.txt`` and ``verdict.txt`` are one
+    file there and two distinct strings everywhere; a symbolic link or a
+    junction is the same problem by another route. Either way the second write
+    would silently destroy the first, which is exactly the collision the guard
+    exists to prevent.
+
+    Args:
+        first: one output path.
+        second: the other.
+
+    Returns:
+        True if the two paths resolve to the same file. ``os.path.samefile``
+        decides it when both already exist, because it asks the filesystem
+        rather than guessing at its rules; otherwise the paths are compared
+        after resolving links and normalizing case, which is a no-op on
+        case-sensitive filesystems and so does not merge two real files there.
+    """
+    if os.path.exists(first) and os.path.exists(second):
+        try:
+            return os.path.samefile(first, second)
+        except OSError:
+            pass
+    return (os.path.normcase(os.path.realpath(first))
+            == os.path.normcase(os.path.realpath(second)))
+
+
 def parse_args(argv=None):
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__,
@@ -542,8 +589,9 @@ def parse_args(argv=None):
     parser.add_argument("--block-kb", type=int, default=1024,
                         help="HTTP range block size in KiB")
     parser.add_argument("--max-mib", type=float, default=1024.0,
-                        help="refuse the read if its bounded transfer or its peak resident "
-                             "arrays exceed this many MiB")
+                        help="refuse the read if its combined peak resident bound -- block "
+                             "cache, converted arrays and live structures together -- "
+                             "exceeds this many MiB")
     parser.add_argument("--plan-only", action="store_true",
                         help="report what the band's slices would cost, and stop")
     args = parser.parse_args(argv)
@@ -551,11 +599,11 @@ def parse_args(argv=None):
         raise SystemExit("[fatal] --block-kb must be positive")
     if not np.isfinite(args.max_mib) or args.max_mib <= 0:
         raise SystemExit("[fatal] --max-mib must be positive and finite")
-    if args.records and os.path.abspath(args.records) == os.path.abspath(args.out):
+    if args.records and same_output_path(args.records, args.out):
         raise SystemExit(
-            "[fatal] --out and --records name the same path %r; the report and the JSON "
-            "record are two different artifacts and one would overwrite the other"
-            % args.out)
+            "[fatal] --out %r and --records %r name the same path on this filesystem; the "
+            "report and the JSON record are two different artifacts and one would "
+            "overwrite the other" % (args.out, args.records))
     return args
 
 
@@ -604,9 +652,11 @@ def main(argv=None):
     plan = read["plan"]
     print("[drift] %d band units of %d on the probe; %d spikes"
           % (plan["n_units"], read["n_units_on_probe"], plan["n_spikes"]), flush=True)
-    print("[drift] payload %d bytes; transfer bounded at %d bytes (%s); peak resident "
-          "%d bytes" % (plan["logical_bytes"], plan["cache_bound_bytes"],
-                        plan["bound_basis"], plan["resident_bytes"]), flush=True)
+    print("[drift] payload %d bytes; transfer bounded at %d bytes (%s); combined peak "
+          "resident at most %d bytes (%d arrays + %d structures + %d hdf5 cache + the block cache)"
+          % (plan["logical_bytes"], plan["cache_bound_bytes"], plan["bound_basis"],
+             plan["peak_resident_bytes"], plan["resident_bytes"],
+             plan["structures_bytes"], plan["library_cache_bytes"]), flush=True)
     if args.plan_only:
         print("[drift] --plan-only: nothing else was read and no verdict was computed",
               flush=True)
@@ -695,7 +745,9 @@ def main(argv=None):
         "io": io_total,
         "plan": {key: plan[key] for key in
                  ("n_units", "n_spikes", "logical_bytes", "cache_bound_bytes",
-                  "resident_bytes", "bound_basis", "block_bytes", "spent_bytes",
+                  "resident_bytes", "structures_bytes", "library_cache_bytes",
+                  "peak_resident_bytes",
+                  "bound_basis", "block_bytes", "spent_bytes",
                   "time_layout", "depth_layout")},
         "descriptions": read["descriptions"],
         "integer_dtypes": read["integer_dtypes"],

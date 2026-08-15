@@ -5,18 +5,45 @@ property it is supposed to establish: every case passes, and would have passed
 against a subtly different fix. The only way to know the difference is to remove
 each repair and watch the suite go red.
 
-Each mutation below reverts exactly one of Codex's Round-1 findings in its own
-clean copy of the tree, runs ``test_measure_host_drift.py`` there, and requires
-the cases named beside it to fail. The unmutated control copy must pass. One
-mutation per copy, so no mutation can mask or amplify another.
+Each mutation below reverts exactly one repair made for one of Codex's findings,
+in its own clean copy of the tree, runs ``test_measure_host_drift.py`` there, and
+requires the cases named beside it to fail. The unmutated control copy must pass.
+One mutation per copy, so no mutation can mask or amplify another.
 
-Two of the entries are worth reading rather than counting. The F1 mutation puts
-the ceiling back on the stored payload, which is the exact defect Codex
-reproduced. The F2b mutation removes the per-unit column-length check, and what
+**What this harness covers, stated exactly rather than as "every repair".** It
+covers F1, F2, F3, F4 and F6 from Codex's Round-1 ledger and the Round-2 repairs
+F1-R1a, F1-R1b, F2-R1 and F6-R1. **It does not cover F5, and cannot.** F5's
+repair was not an edit: it was moving the command into the packet and declaring
+it pending in the runbook checker. This harness reverts one anchored string in
+one file per copy, and neither half of F5 is a string it can revert. The
+command's own ``sys.path`` line looks like the candidate and is not one --
+CPython puts a directly executed script's own directory on ``sys.path`` anyway,
+so removing that line changes nothing observable and a mutation entry for it
+would have been a green tick with nothing behind it. What does cover the two
+halves is stated so the gap is not silent: the acceptance suite runs the moved
+command as a subprocess with ``PYTHONPATH`` cleared and requires ``--help`` to
+work, and ``mutation_test_runbook_checker.py`` mutates the checker's
+``PENDING_STEP`` handling. This paragraph is the narrowing Codex's RC-002-E1
+asked for, and it replaces the claim that every finding's repair is mutated
+here.
+
+Three of the entries are worth reading rather than counting. The F1 mutation
+puts the ceiling back on the stored payload, which is the exact defect Codex
+reproduced in Round 1. The F1b mutation puts the ceiling back on the two memory
+figures separately, which is the Round-2 defect: each part fits and their sum
+does not. The F2b mutation removes the per-unit column-length check, and what
 the suite notices is not a refusal but a raise: without the check the command
 does not reach a verdict, it crashes -- so either the case's own assertion or
 the harness recording the exception counts as noticing, and both names are
 listed.
+
+**One entry is platform-conditional and says so here rather than pretending
+otherwise.** F6c removes the path-alias resolution and leaves a plain string
+comparison. That is observable only on a case-insensitive filesystem, which is
+what this project runs on; on a case-sensitive one the acceptance case correctly
+asserts that two case-distinct paths are two files, and this mutation would not
+be caught there. The reported total is therefore a statement about this machine
+for that one entry.
 
 This is evidence about the harness, not about any recording. Nothing here reads
 the archive, and no fixture resembles a real candidate.
@@ -44,12 +71,44 @@ HARNESS = os.path.join("agents", "Claude", "tools", "test_measure_host_drift.py"
 
 MUTATIONS = [
     ("F1 the ceiling watches only the stored payload", UNITS,
-     'over = [(name, plan[name]) for name in ("cache_bound_bytes", "resident_bytes")',
-     'over = [(name, plan[name]) for name in ("logical_bytes",)',
+     'if max_bytes is not None and plan["peak_resident_bytes"] > max_bytes:',
+     'if max_bytes is not None and plan["logical_bytes"] > max_bytes:',
      # The names below are prefixes of the *first token* of a failed check's
      # name, which is what the suite prints and what this file matches on.
      [("ceiling_blocks/a",), ("ceiling_blocks/refusal",),
       ("ceiling_resident/refused",)]),
+    # Restores the superseded rule: round the element range out to whole chunks
+    # and place it as one contiguous span, which is what assuming chunk
+    # contiguity amounts to.
+    ("F1a the chunk bound assumes one contiguous span", UNITS,
+     '    chunk_map = layout.get("chunk_map")\n    chunk = layout["chunk_elements"]\n'
+     '    if chunk_map is not None and chunk:',
+     '    chunk_map = layout.get("chunk_map")\n    chunk = layout["chunk_elements"]\n'
+     '    if chunk:\n'
+     '        element_lo = (lo // chunk) * chunk\n'
+     '        element_hi = ((hi + chunk - 1) // chunk) * chunk\n'
+     '        start = (layout["offset"] or 0) + element_lo * layout["itemsize"]\n'
+     '        span = (element_hi - element_lo) * layout["itemsize"]\n'
+     '        return _blocks_covering(start, span, block_bytes), "chunk offsets"\n'
+     '    if False:',
+     # Only the bound check. The ceiling case is derived from the bound, so a
+     # smaller bound makes a smaller ceiling and the read is still refused --
+     # requiring that one to fail would be requiring the wrong thing.
+     [("fragmented/bound_covers_actual",)]),
+    ("F1b the memory figures are checked one at a time", UNITS,
+     '        if max_bytes is not None and plan["peak_resident_bytes"] > max_bytes:',
+     '        if max_bytes is not None and max(plan["cache_bound_bytes"],\n'
+     '                                         plan["resident_bytes"]) > max_bytes:',
+     [("combined/refused",)]),
+    ("F1c the library's own chunk cache is not counted", UNITS,
+     '"peak_resident_bytes": cache_bound + resident + structures + library_cache,',
+     '"peak_resident_bytes": cache_bound + resident + structures,',
+     # Only a chunked column has a library chunk cache, so only the chunked
+     # fixture can see this term go missing.
+     [("chunked/peak_includes_library_cache",)]),
+    ("F2c a floating-point ragged index is accepted when whole", UNITS,
+     "    if require_integer_dtype:", "    if False:",
+     [("float_index/refused",), ("fractional_offsets/refused",)]),
     ("F2a structural columns are coerced, not checked", UNITS,
      "    values = node[name][:]\n    if np.issubdtype(values.dtype, np.integer):\n"
      "        return [int(v) for v in values]",
@@ -79,9 +138,19 @@ MUTATIONS = [
      "    clear_outputs((args.out, args.records))\n", "",
      [("stale/report",), ("stale/record",), ("stale/files",)]),
     ("F6b --out and --records may name one path", CLI,
-     "    if args.records and os.path.abspath(args.records) == os.path.abspath(args.out):",
+     "    if args.records and same_output_path(args.records, args.out):",
      "    if False:",
-     [("same_path/refused",)]),
+     [("same_path/refused",), ("aliases/detour_caught",)]),
+    ("F6c output paths are compared as strings", CLI,
+     "    if os.path.exists(first) and os.path.exists(second):\n"
+     "        try:\n"
+     "            return os.path.samefile(first, second)\n"
+     "        except OSError:\n"
+     "            pass\n"
+     "    return (os.path.normcase(os.path.realpath(first))\n"
+     "            == os.path.normcase(os.path.realpath(second)))",
+     "    return os.path.abspath(first) == os.path.abspath(second)",
+     [("aliases/case_alias_caught",)]),
 ]
 
 

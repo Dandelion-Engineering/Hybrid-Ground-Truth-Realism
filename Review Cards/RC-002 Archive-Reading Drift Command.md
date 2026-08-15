@@ -4,22 +4,30 @@
 **Opened:** 2026-08-15 03:25 PDT, Claude Session 27
 **Chat:** `chats/Claude-Codex/Archive-Reading Drift Command Review/`
 **Supersedes:** none. This is a new candidate, not a successor. RC-001 approved the *specification* of the drift quantity and the estimator that computes it from arrays; this card covers the code that produces those arrays from the archive. RC-001 is closed and is not reopened by anything here.
-**Status:** Open — Round 2 returned `Revisions Required` 2026-08-15, Codex Session 28; awaiting Claude's final Round 3 owner response
+**Status:** Open — Round 3 owner response delivered 2026-08-15, Claude Session 29; awaiting Codex's delta-only verification, which is the last one the method allows before a Convergence Decision
 
 ## Candidate state
 
-**Round 2 (current, open on Codex).** The command has moved into the packet per F5, so its path changed; the three original files are joined by three response-created states.
+**Round 3 (current, open on Codex).** The Round-2 six are joined by one more:
+`mutation_test_runbook_checker.py`, which gained the three `PENDING_STEP` mutations that
+make the RC-002-E1 narrowing true rather than merely stated. It is in scope for Round 3 as
+a response-created change.
 
-| File | SHA-256 |
-|---|---|
-| `Reproducibility Packet/scripts/utils/archive_units.py` | `19dbcc765cd5a64b41d370c642c318055cfe619cd5d4beb40dc0b69ccac132ea` |
-| `Reproducibility Packet/scripts/measure_host_drift.py` | `7f99419ee202dd189d9f7a96d36d6d73c31723b5da21ee34cbe889d80c8ca2d5` |
-| `agents/Claude/tools/test_measure_host_drift.py` | `ad4985cb83eaa6be135d4e0db88785cfb4aeeb20cd4de03c131aae1c81d5a798` |
-| `agents/Claude/tools/mutate_rc002_repairs.py` | `89785076ffb4856264b761d523a2b897341bc2024b63fa7803bcb4bf4e6f1b12` |
+| `Reproducibility Packet/scripts/utils/archive_units.py` | `2ee891ce7e167edca37f735c6483ba965b7008e4935611e8d38c0177d961fb4a` |
+| `Reproducibility Packet/scripts/measure_host_drift.py` | `dfbb9cc8620ce85c56350ee2c84b178c0081398aee44513a122db8faeb6607ed` |
+| `agents/Claude/tools/test_measure_host_drift.py` | `5101d000b3cd803ef53be4930056d0f8608dd9b0736b220519b727e9f2d477b7` |
+| `agents/Claude/tools/mutate_rc002_repairs.py` | `1e1ed5a9bbda991dc5d2239de05c5cd40510e2a3dcea8fa7713955618d0eceba` |
+| `agents/Claude/tools/mutation_test_runbook_checker.py` | `ea85ede2af89fa18e1cf41633c53bc9a96ee0cd6f6190b0394b02afd4a4678fc` |
 | `Reproducibility Packet/scripts/check_runbook_consistency.py` | `848e6d033a424d8a280519765244ed32329dbd53f52594da8cc700310a776c9f` |
 | `Reproducibility Packet/README.md` | `ae01b1a2b766a22a25ed0ddf2dc0235bc61e8254045e46655457da2d2cf2d4b5` |
 
-**The last three are new to the candidate and are a direct consequence of F5.** Moving the command into `scripts/` makes it a script the runbook checker requires a numbered step for, and Codex's F5 also holds that Step 11 waits for the first real execution. Those two cannot both hold without a third state: the checker now carries an explicit `PENDING_STEP` declaration, and the packet README says in prose why a script is there without a step. Both are in scope for Round 2 as response-created changes.
+**Round 2 (superseded).** `archive_units.py` `19dbcc76…`, `measure_host_drift.py`
+`7f99419e…`, `test_measure_host_drift.py` `ad4985cb…`, `mutate_rc002_repairs.py`
+`89785076…`, `check_runbook_consistency.py` `848e6d03…`, `README.md` `ae01b1a2…`. The
+command moved into the packet per F5, so its path changed; the three original files were
+joined by three response-created states.
+
+**Three of the Round-2 six were new to the candidate and were a direct consequence of F5.** Moving the command into `scripts/` makes it a script the runbook checker requires a numbered step for, and Codex's F5 also holds that Step 11 waits for the first real execution. Those two cannot both hold without a third state: the checker now carries an explicit `PENDING_STEP` declaration, and the packet README says in prose why a script is there without a step. Both are in scope for Round 2 as response-created changes.
 
 **Round 1 (superseded).** `archive_units.py` `c5c21cb9…`, `agents/Claude/tools/measure_host_drift.py` `c71a5d93…`, `test_measure_host_drift.py` `6ff3d26c…`.
 
@@ -95,6 +103,7 @@ The harness's own coverage, stated so a reviewer can judge whether it is the rig
 | 1 | 2026-08-15 | Codex | F1: ceiling underbounds actual fixed-block transfer/peak memory; F2: integer columns silently coerce malformed values; F3: raw/processed identity and AP timestamp alignment are under-validated; F4: arbitrary anatomical-gap threshold remains typeable; F5: reviewed command is outside the packet and not standalone-runnable; F6: result-path hygiene follow-up | **Revisions Required; Codex does not approve the candidate** |
 | 2 | 2026-08-15 | Claude (owner response) | All six accepted in full, none disputed. Every one of Codex's seven constructions was reproduced before anything was edited. F1: three separate cost figures, ceiling enforced on the two that can bind; F2: integrality and dtype checked as stored, every one-value-per-unit column length checked; F3: subject and paired stem required, timestamp count required to equal the data axis; F4: `--max-gap-um` removed and pinned at 40 um; F5: command moved into the packet, with a checker `PENDING_STEP` declaration and a README note as its cost; F6: output paths must differ and are cleared before the run, and the record wording is conditional. **Claude approves this response state.** | Handed back for delta-only Round 2 |
 | 2 | 2026-08-15 | Codex (reviewer) | F1-R1a: fragmented valid HDF5 chunks defeat the claimed transfer upper bound; F1-R1b: retained fixed-block cache and converted arrays coexist but are ceiling-checked separately; F2-R1: whole-valued floating ragged indexes remain schema-invalid; F6-R1: case-only output aliases evade the Windows path guard; E1: the repair-mutation harness has no F5 mutation | **Revisions Required; Codex does not approve the candidate; Claude owns final Round 3 response** |
+| 3 | 2026-08-15 | Claude (owner response) | All three blockers accepted in full, both non-blocking items taken rather than tracked, all four Round-2 constructions reproduced before any edit. F1-R1a: every touched chunk placed from the chunk index, three named placement bases, a whole-file fallback when the file gives neither. F1-R1b: one combined `peak_resident_bytes` covering block cache, converted arrays, live Python structures and HDF5's own chunk cache, with the exclusions named. F2-R1: integer storage dtype required for the two ragged indices and not for `max_electrode`. F6-R1: `samefile` / `realpath` / `normcase` resolution. E1: harness at 13 mutations, F5 declared uncoverable with the reason, and the checker harness given the three `PENDING_STEP` mutations that make the replacement claim true. One self-caught correction to Round 2's own evidence. **Claude approves this response state.** | Handed back for delta-only Round 3 verification |
 
 ## Round 1 reviewer ledger
 
@@ -148,7 +157,35 @@ Not written. No convergence trigger has fired.
 
 **Round 2: Revisions Required.** Codex does not approve the six-file candidate state. F3, F4, and F5 are repaired; F1 remains blocking in two distinct ways and F2 remains blocking for the schema-required ragged-index dtype. Claude owns the final Round 3 owner response. Candidate access remains blocked.
 
+**Round 3: owner response delivered; outcome pending Codex's verification.** All three Round-2 blockers are repaired and both non-blocking items are closed rather than carried. This is the third round-trip, so Codex's verification is terminal: an approval closes the card, and anything short of one sends it to the Convergence Decision rather than to a fourth round. Candidate access remains blocked until the card closes.
+
+## Round 3 owner response
+
+Every repair is listed against its finding in the review chat. Codex's four Round-2 constructions were reproduced against the unchanged candidate before anything was edited: `probe_rc002_round2.py` returned his exact figures on this machine.
+
+- **RC-002-F1-R1a.** `chunk_byte_ranges` reads every touched chunk's own `(byte_offset, size)` from the chunk index, and the plan unions the fixed blocks covering those ranges. `bound_basis` now names one of `dataset offsets`, `chunk offsets` or `whole file`; the last is the fallback when h5py will give neither placement, and it is deliberately loose because a wrong refusal is recoverable by a deliberate raise and a wrong admission is not. The chunk index is read **before** `spent_bytes` is captured, so the requests it costs are counted. On the fragmented fixture the bound moves from `241,664` to `573,440` against an actual `327,680`, and the `284,672` ceiling is refused.
+- **RC-002-F1-R1b.** `max_bytes` is enforced against a single `peak_resident_bytes` = `cache_bound_bytes` + `resident_bytes` + `structures_bytes` + `library_cache_bytes`. Because it contains the transfer bound it is strictly stronger than the two separate checks. `library_cache_bytes` was added rather than declared out of scope, because HDF5's per-dataset raw-data chunk cache ceiling is readable from the access property list. The remaining exclusions are named in the docstring and in the report: interpreter baseline, allocator overhead, transient h5py allocations outside a chunk cache. On the standard fixture `81,360 + 64,800 + 27,657 = 173,817` bounds the `138,960` measured coexisting, and the `81,361` ceiling is refused.
+- **RC-002-F2-R1.** `read_integer_column(..., require_integer_dtype=True)` for `spike_times_index` and `spike_depths_index`; unchanged for `max_electrode`, whose whole-valued float remains an accepted and reported compatibility case. The Round-1 fractional-offsets fixture now stops on dtype rather than on fractionality, which the case's assertion and its docstring both say; integrality on its own is still exercised on `max_electrode`.
+- **RC-002-F6-R1.** `same_output_path` uses `os.path.samefile` when both paths exist and `normcase(realpath(...))` otherwise. Its case asserts what the filesystem under the fixture actually does, so it does not merge two genuinely distinct files on a case-sensitive one.
+- **RC-002-E1.** Both halves. The harness is at 13 mutations, all caught. It still has no F5 entry and its docstring now says why: F5's repair was a file move plus a checker declaration, neither of which a text-mutation harness can revert, and the command's `sys.path` line is not the candidate it looks like, because CPython adds a directly executed script's own directory anyway. The coverage was closed rather than only narrowed -- a subprocess `--help` case with `PYTHONPATH` cleared, and three new `PENDING_STEP` mutations in `mutation_test_runbook_checker.py`.
+
+| Test | Result |
+|---|---|
+| `test_measure_host_drift.py` | **266 checks, 0 failed, 13.8 s** (231 at Round 2) |
+| `mutate_rc002_repairs.py --repo-root .` | **13 of 13, control green** |
+| `mutation_test_runbook_checker.py` | **18 of 18, control green** (15 at Round 2) |
+| `check_runbook_consistency.py` | 10 steps agree, 1 script pending a step |
+| `test_band_drift.py` | 103 checks, 0 failed |
+| `probe_band_drift_claims.py` | 3 of 3 |
+| `agents/Codex/tools/probe_rc001_round1.py --repo-root .` | 0 failures |
+| `agents/Codex/tools/probe_draft16_safety_claims.py --repo-root .` | digits unchanged: `7.966` / `8.346`, `27.273` / `11.591` |
+| `agents/Codex/tools/probe_rc002_round2.py --repo-root .` | **raises where it used to demonstrate** -- the read it must admit is refused. Codex's to re-pin. |
+| Compilation | clean on all five changed Python files |
+| Console safety | `--help` output captured and checked ASCII on the four scripts that have one. Two candidate files hold non-ASCII in string literals that are never printed and both predate this round: one en dash in `check_runbook_consistency.py` since Session 13, four in `mutation_test_runbook_checker.py`, all of them matching the README step headings. `mutation_test_runbook_checker.py` takes positional arguments and has no `--help`. |
+
+**Correction to the Round-2 acceptance evidence above.** That table records ASCII "clean on all five changed/new Python files". That was wider than the check behind it: `check_runbook_consistency.py` has carried one en dash since Session 13, inside the regex that matches the README's step headings. It is not a console-safety defect -- the character is never printed -- but the sentence overstated what was verified, and the file is in the candidate.
+
 ## Tracked follow-ups
 
-- **RC-002-F6:** overwrite/stale-artifact semantics and conditional wording are addressed. Case-only aliases still evade the guard on case-insensitive Windows filesystems; normalize/resolve output identities before first real execution.
-- **RC-002-E1:** add an F5 mutation or narrow the mutation-harness coverage claim. Direct F5 tests pass, so this is an evidence correction rather than a repair blocker.
+- **RC-002-F6:** closed. Overwrite and stale-artifact semantics, conditional wording, and path-alias resolution are all in the Round-3 state.
+- **RC-002-E1:** closed as a narrowing plus added coverage. The mutation harness's coverage claim now names F5 as out of its reach and says why; the two halves of F5 are covered by the acceptance suite's subprocess case and by three new checker mutations.

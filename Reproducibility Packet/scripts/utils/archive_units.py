@@ -15,18 +15,33 @@ few hundred megabytes and the entire sorting. The index arrays are one integer
 per unit and are read in full, so every slice is known before any of them is
 read and :func:`plan_transfer` can size the read before it happens.
 
-**Three different byte counts, because they are three different questions.**
-The count this module used to report was the stored payload of the slices, and
-a ceiling enforced on it did not bound what the read actually costs. A
-range-request reader fetches whole fixed-size blocks, so a scattered slice can
-cost a block or more of transfer for a few kilobytes of payload; and the arrays
-are converted to float64 in memory, so what is resident is not what is stored.
-:func:`plan_transfer` therefore reports all three separately -- ``logical_bytes``
-(the stored payload, exact), ``cache_bound_bytes`` (an upper bound on the
-distinct block bytes the read can fetch, including what has already been spent
-on metadata) and ``resident_bytes`` (the peak in-memory arrays, exact) -- and
-:func:`read_band_units` enforces its ceiling against both of the two that can
-bind, naming which one did.
+**Several byte counts, because the read is paid for in more than one currency
+and the parts of it are live at the same time.** The count this module first
+reported was the stored payload of the slices, and a ceiling enforced on it
+bounded neither what the read transfers nor what it holds. A range-request
+reader fetches whole fixed-size blocks and *keeps* them -- its cache is
+unbounded and lives until the read returns -- so a scattered slice can cost a
+block or more of transfer for a few kilobytes of payload, and those blocks are
+still resident when the arrays they fed are resident too. The arrays are
+converted to float64 on the way in, so what is held is not what is stored
+either. :func:`plan_transfer` therefore reports ``logical_bytes`` (the stored
+payload, exact), ``cache_bound_bytes`` (an upper bound on the distinct block
+bytes the read can fetch, including what has already been spent on metadata),
+``resident_bytes`` (the converted arrays plus the largest slice at its stored
+width) and ``structures_bytes`` (a measured bound on the Python containers the
+read holds while it runs). ``peak_resident_bytes`` is the sum of the last
+three, and it is the single quantity :func:`read_band_units` enforces its
+ceiling against, because those three are live together rather than in turn.
+
+**The block bound is derived from where the bytes actually are.** A contiguous
+dataset whose file offset h5py will give is placed exactly. A chunked dataset is
+placed from the file byte range of every chunk the slices touch, read from the
+chunk index, because HDF5 does not promise that successive chunks occupy one
+contiguous span -- an earlier version assumed they did, and on a file whose
+chunks are interleaved with other data it under-bounded the transfer by a
+quarter. Where neither route is available the bound is the whole file, which is
+loose but is the only thing still true. ``bound_basis`` names which routes a
+given plan used.
 
 **What it validates, and why validation lives here rather than in the caller.**
 Four properties have to hold before a drift number computed from these arrays
@@ -52,6 +67,17 @@ been read as a well-formed partition and as a valid row. Integrality and dtype
 are therefore confirmed on the stored values, and every one-value-per-unit
 column is required to hold one value per unit, before a single row is resolved.
 
+**The two ragged indices are held to a stricter rule than the electrode
+reference, because the schema is stricter about them.** ``spike_times_index``
+and its depth counterpart are HDMF ``VectorIndex`` datasets, and the common
+schema specifies unsigned-integer storage for them, so a floating-point index is
+a malformed file rather than a permissible encoding -- integral values do not
+make it well formed. Those two are required to be stored in an integer dtype.
+``max_electrode`` is a custom IBL column that the schema does not type, so a
+float column whose values are exactly whole is accepted there and its stored
+dtype is reported. The asymmetry is deliberate and is the difference between
+enforcing a specification and inventing one.
+
 A violation of any of these raises :class:`ValueError`. That is deliberate and it
 matters for the host order: a candidate whose *inputs* are malformed has not
 failed the drift gate, and recording it as a drift failure would hand the host
@@ -60,6 +86,8 @@ to the next rank for a reason that has nothing to do with drift.
 Nothing here computes, thresholds, or interprets a drift value. This module
 reads and checks; ``utils.band_drift`` measures.
 """
+
+import sys
 
 import numpy as np
 
@@ -191,7 +219,7 @@ def source_provenance(handle):
     return out
 
 
-def read_integer_column(node, name):
+def read_integer_column(node, name, require_integer_dtype=False):
     """Read a units-table column that must be integral as it is stored.
 
     A ragged partition offset and an electrode row reference are both indices
@@ -201,22 +229,36 @@ def read_integer_column(node, name):
     and a fractional electrode becomes a real row. The check therefore runs on
     the stored values, before any conversion.
 
+    ``require_integer_dtype`` is the stricter rule the ragged indices are held
+    to. They are HDMF ``VectorIndex`` datasets and the common schema specifies
+    unsigned-integer storage, so a floating-point index is a malformed file and
+    exact whole values do not repair it. The custom ``max_electrode`` column
+    carries no such specification, so it is read with the flag off: whole-valued
+    floats are accepted there and the stored dtype is reported.
+
     Args:
         node: the open units-table group.
         name: the column name.
+        require_integer_dtype: reject a non-integer storage dtype outright,
+            for columns whose schema requires integer storage.
 
     Returns:
         The column as a list of Python ints.
 
     Raises:
-        ValueError: if the column is not stored in an integer dtype and its
-            values are not all finite whole numbers. A float column whose
-            values happen to be integral is accepted, and reported as such by
-            the caller, because NWB does not require the dtype.
+        ValueError: if the column is not stored in an integer dtype and either
+            ``require_integer_dtype`` is set or its values are not all finite
+            whole numbers.
     """
     values = node[name][:]
     if np.issubdtype(values.dtype, np.integer):
         return [int(v) for v in values]
+    if require_integer_dtype:
+        raise ValueError(
+            "units column %r is stored as %s, but it is an HDMF VectorIndex and the "
+            "common schema specifies integer storage for it; a floating-point ragged "
+            "index is a malformed file rather than an encoding choice, and values that "
+            "happen to be whole do not make it well formed" % (name, values.dtype))
     if not np.issubdtype(values.dtype, np.floating):
         raise ValueError(
             "units column %r has dtype %s, which is neither integer nor float; it is "
@@ -252,7 +294,8 @@ def read_unit_scalars(handle):
 
     Raises:
         KeyError: if the units table or either ragged column is absent.
-        ValueError: if a structural column is not integral as stored, or if any
+        ValueError: if either ragged index is not stored in an integer dtype, if
+            a structural column is not integral as stored, or if any
             one-value-per-unit column does not hold exactly one value per unit.
             A short column would otherwise silently shorten the unit set.
     """
@@ -271,8 +314,10 @@ def read_unit_scalars(handle):
         "label": (_decode(node["kilosort2_label"][:])
                   if "kilosort2_label" in node else [""] * n_units),
         "max_electrode": read_integer_column(node, "max_electrode"),
-        "times_index": read_integer_column(node, TIME_COLUMN + "_index"),
-        "depths_index": read_integer_column(node, DEPTH_COLUMN + "_index"),
+        "times_index": read_integer_column(node, TIME_COLUMN + "_index",
+                                           require_integer_dtype=True),
+        "depths_index": read_integer_column(node, DEPTH_COLUMN + "_index",
+                                            require_integer_dtype=True),
         "n_units": n_units,
         "n_times": int(node[TIME_COLUMN].shape[0]),
         "n_depths": int(node[DEPTH_COLUMN].shape[0]),
@@ -397,17 +442,71 @@ def select_band_units(unit_electrodes, depth_lo_um, depth_hi_um):
             if depth_lo_um <= unit["rel_y_um"] <= depth_hi_um]
 
 
-def column_layout(dataset):
+def chunk_byte_ranges(dataset, slices):
+    """Locate in the file every chunk a set of element slices touches.
+
+    An HDF5 chunk is stored contiguously, but successive chunks of one dataset
+    are not: the library allocates each chunk where it can, so a file written
+    incrementally, or alongside other growing datasets, interleaves them with
+    unrelated data. Treating the first-to-last chunk span as one contiguous
+    region therefore under-counts the blocks a fixed-block reader touches, by
+    however much other data sits between them. The chunk index knows where each
+    one is, so this asks it rather than assuming.
+
+    Args:
+        dataset: an open chunked :class:`h5py.Dataset`.
+        slices: ``(lo, hi)`` element ranges, half-open.
+
+    Returns:
+        A dict from a chunk's first element to its ``(byte_offset, size)``, with
+        None for a chunk the file has not allocated (an unwritten chunk costs no
+        transfer). None if the dataset is not chunked or the chunk index will
+        not answer, which the caller must treat as an unknown layout rather than
+        as an empty one.
+    """
+    chunks = dataset.chunks
+    if not chunks:
+        return None
+    chunk = int(chunks[0])
+    wanted = set()
+    for lo, hi in slices:
+        if hi <= lo:
+            continue
+        for start in range((lo // chunk) * chunk, hi, chunk):
+            wanted.add(start)
+    ranges = {}
+    for start in sorted(wanted):
+        try:
+            info = dataset.id.get_chunk_info_by_coord((start,))
+        except (AttributeError, TypeError, ValueError, OSError, RuntimeError):
+            return None
+        if info is None or getattr(info, "byte_offset", None) is None:
+            ranges[start] = None
+            continue
+        ranges[start] = (int(info.byte_offset), int(info.size))
+    return ranges
+
+
+def column_layout(dataset, slices=None):
     """Describe one stored column's layout, as the file itself reports it.
 
     Args:
         dataset: an open :class:`h5py.Dataset`.
+        slices: the ``(lo, hi)`` element ranges the read will take. When given
+            and the dataset is chunked, the chunk index is consulted so the
+            plan can place every touched chunk exactly. Reading the index costs
+            range requests, so the caller does this before it records what the
+            read has already spent.
 
     Returns:
         A dict with ``itemsize``, ``offset`` (the dataset's byte offset in the
         file when it is stored contiguously, else None), ``chunk_elements``
         (the first chunk dimension when the dataset is chunked, else None),
-        ``storage_bytes`` (what the file spends on it) and ``compression``.
+        ``chunk_map`` (from :func:`chunk_byte_ranges`, else None),
+        ``storage_bytes`` (what the file spends on it), ``library_cache_bytes``
+        (the size HDF5's own raw-data chunk cache is allowed to reach for this
+        dataset, which is memory the read occupies without ever appearing in a
+        Python object) and ``compression``.
     """
     try:
         offset = dataset.id.get_offset()
@@ -418,28 +517,49 @@ def column_layout(dataset):
         storage_bytes = int(dataset.id.get_storage_size())
     except (AttributeError, TypeError, ValueError):
         storage_bytes = None
+    library_cache_bytes = 0
+    if chunks:
+        try:
+            library_cache_bytes = int(dataset.id.get_access_plist().get_chunk_cache()[1])
+        except (AttributeError, TypeError, ValueError, OSError, RuntimeError):
+            # Unreadable rather than absent: charge the library's documented
+            # default rather than nothing, because nothing would be a claim.
+            library_cache_bytes = 1024 * 1024
     return {
         "itemsize": int(dataset.dtype.itemsize),
         "offset": None if offset is None else int(offset),
         "chunk_elements": int(chunks[0]) if chunks else None,
+        "chunk_map": (chunk_byte_ranges(dataset, slices)
+                      if slices is not None and chunks else None),
         "storage_bytes": storage_bytes,
+        "library_cache_bytes": library_cache_bytes,
         "compression": dataset.compression,
     }
 
 
-def _slice_block_bytes(lo, hi, layout, block_bytes):
-    """Bound the distinct block bytes one column slice can cost.
+def _blocks_covering(start, length, block_bytes):
+    """Return the block indices a byte range occupies."""
+    if length <= 0:
+        return set()
+    return set(range(start // block_bytes,
+                     (start + length - 1) // block_bytes + 1))
+
+
+def _slice_blocks(lo, hi, layout, block_bytes):
+    """Name the distinct blocks one column slice can cost, and how it was placed.
 
     A block-caching reader fetches whole fixed-width blocks, so the cost of a
-    slice is the blocks it lands in rather than its own length. Two regimes:
+    slice is the blocks it lands in rather than its own length. Three regimes,
+    in decreasing order of what the file will tell us:
 
+    * **a chunked dataset whose chunk index answered** -- every chunk the slice
+      touches is placed at its own file byte range, and the blocks covering
+      those ranges are returned. A chunked read fetches whole chunks, so a
+      partially used chunk still costs all of its blocks;
     * **contiguous storage with a known file offset** -- the slice's byte range
-      is known, so the blocks it lands in are known exactly, and this returns
-      the set of block indices for the caller to union across slices;
-    * **anything else** (chunked, compressed, or an offset h5py will not give)
-      -- the element range is first rounded out to whole chunks, because a
-      chunked read fetches whole chunks, and the byte range is then placed at
-      the worst alignment the block grid allows.
+      is known directly;
+    * **neither** -- nothing is known about where the bytes are, so no block set
+      can be named and the caller must fall back to the whole file.
 
     Args:
         lo: first element of the slice.
@@ -448,36 +568,77 @@ def _slice_block_bytes(lo, hi, layout, block_bytes):
         block_bytes: the reader's block size.
 
     Returns:
-        A ``(blocks, bytes)`` pair. ``blocks`` is a set of block indices when
-        the offset is known and None otherwise; ``bytes`` is a bound when it is
-        not, and 0 when the caller should total the block set instead.
+        A ``(blocks, basis)`` pair. ``blocks`` is a set of block indices, or
+        None when the layout is unknown; ``basis`` names how it was derived.
     """
     if hi <= lo:
-        return set(), 0
-    element_lo, element_hi = lo, hi
+        return set(), None
+    chunk_map = layout.get("chunk_map")
     chunk = layout["chunk_elements"]
-    if chunk:
-        element_lo = (lo // chunk) * chunk
-        element_hi = ((hi + chunk - 1) // chunk) * chunk
-    span = (element_hi - element_lo) * layout["itemsize"]
-    if layout["offset"] is None:
-        # Unknown alignment: a byte span of length ``span`` can straddle one
-        # more block at each end than its length alone implies.
-        return None, (span // block_bytes + 2) * block_bytes
-    start = layout["offset"] + element_lo * layout["itemsize"]
-    return set(range(start // block_bytes,
-                     (start + span - 1) // block_bytes + 1)), 0
+    if chunk_map is not None and chunk:
+        blocks = set()
+        for start in range((lo // chunk) * chunk, hi, chunk):
+            if start not in chunk_map:
+                return None, "whole file"
+            located = chunk_map[start]
+            if located is None:
+                continue
+            blocks |= _blocks_covering(located[0], located[1], block_bytes)
+        return blocks, "chunk offsets"
+    if layout["offset"] is not None and not chunk:
+        start = layout["offset"] + lo * layout["itemsize"]
+        return (_blocks_covering(start, (hi - lo) * layout["itemsize"], block_bytes),
+                "dataset offsets")
+    return None, "whole file"
+
+
+def python_structure_bytes(*objects):
+    """Measure the live Python containers a read holds, conservatively.
+
+    The block cache and the converted arrays are the two large terms in what
+    this read occupies, but they are not the only ones: the unit scalars, the
+    electrode table and the per-unit records are lists and dicts of Python
+    objects that stay alive for the whole read. This walks them with
+    :func:`sys.getsizeof` and counts a shared object once per reference, which
+    over-counts rather than under-counts.
+
+    Args:
+        *objects: the containers to charge for.
+
+    Returns:
+        The total in bytes.
+    """
+
+    def walk(obj, depth):
+        total = sys.getsizeof(obj)
+        if depth >= 6:
+            return total
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                total += walk(key, depth + 1) + walk(value, depth + 1)
+        elif isinstance(obj, (list, tuple, set, frozenset)):
+            for item in obj:
+                total += walk(item, depth + 1)
+        return total
+
+    return sum(walk(obj, 0) for obj in objects)
+
+
+def band_slices(band_units, index):
+    """Return each band unit's ``(lo, hi)`` element range in the ragged columns."""
+    return [_slice_bounds(index, unit["row"]) for unit in band_units]
 
 
 def plan_transfer(band_units, scalars, time_layout, depth_layout,
-                  block_bytes, file_size, spent_bytes=0):
-    """Size the band units' read three ways, before any of it is spent.
+                  block_bytes, file_size, spent_bytes=0, held=()):
+    """Size the band units' read before any of it is spent.
 
-    The three numbers answer three different questions and the project's compute
-    rule needs all of them: what the slices hold, what the network fetch can
-    cost, and what has to fit in memory at once. Reporting one of them as
-    ``bytes`` is what let a ceiling pass a read that then transferred more than
-    the ceiling allowed.
+    The numbers answer different questions and the project's compute rule needs
+    all of them: what the slices hold, what the network fetch can cost, and what
+    has to fit in memory at once. Reporting one of them as ``bytes`` is what let
+    a ceiling pass a read that then transferred more than the ceiling allowed;
+    reporting the memory ones separately is what let a ceiling pass a read whose
+    parts each fit but which together did not.
 
     Args:
         band_units: the list returned by :func:`select_band_units`.
@@ -489,24 +650,39 @@ def plan_transfer(band_units, scalars, time_layout, depth_layout,
         file_size: the asset's total size, which caps distinct block bytes.
         spent_bytes: bytes already transferred resolving the index and the
             metadata. Already spent, and part of what this read costs.
+        held: any further live containers the caller holds for the duration of
+            the read -- the electrode table and the per-unit records -- charged
+            into ``structures_bytes``.
 
     Returns:
         A dict with ``n_units``, ``n_spikes``, ``per_unit`` (``(row, n_spikes)``
         pairs), ``logical_bytes`` (exact stored payload), ``cache_bound_bytes``
         (an upper bound on distinct block bytes, ``spent_bytes`` included),
-        ``resident_bytes`` (exact peak in-memory arrays), ``bound_basis``
-        naming how the block bound was derived, plus ``block_bytes``,
-        ``spent_bytes`` and the two layouts.
+        ``resident_bytes`` (the converted arrays plus the largest slice at its
+        stored width), ``structures_bytes`` (the live Python containers),
+        ``library_cache_bytes`` (what HDF5's own raw-data chunk cache is allowed
+        to reach for the two columns), ``peak_resident_bytes`` (the sum of the
+        previous four), ``bound_basis`` naming how the block bound was derived,
+        plus ``block_bytes``, ``spent_bytes`` and the two layouts.
 
     Note:
         ``cache_bound_bytes`` bounds *distinct* blocks. A range request that
         fails and is retried re-transfers its block, and that is deliberately
         outside this bound: it is a network condition rather than a property of
-        the read being planned. Under ``worst-case alignment`` the bound can sit
-        far above what the read really costs, because every slice is charged for
-        the blocks it could straddle rather than the ones it shares; the layouts
-        are returned beside it so a reader can see why it is loose rather than
-        having to guess.
+        the read being planned.
+
+        ``peak_resident_bytes`` adds the memory terms because they are live at
+        the same moment, not one after another: the reader's block cache is
+        unbounded and is not released until the read returns, so the last unit's
+        arrays are resident while every block that fed the first unit is still
+        resident too. Its declared scope is the block cache, the converted
+        per-unit arrays with the largest stored-width slice, the Python
+        containers this call is given, and the ceiling HDF5's own raw-data chunk
+        cache is allowed to reach for the two columns. What it does **not**
+        cover is named rather than left to be discovered: the interpreter's
+        baseline, the allocator's fragmentation overhead, and any transient
+        h5py allocation outside a chunk cache. It bounds this read's own
+        footprint, not the process's.
     """
     index = scalars["times_index"]
     per_unit = []
@@ -514,42 +690,59 @@ def plan_transfer(band_units, scalars, time_layout, depth_layout,
     largest = 0
     slices = []
     for unit in band_units:
-        row = unit["row"]
-        lo = index[row - 1] if row > 0 else 0
-        hi = index[row]
-        per_unit.append((row, hi - lo))
+        lo, hi = _slice_bounds(index, unit["row"])
+        per_unit.append((unit["row"], hi - lo))
         total_spikes += hi - lo
         largest = max(largest, hi - lo)
         slices.append((lo, hi))
 
     bounded_bytes = 0
-    exact = True
+    bases = []
     for layout in (time_layout, depth_layout):
         known_blocks = set()
-        column_bytes = 0
+        unknown = False
         for lo, hi in slices:
-            blocks, extra = _slice_block_bytes(lo, hi, layout, block_bytes)
+            blocks, basis = _slice_blocks(lo, hi, layout, block_bytes)
             if blocks is None:
-                exact = False
-                column_bytes += extra
-            else:
-                known_blocks |= blocks
+                unknown = True
+                break
+            known_blocks |= blocks
+            if basis is not None and basis not in bases:
+                bases.append(basis)
+        if unknown:
+            # Nothing is known about where this column's bytes sit, so the only
+            # remaining true statement is that the reader cannot fetch more
+            # distinct bytes than the file holds.
+            if "whole file" not in bases:
+                bases.append("whole file")
+            bounded_bytes += int(file_size)
+            continue
         for block in known_blocks:
-            column_bytes += min(block_bytes, max(0, file_size - block * block_bytes))
+            bounded_bytes += min(block_bytes, max(0, file_size - block * block_bytes))
         # One block per column for the object-header and chunk-index metadata
         # h5py reads alongside the payload, which is not inside the payload's
         # own byte range and so is not in the block set above.
-        bounded_bytes += column_bytes + block_bytes
+        bounded_bytes += block_bytes
+
+    cache_bound = min(int(file_size), spent_bytes + bounded_bytes)
+    resident = total_spikes * 16 + largest * (time_layout["itemsize"]
+                                              + depth_layout["itemsize"])
+    structures = python_structure_bytes(band_units, scalars, time_layout,
+                                        depth_layout, *held)
+    library_cache = (time_layout.get("library_cache_bytes", 0)
+                     + depth_layout.get("library_cache_bytes", 0))
     return {
         "n_units": len(band_units),
         "n_spikes": total_spikes,
         "per_unit": per_unit,
         "logical_bytes": total_spikes * (time_layout["itemsize"]
                                          + depth_layout["itemsize"]),
-        "cache_bound_bytes": min(int(file_size), spent_bytes + bounded_bytes),
-        "resident_bytes": total_spikes * 16 + largest * (time_layout["itemsize"]
-                                                         + depth_layout["itemsize"]),
-        "bound_basis": ("dataset offsets" if exact else "worst-case alignment"),
+        "cache_bound_bytes": cache_bound,
+        "resident_bytes": resident,
+        "structures_bytes": structures,
+        "library_cache_bytes": library_cache,
+        "peak_resident_bytes": cache_bound + resident + structures + library_cache,
+        "bound_basis": (" + ".join(bases) if bases else "no slices"),
         "block_bytes": int(block_bytes),
         "spent_bytes": int(spent_bytes),
         "time_layout": time_layout,
@@ -574,11 +767,13 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         probe: the probe name to read, exactly as stored in ``probe_name``.
         depth_lo_um: the pinned band's lower ``rel_y`` bound, inclusive.
         depth_hi_um: the pinned band's upper ``rel_y`` bound, inclusive.
-        max_bytes: refuse the read if either the bounded block transfer or the
-            peak resident arrays would exceed this many bytes. It is enforced
-            against both because either can be the larger, and a ceiling that
-            only watched the stored payload would bound neither. None means no
-            ceiling, which is the caller taking responsibility for both.
+        max_bytes: refuse the read if ``peak_resident_bytes`` -- the block cache,
+            the converted arrays and the live Python structures together --
+            would exceed this many bytes. That single quantity is what a free-RAM
+            measurement has to be compared against, and because it contains the
+            block-transfer bound it also refuses everything a transfer-only
+            ceiling would have refused. None means no ceiling, which is the
+            caller taking responsibility for the whole footprint.
         plan_only: resolve and validate the index and the band membership, then
             return without reading any spike data.
 
@@ -595,7 +790,8 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
     Raises:
         KeyError: if the file lacks the units or electrodes table.
         ValueError: on any of the four input-error conditions this module
-            checks, or if the planned transfer exceeds ``max_bytes``.
+            checks, or if the planned peak resident footprint exceeds
+            ``max_bytes``.
     """
     remote = RemoteFile(url, size, block=block_bytes)
     with h5py.File(remote, "r") as handle:
@@ -620,23 +816,27 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         node = handle[UNITS_PATH]
         times_dataset = node[TIME_COLUMN]
         depths_dataset = node[DEPTH_COLUMN]
-        plan = plan_transfer(band_units, scalars,
-                             column_layout(times_dataset), column_layout(depths_dataset),
-                             block_bytes, size, spent_bytes=remote.n_bytes)
-        if max_bytes is not None:
-            over = [(name, plan[name]) for name in ("cache_bound_bytes", "resident_bytes")
-                    if plan[name] > max_bytes]
-            if over:
-                raise ValueError(
-                    "reading %d band units (%d spikes, %d bytes of stored payload) is bounded "
-                    "at %d bytes of block transfer (%s) and %d bytes of peak resident arrays; "
-                    "%s the declared ceiling of %d. Raise the ceiling deliberately "
-                    "against a measurement of free memory, or read a smaller band."
-                    % (plan["n_units"], plan["n_spikes"], plan["logical_bytes"],
-                       plan["cache_bound_bytes"], plan["bound_basis"],
-                       plan["resident_bytes"],
-                       "%s %s above" % (" and ".join(name for name, _ in over),
-                                        "is" if len(over) == 1 else "are"), max_bytes))
+        # The layouts are resolved before spent_bytes is read, because placing a
+        # chunked column costs range requests of its own and they are part of
+        # what this read spends.
+        slices = band_slices(band_units, scalars["times_index"])
+        time_layout = column_layout(times_dataset, slices)
+        depth_layout = column_layout(depths_dataset, slices)
+        plan = plan_transfer(band_units, scalars, time_layout, depth_layout,
+                             block_bytes, size, spent_bytes=remote.n_bytes,
+                             held=(electrodes, unit_electrodes, descriptions))
+        if max_bytes is not None and plan["peak_resident_bytes"] > max_bytes:
+            raise ValueError(
+                "reading %d band units (%d spikes, %d bytes of stored payload) would hold "
+                "%d bytes at once -- %d bytes of retained block cache (%s), %d bytes of "
+                "converted arrays, %d bytes of Python structures and %d bytes of HDF5 "
+                "chunk cache, all live together -- and peak_resident_bytes is above the "
+                "declared ceiling of %d. Raise the ceiling deliberately against a "
+                "measurement of free memory, or read a smaller band."
+                % (plan["n_units"], plan["n_spikes"], plan["logical_bytes"],
+                   plan["peak_resident_bytes"], plan["cache_bound_bytes"],
+                   plan["bound_basis"], plan["resident_bytes"],
+                   plan["structures_bytes"], plan["library_cache_bytes"], max_bytes))
 
         result = {
             "probe": probe,
