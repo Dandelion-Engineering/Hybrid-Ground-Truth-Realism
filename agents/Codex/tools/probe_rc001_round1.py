@@ -17,6 +17,7 @@ Run from the project root with the project virtual environment:
 import argparse
 import hashlib
 import importlib.util
+import itertools
 import pathlib
 
 import numpy as np
@@ -122,6 +123,16 @@ def make_random_fixture(rng, n_units, n_bins):
         spike_times.append(np.asarray(times_u, dtype=np.float64))
         depths.append(np.asarray(depths_u, dtype=np.float64))
     return spike_times, depths
+
+
+def upward_median_bound(sorted_depths, moved_count, offset_um):
+    """Return the order-statistic upper bound for one upward displacement."""
+    indices = np.arange(sorted_depths.size)
+    rank_cap = np.full(sorted_depths.size, np.inf, dtype=np.float64)
+    valid = indices + moved_count < sorted_depths.size
+    rank_cap[valid] = sorted_depths[indices[valid] + moved_count]
+    caps = np.minimum(sorted_depths + offset_um, rank_cap)
+    return float(np.median(caps) - np.median(sorted_depths))
 
 
 def main():
@@ -281,6 +292,38 @@ def main():
           abs(varied_obs["delta_window"] - 29.0) < 1e-12,
           "49 percent displaced by 30 um, Delta_10min %.3f um"
           % varied_obs["delta_window"])
+
+    # Round-3 repair: exhaust small samples rather than relying on the owner's
+    # randomized check of the replacement rank/offset bound. For each sorted
+    # depth multiset, every moved subset and every tested upward offset, a
+    # coordinatewise increase cannot lower the median; at most k moved values
+    # also leave enough original low ranks to cap each central order statistic.
+    bound_ok = True
+    bound_cases = 0
+    levels = (-3.0, 0.0, 1.0, 5.0)
+    for sample_size in range(1, 8):
+        for values in itertools.combinations_with_replacement(levels, sample_size):
+            baseline_small = np.asarray(values, dtype=np.float64)
+            for mask_bits in itertools.product((False, True), repeat=sample_size):
+                moved = np.asarray(mask_bits, dtype=bool)
+                moved_count = int(moved.sum())
+                for offset_um in (0.0, 0.5, 3.0, 10.0):
+                    shift = (float(np.median(baseline_small + moved * offset_um))
+                             - float(np.median(baseline_small)))
+                    bound = upward_median_bound(
+                        baseline_small, moved_count, offset_um)
+                    bound_cases += 1
+                    if shift < -1e-12 or shift > bound + 1e-12:
+                        bound_ok = False
+                        break
+                if not bound_ok:
+                    break
+            if not bound_ok:
+                break
+        if not bound_ok:
+            break
+    check("exhaustive small samples respect the upward rank/offset bound",
+          bound_ok, "%d depth/mask/offset cases" % bound_cases)
 
     # An arbitrary ten-minute segment may contain portions of eleven session
     # bins.  The repaired gate must contain both extreme bins.

@@ -20,7 +20,7 @@ A card scopes a review. **It does not amend the Claim Sheet**, and it does not a
 
 | Card | Candidate | Owner | Reviewer | Chat | Status |
 |---|---|---|---|---|---|
-| [RC-001](RC-001%20Tier%20A%20Selection%20Section%2016.md) | `agents/Claude/Tier A Host and Injection Zone Selection.md` §16 + two implementation states | Claude | Codex | `chats/Claude-Codex/Tier A Selection Section 16 Review/` | **Open — Round 2, delta-only, on Codex** |
+| [RC-001](RC-001%20Tier%20A%20Selection%20Section%2016.md) | `agents/Claude/Tier A Host and Injection Zone Selection.md` §16 + two implementation states | Claude | Codex | `chats/Claude-Codex/Tier A Selection Section 16 Review/` | **Approved — closed 2026-08-15** |
 
 ## Template
 
