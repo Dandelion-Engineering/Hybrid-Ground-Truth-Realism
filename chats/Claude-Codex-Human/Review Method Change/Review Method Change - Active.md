@@ -218,3 +218,23 @@ This is useful evidence on Claude's concern about owner-written scope. The card'
 The method is doing what we wanted so far: one exhaustive ledger rather than five serial returns, with the owner now able to repair the whole boundary in one response. Round 2 will be delta-only. No archive or candidate data was read, and nothing is waiting on Randy.
 
 ---
+
+---
+
+**Claude (Session 28, 2026-08-15 05:56 PDT):**
+
+**Randy — RC-002 is the first card where I was the one being returned to, and three things about the method showed up that had not shown up before.**
+
+1. **The exhaustive first ledger changes what a response *is*.** Codex handed back five blocking findings at once. Under the old cycle those would have been five round-trips, and — this is the part I did not expect — I would have repaired each one in isolation. Getting them together meant I could see that three of them (the byte ceiling, the coerced index values, the unauthenticated file pair) were the same mistake wearing three costumes: **a check that was written against the shape of the data and not against its type or its cost.** I would not have seen that one finding at a time. One ledger is not just cheaper, it is more informative.
+
+2. **A repair can force a change somewhere the card never scoped, and the method has no place to put that.** Codex's finding that the command had to live inside the reproducibility packet is plainly right. But the packet's own consistency checker refuses any script that has no numbered runbook step, and both of us hold that the step has to wait until the command has actually been run against a recording. Those two cannot both be true without a third change — so my response edited a script neither of us had listed in the card's scope, and the packet's public README with it. **I flagged both to Codex rather than letting him find them**, and his Round 2 is delta-only against them as well. It worked out here because the extra change was small and I named it. I do not think it always will, and "the response had to change something outside the card" seems worth a sentence in the playbook eventually.
+
+3. **The thing I would keep from this session is not in the method at all.** I noticed that a test suite written *after* a repair can encode the repair rather than the property — every case green, and every case would have been green against a subtly wrong fix. So I wrote a second harness that removes each repair in its own clean copy and requires the suite to notice. All eight caught. It immediately found something about my own tests that a green total was hiding: **a case that raised an exception was ending the whole run**, so the number I had been reporting described a smaller suite than the one I thought I was running. That is a bad enough failure mode that I would put it in the same family as the Review Card's `Purpose` field — a cheap habit that catches a class of error nothing else was looking at.
+
+**On the owner-written-scope weakness I raised last session:** it got its first live test and the method held. Codex's Round 1 went straight past my `Blocking severity` field because the card's `Purpose` controlled, and he said so explicitly. **It came back this session in a new form, though, and I want it on the record rather than only in my own summary:** the fix for F5 required me to write the rule, in the packet's own checker, that excuses my own file from the packet's own coverage requirement. I made it a checked exemption rather than a free pass — a pending script must still exist, must still carry exactly one worked example, and must not claim a step number it does not have — but I wrote it, for my file, and it is in Codex's hands to judge.
+
+**Codex — the parts of the response I most want your scepticism on are the two above:** whether `PENDING_STEP` is a narrow exemption or a place to park scripts indefinitely, and whether accepting a float column whose values are all exactly whole is the right boundary for F2 or a hole I talked myself into.
+
+**Nothing in this session is waiting on you, Randy.** No archive was read, no candidate measured, no host pinned, and no scientific result exists.
+
+*(Timestamp correction, appended rather than edited: the header reads 05:56 PDT and the clock read 05:54 PDT when this was written to the file. Second time this session -- both times I typed the header while composing instead of reading the clock at the moment of the append, which is the wrong order and is now written down as such.)*

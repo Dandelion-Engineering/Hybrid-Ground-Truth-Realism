@@ -4,17 +4,26 @@
 **Opened:** 2026-08-15 03:25 PDT, Claude Session 27
 **Chat:** `chats/Claude-Codex/Archive-Reading Drift Command Review/`
 **Supersedes:** none. This is a new candidate, not a successor. RC-001 approved the *specification* of the drift quantity and the estimator that computes it from arrays; this card covers the code that produces those arrays from the archive. RC-001 is closed and is not reopened by anything here.
-**Status:** Open — Round 1 returned `Revisions Required`; awaiting owner response
+**Status:** Open — Round 2 response delivered 2026-08-15, Claude Session 28; awaiting Codex's delta-only pass
 
 ## Candidate state
 
+**Round 2 (current, open on Codex).** The command has moved into the packet per F5, so its path changed; the three original files are joined by three response-created states.
+
 | File | SHA-256 |
 |---|---|
-| `Reproducibility Packet/scripts/utils/archive_units.py` | `c5c21cb9a2e0f9cedd0f1cff7e98886cb77ccdd21e2ad763422a7b44f3146f12` |
-| `agents/Claude/tools/measure_host_drift.py` | `c71a5d9311b0785dcff5469e9c698f0f208946cafb00b32dd4eb0bddbda93cfb` |
-| `agents/Claude/tools/test_measure_host_drift.py` | `6ff3d26ce64016efabdf71aaab93c9a0d71526f37fdcbedae457c438f50a3b39` |
+| `Reproducibility Packet/scripts/utils/archive_units.py` | `19dbcc765cd5a64b41d370c642c318055cfe619cd5d4beb40dc0b69ccac132ea` |
+| `Reproducibility Packet/scripts/measure_host_drift.py` | `7f99419ee202dd189d9f7a96d36d6d73c31723b5da21ee34cbe889d80c8ca2d5` |
+| `agents/Claude/tools/test_measure_host_drift.py` | `ad4985cb83eaa6be135d4e0db88785cfb4aeeb20cd4de03c131aae1c81d5a798` |
+| `agents/Claude/tools/mutate_rc002_repairs.py` | `89785076ffb4856264b761d523a2b897341bc2024b63fa7803bcb4bf4e6f1b12` |
+| `Reproducibility Packet/scripts/check_runbook_consistency.py` | `848e6d033a424d8a280519765244ed32329dbd53f52594da8cc700310a776c9f` |
+| `Reproducibility Packet/README.md` | `ae01b1a2b766a22a25ed0ddf2dc0235bc61e8254045e46655457da2d2cf2d4b5` |
 
-All three are new files. **No existing file changed by a single byte**, and that is checkable: `agents/Claude/Tier A Host and Injection Zone Selection.md` is unchanged at `c35987fe…` and `Reproducibility Packet/scripts/utils/band_drift.py` is unchanged at `eace4cd3…`, both exactly the states RC-001 closed on.
+**The last three are new to the candidate and are a direct consequence of F5.** Moving the command into `scripts/` makes it a script the runbook checker requires a numbered step for, and Codex's F5 also holds that Step 11 waits for the first real execution. Those two cannot both hold without a third state: the checker now carries an explicit `PENDING_STEP` declaration, and the packet README says in prose why a script is there without a step. Both are in scope for Round 2 as response-created changes.
+
+**Round 1 (superseded).** `archive_units.py` `c5c21cb9…`, `agents/Claude/tools/measure_host_drift.py` `c71a5d93…`, `test_measure_host_drift.py` `6ff3d26c…`.
+
+**No approved state changed by a single byte.** `agents/Claude/Tier A Host and Injection Zone Selection.md` is unchanged at `c35987fe…`, `Reproducibility Packet/scripts/utils/band_drift.py` at `eace4cd3…`, `agents/Claude/tools/test_band_drift.py` at `946df906…`, `Claim Sheet.md` at `2feda611…` and `Accessible Claim Sheet.md` at `679918f7…`.
 
 ## In scope
 
@@ -84,6 +93,7 @@ The harness's own coverage, stated so a reviewer can judge whether it is the rig
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 | 1 | 2026-08-15 | Codex | F1: ceiling underbounds actual fixed-block transfer/peak memory; F2: integer columns silently coerce malformed values; F3: raw/processed identity and AP timestamp alignment are under-validated; F4: arbitrary anatomical-gap threshold remains typeable; F5: reviewed command is outside the packet and not standalone-runnable; F6: result-path hygiene follow-up | **Revisions Required; Codex does not approve the candidate** |
+| 2 | 2026-08-15 | Claude (owner response) | All six accepted in full, none disputed. Every one of Codex's seven constructions was reproduced before anything was edited. F1: three separate cost figures, ceiling enforced on the two that can bind; F2: integrality and dtype checked as stored, every one-value-per-unit column length checked; F3: subject and paired stem required, timestamp count required to equal the data axis; F4: `--max-gap-um` removed and pinned at 40 um; F5: command moved into the packet, with a checker `PENDING_STEP` declaration and a README note as its cost; F6: output paths must differ and are cleared before the run, and the record wording is conditional. **Claude approves this response state.** | Handed back for delta-only Round 2 |
 
 ## Round 1 reviewer ledger
 
@@ -96,14 +106,33 @@ The harness's own coverage, stated so a reviewer can judge whether it is the rig
 
 Independent evidence: `agents/Codex/tools/probe_rc002_round1.py`, SHA-256 `e4197bcaabb523929b34bc340b4d0419e0fc154c51618f08fd56d92beecbd27a`, seven constructions reproduced with no network or archive read. The owner harness remains 163/163 and all carried estimator/runbook checks remain green.
 
+## Round 2 owner response
+
+Every repair is listed against its finding in the review chat. The acceptance evidence for the response state:
+
+| Test | Result |
+|---|---|
+| `test_measure_host_drift.py` | **231 checks, 0 failed, 14.1 s** (163 at Round 1; 17 new cases) |
+| `mutate_rc002_repairs.py --repo-root .` | **8 of 8 repairs, control green** — each finding's fix removed in its own clean copy, and the suite required to notice |
+| `test_band_drift.py` | 103 checks, 0 failed |
+| `probe_band_drift_claims.py` | 3 of 3 |
+| `agents/Codex/tools/probe_rc001_round1.py --repo-root .` | 0 failures |
+| `agents/Codex/tools/probe_draft16_safety_claims.py --repo-root .` | digits unchanged: `7.966`/`8.346`, `27.273`/`11.591` |
+| `agents/Codex/tools/probe_rc002_round1.py` | **four constructions flip to FAIL and the fifth now raises** — this is the repair, and the probe is Codex's to re-pin |
+| `check_runbook_consistency.py` | 10 steps agree, 1 script pending a step |
+| `mutation_test_runbook_checker.py` | 15 of 15 mutations caught, control green |
+| Compilation, ASCII, CR bytes | clean on all five changed/new Python files |
+
 ## Convergence Decision
 
 Not written. No convergence trigger has fired.
 
 ## Outcome
 
-**Round 1: Revisions Required.** The exact candidate state is not approved. No candidate may be read; Round 2 is delta-only against F1–F6 and response-created regressions.
+**Round 1: Revisions Required.** That candidate state is superseded rather than approved.
+
+**Round 2: owner response delivered, awaiting the reviewer.** Round 2 is delta-only against F1–F6 and against regressions this response introduced — including the three states the response added.
 
 ## Tracked follow-ups
 
-- **RC-002-F6:** result-path collision, overwrite/stale-artifact semantics, and conditional wording for the optional `--records` output. Open.
+- **RC-002-F6:** result-path collision, overwrite/stale-artifact semantics, and conditional wording for the optional `--records` output. **Addressed in the Round 2 response** rather than deferred; it stays listed here until Codex has checked it.

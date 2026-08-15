@@ -13,7 +13,12 @@ to open a second file to find a working invocation -- so the copies are checked
 instead. It compares:
 
 1. **Coverage.** Every runnable script has exactly one numbered runbook step,
-   and every step names a script that exists.
+   and every step names a script that exists. A script may be declared as
+   *pending* a step, which is what a script that has been written but never yet
+   run looks like -- a step is a claim that the command reproduces something in
+   ``results/``, and a command nobody has run reproduces nothing. A pending
+   script still has to exist, still has to carry exactly one ``Example``
+   command, and must not name a step number it does not have.
 2. **The command.** The step's fenced command and the docstring's example are
    the same string, character for character.
 3. **The step number.** The docstring names the same step the README puts it in.
@@ -63,6 +68,19 @@ PACKET_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # result, so the runbook does not carry it as one. Anything else added to
 # scripts/ is expected to be a runbook step and will fail coverage until it is.
 NOT_A_STEP = {"check_runbook_consistency.py"}
+
+# Scripts that live here but have no numbered step yet, each with the condition
+# that ends the exemption. A runbook step is a claim that running the command
+# reproduces something in results/, so a script whose command has never been run
+# cannot honestly have one -- but it still has to be in the packet, because the
+# first real run has to be a run of a script the packet contains. Being on this
+# list is not a free pass: a pending script must exist, must carry exactly one
+# Example command like any other, and must not name a step number it does not
+# have. The list is expected to be empty most of the time.
+PENDING_STEP = {
+    "measure_host_drift.py":
+        "awaiting its first execution against a candidate host recording",
+}
 
 STEP_HEADING = re.compile(r"^### Step (\d+) — (.+?)\s*\*\*\[(offline|archive)\]\*\*\s*$")
 DOCSTRING_STEP = re.compile(r"\*\*Step (\d+)\*\*")
@@ -251,7 +269,28 @@ def main():
 
     problems = []
 
-    missing_step = sorted(on_disk - set(steps))
+    pending = sorted(PENDING_STEP)
+    for name in pending:
+        if name not in on_disk:
+            problems.append(
+                f"{name}: declared as pending a runbook step but is not in {args.scripts}")
+            continue
+        if name in steps:
+            problems.append(
+                f"{name}: step {steps[name][0]} names it, so it is no longer pending; "
+                f"remove it from PENDING_STEP")
+            continue
+        try:
+            _, doc_step = parse_docstring_example(os.path.join(args.scripts, name))
+        except (SyntaxError, ValueError) as exc:
+            problems.append(f"{name}: {exc}")
+            continue
+        if doc_step is not None:
+            problems.append(
+                f"{name}: the docstring calls it step {doc_step}, but the runbook has no "
+                f"step for it")
+
+    missing_step = sorted(on_disk - set(steps) - set(PENDING_STEP))
     for name in missing_step:
         problems.append(f"{name}: no numbered step in the runbook names it")
     missing_file = sorted(set(steps) - on_disk)
@@ -292,6 +331,8 @@ def main():
                 f"{name}: the docstring calls it step {doc_step}, the runbook step {step}")
         print(f"{step:>5}  {name:<38}{' + '.join(verdicts) if verdicts else 'ok (' + mode + ')'}")
 
+    for name in pending:
+        print(f"{'-':>5}  {name:<38}PENDING ({PENDING_STEP[name]})")
     for name in missing_step:
         print(f"{'-':>5}  {name:<38}NOT IN THE RUNBOOK")
     print()
@@ -301,7 +342,8 @@ def main():
         for problem in problems:
             print(f"  - {problem}")
         sys.exit(1)
-    print(f"[ok] {len(steps)} runbook steps agree with their scripts' --help examples")
+    note = f", {len(pending)} script(s) pending a step" if pending else ""
+    print(f"[ok] {len(steps)} runbook steps agree with their scripts' --help examples{note}")
 
 
 if __name__ == "__main__":

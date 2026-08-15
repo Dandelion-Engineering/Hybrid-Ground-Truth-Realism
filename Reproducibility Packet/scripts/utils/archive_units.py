@@ -12,24 +12,45 @@ columns hold every spike of every unit on every probe. A candidate's band holds
 22 to 267 units out of many hundreds, so resolving each band unit's slice from
 the column's own index and reading only that slice is the difference between a
 few hundred megabytes and the entire sorting. The index arrays are one integer
-per unit and are read in full, which makes the transfer that follows an exact
-number rather than an estimate: :func:`read_band_units` reports the byte count
-it is about to spend, and refuses to spend more than a caller-declared ceiling.
+per unit and are read in full, so every slice is known before any of them is
+read and :func:`plan_transfer` can size the read before it happens.
+
+**Three different byte counts, because they are three different questions.**
+The count this module used to report was the stored payload of the slices, and
+a ceiling enforced on it did not bound what the read actually costs. A
+range-request reader fetches whole fixed-size blocks, so a scattered slice can
+cost a block or more of transfer for a few kilobytes of payload; and the arrays
+are converted to float64 in memory, so what is resident is not what is stored.
+:func:`plan_transfer` therefore reports all three separately -- ``logical_bytes``
+(the stored payload, exact), ``cache_bound_bytes`` (an upper bound on the
+distinct block bytes the read can fetch, including what has already been spent
+on metadata) and ``resident_bytes`` (the peak in-memory arrays, exact) -- and
+:func:`read_band_units` enforces its ceiling against both of the two that can
+bind, naming which one did.
 
 **What it validates, and why validation lives here rather than in the caller.**
 Four properties have to hold before a drift number computed from these arrays
 means anything, and every one of them is a property of the file rather than of
 the statistic:
 
-1. the two ragged columns are partitioned identically, so that a unit's times
-   and its depths are the same spikes in the same order;
+1. the two ragged columns are partitioned identically, by offsets that are
+   stored as integers, so that a unit's times and its depths are the same
+   spikes in the same order;
 2. the loaded values are finite, each unit's times ascend, and the depth column
    still carries its documented micrometre unit;
-3. each unit's ``max_electrode`` names exactly one electrode on that unit's own
-   probe, and that electrode's ``rel_y`` is finite;
+3. each unit's ``max_electrode`` -- also an integer as stored -- names exactly
+   one electrode on that unit's own probe, and that electrode's ``rel_y`` is
+   finite;
 4. the processed file's electrode table agrees with the raw file's, because the
    band is derived from the raw table while ``max_electrode`` indexes the
    processed one.
+
+**The structural columns are checked as stored, before anything converts them.**
+``int()`` accepts a float and truncates it, so two ragged indices differing by
+less than one, or an electrode reference that is not a whole number, would have
+been read as a well-formed partition and as a valid row. Integrality and dtype
+are therefore confirmed on the stored values, and every one-value-per-unit
+column is required to hold one value per unit, before a single row is resolved.
 
 A violation of any of these raises :class:`ValueError`. That is deliberate and it
 matters for the host order: a candidate whose *inputs* are malformed has not
@@ -170,6 +191,50 @@ def source_provenance(handle):
     return out
 
 
+def read_integer_column(node, name):
+    """Read a units-table column that must be integral as it is stored.
+
+    A ragged partition offset and an electrode row reference are both indices
+    into something else, so a value that is not a whole number is not a small
+    inaccuracy -- it is a structural claim the file cannot support. ``int()``
+    would accept it and truncate: two offsets 0.75 apart become one partition,
+    and a fractional electrode becomes a real row. The check therefore runs on
+    the stored values, before any conversion.
+
+    Args:
+        node: the open units-table group.
+        name: the column name.
+
+    Returns:
+        The column as a list of Python ints.
+
+    Raises:
+        ValueError: if the column is not stored in an integer dtype and its
+            values are not all finite whole numbers. A float column whose
+            values happen to be integral is accepted, and reported as such by
+            the caller, because NWB does not require the dtype.
+    """
+    values = node[name][:]
+    if np.issubdtype(values.dtype, np.integer):
+        return [int(v) for v in values]
+    if not np.issubdtype(values.dtype, np.floating):
+        raise ValueError(
+            "units column %r has dtype %s, which is neither integer nor float; it is "
+            "used as an index and must be whole numbers" % (name, values.dtype))
+    if not np.all(np.isfinite(values)):
+        raise ValueError(
+            "units column %r holds %d non-finite values and is used as an index"
+            % (name, int((~np.isfinite(values)).sum())))
+    fractional = values != np.floor(values)
+    if np.any(fractional):
+        first = int(np.argmax(fractional))
+        raise ValueError(
+            "units column %r is stored as %s and its value at row %d is %r, which is not a "
+            "whole number; it indexes another table and truncating it would invent a "
+            "structure the file does not state" % (name, values.dtype, first, values[first]))
+    return [int(v) for v in values]
+
+
 def read_unit_scalars(handle):
     """Read the one-value-per-unit columns the band selection needs.
 
@@ -180,32 +245,48 @@ def read_unit_scalars(handle):
         A dict with ``probe_name`` and ``label`` (lists of str),
         ``max_electrode`` (list of int), ``times_index`` and ``depths_index``
         (lists of int, the ragged columns' own end-offset indices),
-        ``n_units``, and ``n_times`` / ``n_depths``, the two ragged columns'
-        total lengths.
+        ``n_units``, ``n_times`` / ``n_depths``, the two ragged columns' total
+        lengths, and ``integer_dtypes``, each structural column's stored dtype
+        as a string, so the report can say what was checked rather than that a
+        check was made.
 
     Raises:
         KeyError: if the units table or either ragged column is absent.
+        ValueError: if a structural column is not integral as stored, or if any
+            one-value-per-unit column does not hold exactly one value per unit.
+            A short column would otherwise silently shorten the unit set.
     """
     if UNITS_PATH not in handle:
         raise KeyError("file has no /%s" % UNITS_PATH)
     node = handle[UNITS_PATH]
     for name in (TIME_COLUMN, DEPTH_COLUMN,
-                 TIME_COLUMN + "_index", DEPTH_COLUMN + "_index"):
+                 TIME_COLUMN + "_index", DEPTH_COLUMN + "_index", "probe_name",
+                 "max_electrode"):
         if name not in node:
             raise KeyError("units table has no %s" % name)
     probe_name = _decode(node["probe_name"][:])
-    labels = (_decode(node["kilosort2_label"][:])
-              if "kilosort2_label" in node else [""] * len(probe_name))
-    return {
+    n_units = len(probe_name)
+    scalars = {
         "probe_name": probe_name,
-        "label": labels,
-        "max_electrode": [int(v) for v in node["max_electrode"][:]],
-        "times_index": [int(v) for v in node[TIME_COLUMN + "_index"][:]],
-        "depths_index": [int(v) for v in node[DEPTH_COLUMN + "_index"][:]],
-        "n_units": len(probe_name),
+        "label": (_decode(node["kilosort2_label"][:])
+                  if "kilosort2_label" in node else [""] * n_units),
+        "max_electrode": read_integer_column(node, "max_electrode"),
+        "times_index": read_integer_column(node, TIME_COLUMN + "_index"),
+        "depths_index": read_integer_column(node, DEPTH_COLUMN + "_index"),
+        "n_units": n_units,
         "n_times": int(node[TIME_COLUMN].shape[0]),
         "n_depths": int(node[DEPTH_COLUMN].shape[0]),
+        "integer_dtypes": {name: str(node[name].dtype) for name in
+                           ("max_electrode", TIME_COLUMN + "_index",
+                            DEPTH_COLUMN + "_index")},
     }
+    for name in ("label", "max_electrode", "times_index", "depths_index"):
+        if len(scalars[name]) != n_units:
+            raise ValueError(
+                "the units table holds %d probe_name values but %d %s values; every "
+                "one-value-per-unit column must have one value per unit"
+                % (n_units, len(scalars[name]), name))
+    return scalars
 
 
 def check_ragged_alignment(scalars):
@@ -316,37 +397,163 @@ def select_band_units(unit_electrodes, depth_lo_um, depth_hi_um):
             if depth_lo_um <= unit["rel_y_um"] <= depth_hi_um]
 
 
-def plan_transfer(band_units, scalars, time_itemsize, depth_itemsize):
-    """Compute exactly how many bytes the band units' slices will cost.
+def column_layout(dataset):
+    """Describe one stored column's layout, as the file itself reports it.
 
-    The ragged indices are already in hand, so this is a count rather than an
-    estimate -- which is what the project's compute rule asks for before a step
-    that needs real memory.
+    Args:
+        dataset: an open :class:`h5py.Dataset`.
+
+    Returns:
+        A dict with ``itemsize``, ``offset`` (the dataset's byte offset in the
+        file when it is stored contiguously, else None), ``chunk_elements``
+        (the first chunk dimension when the dataset is chunked, else None),
+        ``storage_bytes`` (what the file spends on it) and ``compression``.
+    """
+    try:
+        offset = dataset.id.get_offset()
+    except (AttributeError, TypeError, ValueError):
+        offset = None
+    chunks = dataset.chunks
+    try:
+        storage_bytes = int(dataset.id.get_storage_size())
+    except (AttributeError, TypeError, ValueError):
+        storage_bytes = None
+    return {
+        "itemsize": int(dataset.dtype.itemsize),
+        "offset": None if offset is None else int(offset),
+        "chunk_elements": int(chunks[0]) if chunks else None,
+        "storage_bytes": storage_bytes,
+        "compression": dataset.compression,
+    }
+
+
+def _slice_block_bytes(lo, hi, layout, block_bytes):
+    """Bound the distinct block bytes one column slice can cost.
+
+    A block-caching reader fetches whole fixed-width blocks, so the cost of a
+    slice is the blocks it lands in rather than its own length. Two regimes:
+
+    * **contiguous storage with a known file offset** -- the slice's byte range
+      is known, so the blocks it lands in are known exactly, and this returns
+      the set of block indices for the caller to union across slices;
+    * **anything else** (chunked, compressed, or an offset h5py will not give)
+      -- the element range is first rounded out to whole chunks, because a
+      chunked read fetches whole chunks, and the byte range is then placed at
+      the worst alignment the block grid allows.
+
+    Args:
+        lo: first element of the slice.
+        hi: one past the last element.
+        layout: the dict from :func:`column_layout`.
+        block_bytes: the reader's block size.
+
+    Returns:
+        A ``(blocks, bytes)`` pair. ``blocks`` is a set of block indices when
+        the offset is known and None otherwise; ``bytes`` is a bound when it is
+        not, and 0 when the caller should total the block set instead.
+    """
+    if hi <= lo:
+        return set(), 0
+    element_lo, element_hi = lo, hi
+    chunk = layout["chunk_elements"]
+    if chunk:
+        element_lo = (lo // chunk) * chunk
+        element_hi = ((hi + chunk - 1) // chunk) * chunk
+    span = (element_hi - element_lo) * layout["itemsize"]
+    if layout["offset"] is None:
+        # Unknown alignment: a byte span of length ``span`` can straddle one
+        # more block at each end than its length alone implies.
+        return None, (span // block_bytes + 2) * block_bytes
+    start = layout["offset"] + element_lo * layout["itemsize"]
+    return set(range(start // block_bytes,
+                     (start + span - 1) // block_bytes + 1)), 0
+
+
+def plan_transfer(band_units, scalars, time_layout, depth_layout,
+                  block_bytes, file_size, spent_bytes=0):
+    """Size the band units' read three ways, before any of it is spent.
+
+    The three numbers answer three different questions and the project's compute
+    rule needs all of them: what the slices hold, what the network fetch can
+    cost, and what has to fit in memory at once. Reporting one of them as
+    ``bytes`` is what let a ceiling pass a read that then transferred more than
+    the ceiling allowed.
 
     Args:
         band_units: the list returned by :func:`select_band_units`.
         scalars: the dict returned by :func:`read_unit_scalars`.
-        time_itemsize: bytes per stored spike time.
-        depth_itemsize: bytes per stored spike depth.
+        time_layout: :func:`column_layout` for the spike-time column.
+        depth_layout: :func:`column_layout` for the spike-depth column.
+        block_bytes: the reader's block size, which is what actually gets
+            fetched.
+        file_size: the asset's total size, which caps distinct block bytes.
+        spent_bytes: bytes already transferred resolving the index and the
+            metadata. Already spent, and part of what this read costs.
 
     Returns:
-        A dict with ``n_units``, ``n_spikes``, ``bytes`` and ``per_unit``, the
-        last a list of ``(row, n_spikes)`` pairs in row order.
+        A dict with ``n_units``, ``n_spikes``, ``per_unit`` (``(row, n_spikes)``
+        pairs), ``logical_bytes`` (exact stored payload), ``cache_bound_bytes``
+        (an upper bound on distinct block bytes, ``spent_bytes`` included),
+        ``resident_bytes`` (exact peak in-memory arrays), ``bound_basis``
+        naming how the block bound was derived, plus ``block_bytes``,
+        ``spent_bytes`` and the two layouts.
+
+    Note:
+        ``cache_bound_bytes`` bounds *distinct* blocks. A range request that
+        fails and is retried re-transfers its block, and that is deliberately
+        outside this bound: it is a network condition rather than a property of
+        the read being planned. Under ``worst-case alignment`` the bound can sit
+        far above what the read really costs, because every slice is charged for
+        the blocks it could straddle rather than the ones it shares; the layouts
+        are returned beside it so a reader can see why it is loose rather than
+        having to guess.
     """
     index = scalars["times_index"]
     per_unit = []
     total_spikes = 0
+    largest = 0
+    slices = []
     for unit in band_units:
         row = unit["row"]
         lo = index[row - 1] if row > 0 else 0
         hi = index[row]
         per_unit.append((row, hi - lo))
         total_spikes += hi - lo
+        largest = max(largest, hi - lo)
+        slices.append((lo, hi))
+
+    bounded_bytes = 0
+    exact = True
+    for layout in (time_layout, depth_layout):
+        known_blocks = set()
+        column_bytes = 0
+        for lo, hi in slices:
+            blocks, extra = _slice_block_bytes(lo, hi, layout, block_bytes)
+            if blocks is None:
+                exact = False
+                column_bytes += extra
+            else:
+                known_blocks |= blocks
+        for block in known_blocks:
+            column_bytes += min(block_bytes, max(0, file_size - block * block_bytes))
+        # One block per column for the object-header and chunk-index metadata
+        # h5py reads alongside the payload, which is not inside the payload's
+        # own byte range and so is not in the block set above.
+        bounded_bytes += column_bytes + block_bytes
     return {
         "n_units": len(band_units),
         "n_spikes": total_spikes,
-        "bytes": total_spikes * (time_itemsize + depth_itemsize),
         "per_unit": per_unit,
+        "logical_bytes": total_spikes * (time_layout["itemsize"]
+                                         + depth_layout["itemsize"]),
+        "cache_bound_bytes": min(int(file_size), spent_bytes + bounded_bytes),
+        "resident_bytes": total_spikes * 16 + largest * (time_layout["itemsize"]
+                                                         + depth_layout["itemsize"]),
+        "bound_basis": ("dataset offsets" if exact else "worst-case alignment"),
+        "block_bytes": int(block_bytes),
+        "spent_bytes": int(spent_bytes),
+        "time_layout": time_layout,
+        "depth_layout": depth_layout,
     }
 
 
@@ -367,9 +574,11 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         probe: the probe name to read, exactly as stored in ``probe_name``.
         depth_lo_um: the pinned band's lower ``rel_y`` bound, inclusive.
         depth_hi_um: the pinned band's upper ``rel_y`` bound, inclusive.
-        max_bytes: refuse to read more than this many bytes of spike data. None
-            means no ceiling, which is the caller taking responsibility for the
-            transfer.
+        max_bytes: refuse the read if either the bounded block transfer or the
+            peak resident arrays would exceed this many bytes. It is enforced
+            against both because either can be the larger, and a ceiling that
+            only watched the stored payload would bound neither. None means no
+            ceiling, which is the caller taking responsibility for both.
         plan_only: resolve and validate the index and the band membership, then
             return without reading any spike data.
 
@@ -378,8 +587,10 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         :func:`plan_transfer`), ``descriptions``, ``provenance``,
         ``electrodes``, ``unit_electrodes`` (every unit on the probe),
         ``band_units`` (the in-band subset, each with ``times`` and ``depths``
-        arrays unless ``plan_only``), ``n_units_on_probe`` and ``io`` (request
-        count and bytes transferred, which includes metadata as well as spikes).
+        arrays unless ``plan_only``), ``n_units_on_probe``,
+        ``integer_dtypes`` (each structural column as stored) and ``io``
+        (request count and bytes transferred, which includes metadata as well
+        as spikes).
 
     Raises:
         KeyError: if the file lacks the units or electrodes table.
@@ -410,12 +621,22 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         times_dataset = node[TIME_COLUMN]
         depths_dataset = node[DEPTH_COLUMN]
         plan = plan_transfer(band_units, scalars,
-                             times_dataset.dtype.itemsize, depths_dataset.dtype.itemsize)
-        if max_bytes is not None and plan["bytes"] > max_bytes:
-            raise ValueError(
-                "reading %d band units would transfer %d bytes of spike data, above the "
-                "declared ceiling of %d; raise the ceiling deliberately or read a smaller band"
-                % (plan["n_units"], plan["bytes"], max_bytes))
+                             column_layout(times_dataset), column_layout(depths_dataset),
+                             block_bytes, size, spent_bytes=remote.n_bytes)
+        if max_bytes is not None:
+            over = [(name, plan[name]) for name in ("cache_bound_bytes", "resident_bytes")
+                    if plan[name] > max_bytes]
+            if over:
+                raise ValueError(
+                    "reading %d band units (%d spikes, %d bytes of stored payload) is bounded "
+                    "at %d bytes of block transfer (%s) and %d bytes of peak resident arrays; "
+                    "%s the declared ceiling of %d. Raise the ceiling deliberately "
+                    "against a measurement of free memory, or read a smaller band."
+                    % (plan["n_units"], plan["n_spikes"], plan["logical_bytes"],
+                       plan["cache_bound_bytes"], plan["bound_basis"],
+                       plan["resident_bytes"],
+                       "%s %s above" % (" and ".join(name for name, _ in over),
+                                        "is" if len(over) == 1 else "are"), max_bytes))
 
         result = {
             "probe": probe,
@@ -428,6 +649,7 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
             "band_units": band_units,
             "n_units_on_probe": len(unit_electrodes),
             "n_units_total": scalars["n_units"],
+            "integer_dtypes": scalars["integer_dtypes"],
             "plan_only": bool(plan_only),
         }
         if plan_only:

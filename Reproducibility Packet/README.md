@@ -269,6 +269,20 @@ Produces: `results/amplitude_conventions.txt`, `results/amplitude_conventions.js
 
 ---
 
+## One script here has no step yet
+
+`scripts/measure_host_drift.py` measures a candidate host recording's band
+drift and applies the pre-declared gate that decides whether that recording can
+be used. It is in this packet, it runs, and its own `--help` prints the command
+it expects — but **it has not been run against a recording yet**, so nothing in
+`results/` came from it and there is nothing for a numbered step to reproduce.
+A step here is a claim that running the command gives you the file beside it,
+and that claim is not available yet. It becomes a numbered step at the first
+real run, and `check_runbook_consistency.py` reports it as pending until then
+rather than passing over it.
+
+---
+
 ## Verifying the result without reading the report
 
 The project commits to a single self-contained script, **`verify_realism.py`**,

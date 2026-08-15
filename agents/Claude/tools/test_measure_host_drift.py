@@ -46,6 +46,7 @@ import shutil
 import sys
 import tempfile
 import time
+import traceback
 
 import numpy as np
 
@@ -128,6 +129,70 @@ class LocalFile(io.RawIOBase):
         if not self._handle.closed:
             self._handle.close()
         super().close()
+
+
+class BlockLocalFile(LocalFile):
+    """A local stand-in that caches fixed-width blocks the way ``RemoteFile`` does.
+
+    :class:`LocalFile` reads whatever h5py asks for, which is the right shape
+    for the cases that only need the command to run. It is the wrong shape for
+    asking what a read *costs*: the real reader fetches whole blocks and caches
+    them, so a scattered slice can cost a block of transfer for a few kilobytes
+    of payload. Every byte counted here is a block byte, fetched once, which is
+    the quantity the transfer bound in ``plan_transfer`` is a bound on.
+    """
+
+    def __init__(self, url, size, block=None, timeout=None, retries=None):
+        LocalFile.__init__(self, url, size)
+        self.block = int(block or 65536)
+        self._pos = 0
+        self._blocks = {}
+
+    def seek(self, offset, whence=io.SEEK_SET):
+        """Move a cursor of this object's own, not the backing file's."""
+        if whence == io.SEEK_SET:
+            self._pos = offset
+        elif whence == io.SEEK_CUR:
+            self._pos += offset
+        elif whence == io.SEEK_END:
+            self._pos = self.size + offset
+        else:
+            raise ValueError("unsupported whence %r" % whence)
+        if self._pos < 0:
+            raise ValueError("negative seek position %r" % self._pos)
+        return self._pos
+
+    def tell(self):
+        """Return this object's cursor."""
+        return self._pos
+
+    def _block(self, index):
+        """Fetch one whole block, counting it only the first time."""
+        if index not in self._blocks:
+            lo = index * self.block
+            self._handle.seek(lo)
+            payload = self._handle.read(min(self.block, self.size - lo))
+            self._blocks[index] = payload
+            self.n_requests += 1
+            self.n_bytes += len(payload)
+        return self._blocks[index]
+
+    def read(self, n=-1):
+        """Read through the block cache."""
+        remaining = self.size - self._pos
+        if remaining <= 0:
+            return b""
+        want = remaining if n is None or n < 0 else min(n, remaining)
+        out = bytearray()
+        while want > 0:
+            index, offset = divmod(self._pos, self.block)
+            chunk = self._block(index)[offset:offset + want]
+            if not chunk:
+                break
+            out += chunk
+            self._pos += len(chunk)
+            want -= len(chunk)
+        return bytes(out)
 
 
 def install_local_file():
@@ -253,8 +318,31 @@ def write_raw(path, rows, t_first_s, t_last_s, timing_source="timestamps",
                 start.attrs["rate"] = 30000.0
 
 
+def replace_dataset(path, edits):
+    """Rewrite named datasets inside a written fixture, keeping their attributes.
+
+    Some malformed inputs cannot be requested from the fixture writers without
+    giving the writers a knob for every possible defect. Writing a well-formed
+    file and then replacing one dataset is closer to what a malformed asset
+    actually is, and it keeps the writers honest: the defect is visible in the
+    case rather than hidden in a default.
+
+    Args:
+        path: the fixture to edit in place.
+        edits: a mapping from NWB path to the replacement array.
+    """
+    with h5py.File(path, "r+") as handle:
+        for name, values in edits.items():
+            attrs = dict(handle[name].attrs)
+            del handle[name]
+            dataset = handle.create_dataset(name, data=values)
+            for key, value in attrs.items():
+                dataset.attrs[key] = value
+
+
 def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
-                    depth_dtype=np.float64, index_mutator=None, provenance=None):
+                    depth_dtype=np.float64, index_mutator=None, provenance=None,
+                    time_dtype=np.float64, chunk_elements=None):
     """Write a processed-asset-shaped file: an electrode table and a units table.
 
     Args:
@@ -265,6 +353,11 @@ def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
         depth_description: the depth column's stored description.
         depth_dtype: storage dtype for the depth column, so a fixture can prove
             the reported byte cost follows the file's own item size.
+        time_dtype: storage dtype for the spike-time column, for the same
+            reason.
+        chunk_elements: chunk length for the two ragged columns, which makes
+            them chunked rather than contiguous and so removes the file offsets
+            the transfer bound uses when it can.
         index_mutator: optional callable taking the two index lists and
             returning the pair actually written, for the malformed-index cases.
         provenance: optional mapping of NWB path to stored string, for the
@@ -293,11 +386,12 @@ def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
         node.create_dataset("max_electrode",
                             data=np.array([u["max_electrode"] for u in units],
                                           dtype=np.int64))
+        chunks = (chunk_elements,) if chunk_elements else None
         time_column = node.create_dataset("spike_times",
-                                          data=times.astype(np.float64))
+                                          data=times.astype(time_dtype), chunks=chunks)
         time_column.attrs["description"] = TIME_DESCRIPTION
         depth_column = node.create_dataset("spike_distances_from_probe_tip_um",
-                                           data=depths.astype(depth_dtype))
+                                           data=depths.astype(depth_dtype), chunks=chunks)
         depth_column.attrs["description"] = depth_description
         node.create_dataset("spike_times_index",
                             data=np.array(times_index, dtype=np.int64))
@@ -460,15 +554,14 @@ def run_case(tmp_root, name, raw_writer, processed_writer, argv_extra=(),
 
 
 def load_cli():
-    """Import ``measure_host_drift.py`` from beside this harness.
+    """Import ``measure_host_drift.py`` from the packet's ``scripts/`` folder.
 
-    The command lives in the agent workspace until it has actually been executed
-    against a candidate, at which point it moves into the packet's ``scripts/``
-    folder unchanged. Importing it by path rather than by package keeps that
-    move a copy with no edit.
+    The command lives in the packet because that is where the first real result
+    has to be produced from. Importing it by path rather than by package is what
+    lets this harness run it as a module while the packet's own ``scripts/``
+    directory is on ``sys.path`` for its sibling imports.
     """
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        "measure_host_drift.py")
+    path = os.path.join(PACKET_SCRIPTS, "measure_host_drift.py")
     spec = importlib.util.spec_from_file_location("measure_host_drift", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -580,7 +673,8 @@ def case_plan_bytes_follow_stored_itemsize(h, tmp):
                                              1024 * 1024, PROBES[0], lo, hi,
                                              plan_only=True)
         h.equal("plan/%s spikes" % tag, read["plan"]["n_spikes"], spikes)
-        h.equal("plan/%s bytes" % tag, read["plan"]["bytes"], spikes * per_spike)
+        h.equal("plan/%s logical bytes" % tag, read["plan"]["logical_bytes"],
+                spikes * per_spike)
 
 
 def case_transfer_ceiling_refuses(h, tmp):
@@ -960,9 +1054,10 @@ def case_plan_only_transfers_less(h, tmp):
             planned["io"]["bytes"] < full["io"]["bytes"],
             "plan %d, full %d" % (planned["io"]["bytes"], full["io"]["bytes"]))
     h.check("plan_transfer/full covers the slices",
-            full["io"]["bytes"] - planned["io"]["bytes"] >= planned["plan"]["bytes"],
+            full["io"]["bytes"] - planned["io"]["bytes"] >= planned["plan"]["logical_bytes"],
             "difference %d, planned %d"
-            % (full["io"]["bytes"] - planned["io"]["bytes"], planned["plan"]["bytes"]))
+            % (full["io"]["bytes"] - planned["io"]["bytes"],
+               planned["plan"]["logical_bytes"]))
     h.check("plan_transfer/plan carries no arrays",
             all("times" not in unit for unit in planned["band_units"]))
     h.check("plan_transfer/full carries arrays",
@@ -1055,8 +1150,7 @@ def case_report_is_ascii_and_complete(h, tmp):
         h.check("report/carries %r" % required, required in text)
     h.check("report/sources are ascii",
             all(ord(char) < 128
-                for path in (os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                          "measure_host_drift.py"),
+                for path in (os.path.join(PACKET_SCRIPTS, "measure_host_drift.py"),
                              os.path.join(PACKET_SCRIPTS, "utils", "archive_units.py"))
                 for char in io.open(path, encoding="utf-8").read()))
 
@@ -1153,6 +1247,496 @@ def case_null_distribution_is_reported(h, tmp):
             CLI.nearest_rank(record["null"]["values"], 100), record["null"]["values"][-1])
 
 
+def case_fractional_ragged_offsets_are_refused(h, tmp):
+    """Ragged offsets that are not whole numbers are refused, not truncated.
+
+    Two offsets 0.75 apart describe no partition at all, but ``int()`` turns
+    them into an equal pair and the file reads as well-formed. The check has to
+    happen on the stored values.
+    """
+    rows = default_electrodes()
+    units = band_units()
+
+    def write(path):
+        write_processed(path, rows, units)
+        with h5py.File(path, "r") as handle:
+            times = handle["units/spike_times_index"][:].astype(np.float64)
+            depths = handle["units/spike_distances_from_probe_tip_um_index"][:].astype(
+                np.float64)
+        times[0] += 0.75
+        depths[0] += 0.75
+        replace_dataset(path, {"units/spike_times_index": times,
+                               "units/spike_distances_from_probe_tip_um_index": depths})
+
+    result = run_case(
+        tmp, "fractional_offsets",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S), write)
+    h.check("fractional_offsets/refused", "not a whole number" in str(result["status"]),
+            str(result["status"]))
+    h.check("fractional_offsets/named as input error",
+            "input error" in str(result["status"]))
+    h.check("fractional_offsets/no report", result["text"] is None)
+    h.check("fractional_offsets/no record", result["record"] is None)
+
+
+def case_fractional_electrode_is_refused(h, tmp):
+    """A ``max_electrode`` that is not a whole number is refused."""
+    rows = default_electrodes()
+    units = band_units()
+
+    def write(path):
+        write_processed(path, rows, units)
+        with h5py.File(path, "r") as handle:
+            values = handle["units/max_electrode"][:].astype(np.float64)
+        values[0] += 0.75
+        replace_dataset(path, {"units/max_electrode": values})
+
+    result = run_case(
+        tmp, "fractional_electrode",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S), write)
+    h.check("fractional_electrode/refused", "not a whole number" in str(result["status"]),
+            str(result["status"]))
+    h.check("fractional_electrode/names the column",
+            "max_electrode" in str(result["status"]))
+    h.check("fractional_electrode/no report", result["text"] is None)
+
+
+def case_integral_float_column_is_accepted_and_named(h, tmp):
+    """A float column whose values are whole is accepted, and its dtype is reported.
+
+    This is the deliberate boundary of the check above: NWB does not require the
+    dtype, and a float column holding exact whole numbers is not ambiguous about
+    which row it names. What would be wrong is accepting it silently, so the
+    stored dtype travels into the record and the report.
+    """
+    rows = default_electrodes()
+    units = band_units()
+
+    def write(path):
+        write_processed(path, rows, units)
+        with h5py.File(path, "r") as handle:
+            values = handle["units/max_electrode"][:].astype(np.float64)
+        replace_dataset(path, {"units/max_electrode": values})
+
+    result = run_case(
+        tmp, "integral_float_column",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S), write)
+    h.equal("integral_float/status", result["status"], 0)
+    h.equal("integral_float/dtype recorded",
+            result["record"]["integer_dtypes"]["max_electrode"], "float64")
+    h.check("integral_float/dtype in report",
+            "max_electrode float64" in (result["text"] or ""))
+
+
+def case_short_unit_column_is_refused(h, tmp):
+    """A one-value-per-unit column with too few values is refused.
+
+    A short column would otherwise shorten the unit set silently: the units it
+    stops covering simply would not resolve, and the band would be measured
+    without them and without saying so.
+    """
+    rows = default_electrodes()
+    units = band_units()
+
+    def write(path):
+        write_processed(path, rows, units)
+        with h5py.File(path, "r") as handle:
+            values = handle["units/max_electrode"][:]
+        replace_dataset(path, {"units/max_electrode": values[:-1]})
+
+    result = run_case(
+        tmp, "short_column",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S), write)
+    h.check("short_column/refused", "one value per unit" in str(result["status"]),
+            str(result["status"]))
+    h.check("short_column/no report", result["text"] is None)
+
+
+def case_cross_subject_pair_is_refused(h, tmp):
+    """A raw and a processed asset from different subjects are not one recording.
+
+    The session UUID alone paired them, and everything downstream then took the
+    band and the clock from one animal and the units from another, reporting the
+    result under whichever subject the raw file named.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    case_dir = os.path.join(tmp, "cross_subject")
+    os.makedirs(case_dir, exist_ok=True)
+    raw_path = os.path.join(case_dir, "raw.nwb")
+    processed_path = os.path.join(case_dir, "processed.nwb")
+    write_raw(raw_path, rows, 0.0, EXTENT_S)
+    write_processed(processed_path, rows, units)
+    session = session_id("cross_subject")
+    assets = [
+        {"asset_id": "raw-cross", "size": os.path.getsize(raw_path), "blob": raw_path,
+         "path": "sub-A/sub-A_ses-%s%s" % (session, dandi.RAW_SUFFIX)},
+        {"asset_id": "processed-cross", "size": os.path.getsize(processed_path),
+         "blob": processed_path,
+         "path": "sub-B/sub-B_ses-%s%s" % (session, dandi.PROCESSED_SUFFIX)},
+    ]
+    dandi.list_assets = lambda *a, **k: assets
+    dandi.blob_url = lambda asset: asset["blob"]
+    out = os.path.join(case_dir, "report.txt")
+    try:
+        status = CLI.main(["--session", session, "--probe", PROBES[0], "--target", TARGET,
+                           "--assets-cache", os.path.join(case_dir, "assets.json"),
+                           "--out", out])
+    except SystemExit as exc:
+        status = str(exc.code)
+    h.check("cross_subject/refused", "same subject's recording" in str(status), str(status))
+    h.check("cross_subject/named as input error", "input error" in str(status))
+    h.check("cross_subject/no report", not os.path.exists(out))
+
+
+def case_paired_stems_must_match(h, tmp):
+    """Two assets of the same subject whose file stems differ are not one recording."""
+    rows = default_electrodes()
+    units = band_units()
+    case_dir = os.path.join(tmp, "stem_mismatch")
+    os.makedirs(case_dir, exist_ok=True)
+    raw_path = os.path.join(case_dir, "raw.nwb")
+    processed_path = os.path.join(case_dir, "processed.nwb")
+    write_raw(raw_path, rows, 0.0, EXTENT_S)
+    write_processed(processed_path, rows, units)
+    session = session_id("stem_mismatch")
+    assets = [
+        {"asset_id": "raw-stem", "size": os.path.getsize(raw_path), "blob": raw_path,
+         "path": "sub-A/sub-A_ses-%s%s" % (session, dandi.RAW_SUFFIX)},
+        {"asset_id": "processed-stem", "size": os.path.getsize(processed_path),
+         "blob": processed_path,
+         "path": "sub-A/sub-A_ses-%s_run-2%s" % (session, dandi.PROCESSED_SUFFIX)},
+    ]
+    dandi.list_assets = lambda *a, **k: assets
+    dandi.blob_url = lambda asset: asset["blob"]
+    out = os.path.join(case_dir, "report.txt")
+    try:
+        status = CLI.main(["--session", session, "--probe", PROBES[0], "--target", TARGET,
+                           "--assets-cache", os.path.join(case_dir, "assets.json"),
+                           "--out", out])
+    except SystemExit as exc:
+        status = str(exc.code)
+    h.check("stem_mismatch/refused", "stems differ" in str(status), str(status))
+    h.check("stem_mismatch/no report", not os.path.exists(out))
+
+
+def case_timestamps_must_cover_the_data(h, tmp):
+    """An AP series with fewer timestamps than samples cannot supply the extent.
+
+    ``t_last_s`` is the grid's whole extent, so a timestamp vector that stops
+    short of the data is not the recording's last sample time -- and it looks
+    exactly like a well-formed one from its endpoints alone.
+    """
+    rows = default_electrodes()
+    units = band_units()
+
+    def write(path):
+        write_raw(path, rows, 0.0, EXTENT_S)
+        with h5py.File(path, "r+") as handle:
+            target = "acquisition/ElectricalSeries%sAP/timestamps" % PROBES[0]
+            del handle[target]
+            handle.create_dataset(target, data=np.linspace(0.0, EXTENT_S, 999))
+
+    result = run_case(
+        tmp, "timestamp_coverage",
+        write, lambda p: write_processed(p, rows, units))
+    h.check("timestamp_coverage/refused",
+            "aligned timestamps" in str(result["status"])
+            and "1000 samples" in str(result["status"]).replace("1000", "1000"),
+            str(result["status"]))
+    h.check("timestamp_coverage/named as input error",
+            "input error" in str(result["status"]))
+    h.check("timestamp_coverage/no report", result["text"] is None)
+
+
+def case_band_gap_is_pinned(h, tmp):
+    """The band's contiguity tolerance cannot be supplied, and it stays at 40 um.
+
+    A wider tolerance merges separate islands of the target label across the
+    structure between them, which changes which units the gate measures. The
+    fixture holds two CA1 islands with CA3 rows between them; at the pinned
+    tolerance only the island the band's own rule admits is measured.
+    """
+    rows = default_electrodes()
+    for row in rows[:N_ROWS_PER_PROBE]:
+        row["location"] = OTHER_LOCATION
+    for index in (10, 11, 12, 25, 26, 27, 28):
+        rows[index]["location"] = BAND_LOCATION
+    units = band_units()
+    typed = run_case(
+        tmp, "typed_gap",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units),
+        argv_extra=["--max-gap-um", "1000"])
+    h.equal("pinned_gap/typed value rejected", str(typed["status"]), "2")
+    h.check("pinned_gap/no report from the typed run", typed["text"] is None)
+    pinned = run_case(
+        tmp, "pinned_gap",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units))
+    record = pinned["record"]
+    h.equal("pinned_gap/status", pinned["status"], 0)
+    h.equal("pinned_gap/value is 40 um", record["max_gap_um"], 40.0)
+    h.equal("pinned_gap/value is the module constant", CLI.BAND_MAX_GAP_UM, 40.0)
+    h.equal("pinned_gap/band is one island",
+            (record["band"]["depth_lo_um"], record["band"]["depth_hi_um"]),
+            (500.0, 560.0))
+    h.equal("pinned_gap/island is four rows", record["band"]["n_channels"], 4)
+    h.check("pinned_gap/report says pinned", "pinned at 40" in (pinned["text"] or ""))
+    # The same fixture read with the tolerance that used to be typeable: the two
+    # islands merge into one band that spans the CA3 rows between them, which is
+    # what makes the pinning a decision about which units get measured.
+    raw = host_anatomy.read_electrode_table(pinned["raw"],
+                                            os.path.getsize(pinned["raw"]), 1024 * 1024)
+    merged = host_anatomy.contiguous_band(raw["probes"][PROBES[0]], TARGET, 1000.0)
+    h.equal("pinned_gap/a wide tolerance would merge them",
+            (merged["depth_lo_um"], merged["depth_hi_um"], merged["n_channels"]),
+            (200.0, 560.0, 7))
+    h.check("pinned_gap/merging admits more rows than the island",
+            merged["n_channels"] > record["band"]["n_channels"])
+
+
+def case_ceiling_bounds_the_block_transfer(h, tmp):
+    """The ceiling stops the transfer it names, not only the stored payload.
+
+    Against a block-caching reader the stored payload is not what gets fetched:
+    a scattered slice costs whole blocks. A ceiling above the payload and below
+    the real transfer used to admit the read.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    case_dir = os.path.join(tmp, "ceiling_blocks")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    write_processed(processed, rows, units)
+    size = os.path.getsize(processed)
+    block = 16 * 1024
+    archive_units.RemoteFile = BlockLocalFile
+    try:
+        planned = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                                plan_only=True)
+        full = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi)
+        plan = full["plan"]
+        h.check("ceiling_blocks/bound covers the actual transfer",
+                plan["cache_bound_bytes"] >= full["io"]["bytes"],
+                "bound %d, actual %d" % (plan["cache_bound_bytes"], full["io"]["bytes"]))
+        h.check("ceiling_blocks/actual exceeds the payload",
+                full["io"]["bytes"] > plan["logical_bytes"],
+                "actual %d, payload %d" % (full["io"]["bytes"], plan["logical_bytes"]))
+        between = (plan["logical_bytes"] + full["io"]["bytes"]) // 2
+        refused = None
+        try:
+            archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                          max_bytes=between)
+        except ValueError as exc:
+            refused = str(exc)
+        h.check("ceiling_blocks/a ceiling above the payload is refused",
+                refused is not None and "above the declared ceiling" in refused,
+                repr(refused))
+        h.check("ceiling_blocks/refusal names which quantity bound",
+                refused is not None and "cache_bound_bytes is above" in refused,
+                repr(refused))
+        h.equal("ceiling_blocks/plan matches the planning read",
+                planned["plan"]["cache_bound_bytes"], plan["cache_bound_bytes"])
+    finally:
+        archive_units.RemoteFile = LocalFile
+
+
+def case_ceiling_can_bind_on_resident_memory(h, tmp):
+    """The ceiling also stops a read whose arrays would not fit, not only its transfer.
+
+    Stored float32 becomes float64 in memory, so the resident arrays are the
+    larger quantity here and a transfer-only ceiling would not see them.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    case_dir = os.path.join(tmp, "ceiling_resident")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    write_processed(processed, rows, units, depth_dtype=np.float32,
+                    time_dtype=np.float32)
+    size = os.path.getsize(processed)
+    block = 4096
+    archive_units.RemoteFile = BlockLocalFile
+    try:
+        planned = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                                plan_only=True)
+        plan = planned["plan"]
+        h.check("ceiling_resident/resident exceeds payload",
+                plan["resident_bytes"] > plan["logical_bytes"],
+                "resident %d, payload %d" % (plan["resident_bytes"],
+                                             plan["logical_bytes"]))
+        h.check("ceiling_resident/resident is the binding one",
+                plan["resident_bytes"] > plan["cache_bound_bytes"],
+                "resident %d, bound %d" % (plan["resident_bytes"],
+                                           plan["cache_bound_bytes"]))
+        refused = None
+        try:
+            archive_units.read_band_units(
+                processed, size, block, PROBES[0], lo, hi,
+                max_bytes=(plan["cache_bound_bytes"] + plan["resident_bytes"]) // 2)
+        except ValueError as exc:
+            refused = str(exc)
+        h.check("ceiling_resident/refused on resident bytes",
+                refused is not None and "resident_bytes is above" in refused, repr(refused))
+        h.check("ceiling_resident/did not name the transfer",
+                refused is not None and "cache_bound_bytes" not in refused.split(";")[-1],
+                repr(refused))
+    finally:
+        archive_units.RemoteFile = LocalFile
+
+
+def case_chunked_columns_fall_back_to_the_worst_case_bound(h, tmp):
+    """A chunked column has no file offset, so the bound is taken the safe way.
+
+    A chunked read fetches whole chunks, and where the chunks sit is not
+    something h5py will say. The bound rounds each slice out to chunk boundaries
+    and then places it at the worst alignment the block grid allows -- looser
+    than the exact one, and still a bound.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    case_dir = os.path.join(tmp, "chunked")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    write_processed(processed, rows, units, chunk_elements=64)
+    size = os.path.getsize(processed)
+    block = 16 * 1024
+    archive_units.RemoteFile = BlockLocalFile
+    try:
+        full = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi)
+    finally:
+        archive_units.RemoteFile = LocalFile
+    plan = full["plan"]
+    h.equal("chunked/basis is worst case", plan["bound_basis"], "worst-case alignment")
+    h.equal("chunked/layout reports the chunk",
+            plan["time_layout"]["chunk_elements"], 64)
+    h.equal("chunked/layout reports no offset", plan["time_layout"]["offset"], None)
+    h.check("chunked/bound covers the actual transfer",
+            plan["cache_bound_bytes"] >= full["io"]["bytes"],
+            "bound %d, actual %d" % (plan["cache_bound_bytes"], full["io"]["bytes"]))
+    h.check("chunked/bound never exceeds the file",
+            plan["cache_bound_bytes"] <= size,
+            "bound %d, size %d" % (plan["cache_bound_bytes"], size))
+
+
+def case_plan_separates_the_three_costs(h, tmp):
+    """The plan reports payload, bounded transfer and peak memory as three numbers."""
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    spikes = sum(len(unit["times"]) for unit in units)
+    largest = max(len(unit["times"]) for unit in units)
+    case_dir = os.path.join(tmp, "three_costs")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    write_processed(processed, rows, units, depth_dtype=np.float32)
+    read = archive_units.read_band_units(processed, os.path.getsize(processed),
+                                         1024 * 1024, PROBES[0], lo, hi, plan_only=True)
+    plan = read["plan"]
+    h.equal("three_costs/payload is the stored size", plan["logical_bytes"], spikes * 12)
+    h.equal("three_costs/resident is float64 plus one slice",
+            plan["resident_bytes"], spikes * 16 + largest * 12)
+    h.check("three_costs/no key called bytes", "bytes" not in plan)
+    h.equal("three_costs/block size recorded", plan["block_bytes"], 1024 * 1024)
+    h.check("three_costs/metadata already spent is included",
+            plan["spent_bytes"] > 0 and plan["cache_bound_bytes"] > plan["spent_bytes"])
+
+
+def case_output_paths_must_differ(h, tmp):
+    """The report and the JSON record cannot be written to one path."""
+    rows = default_electrodes()
+    units = band_units()
+    case_dir = os.path.join(tmp, "same_path")
+    os.makedirs(case_dir, exist_ok=True)
+    raw_path = os.path.join(case_dir, "raw.nwb")
+    processed_path = os.path.join(case_dir, "processed.nwb")
+    write_raw(raw_path, rows, 0.0, EXTENT_S)
+    write_processed(processed_path, rows, units)
+    session = session_id("same_path")
+    install_local_assets([(session, raw_path, processed_path)])
+    out = os.path.join(case_dir, "report.txt")
+    try:
+        status = CLI.main(["--session", session, "--probe", PROBES[0], "--target", TARGET,
+                           "--assets-cache", os.path.join(case_dir, "assets.json"),
+                           "--out", out, "--records", out])
+    except SystemExit as exc:
+        status = str(exc.code)
+    h.check("same_path/refused", "same path" in str(status), str(status))
+    h.check("same_path/nothing written", not os.path.exists(out))
+
+
+def case_input_error_clears_the_earlier_verdict(h, tmp):
+    """A failed rerun does not leave the previous run's verdict at its own paths.
+
+    The exit status distinguishes the two runs; the files did not. A report that
+    belongs to a different run is the kind of artifact that gets read later
+    without its exit status beside it.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    first = run_case(
+        tmp, "stale_outputs",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units))
+    h.equal("stale/first run wrote a verdict", first["status"], 0)
+    second = run_case(
+        tmp, "stale_outputs",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units,
+                                  depth_description="Distance from the probe tip."))
+    h.check("stale/second run failed", second["status"] != 0, str(second["status"]))
+    h.check("stale/report is gone", second["text"] is None)
+    h.check("stale/record is gone", second["record"] is None)
+    h.check("stale/files removed from disk",
+            not os.path.exists(first["out"])
+            and not os.path.exists(os.path.join(second["dir"], "record.json")))
+
+
+def case_records_wording_is_conditional(h, tmp):
+    """The report only points at the JSON record when one was actually written."""
+    rows = default_electrodes()
+    units = band_units()
+    case_dir = os.path.join(tmp, "no_records")
+    os.makedirs(case_dir, exist_ok=True)
+    raw_path = os.path.join(case_dir, "raw.nwb")
+    processed_path = os.path.join(case_dir, "processed.nwb")
+    write_raw(raw_path, rows, 0.0, EXTENT_S)
+    write_processed(processed_path, rows, units)
+    session = session_id("no_records")
+    install_local_assets([(session, raw_path, processed_path)])
+    out = os.path.join(case_dir, "report.txt")
+    status = CLI.main(["--session", session, "--probe", PROBES[0], "--target", TARGET,
+                       "--assets-cache", os.path.join(case_dir, "assets.json"),
+                       "--out", out])
+    with open(out, "r", encoding="utf-8") as handle:
+        text = handle.read()
+    h.equal("no_records/status", status, 0)
+    h.check("no_records/says it was not written", "not written, because --records" in text)
+    h.check("no_records/does not claim one exists",
+            "in the JSON record written beside this report" not in text)
+
+
+def case_report_names_the_new_confirmations(h, tmp):
+    """The report carries every confirmation and cost the command now performs."""
+    rows = default_electrodes()
+    units = band_units()
+    result = run_case(
+        tmp, "report_confirmations",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units))
+    text = result["text"] or ""
+    h.equal("confirmations/status", result["status"], 0)
+    for required in ("structural columns", "asset pair identity",
+                     "AP timestamp coverage", "stored payload", "block transfer",
+                     "peak resident arrays", "pinned at 40 um"):
+        h.check("confirmations/report carries %r" % required, required in text)
+    h.check("confirmations/report is ascii", all(ord(char) < 128 for char in text))
+
+
 CASES = (
     case_clean_band_passes,
     case_labels_recorded_not_filtered,
@@ -1189,6 +1773,22 @@ CASES = (
     case_only_band_units_are_read,
     case_provenance_is_recorded_not_required,
     case_null_distribution_is_reported,
+    case_fractional_ragged_offsets_are_refused,
+    case_fractional_electrode_is_refused,
+    case_integral_float_column_is_accepted_and_named,
+    case_short_unit_column_is_refused,
+    case_cross_subject_pair_is_refused,
+    case_paired_stems_must_match,
+    case_timestamps_must_cover_the_data,
+    case_band_gap_is_pinned,
+    case_ceiling_bounds_the_block_transfer,
+    case_ceiling_can_bind_on_resident_memory,
+    case_chunked_columns_fall_back_to_the_worst_case_bound,
+    case_plan_separates_the_three_costs,
+    case_output_paths_must_differ,
+    case_input_error_clears_the_earlier_verdict,
+    case_records_wording_is_conditional,
+    case_report_names_the_new_confirmations,
 )
 
 
@@ -1213,7 +1813,17 @@ def main():
     try:
         for case in CASES:
             print("[case] %s" % case.__name__, flush=True)
-            case(harness, tmp)
+            try:
+                case(harness, tmp)
+            except Exception as exc:  # noqa: BLE001 - a case that raises is a failed case
+                # Without this, one unexpected exception ends the run and every
+                # case after it is silently not run: the totals then describe a
+                # smaller suite than the one that was asked for. An uncaught
+                # exception from the command is also a real defect -- the
+                # command's own contract is a named exit, not a traceback.
+                harness.check("%s/raised" % case.__name__, False,
+                              "%s: %s" % (type(exc).__name__, exc))
+                traceback.print_exc()
     finally:
         if not args.keep:
             shutil.rmtree(tmp, ignore_errors=True)
