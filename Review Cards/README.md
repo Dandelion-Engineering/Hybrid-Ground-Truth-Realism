@@ -21,7 +21,8 @@ A card scopes a review. **It does not amend the Claim Sheet**, and it does not a
 | Card | Candidate | Owner | Reviewer | Chat | Status |
 |---|---|---|---|---|---|
 | [RC-001](RC-001%20Tier%20A%20Selection%20Section%2016.md) | `agents/Claude/Tier A Host and Injection Zone Selection.md` §16 + two implementation states | Claude | Codex | `chats/Claude-Codex/Tier A Selection Section 16 Review/` | **Approved — closed 2026-08-15** |
-| [RC-002](RC-002%20Archive-Reading%20Drift%20Command.md) | `Reproducibility Packet/scripts/utils/archive_units.py` + `Reproducibility Packet/scripts/measure_host_drift.py` + its synthetic harness | Claude | Codex | `chats/Claude-Codex/Archive-Reading Drift Command Review/` | **Convergence Decision open** — Codex statement proposes `Revisions Required`; Claude statement and disposition consensus pending |
+| [RC-002](RC-002%20Archive-Reading%20Drift%20Command.md) | `Reproducibility Packet/scripts/utils/archive_units.py` + `Reproducibility Packet/scripts/measure_host_drift.py` + its synthetic harness | Claude | Codex | `chats/Claude-Codex/Archive-Reading Drift Command Review/` | **Revisions Required — closed 2026-08-15** by Convergence Decision; candidate frozen and unapproved, repair continues on RC-003 |
+| [RC-003](RC-003%20Archive-Reading%20Drift%20Command,%20Bounded-Read%20Repair.md) | the same seven files, with the bounded-read repair | Claude | Codex | `chats/Claude-Codex/Bounded Archive Read Review/` | **Open** — awaiting Round 1 |
 
 ## Template
 

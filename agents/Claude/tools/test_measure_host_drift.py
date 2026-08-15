@@ -75,6 +75,38 @@ DEPTH_DESCRIPTION = ("Distance from the probe tip for each spike in micrometers,
 TIME_DESCRIPTION = "the spike times for each unit in seconds"
 
 
+# Every local reader built during a case, so the suite can ask afterwards which
+# byte ranges of a fixture were actually touched. Cleared at the start of each
+# run_case; readers are small and a case builds a handful.
+READERS = []
+
+
+def distinct_bytes(url):
+    """Return the union, in bytes, of every range any reader touched on one file.
+
+    The plan's ``cache_bound_bytes`` bounds *distinct* bytes -- a block fetched
+    twice is transferred once, because the reader caches it. The local stand-in
+    has no cache, so its ``n_bytes`` counter double-counts and is not the
+    quantity to compare against a bound. This is.
+
+    Args:
+        url: the fixture path a reader was opened on.
+
+    Returns:
+        The size of the union of the touched ranges, in bytes.
+    """
+    spans = sorted(span for reader in READERS
+                   if os.path.abspath(reader.url) == os.path.abspath(url)
+                   for span in reader.touched)
+    total, end = 0, 0
+    for lo, hi in spans:
+        if hi <= end:
+            continue
+        total += hi - max(lo, end)
+        end = hi
+    return total
+
+
 class LocalFile(io.RawIOBase):
     """A local stand-in for ``RemoteFile`` with the same constructor and counters.
 
@@ -87,9 +119,16 @@ class LocalFile(io.RawIOBase):
 
     def __init__(self, url, size, block=None, timeout=None, retries=None):
         self._handle = open(url, "rb")
+        self.url = url
         self.size = int(size)
         self.n_requests = 0
         self.n_bytes = 0
+        # Every byte range this reader touches, so a case can ask what the read
+        # cost in *distinct* bytes. n_bytes cannot answer that: this reader has
+        # no cache, so a region read twice is counted twice and the total can
+        # exceed the file size, while the plan's bound is on distinct blocks.
+        self.touched = []
+        READERS.append(self)
 
     def readable(self):
         """Return True."""
@@ -113,9 +152,11 @@ class LocalFile(io.RawIOBase):
 
     def read(self, n=-1):
         """Read and count, so the reported io counters stay meaningful."""
+        start = self._handle.tell()
         data = self._handle.read(n if n is not None and n >= 0 else -1)
         self.n_requests += 1
         self.n_bytes += len(data)
+        self.touched.append((start, start + len(data)))
         return data
 
     def readinto(self, buffer):
@@ -175,6 +216,7 @@ class BlockLocalFile(LocalFile):
             self._blocks[index] = payload
             self.n_requests += 1
             self.n_bytes += len(payload)
+            self.touched.append((lo, lo + len(payload)))
         return self._blocks[index]
 
     def read(self, n=-1):
@@ -581,6 +623,7 @@ def run_case(tmp_root, name, raw_writer, processed_writer, argv_extra=(),
     processed_path = os.path.join(case_dir, "processed.nwb")
     raw_writer(raw_path)
     processed_writer(processed_path)
+    del READERS[:]
     install_local_assets([(session, raw_path, processed_path)])
     out = os.path.join(case_dir, "report.txt")
     records = os.path.join(case_dir, "record.json")
@@ -600,6 +643,29 @@ def run_case(tmp_root, name, raw_writer, processed_writer, argv_extra=(),
     if os.path.exists(records):
         with open(records, "r", encoding="utf-8") as handle:
             record = json.load(handle)
+    if record is not None:
+        # The RC-002-F1-R2 invariant, checked on every case that reaches a
+        # record rather than on the one fixture that exposed it: the distinct
+        # bytes the processed read actually touched must be inside what its plan
+        # said they could be. The defect that closed that card was a single read
+        # placed after the ceiling was enforced, and no case in this suite was
+        # looking for it. The comparison is against the union of touched ranges
+        # and not against io["bytes"], because the local reader has no cache and
+        # counts a re-read twice while the bound is on distinct bytes.
+        planned = (record.get("plan") or {}).get("cache_bound_bytes")
+        touched = distinct_bytes(processed_path)
+        if planned is not None:
+            if not touched:
+                raise AssertionError(
+                    "case %r matched no reader against %s, so the transfer invariant "
+                    "checked nothing. A check that cannot fail is not a check."
+                    % (name, processed_path))
+            if touched > planned:
+                raise AssertionError(
+                    "case %r touched %d distinct bytes of the processed asset against a "
+                    "planned bound of %d. A read the plan does not cover is the defect "
+                    "class that closed RC-002, and it fails here rather than in review."
+                    % (name, touched, planned))
     return {"status": status, "out": out, "text": text, "record": record,
             "raw": raw_path, "processed": processed_path, "dir": case_dir}
 
@@ -1271,6 +1337,84 @@ def case_provenance_is_recorded_not_required(h, tmp):
     h.check("provenance/file_name attribute carried",
             record["provenance"].get("general/source_script@file_name")
             == "source_script.py")
+
+
+def case_provenance_cost_is_inside_the_plan(h, tmp):
+    """A megabyte-sized provenance value is counted by the plan and capped when kept.
+
+    This is RC-002-F1-R2, which closed that card unapproved. ``source_provenance``
+    reads complete stored datasets, and it used to be called *after*
+    ``read_band_units`` had enforced its memory ceiling: a schema-valid file
+    whose ``general/source_script`` held 4,200,030 characters was admitted under
+    a 174,368-byte transfer bound and then transferred 4,232,336 bytes. The read
+    now happens in preflight, where the reader's spend is still being counted,
+    so the cost is inside ``spent_bytes`` and therefore inside the bound; and
+    what is retained is capped, because a variable-length string has no stored
+    size to refuse on before reading it.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    big = "# generated conversion source\n" + ("x = 123456789\n" * 300000)
+    result = run_case(
+        tmp, "provenance_cost",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units,
+                                  provenance={"general/source_script": big}))
+    h.equal("provenance_cost/status", result["status"], 0)
+    record = result["record"]
+    plan = record["plan"]
+    spent = distinct_bytes(result["processed"])
+    h.check("provenance_cost/transfer_inside_the_bound",
+            spent <= plan["cache_bound_bytes"],
+            "%d touched against %d bounded" % (spent, plan["cache_bound_bytes"]))
+    h.check("provenance_cost/preflight_spend_counted",
+            plan["spent_bytes"] >= len(big),
+            "spent_bytes %d against a %d-character value"
+            % (plan["spent_bytes"], len(big)))
+    h.check("provenance_cost/peak_covers_the_transfer",
+            plan["peak_resident_bytes"] >= spent,
+            "peak %d against %d transferred" % (plan["peak_resident_bytes"], spent))
+    value = record["provenance"]["general/source_script"]
+    h.check("provenance_cost/retained_value_is_capped",
+            len(value) < len(big) and "truncated" in value, value[-90:])
+    h.check("provenance_cost/cap_is_the_modules",
+            str(archive_units.PROVENANCE_MAX_BYTES) in value, value[-90:])
+
+
+def case_oversize_stored_provenance_is_not_read(h, tmp):
+    """Where the file will state a value's stored size, an oversized one is refused.
+
+    The cap has two halves because HDF5 answers the size question for only one
+    of them. A fixed-length string dataset reports its stored bytes, so the read
+    can be refused before it happens; a variable-length one keeps its characters
+    in the global heap and reports 16 bytes of storage for a 4.2 MB value, so
+    the only bound left there is on what is retained. This case is the first
+    half, and it asserts the value really is in the file so that a refusal is
+    not confused with an absence.
+    """
+    case_dir = os.path.join(tmp, "provenance_stored_size")
+    os.makedirs(case_dir, exist_ok=True)
+    path = os.path.join(case_dir, "provenance.nwb")
+    big = ("y = 1\n" * 700000).encode()
+    with h5py.File(path, "w") as handle:
+        handle.create_dataset("general/source_script", data=np.bytes_(big))
+        handle.create_dataset("general/lab", data="cortexlab",
+                              dtype=h5py.string_dtype(encoding="utf-8"))
+    with h5py.File(path, "r") as handle:
+        node = handle["general/source_script"]
+        h.check("stored_provenance/file_really_holds_it", len(node[()]) == len(big),
+                "%d bytes" % len(node[()]))
+        h.check("stored_provenance/size_is_readable",
+                archive_units._stored_value_bytes(node) == len(big),
+                "%s" % archive_units._stored_value_bytes(node))
+        out = archive_units.source_provenance(handle)
+    value = out["general/source_script"]
+    h.check("stored_provenance/not_read", value.startswith("<not read:"), value[:90])
+    h.check("stored_provenance/names_the_size", str(len(big)) in value, value[:90])
+    h.check("stored_provenance/names_the_cap",
+            str(archive_units.PROVENANCE_MAX_BYTES) in value, value[:90])
+    h.check("stored_provenance/retained_is_small", len(value) < 200, len(value))
+    h.equal("stored_provenance/small_value_untouched", out["general/lab"], "cortexlab")
 
 
 def case_null_distribution_is_reported(h, tmp):
@@ -2161,6 +2305,8 @@ CASES = (
     case_io_counts_every_read,
     case_only_band_units_are_read,
     case_provenance_is_recorded_not_required,
+    case_provenance_cost_is_inside_the_plan,
+    case_oversize_stored_provenance_is_not_read,
     case_null_distribution_is_reported,
     case_fractional_ragged_offsets_are_refused,
     case_float_ragged_index_is_refused_even_when_whole,

@@ -43,6 +43,16 @@ quarter. Where neither route is available the bound is the whole file, which is
 loose but is the only thing still true. ``bound_basis`` names which routes a
 given plan used.
 
+**Every read this module performs happens before that bound is computed, except
+the per-unit slices the bound is about.** The electrode table, the unit scalars,
+the column descriptions, the conversion provenance, the two column layouts and
+the chunk index are all read while the reader's spend is still being counted, so
+each of them lands inside ``spent_bytes`` and therefore inside the bound. The
+provenance read used to sit *after* the ceiling was enforced, where it was
+invisible to the plan and could transfer megabytes a caller had been told would
+not be transferred; the rule the repair leaves behind is the general one, and it
+is what the harness now checks on every fixture that performs a read.
+
 **What it validates, and why validation lives here rather than in the caller.**
 Four properties have to hold before a drift number computed from these arrays
 means anything, and every one of them is a property of the file rather than of
@@ -116,6 +126,13 @@ PROVENANCE_PATHS = (
     "general/lab",
 )
 
+# The per-value cap on conversion provenance, pinned here rather than passed in,
+# because a value read from a candidate must not be able to choose the number
+# that decides whether reading it was allowed. It is deliberately far above any
+# plausible real value: IBL's source_script is a conversion script, and the
+# largest of the four paths on a real asset is kilobytes.
+PROVENANCE_MAX_BYTES = 65536
+
 
 def _decode(values):
     """Decode an h5py string column into a list of str.
@@ -184,38 +201,111 @@ def column_descriptions(handle, columns=(TIME_COLUMN, DEPTH_COLUMN)):
     return out
 
 
-def source_provenance(handle):
+def _stored_value_bytes(node):
+    """Return a dataset's stored payload size in bytes, or None if HDF5 will not say.
+
+    Args:
+        node: whatever :meth:`h5py.File.__getitem__` returned for the path.
+
+    Returns:
+        The stored size in bytes, or None when there is no honest pre-read
+        answer. A variable-length string is the case that matters: its
+        characters live in HDF5's global heap and the dataset itself stores only
+        the heap references, so on h5py 3.16.0 a 4,200,030-character value
+        reports 16 bytes of storage and 8 bytes of ``nbytes``. Returning either
+        as a size would be a fiction, and a fictional bound is worse than an
+        absent one.
+    """
+    if not isinstance(node, h5py.Dataset):
+        return None
+    info = h5py.check_string_dtype(node.dtype)
+    if info is not None and info.length is None:
+        return None
+    try:
+        return int(node.id.get_storage_size())
+    except (AttributeError, ValueError, RuntimeError):
+        return None
+
+
+def _capped(text, max_bytes):
+    """Return ``text`` if it is within the cap, or a truncated, self-describing form.
+
+    Args:
+        text: the decoded value.
+        max_bytes: the cap, applied here to characters. A UTF-8 character is at
+            least one byte, so this never retains fewer bytes than the cap
+            names, and at most four times it. The exact retained size is
+            measured rather than assumed: the returned dict is charged into
+            ``structures_bytes`` by :func:`plan_transfer`.
+
+    Returns:
+        The text, or its first ``max_bytes`` characters followed by a marker
+        naming the full length, so a reader can tell a short value from a
+        truncated one.
+    """
+    if len(text) <= max_bytes:
+        return text
+    return ("%s<truncated: %d characters read, %d-character provenance cap>"
+            % (text[:max_bytes], len(text), max_bytes))
+
+
+def source_provenance(handle, max_bytes=PROVENANCE_MAX_BYTES):
     """Read whatever conversion provenance the asset carries, without gating on it.
 
     Args:
         handle: an open :class:`h5py.File`.
+        max_bytes: the pinned per-value cap. A value whose stored size the file
+            will report, above the cap, is not read at all. A value whose size
+            the file will not report is read and then retained only up to the
+            cap. Either way what this function returns is bounded, and it says
+            in the value itself which of the two happened.
 
     Returns:
         A dict from path to its stored value as a string, omitting paths the
-        file does not carry. Values are recorded for the report; no value here
-        is required to hold, because the session-time convention this project
-        relies on is pinned to a conversion-repository commit rather than
-        asserted by the asset.
+        file does not carry and replacing an oversized value with a marker
+        naming its size and the cap. Values are recorded for the report; no
+        value here is required to hold, because the session-time convention this
+        project relies on is pinned to a conversion-repository commit rather
+        than asserted by the asset.
+
+    Note:
+        **This reads the file, so it belongs in preflight, and that is a repair
+        rather than a preference.** An earlier version was called after
+        :func:`read_band_units` had already enforced its memory ceiling, which
+        made every byte it transferred invisible to the plan: a schema-valid
+        file carrying a 4,200,030-character ``general/source_script`` was
+        admitted under a 174,368-byte transfer bound and a 267,001-byte peak,
+        and then transferred and retained 4,232,336 bytes. It is now called
+        before the reader's spend is captured, so its cost is inside
+        ``spent_bytes`` and therefore inside ``cache_bound_bytes`` and
+        ``peak_resident_bytes``. The cap is the second half of the repair: for a
+        variable-length string there is no pre-read size to refuse on, so the
+        bound that can still be enforced is on what is retained.
     """
     out = {}
     for path in PROVENANCE_PATHS:
         if path not in handle:
             continue
         node = handle[path]
+        stored = _stored_value_bytes(node)
+        if stored is not None and stored > max_bytes:
+            out[path] = ("<not read: %d stored bytes exceeds the %d-byte provenance cap>"
+                         % (stored, max_bytes))
+            continue
         try:
             value = node[()]
         except (TypeError, ValueError):
             continue
         if isinstance(value, bytes):
             value = value.decode()
-        out[path] = str(value)
+        out[path] = _capped(str(value), max_bytes)
         for key in ("file_name", "software", "version"):
             attr = node.attrs.get(key)
             if attr is None:
                 continue
             if isinstance(attr, bytes):
                 attr = attr.decode()
-            out["%s@%s" % (path, key)] = str(attr)
+            out["%s@%s" % (path, key)] = _capped(str(attr), max_bytes)
     return out
 
 
@@ -799,6 +889,11 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         scalars = read_unit_scalars(handle)
         check_ragged_alignment(scalars)
         descriptions = column_descriptions(handle)
+        # Read here, in preflight, and never after the ceiling is enforced.
+        # source_provenance reads complete stored datasets, so a call placed
+        # after the check spends bytes the plan has already promised were
+        # bounded -- which is exactly what it used to do.
+        provenance = source_provenance(handle)
 
         depth_description = descriptions.get(DEPTH_COLUMN)
         if not depth_description or DEPTH_UNIT_PHRASE not in depth_description.lower():
@@ -824,7 +919,8 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         depth_layout = column_layout(depths_dataset, slices)
         plan = plan_transfer(band_units, scalars, time_layout, depth_layout,
                              block_bytes, size, spent_bytes=remote.n_bytes,
-                             held=(electrodes, unit_electrodes, descriptions))
+                             held=(electrodes, unit_electrodes, descriptions,
+                                   provenance))
         if max_bytes is not None and plan["peak_resident_bytes"] > max_bytes:
             raise ValueError(
                 "reading %d band units (%d spikes, %d bytes of stored payload) would hold "
@@ -843,7 +939,7 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
             "band": {"depth_lo_um": float(depth_lo_um), "depth_hi_um": float(depth_hi_um)},
             "plan": plan,
             "descriptions": descriptions,
-            "provenance": source_provenance(handle),
+            "provenance": provenance,
             "electrodes": electrodes,
             "unit_electrodes": unit_electrodes,
             "band_units": band_units,

@@ -43,6 +43,19 @@ ceiling that checked them one at a time admitted a read that needed their sum.
 All of that exists so the machine's free memory can be compared against a
 measurement rather than against a guess.
 
+**What the ceiling covers, said here rather than left to be discovered.** It
+covers the processed asset's read, and every read that read performs is inside
+its plan: the electrode table, the unit scalars, the column descriptions, the
+conversion provenance, the column layouts and the chunk index are all read while
+the reader's spend is still being counted, and the per-unit slices after the
+check are what the plan sizes. It does **not** cover the two reads on the *raw*
+asset that precede it -- one electrode table, and two timestamps from each end
+of each AP series. Those are bounded by construction rather than by a ceiling:
+neither grows with the recording's length or its spike count. Their actual cost
+is measured and reported beside the processed one, under ``raw_electrodes`` and
+``raw_timing``, so the transcript states all three rather than the one the
+ceiling governs.
+
 Example
 -------
 Run from the ``Reproducibility Packet`` folder, which is the working directory
@@ -589,9 +602,12 @@ def parse_args(argv=None):
     parser.add_argument("--block-kb", type=int, default=1024,
                         help="HTTP range block size in KiB")
     parser.add_argument("--max-mib", type=float, default=1024.0,
-                        help="refuse the read if its combined peak resident bound -- block "
-                             "cache, converted arrays and live structures together -- "
-                             "exceeds this many MiB")
+                        help="refuse the processed asset's read if its combined peak "
+                             "resident bound -- block cache, converted arrays, live "
+                             "structures and HDF5's own chunk cache together -- exceeds "
+                             "this many MiB. The two raw-asset reads that precede it are "
+                             "bounded by construction, not by this ceiling, and their "
+                             "cost is reported separately")
     parser.add_argument("--plan-only", action="store_true",
                         help="report what the band's slices would cost, and stop")
     args = parser.parse_args(argv)

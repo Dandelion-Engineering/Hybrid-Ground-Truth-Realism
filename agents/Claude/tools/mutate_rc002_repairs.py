@@ -11,8 +11,9 @@ requires the cases named beside it to fail. The unmutated control copy must pass
 One mutation per copy, so no mutation can mask or amplify another.
 
 **What this harness covers, stated exactly rather than as "every repair".** It
-covers F1, F2, F3, F4 and F6 from Codex's Round-1 ledger and the Round-2 repairs
-F1-R1a, F1-R1b, F2-R1 and F6-R1. **It does not cover F5, and cannot.** F5's
+covers F1, F2, F3, F4 and F6 from Codex's Round-1 ledger, the Round-2 repairs
+F1-R1a, F1-R1b, F2-R1 and F6-R1, and the three parts of the F1-R2 repair made
+after RC-002 closed unapproved. **It does not cover F5, and cannot.** F5's
 repair was not an edit: it was moving the command into the packet and declaring
 it pending in the runbook checker. This harness reverts one anchored string in
 one file per copy, and neither half of F5 is a string it can revert. The
@@ -27,7 +28,15 @@ work, and ``mutation_test_runbook_checker.py`` mutates the checker's
 asked for, and it replaces the claim that every finding's repair is mutated
 here.
 
-Three of the entries are worth reading rather than counting. The F1 mutation
+**The F1d entry is the one to read if you read only one.** It does not touch the
+provenance read at all: it sets ``spent_bytes`` to zero, which leaves the plan
+blind to everything preflight already transferred. That is byte-for-byte the
+state the post-ceiling ``source_provenance`` call created, and what notices it
+is not a case written for provenance but the invariant ``run_case`` now applies
+to every fixture that reaches a record. The defect that closed RC-002 would fail
+this suite today without anyone having to look for it.
+
+Three more of the entries are worth reading rather than counting. The F1 mutation
 puts the ceiling back on the stored payload, which is the exact defect Codex
 reproduced in Round 1. The F1b mutation puts the ceiling back on the two memory
 figures separately, which is the Round-2 defect: each part fits and their sum
@@ -106,6 +115,22 @@ MUTATIONS = [
      # Only a chunked column has a library chunk cache, so only the chunked
      # fixture can see this term go missing.
      [("chunked/peak_includes_library_cache",)]),
+    # The three below are the RC-002-F1-R2 repair, made after that card closed
+    # unapproved. F1d is the accounting half: a plan blind to what preflight
+    # already spent is byte-for-byte the state a post-ceiling read created.
+    ("F1d the plan is blind to what preflight already spent", UNITS,
+     "                             block_bytes, size, spent_bytes=remote.n_bytes,",
+     "                             block_bytes, size, spent_bytes=0,",
+     [("provenance_cost/transfer_inside_the_bound",
+       "case_provenance_cost_is_inside_the_plan/raised")]),
+    ("F1e an oversized provenance value is retained whole", UNITS,
+     "        out[path] = _capped(str(value), max_bytes)",
+     "        out[path] = str(value)",
+     [("provenance_cost/retained_value_is_capped",)]),
+    ("F1f a value whose stored size is readable is read anyway", UNITS,
+     "        stored = _stored_value_bytes(node)",
+     "        stored = None",
+     [("stored_provenance/not_read",)]),
     ("F2c a floating-point ragged index is accepted when whole", UNITS,
      "    if require_integer_dtype:", "    if False:",
      [("float_index/refused",), ("fractional_offsets/refused",)]),
