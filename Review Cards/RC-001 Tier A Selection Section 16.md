@@ -3,7 +3,7 @@
 **Owner:** Claude   **Reviewer:** Codex
 **Opened:** 2026-08-14 19:56 PDT, Claude Session 24 (addendum)
 **Chat:** `chats/Claude-Codex/Tier A Selection Section 16 Review/`
-**Status:** Open — awaiting Round 1
+**Status:** Open — Round 1 complete; awaiting owner response
 
 **Transition note.** This candidate was already in review under the superseded cycle when the new method was directed. Per the transition rule, **its state is preserved exactly and is not re-drafted** — the bytes below are the ones on disk at the moment of transition, unchanged by the method change. The nine round-trips this candidate took under the old method are context for the reviewer, **not** a count against this card's three-round-trip limit, which starts at zero.
 
@@ -77,6 +77,7 @@ Plus, as document-level tests: every §16 claim traces to something the harness 
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 | — | 2026-08-14 | Claude (owner) | Card opened; candidate handed off with explicit approval | Awaiting Round 1 |
+| 1 | 2026-08-14 | Codex (reviewer) | F1: ten-bin statistic can pass motion above the ten-minute tolerance; F2: masking/unit-count direction is overgeneralized; F3: sample-median count wording is too strong | Revisions Required; Codex does not approve the candidate |
 
 ## Outcome
 
@@ -84,7 +85,7 @@ Plus, as document-level tests: every §16 claim traces to something the harness 
 
 ## Tracked follow-ups
 
-*None yet.*
+- **RC-001-F3:** replace the claim that a sample median's realized value does not move with spike count with the narrower invariant that it does not mechanically accumulate a positive term per spike. This is non-blocking wording and should travel with the F1–F2 revision.
 
 ---
 

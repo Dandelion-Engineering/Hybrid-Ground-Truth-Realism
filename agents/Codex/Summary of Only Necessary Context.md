@@ -1,103 +1,112 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 23 · 2026-08-14 08:13 PDT**
+**Rewritten at the end of Codex Session 24 · 2026-08-14 22:15 PDT**
 
-**Next Codex session will be Session 24. A count-based progress report is due in addition to normal work.**
+**Next Codex session will be Session 25. No count-based progress report is due until Session 32.**
 
 ## Current phase and immovable boundary
 
-**Phase 2 — Execution is open. No scientific result exists.** No host is pinned. No candidate drift/noise/effective-SNR value, target-eligibility manifest, host-specific pool, rendered edge table, schedule, selected donor, template-array pull, dependency installation, network/archive/raw-recording read, Rung 0, hybrid generation or sorter run occurred in Codex Session 23.
+**Phase 2 — Execution is open. No scientific result exists.** No host is pinned. No candidate drift/noise/effective-SNR value, target-eligibility manifest, host-specific pool, rendered edge table, schedule, selected donor, template-array pull, dependency installation, network/archive/raw-recording read, Rung 0, hybrid generation or sorter run occurred in Codex Session 24.
 
-The public state remains `In Progress`. Host ordering, drift governance, donor-matching prose, synthetic estimators and review probes are pre-measurement design/implementation work, not evidence about whether realism changes sorter accuracy.
+The public state remains `In Progress`. The next executable step is still blocked on pre-measurement design approval.
 
-## Contract state — Amendments 1–6 are in force
+## Review method now governing
 
-Current synchronized hashes remain:
+`Playbooks/review-cycle.md` begins with the director's superseding method, implemented at Claude Session 24 addendum and Codex Session 24:
+
+- the owner opens a Review Card around one stable candidate;
+- Round 1 is the only full-artifact pass and records every reasonably discoverable finding in one numbered ledger;
+- later rounds are delta-only: recorded findings and regressions introduced by the response;
+- the review ends within three owner-reviewer round-trips with a named outcome;
+- substantive reviewer edits are findings unless ownership was transferred; approval stays explicit and state-specific.
+
+The old cycle remains in the file only as history.
+
+Randy then asked Claude and Codex to replace human escalation because his asynchronous schedule could strand later sessions. In `chats/Claude-Codex-Human/Review Method Change/Review Method Change - Active.md`, Codex proposed a bounded **agent-only Convergence Decision**:
+
+1. each agent records a minimum shippable claim, controlling evidence, strongest contrary evidence and acceptable safe disposition;
+2. evidence controls what may ship; uncertainty on a blocker never becomes approval;
+3. both agents explicitly agree on `Revisions Required`, `Split/Redesign Required`, or `Approved with Follow-ups`, even if they retain different substantive beliefs;
+4. one successor card names `Supersedes:` and the material pre-review change;
+5. a repeated same-purpose non-approval forces a real split/redesign rather than another card reset.
+
+Claude's acceptance or smallest counterproposal is pending. **Do not edit the playbook until consensus is recorded.** Codex agrees with Claude's existing operating readings: explicit same-state approval, response-created regressions in scope, repair-created LATE-BLOCKER language, the evidence test for mechanical edits, and the transition closure of the old chat.
+
+## RC-001 — Round 1 complete, candidate not approved
+
+- **Card:** `Review Cards/RC-001 Tier A Selection Section 16.md`
+- **Chat:** `chats/Claude-Codex/Tier A Selection Section 16 Review/Tier A Selection Section 16 Review - Active.md`
+
+Candidate hashes verified before review and unchanged afterward:
+
+- `agents/Claude/Tier A Host and Injection Zone Selection.md` Draft 22 — `5ca2d6ca188d27ad1cfd9352b9078855815b3fc274eb8cc2773a6e11063f4d1a`
+- `Reproducibility Packet/scripts/utils/band_drift.py` — `3420dec17a9717abc7a5078e53a5826bc78c9bd8ad0ec2bca07fdbcc8da70063`
+- `agents/Claude/tools/test_band_drift.py` — `2117983084ceee241273e355077f8c6792ec60c24e6c0ed44813b3481bcd9c89`
+
+Round-1 outcome: **Revisions Required. Codex does not approve the candidate.**
+
+### RC-001-F1 — blocking temporal aggregation mismatch
+
+Ten consecutive 60-second bin medians span only nine minutes between their centres, yet §16 calls their peak-to-peak range the worst movement inside a ten-minute experiment segment and says the host is protected wherever the segment lands.
+
+Permanent independent evidence in `agents/Codex/tools/probe_rc001_round1.py`:
+
+- five units, 61 bins, 100 spikes/unit/bin, common `2.1 µm/min` ramp: true ten-minute movement `21.000 µm`, utility `Delta_10 = 18.900 µm`, deterministic `Q95_null = 18.682 µm`, strict gate **passes**;
+- common 30 µm episode occupying fewer than half the spikes in one minute: `Delta_10 = 0`, `Q95_null = 0`, all five per-unit audit values zero, gate **passes**;
+- common bin levels `[0, 15 × 9, 30, 15]`: an off-grid segment `[30 s, 630 s)` contains 0 and 30 µm, every aligned ten-bin window is at most 15 µm, null is zero, gate **passes**.
+
+These are not the label-blind conditional: every included unit moves. They are not IBL estimator bias: the movement exists in the utility input and is lost through the utility's own binning/windowing. The response must align the time object with the actual 600-second segment and cover within-bin/off-grid aliasing, or place those cases under another justified pre-measurement gate. Wording alone cannot repair the smooth-ramp wrong verdict.
+
+### RC-001-F2 — blocking unit-count overgeneralization
+
+Draft 22 says masking gets easier with more units at a fixed moving fraction, citing 5/11, 10/21 and 20/41. Those fractions are `0.4545`, `0.4762`, `0.4878`, not fixed. At a genuinely fixed 40% moving fraction and seed 7013, the admitted construction gives `Delta_10 = 14.891`, `15.532`, `8.182 µm` at 10, 20, 40 units; the first transition reverses the claimed direction.
+
+The valid limitation is that a moving minority can be suppressed. The evidence does not order candidate recordings by unit count. The owner must constrain the claim to the one pinned fixture or support a conditioned probabilistic/expected claim.
+
+### RC-001-F3 — non-blocking tracked follow-up
+
+Replace the sentence that a sample median's realized value cannot move with spike count. The valid invariant is that it does not mechanically accumulate a positive term per spike like the retired path length.
+
+### Round-2 boundary
+
+Round 2 is delta-only. Verify F1–F3 and regressions introduced by the response; do not re-audit unchanged §16 from scratch. Any unchanged sentence made false by the repair counts as a response regression. The archive reader and candidate measurement remain blocked until both agents explicitly approve the same exact state.
+
+## Validation state
+
+All RC-001 declared acceptance tests passed:
+
+- 86/86 synthetic harness checks at 200 permutations;
+- 3/3 claim probes;
+- both prior safety counterexamples to the digit;
+- 10/10 packet runbook steps;
+- eight document curly quotes, ASCII harness, candidate Python compilation.
+
+New independent probe also passed:
+
+- forty randomized observations against a separate reference implementation;
+- one nine-permutation null replayed byte-for-byte against a separate seed/binning implementation;
+- exact grid-edge exclusion, caller-array immutability, and every gate boundary;
+- all F1/F2 counterexamples.
+
+The implementation matches its written ten-bin algorithm. The blocker is the algorithm's interpretation and purpose, not an accidental code divergence.
+
+## Contract and other approved state
+
+Amendments 1–6 remain in force. Current synchronized hashes:
 
 - `Claim Sheet.md`: `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365`
 - `Accessible Claim Sheet.md`: `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`
 
-Amendment 6 governs Tier A: Z is the full sixteen-key zone universe; one finite donor-level site set and per-site predicates produce T/K once; `N = count(T)` continues for `10 <= N <= 16`; the `1910753866` digest deal assigns fifty occurrences across five ten-distinct-target blocks; joint block-placement failure rejects the host without shrinking T; controls and pseudo-arms follow N while removal stays at full Z.
+The real-arm donor-matching prose remains closed and same-state approved:
 
-## Real-arm matching rule — prose closed, implementation absent
+- `agents/Codex/Tier A Real-Arm Donor Matching Rule.md` Draft 6 — `51adae4bd19ffc2ef72445e474371b56eee04d93883c6da1d59fedbca553f282`
 
-Artifact: `agents/Codex/Tier A Real-Arm Donor Matching Rule.md`
-
-Same-state-approved Draft 6 SHA-256:
-
-`51adae4bd19ffc2ef72445e474371b56eee04d93883c6da1d59fedbca553f282`
-
-Before any real target manifest, host-specific pool or edge table, the separate exposure-schedule/placement specification and matcher implementation/exhaustive tests must receive same-state approval on synthetic inputs. The rule fixes T/K/N once, full-sixteen Z removal, a common U-derived ruler, donor-equal global no-reuse assignment, provenance stages, complete counterfactual outputs and loud failure semantics.
-
-## Host order — same-state approved
-
-Artifact: `agents/Claude/Tier A Host and Injection Zone Selection.md`, §15.
-
-The pinned order begins:
-
-1. CSHL047 Probe01, session `b52182e7`;
-2. NYU-12 Probe01, session `a8a8af78`;
-3. CSHL047 Probe00, session `b52182e7`.
-
-Ranks 4–13 remain the declared table order. Strict admission evaluates ranks 1–13 sequentially under the 20 µm drift rule and every later gate. If none is fully admissible, the same order restarts once under 40 µm; only then does tracked asset-cache continuation begin in cached discovery order. No candidate has been measured on any open gate.
-
-## Drift Draft 21 — Codex-approved, Claude owner re-review open
-
-Active chat: `chats/Claude-Codex/Tier A Selection Review/Tier A Selection Review - Active.md`
-
-Claude owner-approved Draft 20 at `e2cbcd60…`. Codex accepted its decision that the per-unit audit values have no unit-level null, cannot vote on the gate, and cannot be read from window-start concentration or scatter alone. Codex blocked one remaining one-way claim: Draft 20 called band `Q95_null` systematically narrower than a single trace based on homogeneous independent-noise fixtures.
-
-A quiet heterogeneous counterexample reverses that ordering:
-
-- five temporally valid units over 61 bins;
-- one exactly flat unit and four units with independent 18 µm Gaussian depth-estimation noise;
-- candidate remains measurable;
-- flat unit own-worst ten-bin excursion `0 µm`;
-- band `Q95_null = 16.598127811340 µm`.
-
-The conclusion is non-comparability, not the opposite direction. `Q95_null` grades the median-across-units band statistic, not a single trace, and may sit below or above an individual audit value as composition/noise differ. Individual magnitude heterogeneity can flag a limitation consistent with suppressed movement but cannot attribute it to movement rather than heterogeneous estimation noise. It carries no threshold, verdict or effect on the pinned order.
-
-Codex directly repaired and explicitly approved:
-
-- host-selection Draft 21: `bd0f678af4d27862d55044be010524782d1d80bb2bccd6a873cc06e70fa3946c`;
-- drift utility: `3420dec17a9717abc7a5078e53a5826bc78c9bd8ad0ec2bca07fdbcc8da70063`;
-- synthetic harness: `fe889703d67b4ee97a9a6a431dbd9dde389216687f07b139db34f0e2df5c317d`.
-
-Claude must genuinely owner-re-review all three exact states before the archive-reading CLI is written or any candidate is read. Section 16 remains open meanwhile.
-
-## Drift implementation validation
-
-- Repaired harness: **79 checks, 0 failed** at all 200 permutations.
-- Existing independent claim probe: **3 of 3 passed**.
-- Codex Draft 16 safety probe: both counterexamples reproduce to the digit.
-- Draft 20 versus Draft 21 utility: docstring-stripped abstract syntax trees are identical; no executable utility line changed.
-- All packet and review-tool Python sources compile.
-- Ten-step runbook checker passes.
-
-The archive-reading CLI and runbook Step 11 do not exist.
-
-## Repository checkout bytes — closed
-
-Both agents approve `.gitattributes` SHA-256:
-
-`036c696c3e1ea9cef70925ec8dfedc407ef59bb20e5c00e17ef9b5f88855bfa0`
-
-The policy defaults the repository to `* -text`; 17 framework/workspace paths and 11 legacy packet outputs explicitly use `text eol=crlf` to reproduce their tested CRLF representation. The last reviewed fresh clone matched every tracked file byte for byte.
-
-## Reproducibility Packet state
-
-The earlier design-stage review remains concluded at:
-
-- packet README `3b07aa5b94203d3f4c826be7aac40e6550c2a13e7d3b45c997399a84af3df4a1`;
-- checker `4eb9401825ec2a4561abf46dc7dc82d89ea316722d338bba9e84bd747d83c651`;
-- mutation harness `d64134b1485a8550412c1eb7fba7fd98ab509471050cad71a41fc8f704d5acc3`.
-
-The drift utility is a later addition under exact-state owner review. The archive-reading CLI and runbook Step 11 do not exist. The headline experiment and Slot 8 `verify_realism.py` do not exist because no result exists. The ten-step runbook consistency checker passes.
+§1–§15 of Claude's host-selection document remain outside RC-001 and same-state approved. The thirteen-candidate order remains pinned. The packet's earlier design-stage review remains closed at ten steps; the archive-reading CLI/Step 11 does not exist.
 
 ## Separate gates — do not collapse
 
-1. Claude owner re-review of Draft 21, utility and harness;
-2. archive-reading drift CLI, its scoped packet step/review, and only then candidate measurement down the pinned order;
+1. Claude's response to RC-001 F1–F3 and Codex's delta-only verification;
+2. archive-reading drift CLI, its own Review Card/packet step, then candidate measurement down the pinned order;
 3. exposure-schedule/placement specification, implementation, synthetic tests and same-state approval;
 4. matcher implementation, exhaustive/mutation tests and same-state approval;
 5. noise and post-rescaling effective-SNR host gates;
@@ -111,17 +120,16 @@ Reviewer edits, commits, downstream use and silence are not same-state approval.
 
 ## Public and director state
 
-- Root `README.md` remains State A / `In Progress`. Codex Session 23 appended a forward correction: the band null and per-unit audit values have no fixed ordering; heterogeneity can expose a limitation but cannot attribute movement. It remains no-result-bounded.
+- Root `README.md` remains State A / `In Progress`. Session 24 appended the temporal-alias blocker and withdrew forward the unsupported claim that larger candidate bands are necessarily easier to fool.
+- `agents/Codex/Progress Reports/Progress Report Session 24.md` is the count-based director report. The next cadence report is Session 32.
 - The Phase 1 director contract-review request remains open and non-blocking.
-- No new director action is needed.
-- No count- or event-triggered progress report was due in Codex Session 23. **The next Codex session is Session 24 and does require the cadence report.**
+- Randy's new method request is active in the three-way chat; no separate `director_requests.md` entry is needed.
+- No Slot 8 verification-artifact update exists because there is no result.
 
-## Validation and append-only boundary
+## Append-only evidence
 
-- All handed-off digests were verified before review.
-- The full harness, both probe sets, packet checker, compilation and docstring-stripped AST check passed as described above.
-- The active transcript's pre-write 196,789-byte prefix remains exact at SHA-256 `cab85070a47f5e3596777d37a4ae115472fb21ef6f49ab7178b713e6b66c6fd8`.
-- Exactly one Codex Session 23 header was added after the prior 1,345-line EOF; strict UTF-8 decode and physical-tail readback passed.
-- No heavy work, dependency installation, network/archive/raw-data read, template pull, Rung 0, generator or sorter run occurred.
+- RC-001 transcript pre-write: 3,757 bytes, SHA-256 `ac11eeb075fc3e3458eda9d4a1685e476f9d6d0c195290eda58c47c93f5368ef`; the new file's exact first 3,757 bytes match and one Codex Session 24 header exists.
+- Three-way transcript pre-write: 11,295 bytes, SHA-256 `6fc8a3850b6bdff5bb1a2c8c96ed7fe61fb9a20e1a6408cb12d12f0d0be0b96f`; the new file's exact first 11,295 bytes match and one Codex Session 24 header exists. Randy's user-authored append is preserved.
+- Root README pre-entry SHA-256 `9bd3e40a63753416b280f748762964904c9fe2ac8ab97891c19b4d4241162996`; removing exactly the one new running-log entry and its insertion newline reconstructs that hash.
 
-`agents/Codex/Session Summaries/HumanReport23.md` contains the full reasoning, files and validation evidence.
+`agents/Codex/Session Summaries/HumanReport24.md` contains the full work and reasoning.

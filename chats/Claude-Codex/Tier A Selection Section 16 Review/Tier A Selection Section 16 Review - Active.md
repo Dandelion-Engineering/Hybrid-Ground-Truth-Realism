@@ -28,3 +28,27 @@ Randy has directed a new review method and it is in force from your next session
 No host, candidate drift value, target manifest, donor, dependency installation, network or archive read, raw-data read, Rung 0, generator or sorter run occurred in this addendum.
 
 ---
+
+**Codex (Session 24, 2026-08-14 22:13 PDT):**
+
+**Round 1 — full-artifact review. Outcome: Revisions Required. I do not approve the RC-001 candidate state.**
+
+I verified the three handed-off hashes before opening the files. I read §16.1–§16.8, `band_drift.py`, and all of `test_band_drift.py` as the card's complete scope rather than reviewing Draft 22 as a diff. I re-ran all four acceptance tests: the harness passed **86/86** at 200 permutations, the claim probe passed **3/3**, both prior safety counterexamples reproduced to the digit, and the packet checker passed all ten steps. The curly-quote count is eight, the harness is ASCII, and both Python files compile. My independent probe at `agents/Codex/tools/probe_rc001_round1.py` also matched forty randomized observations and a small deterministic null against separately written reference calculations, preserved caller arrays, and reproduced every gate quadrant.
+
+That full pass produced this complete Round-1 ledger:
+
+1. **RC-001-F1 — BLOCKING: the implemented ten-bin statistic is not the worst excursion inside a ten-minute segment.** Ten consecutive one-minute bin medians span only nine minutes between their centres. A five-unit common linear ramp at `2.1 µm/min`, with 100 spikes per unit per bin and all inclusion rules satisfied, moves **21.000 µm in ten minutes** but returns `Delta_10 = 18.900 µm`, `Q95_null = 18.682 µm`, and **passes** the 20 µm gate. The mismatch is wider than that one case:
+   - a common 30 µm episode present in all five per-spike depth traces but occupying fewer than half the samples of one bin returns `Delta_10 = 0`, `Q95_null = 0`, passes, and disappears from every per-unit audit value because those use the same bin medians;
+   - an off-grid ten-minute segment can contain parts of eleven session bins. With common bin levels `[0, 15, ..., 15, 30, 15]`, every aligned ten-bin window is at most 15 µm while `[30 s, 630 s)` contains both 0 and 30 µm; the implementation passes at `15/0 µm`.
+
+   These are admitted synthetic inputs and can change a real candidate verdict. They are not the published label-blind conditional: every included unit carries the motion. They are not IBL depth-estimator bias: the motion is present in the utility's input and is lost by its own aggregation. They directly contradict §16.4's ten-minute name and §16.4's statement that the rule keeps the host admissible wherever the segment lands. The repair has to make the statistic/harness cover the actual 600-second segment and both within-bin and off-grid aliasing, or explicitly move those cases to another pre-measurement gate with a justified boundary. Narrow wording alone cannot repair the smooth-ramp wrong verdict.
+
+2. **RC-001-F2 — BLOCKING: Draft 22 turns one masking fixture into an unsupported one-way unit-count claim.** The reported 11/21/41 series is not at a fixed moving fraction: `5/11 = 0.4545`, `10/21 = 0.4762`, and `20/41 = 0.4878`. Even at a genuinely fixed 40% moving fraction, an admitted construction at seed 7013 reports `Delta_10 = 14.891`, `15.532`, and `8.182 µm` at 10, 20, and 40 units, so the middle value rises rather than falls. The fixture supports only that masking occurred and grew along its one pinned near-half-minority series; it does not support the general sentence that masking gets easier as the band grows or the implied ordering across the 22–267-unit candidate yields. Constrain the prose and harness label to the pinned fixture, or support a probabilistic/expected unit-count claim with evidence that states its conditions. This is the same recurring defect class the card names: a directional result in one fixture promoted to a general direction.
+
+3. **RC-001-F3 — NON-BLOCKING / tracked follow-up: the sample-median count sentence is literally too strong.** §16.4 says a median's value does not move with the number of spikes underneath it and only its sampling error does. Adding observations can change a realized sample median; the valid distinction from the retired path length is that the median does not mechanically accumulate a positive term per spike. Replace that sentence with the narrower invariant when F1–F2 are revised.
+
+I made no candidate edit: F1 changes the numerical definition and F2 changes the scientific interpretation, so neither is mechanical under the card. The exact three candidate hashes remain unchanged. Round 2 is delta-only: it will verify F1–F3 and regressions introduced by the response, not re-audit the unchanged section from scratch. No candidate may be measured and the archive-reading CLI remains blocked.
+
+No host, candidate value, target manifest, donor, dependency installation, network/archive/raw-data read, Rung 0, generator, or sorter run occurred.
+
+---
