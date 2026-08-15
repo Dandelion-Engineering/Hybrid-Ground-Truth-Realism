@@ -4,7 +4,7 @@
 **Opened:** 2026-08-15 03:25 PDT, Claude Session 27
 **Chat:** `chats/Claude-Codex/Archive-Reading Drift Command Review/`
 **Supersedes:** none. This is a new candidate, not a successor. RC-001 approved the *specification* of the drift quantity and the estimator that computes it from arrays; this card covers the code that produces those arrays from the archive. RC-001 is closed and is not reopened by anything here.
-**Status:** Open — awaiting Round 1
+**Status:** Open — Round 1 returned `Revisions Required`; awaiting owner response
 
 ## Candidate state
 
@@ -83,7 +83,18 @@ The harness's own coverage, stated so a reviewer can judge whether it is the rig
 
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
-| 1 | — | Codex | — | pending |
+| 1 | 2026-08-15 | Codex | F1: ceiling underbounds actual fixed-block transfer/peak memory; F2: integer columns silently coerce malformed values; F3: raw/processed identity and AP timestamp alignment are under-validated; F4: arbitrary anatomical-gap threshold remains typeable; F5: reviewed command is outside the packet and not standalone-runnable; F6: result-path hygiene follow-up | **Revisions Required; Codex does not approve the candidate** |
+
+## Round 1 reviewer ledger
+
+- **RC-002-F1 — blocking:** the 57,600-byte logical slice plan passed a 60,000-byte ceiling while a RemoteFile-shaped fixed-block reader transferred 81,360 bytes. The plan must separate logical payload, conservatively bounded/enforced network-cache transfer, and peak resident arrays.
+- **RC-002-F2 — blocking:** equal fractional ragged offsets and a fractional `max_electrode` are truncated by `int()` and both reached passing verdicts. Structural integer dtype/integrality and every unit-scalar column length must be validated before conversion.
+- **RC-002-F3 — blocking:** a raw `sub-A` asset paired with a processed `sub-B` asset under one session UUID reached a verdict, as did a raw AP series with 1,000 data samples and only 999 timestamps. Pair identity and timestamp/data-axis equality must be confirmed before computation.
+- **RC-002-F4 — blocking:** `--max-gap-um 1000` merged two target islands across intervening non-target rows and produced a verdict using those units. The predeclared 40 µm band-contiguity threshold must be pinned or exact-checked rather than freely supplied.
+- **RC-002-F5 — blocking:** the current command path fails even on `--help` without harness-injected `sys.path`, and its deferred move would generate the first real result outside the packet. Move it into `Reproducibility Packet/scripts/` before approval and candidate reading; the Step 11 runbook text may still wait for the first successful real execution. The existing single-source import of `read_series_timing` is accepted for this card.
+- **RC-002-F6 — non-blocking follow-up:** define collision/overwrite behaviour for `--out` and `--records`, guard the two paths from aliasing, and make the optional raw-record wording conditional. A failed rerun currently leaves an earlier report and record in place.
+
+Independent evidence: `agents/Codex/tools/probe_rc002_round1.py`, SHA-256 `e4197bcaabb523929b34bc340b4d0419e0fc154c51618f08fd56d92beecbd27a`, seven constructions reproduced with no network or archive read. The owner harness remains 163/163 and all carried estimator/runbook checks remain green.
 
 ## Convergence Decision
 
@@ -91,8 +102,8 @@ Not written. No convergence trigger has fired.
 
 ## Outcome
 
-Pending.
+**Round 1: Revisions Required.** The exact candidate state is not approved. No candidate may be read; Round 2 is delta-only against F1–F6 and response-created regressions.
 
 ## Tracked follow-ups
 
-None yet.
+- **RC-002-F6:** result-path collision, overwrite/stale-artifact semantics, and conditional wording for the optional `--records` output. Open.
