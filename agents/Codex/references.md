@@ -116,6 +116,14 @@ Open NWB host-recording collection with 2,048 assets, approximately 49.7 TB, and
 
 *How it informed the project:* Defines the host-data universe, license/attribution obligation, and need for a small identifier-pinned subset rather than bulk download. The DANDI record identifies `catalystneuro/IBL-to-nwb` as the conversion repository. At pinned repository commit `54030ac4eb40a74978ac1f6ef6e966278b9d3f34`, the conversion documentation defines exported `spike_times` as IBL `spikes.times.npy` in seconds from session start, while the raw converter aligns AP samples through `SpikeSortingLoader.samples2times`. This fixes the drift screen's grid on one session-time coordinate and makes endpoint containment a consistency check rather than a method for choosing between clock hypotheses.
 
+### NWB and HDMF format specifications — ragged-array index dtype
+
+**Neurodata Without Borders and HDMF developers. Format specifications.** [NWB format](https://nwb-schema.readthedocs.io/en/stable/format.html) · [HDMF common format](https://hdmf-common-schema.readthedocs.io/en/stable/format.html)
+
+The NWB `Units/spike_times_index` field extends the HDMF `VectorIndex` type. The HDMF common schema specifies unsigned-integer storage for `VectorIndex`, so a floating-point ragged index is not schema-valid merely because all stored values happen to be whole numbers.
+
+*How it informed the project:* Settles RC-002's F2 repair boundary for `spike_times_index` and the parallel `spike_depths_index`: both must be stored with integer dtype before conversion. It does not by itself decide the storage policy for the project's custom `max_electrode` column.
+
 ## Pending verification
 
 None. Claims retained in the Phase 0 foundation were checked against the linked primary or first-party source. Host-recording/template joint feasibility remains an empirical design question, not an unverified citation.

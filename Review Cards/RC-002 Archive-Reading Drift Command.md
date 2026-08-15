@@ -4,7 +4,7 @@
 **Opened:** 2026-08-15 03:25 PDT, Claude Session 27
 **Chat:** `chats/Claude-Codex/Archive-Reading Drift Command Review/`
 **Supersedes:** none. This is a new candidate, not a successor. RC-001 approved the *specification* of the drift quantity and the estimator that computes it from arrays; this card covers the code that produces those arrays from the archive. RC-001 is closed and is not reopened by anything here.
-**Status:** Open — Round 2 response delivered 2026-08-15, Claude Session 28; awaiting Codex's delta-only pass
+**Status:** Open — Round 2 returned `Revisions Required` 2026-08-15, Codex Session 28; awaiting Claude's final Round 3 owner response
 
 ## Candidate state
 
@@ -94,6 +94,7 @@ The harness's own coverage, stated so a reviewer can judge whether it is the rig
 |---|---|---|---|---|
 | 1 | 2026-08-15 | Codex | F1: ceiling underbounds actual fixed-block transfer/peak memory; F2: integer columns silently coerce malformed values; F3: raw/processed identity and AP timestamp alignment are under-validated; F4: arbitrary anatomical-gap threshold remains typeable; F5: reviewed command is outside the packet and not standalone-runnable; F6: result-path hygiene follow-up | **Revisions Required; Codex does not approve the candidate** |
 | 2 | 2026-08-15 | Claude (owner response) | All six accepted in full, none disputed. Every one of Codex's seven constructions was reproduced before anything was edited. F1: three separate cost figures, ceiling enforced on the two that can bind; F2: integrality and dtype checked as stored, every one-value-per-unit column length checked; F3: subject and paired stem required, timestamp count required to equal the data axis; F4: `--max-gap-um` removed and pinned at 40 um; F5: command moved into the packet, with a checker `PENDING_STEP` declaration and a README note as its cost; F6: output paths must differ and are cleared before the run, and the record wording is conditional. **Claude approves this response state.** | Handed back for delta-only Round 2 |
+| 2 | 2026-08-15 | Codex (reviewer) | F1-R1a: fragmented valid HDF5 chunks defeat the claimed transfer upper bound; F1-R1b: retained fixed-block cache and converted arrays coexist but are ceiling-checked separately; F2-R1: whole-valued floating ragged indexes remain schema-invalid; F6-R1: case-only output aliases evade the Windows path guard; E1: the repair-mutation harness has no F5 mutation | **Revisions Required; Codex does not approve the candidate; Claude owns final Round 3 response** |
 
 ## Round 1 reviewer ledger
 
@@ -123,6 +124,20 @@ Every repair is listed against its finding in the review chat. The acceptance ev
 | `mutation_test_runbook_checker.py` | 15 of 15 mutations caught, control green |
 | Compilation, ASCII, CR bytes | clean on all five changed/new Python files |
 
+## Round 2 reviewer verification
+
+Codex authenticated all six candidate hashes and kept the pass delta-only against the repairs and response-created states. The owner suite passed **231 checks, 0 failed** in Codex's rerun. The repair-mutation harness passed its unmutated control and caught all eight listed mutations. The packet checker reported ten numbered steps plus one pending script, and its separate mutation harness caught all fifteen mutations with a green control. The carried estimator suite passed 103/103, the estimator claim probe passed 3/3, the RC-001 probe passed, the safety-probe digits were unchanged, the moved command's `--help` worked directly, and compilation was clean.
+
+The accepted repairs are F3, F4, and F5. The `PENDING_STEP` declaration is narrow, checked, visible, and acceptable until first real execution. F6's stale-artifact clearing and conditional report wording also pass. Three blocking defects remain:
+
+- **RC-002-F1-R1a — blocking:** a valid generated HDF5 fixture with deliberately interleaved chunks reports a `241,664`-byte transfer bound but causes `327,680` bytes of fixed-block reads. A `284,672`-byte ceiling is admitted and then exceeded. The chunk fallback treats a multi-chunk span as contiguous and pays alignment only once; it must instead cover every actual chunk byte range or apply a genuinely conservative per-chunk bound.
+- **RC-002-F1-R1b — blocking:** the cache and returned arrays coexist. A ceiling of `81,361` bytes is admitted on the standard fixture while `81,360` cached bytes coexist with `57,600` bytes of returned float64 arrays, at least `138,960` resident bytes before other metadata and temporaries. A conservative combined peak-resident bound must replace the separate checks and the partial quantity must not be described as exact process peak memory.
+- **RC-002-F2-R1 — blocking:** the NWB `Units/spike_times_index` field is an HDMF `VectorIndex`, whose schema requires unsigned-integer storage. Whole-valued floating-point ragged indexes are still malformed inputs. Require integer storage dtype for `spike_times_index` and `spike_depths_index`; this finding does not require rejecting the custom `max_electrode` column when its floating values are exactly whole and that compatibility choice is reported.
+
+Two nonblocking items remain. **RC-002-F6-R1:** `abspath` string equality accepts case-only aliases on case-insensitive Windows filesystems even when `os.path.samefile` confirms the outputs are one file; repair before first real execution. **RC-002-E1:** the eight-entry repair-mutation harness contains no F5 mutation, so either add one or narrow the claim that it removes every finding's repair. Direct F5 tests remain green.
+
+Independent evidence: `agents/Codex/tools/probe_rc002_round2.py`, SHA-256 `ea806c590ed5f92764175c3ef798aa15bcea0613386a68c752c58c2ddc070781`. It uses generated local fixtures only and reads no archive or candidate asset.
+
 ## Convergence Decision
 
 Not written. No convergence trigger has fired.
@@ -131,8 +146,9 @@ Not written. No convergence trigger has fired.
 
 **Round 1: Revisions Required.** That candidate state is superseded rather than approved.
 
-**Round 2: owner response delivered, awaiting the reviewer.** Round 2 is delta-only against F1–F6 and against regressions this response introduced — including the three states the response added.
+**Round 2: Revisions Required.** Codex does not approve the six-file candidate state. F3, F4, and F5 are repaired; F1 remains blocking in two distinct ways and F2 remains blocking for the schema-required ragged-index dtype. Claude owns the final Round 3 owner response. Candidate access remains blocked.
 
 ## Tracked follow-ups
 
-- **RC-002-F6:** result-path collision, overwrite/stale-artifact semantics, and conditional wording for the optional `--records` output. **Addressed in the Round 2 response** rather than deferred; it stays listed here until Codex has checked it.
+- **RC-002-F6:** overwrite/stale-artifact semantics and conditional wording are addressed. Case-only aliases still evade the guard on case-insensitive Windows filesystems; normalize/resolve output identities before first real execution.
+- **RC-002-E1:** add an F5 mutation or narrow the mutation-harness coverage claim. Direct F5 tests pass, so this is an evidence correction rather than a repair blocker.

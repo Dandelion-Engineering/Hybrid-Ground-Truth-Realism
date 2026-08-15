@@ -14,9 +14,10 @@ agents/Codex/
 ├── tools/
 │  ├── probe_draft16_safety_claims.py
 │  ├── probe_rc001_round1.py
-│  └── probe_rc002_round1.py
+│  ├── probe_rc002_round1.py
+│  └── probe_rc002_round2.py
 ├── Session Summaries/
-│  └── HumanReport1.md … HumanReport27.md
+│  └── HumanReport1.md … HumanReport28.md
 └── Progress Reports/
    ├── Progress Report Phase 1 Close.md
    ├── Progress Report Amendment Compute Schedule.md
@@ -35,6 +36,7 @@ agents/Codex/
 - **`tools/probe_draft16_safety_claims.py`** — deterministic synthetic review probe showing that label-blind unit expansion and retaining a first bin do not have one-way safety guarantees. Its public labels now use `Delta_10min`; it reads no candidate asset.
 - **`tools/probe_rc001_round1.py`** — independent RC-001 evidence: reference recomputation, deterministic-null replay, gate boundaries, repaired temporal-alias/unit-count cases, the heterogeneous-depth counterexample to Draft 23's universal cutoff, and an exhaustive 93,184-case check of Draft 24's replacement rank/offset bound. It uses synthetic arrays only and reads no candidate asset.
 - **`tools/probe_rc002_round1.py`** — independent RC-002 refusal and resource-accounting probe. It reproduces seven adversarial constructions against the archive reader using synthetic local HDF5 fixtures only; it reads no archive or candidate asset.
+- **`tools/probe_rc002_round2.py`** — independent RC-002 response probe. It constructs fragmented valid HDF5 chunks that defeat the claimed transfer bound, measures coexisting fixed-block cache and converted arrays against the ceiling, checks case-only output aliases on Windows, and audits the repair-mutation list. It reads no archive or candidate asset.
 - **`Session Summaries/HumanReport<N>.md`** — permanent detailed session reports for the director.
 - **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 24 count-based report; the next cadence report is Session 32.
 
@@ -42,12 +44,12 @@ agents/Codex/
 
 - `chats/Claude-Codex/Phase 0 Literature Comparison/`, `Claim Sheet Review/`, `Study Guide Pass 1 Review/`, `Compute Environment Update/`, `Reproducibility Packet Review/`, and `Tier A Donor Matching Rule/` are concluded.
 - `chats/Claude-Codex/Tier A Selection Review/` is concluded on the director's method transition. Its successor, `chats/Claude-Codex/Tier A Selection Section 16 Review/`, is also concluded: RC-001 closed `Approved` at Round 3 with exact same-state approval of Draft 24 and both implementation states. No Convergence Decision was needed. The archive CLI is a separate RC-002 gate; candidate measurement remains later and blocked.
-- `chats/Claude-Codex/Archive-Reading Drift Command Review/` is active. RC-002 Round 1 returned `Revisions Required` with five blocking findings and one tracked nonblocking follow-up. Claude owns the response; Codex's Round 2, if requested, is delta-only. Candidate reading remains blocked.
+- `chats/Claude-Codex/Archive-Reading Drift Command Review/` is active. RC-002 Round 2 returned `Revisions Required`: F3, F4 and F5 pass, but two resource-bound defects and the schema-required ragged-index dtype remain blocking. Claude owns the final Round 3 response. Candidate reading remains blocked.
 - `chats/Claude-Codex-Human/Review Method Change/` is active at Randy's request. The bounded agent-only Convergence Decision, successor-card lineage, and forced redesign after repeated non-approval are now agreed and written into the superseding review method. Codex accepts Claude's two applications; one stale quality-checklist reference to human triage was mechanically corrected.
 - `Claim Sheet.md` and `Accessible Claim Sheet.md` are synchronized at SHA-256 `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365` / `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`. Amendments 1–6 are `In force`. The matching-rule prose, implementation/tests, host-dependent exact configuration, and manipulation gate remain separate approvals.
 - `Study Guide/Pass 1 - Conceptual Foundation.tex` and PDF are approved Phase 1 artifacts. Pass 2 remains a Phase 3 deliverable.
 - `director_requests.md` contains one open non-blocking Phase 1 contract-review item. No new director action is needed.
-- Root `README.md` is the append-only public live-run page. Codex Session 27 records that RC-002's owner harness remains green but independent adversarial review returned the archive reader before any real recording was opened. The project remains in progress with no candidate measurement or result.
+- Root `README.md` is the append-only public live-run page. Codex Session 28 records that independent response review found the repaired byte/memory ceiling can still be exceeded and that floating ragged indexes remain invalid structure. The project remains in progress with no candidate measurement or result.
 - The Reproducibility Packet is co-owned. Its design-stage runbook remains same-state approved at ten steps. Codex owns Rung 0, the sorter-panel decision, inference/negative-control harness, Tier A's independent balance/manipulation gate, and the two-part placement calibration.
 
 ## Current technical boundaries
@@ -58,7 +60,7 @@ agents/Codex/
 - Before T is measured or any host-specific manifest/pool is opened, an exact exposure-schedule/placement specification and synthetic tests must pin the nuisance seed, amplitude target, and commanded-placement construction. Matcher implementation/test review follows as another same-state gate.
 - The derived CCF label layer is opt-in; recognized white-matter/fibre-tract labels remain non-injectable. Any non-CA1 zone change must define the removal set across parent/descendant labels before matching.
 - RC-001 is closed `Approved` on Draft 24 `c35987fe…`, utility `eace4cd35…`, and harness `946df906…`. The gate uses eleven consecutive one-minute medians; the universal half-bin cutoff is withdrawn; within-bin transmission depends on depth ranks and episode placement; and neither missed nor transmitted sub-minute motion is treated as a one-way safety property. The owner harness passes 103 checks, Codex's probe passes thirteen checks including 93,184 exhaustive small cases, and the utility's executable AST is unchanged from Round 2. The archive CLI is now under RC-002; candidate measurement remains blocked.
-- RC-002 Round 1 is `Revisions Required` on archive utility `c5c21cb…`, command `c71a5d93…`, and owner harness `6ff3d26c…`. The five blockers are: actual fixed-block transfer/cache and peak-memory accounting; exact integral and length validation of structural arrays; raw/processed identity plus AP timestamp/data-axis equality; removal of the undeclared arbitrary anatomy-gap threshold in favor of the predeclared exact 40 µm check; and moving the command into the packet so it runs standalone before approval or any candidate read. Stale output/record collision semantics are a tracked nonblocking follow-up. Codex's synthetic probe reproduces seven constructions; no archive or candidate asset was opened.
+- RC-002 Round 2 is `Revisions Required` on archive utility `19dbcc76…`, packet command `7f99419e…`, owner harness `ad4985cb…`, mutation harness `89785076…`, packet checker `848e6d03…`, and packet README `ae01b1a2…`. F3, F4 and F5 pass. F1 remains blocking because fragmented valid HDF5 chunks undercut the transfer bound and because retained cache plus converted arrays exceed an admitted ceiling; F2 remains blocking because NWB ragged indexes require integer storage dtype. Case-only output aliases and the missing F5 mutation are nonblocking follow-ups. Codex's Round-2 probe is `ea806c59…`; no archive or candidate asset was opened.
 - `.gitattributes` makes repository-wide checkout bytes explicit and is same-state approved by both agents. All paths default to `-text`; 17 framework files and 11 legacy packet outputs intentionally reconstruct CRLF. A temporary `core.autocrlf=true` clone matched all 153 reviewed tracked files byte-for-byte.
 - No host is pinned, no candidate drift value has been read, and no dependency install, raw-data read, Rung 0, generation, or sorter run has occurred.
 

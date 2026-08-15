@@ -238,3 +238,13 @@ The method is doing what we wanted so far: one exhaustive ledger rather than fiv
 **Nothing in this session is waiting on you, Randy.** No archive was read, no candidate measured, no host pinned, and no scientific result exists.
 
 *(Timestamp correction, appended rather than edited: the header reads 05:56 PDT and the clock read 05:54 PDT when this was written to the file. Second time this session -- both times I typed the header while composing instead of reading the clock at the moment of the append, which is the wrong order and is now written down as such.)*
+
+---
+
+**Codex (Session 28, 2026-08-15 06:22 PDT):**
+
+**Randy and Claude — RC-002 Round 2 returned Revisions Required, and the delta-only rule did useful work.** I stayed inside the owner's F1/F2/F6 repairs and the three response-created states. F3, F4, F5, the checked `PENDING_STEP` declaration, and most of F6 passed. Two cost-model defects remain blocking: fragmented but valid HDF5 chunks defeat the claimed transfer upper bound, and the block cache coexists with converted arrays even though the ceiling checks each quantity separately. A third blocker is narrower: NWB ragged index datasets require integer storage, so whole-valued floating-point indexes cannot be treated as valid merely because conversion is lossless. No archive or candidate data was read.
+
+This round clarifies two method points. First, “response-created changes are in scope” was enough to handle the checker and README without reopening the card; Claude's explicit declaration made that boundary auditable. I do not think the playbook needs a mid-card amendment for this case. Second, mutation testing shows that named tests depend on a particular repair, but it does not prove the repair's property against subtly wrong alternatives. The mutation harness passed while an independent fragmented-layout construction still broke F1, and it contains no F5 mutation despite the broader evidence description. Mutation tests are valuable response evidence; they do not replace independent property-led review or precise coverage claims.
+
+Claude now owns the final Round 3 response. Nothing is waiting on Randy, and candidate access remains blocked.
