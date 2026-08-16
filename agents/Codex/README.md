@@ -16,9 +16,10 @@ agents/Codex/
 │  ├── probe_rc001_round1.py
 │  ├── probe_rc002_round1.py
 │  ├── probe_rc002_round2.py
-│  └── probe_rc002_round3.py
+│  ├── probe_rc002_round3.py
+│  └── probe_rc003_round1.py
 ├── Session Summaries/
-│  └── HumanReport1.md … HumanReport29.md
+│  └── HumanReport1.md … HumanReport30.md
 └── Progress Reports/
    ├── Progress Report Phase 1 Close.md
    ├── Progress Report Amendment Compute Schedule.md
@@ -39,19 +40,21 @@ agents/Codex/
 - **`tools/probe_rc002_round1.py`** — independent RC-002 refusal and resource-accounting probe. It reproduces seven adversarial constructions against the archive reader using synthetic local HDF5 fixtures only; it reads no archive or candidate asset.
 - **`tools/probe_rc002_round2.py`** — independent RC-002 response probe. It constructs fragmented valid HDF5 chunks that defeat the claimed transfer bound, measures coexisting fixed-block cache and converted arrays against the ceiling, checks case-only output aliases on Windows, and audits the repair-mutation list. It reads no archive or candidate asset.
 - **`tools/probe_rc002_round3.py`** — independent RC-002 terminal probe. It builds a local file with a large schema-valid stored conversion script and shows that `source_provenance()` runs after the safety ceiling, letting an admitted read exceed both the claimed transfer bound and combined resident bound. It reads no archive, candidate asset or network data.
+- **`tools/probe_rc003_round1.py`** — independent RC-003 full-pass evidence. It shows that absent conversion provenance reaches a verdict, a substring-matched `Probe000` AP series can supply `Probe00`'s clock and reach a verdict, and a variable-length provenance value spends about 2.03 MB before a one-byte ceiling refuses it. A separate object-size diagnostic did not establish another blocker. It uses generated local HDF5 files only and reads no archive, candidate asset or network data.
 - **`Session Summaries/HumanReport<N>.md`** — permanent detailed session reports for the director.
 - **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 24 count-based report; the next cadence report is Session 32.
 
 ## Shared work outside this folder
 
 - `chats/Claude-Codex/Phase 0 Literature Comparison/`, `Claim Sheet Review/`, `Study Guide Pass 1 Review/`, `Compute Environment Update/`, `Reproducibility Packet Review/`, and `Tier A Donor Matching Rule/` are concluded.
-- `chats/Claude-Codex/Tier A Selection Review/` is concluded on the director's method transition. Its successor, `chats/Claude-Codex/Tier A Selection Section 16 Review/`, is also concluded: RC-001 closed `Approved` at Round 3 with exact same-state approval of Draft 24 and both implementation states. No Convergence Decision was needed. The archive CLI is a separate RC-002 gate; candidate measurement remains later and blocked.
-- `chats/Claude-Codex/Archive-Reading Drift Command Review/` is active. The final Round-3 verification repaired every recorded Round-2 item on its tested boundary but found F1-R2, a blocking post-ceiling provenance read. The method triggered its first Convergence Decision; Codex proposes terminal `Revisions Required`, and Claude's one statement plus disposition consensus are pending. The seven-file candidate is frozen and candidate reading remains blocked.
+- `chats/Claude-Codex/Tier A Selection Review/` is concluded on the director's method transition. Its successor, `chats/Claude-Codex/Tier A Selection Section 16 Review/`, is also concluded: RC-001 closed `Approved` at Round 3 with exact same-state approval of Draft 24 and both implementation states. No Convergence Decision was needed. The archive CLI remains a separate gate under successor RC-003; candidate measurement remains later and blocked.
+- `chats/Claude-Codex/Archive-Reading Drift Command Review/` is concluded. RC-002 closed unapproved at the Convergence Decision with both agents explicitly agreeing on `Revisions Required`; its frozen state was repaired outside formal review.
+- `chats/Claude-Codex/Bounded Archive Read Review/` is active under successor RC-003. Codex completed the full-artifact Round 1 and returned `Revisions Required` on three blockers: missing common-clock provenance reaches a verdict, substring series association lets `Probe000` supply `Probe00`, and a variable-length provenance value is materialized before the ceiling can refuse it. Claude owns the delta-only Round 2 response; candidate reading remains blocked.
 - `chats/Claude-Codex-Human/Review Method Change/` is active at Randy's request. The bounded agent-only Convergence Decision, successor-card lineage, and forced redesign after repeated non-approval are now agreed and written into the superseding review method. Codex accepts Claude's two applications; one stale quality-checklist reference to human triage was mechanically corrected.
 - `Claim Sheet.md` and `Accessible Claim Sheet.md` are synchronized at SHA-256 `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365` / `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`. Amendments 1–6 are `In force`. The matching-rule prose, implementation/tests, host-dependent exact configuration, and manipulation gate remain separate approvals.
 - `Study Guide/Pass 1 - Conceptual Foundation.tex` and PDF are approved Phase 1 artifacts. Pass 2 remains a Phase 3 deliverable.
 - `director_requests.md` contains one open non-blocking Phase 1 contract-review item. No new director action is needed.
-- Root `README.md` is the append-only public live-run page. Codex Session 29 records the post-ceiling provenance-read counterexample and the resulting Convergence Decision. The project remains in progress with no candidate measurement or result.
+- Root `README.md` is the append-only public live-run page. Codex Session 30 records the three RC-003 Round-1 blocker constructions. The project remains in progress with no candidate measurement or result.
 - The Reproducibility Packet is co-owned. Its design-stage runbook remains same-state approved at ten steps. Codex owns Rung 0, the sorter-panel decision, inference/negative-control harness, Tier A's independent balance/manipulation gate, and the two-part placement calibration.
 
 ## Current technical boundaries
@@ -62,7 +65,7 @@ agents/Codex/
 - Before T is measured or any host-specific manifest/pool is opened, an exact exposure-schedule/placement specification and synthetic tests must pin the nuisance seed, amplitude target, and commanded-placement construction. Matcher implementation/test review follows as another same-state gate.
 - The derived CCF label layer is opt-in; recognized white-matter/fibre-tract labels remain non-injectable. Any non-CA1 zone change must define the removal set across parent/descendant labels before matching.
 - RC-001 is closed `Approved` on Draft 24 `c35987fe…`, utility `eace4cd35…`, and harness `946df906…`. The gate uses eleven consecutive one-minute medians; the universal half-bin cutoff is withdrawn; within-bin transmission depends on depth ranks and episode placement; and neither missed nor transmitted sub-minute motion is treated as a one-way safety property. The owner harness passes 103 checks, Codex's probe passes thirteen checks including 93,184 exhaustive small cases, and the utility's executable AST is unchanged from Round 2. The archive CLI is now under RC-002; candidate measurement remains blocked.
-- RC-002's Round-3 seven-file state is frozen in the Convergence Decision: archive utility `2ee891ce…`, packet command `dfbb9cc8…`, owner harness `5101d000…`, repair harness `1e1ed5a9…`, checker mutation harness `ea85ede2…`, packet checker `848e6d03…`, and packet README `ae01b1a2…`. The recorded Round-2 items pass, but F1-R2 remains blocking because `source_provenance()` reads complete datasets after the combined ceiling has been enforced. Codex's Round-3 fixture was admitted at 267,001 bytes and then transferred/cached 4,232,336 bytes; probe SHA-256 `506d7280…`. Codex proposes terminal `Revisions Required`, Claude's statement is pending, and no candidate asset was opened.
+- RC-002 closed unapproved at its Convergence Decision, with both agents agreeing on `Revisions Required`. Its one allowed successor, RC-003, carries archive utility `c1050b07…`, packet command `0f9c4ad1…`, owner harness `4b430838…`, repair harness `f9e0d732…`, and the three unchanged packet/checker states. Codex's Round-1 probe `df97e1a0…` independently reproduces all three open blockers using local synthetic files. The broad evidence remains green at 279 owner checks, 16/16 repair mutations and 18/18 checker mutations, but the exact candidate is not approved and no candidate asset was opened.
 - `.gitattributes` makes repository-wide checkout bytes explicit and is same-state approved by both agents. All paths default to `-text`; 17 framework files and 11 legacy packet outputs intentionally reconstruct CRLF. A temporary `core.autocrlf=true` clone matched all 153 reviewed tracked files byte-for-byte.
 - No host is pinned, no candidate drift value has been read, and no dependency install, raw-data read, Rung 0, generation, or sorter run has occurred.
 

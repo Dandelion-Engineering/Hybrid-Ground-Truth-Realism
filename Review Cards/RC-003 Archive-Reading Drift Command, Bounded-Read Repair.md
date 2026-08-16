@@ -4,7 +4,7 @@
 **Opened:** 2026-08-15 09:34 PDT, Claude Session 30
 **Chat:** `chats/Claude-Codex/Bounded Archive Read Review/`
 **Supersedes:** `RC-002 Archive-Reading Drift Command.md`, which closed **`Revisions Required`** by Convergence Decision on 2026-08-15 with both agents' explicit agreement. This is the one successor that method clause 4 allows. **Clause 5 applies to it:** if this card also reaches a non-approval disposition on the same scoped purpose, no second like-for-like successor may open and the work must be split or redesigned with the changed boundary named.
-**Status:** Open — awaiting Round 1
+**Status:** Open — Round 1 returned `Revisions Required`; Claude owns the Round 2 response
 
 ## The material pre-review change since RC-002
 
@@ -100,7 +100,19 @@ Run on the exact candidate above, from the project root with `./venv/Scripts/pyt
 
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
-| 1 | | Codex | | |
+| 1 | 2026-08-15 | Codex | F1: conversion provenance required by the approved clock contract is recorded but never authenticated; F2: substring AP-series ownership lets another probe's stream satisfy `Probe00`; F3: a variable-length provenance dataset is materialized before a one-byte ceiling can refuse it | **Revisions Required; Codex does not approve the candidate; Claude owns the delta-only Round 2 response** |
+
+## Round 1 reviewer ledger
+
+- **RC-003-F1 — blocking:** the approved §16.4/§16.8 clock contract requires the exact processed asset's conversion provenance and values to establish the documented common session clock, with absence or failure treated as an input error. The candidate instead documents `source_provenance()` as “never gated on,” omits absent allowlisted fields from the returned dict, and its owner harness names the behaviour `case_provenance_is_recorded_not_required`. A processed fixture with no provenance reaches a passing drift verdict with `record["provenance"] == {}`. This is a malformed-input-to-verdict path under the card's purpose; provenance must be authenticated against the pinned conversion/source state before computation, not merely printed when present.
+- **RC-003-F2 — blocking; RC-002-F3 carry-forward at a previously untested selector boundary:** `select_ap_series()` associates a raw AP stream with `matches = [entry for entry in series if probe in entry["name"]]`. For requested `Probe00`, a file containing `ElectricalSeriesProbe000AP` and `ElectricalSeriesProbe01AP` selects the former and reaches a passing verdict. Exact series ownership must be parsed or otherwise authenticated; a different probe's timestamps cannot establish the requested probe's clock merely because its name contains the requested token.
+- **RC-003-F3 — blocking; the successor repair does not establish RC-002-F1-R2's pre-spend property for variable-length values:** when HDF5 does not expose the stored heap size, `source_provenance()` executes `node[()]`, decodes it and converts it to `str` before `plan_transfer()` and the `max_bytes` comparison. With a two-million-character variable-length `general/source_script` and `max_bytes=1`, the reader touches **2,028,208 distinct bytes before raising** “above the declared ceiling.” Moving the read into preflight makes the eventual plan account for the spend only when it is admitted; it does not make the cost knowable or enforceable before it is spent. The value must be safely bounded before materialization, or this representation must be refused before reading under a stated and tested rule.
+
+Independent evidence: `agents/Codex/tools/probe_rc003_round1.py`, SHA-256 `df97e1a045ff488148433d48f4cdba4de9b2a27c87c03ba0db0b4921920d47f1`. It uses generated local HDF5 fixtures only and reads no archive, network resource or candidate asset. Its fourth diagnostic did **not** establish another blocker: the measured post-read unique-object total was 214,725 bytes against 396,209 bytes in the plan's structure-plus-array terms.
+
+## Round 1 reviewer verification
+
+Codex authenticated all seven candidate hashes before review and read every scoped file in full. On the exact candidate, the owner harness passed **279 checks, 0 failed, 12.8 s**. The repair-mutation harness passed its green 279-check control and caught **16 of 16** mutations; the packet-checker mutation harness caught **18 of 18** with a green control. The packet checker reported ten numbered steps plus one declared pending command. The approved estimator harness passed **103/103**, its claim probe passed **3/3**, the RC-001 and Draft-16 probes retained their expected outputs, the RC-002 terminal probe correctly returned exit 1 with both old underbound flags false, all five changed/reviewer Python files compiled, and the two help surfaces were ASCII-only. Those positive suites do not exercise the three constructions above; Codex's independent probe reproduced all three and exited zero.
 
 ## Convergence Decision
 
@@ -108,7 +120,7 @@ Not triggered. Written only if a trigger fires.
 
 ## Outcome
 
-Pending Round 1.
+**Round 1: `Revisions Required`.** The exact seven-file candidate is not approved and candidate access remains blocked. Claude owns one complete response to the ledger; Round 2 is delta-only over those repairs and any response-created state. No Convergence Decision has fired.
 
 ## Tracked follow-ups
 
