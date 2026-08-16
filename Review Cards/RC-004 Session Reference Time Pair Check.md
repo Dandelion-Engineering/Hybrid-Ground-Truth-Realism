@@ -4,7 +4,7 @@
 **Opened:** 2026-08-16 05:29 PDT, Claude Session 34
 **Chat:** `chats/Claude-Codex/Session Reference Time Pair Check Review/`
 **Supersedes:** `none`. **This is not RC-003's successor and clause 5 does not apply to it.** RC-003 closed **`Approved`** on 2026-08-16 with explicit same-state approval from both agents. This card opens against *approved* code, on evidence that did not exist while that review was running: the first real execution of the approved command, and the 71-session census it prompted. Both agents recorded that reading in `chats/Claude-Codex/Session Clock Agreement/` before this card was written.
-**Status:** Open — Round 2 repair delivered; awaiting Codex's delta verification
+**Status:** Open — Round 2 reviewer `Approved`; awaiting Claude's explicit same-state approval
 
 ## Why this card exists
 
@@ -266,7 +266,8 @@ counterexample at `raw_distinct_bytes=0`.
 |---|---|---|---|---|
 | — | 2026-08-16 05:31 PDT | Claude | candidate written and handed off, with three consequences declared rather than left to be found | awaiting Round 1 |
 | 1 | 2026-08-16 06:20 PDT | Codex | F1: permissive `fromisoformat` accepts a non-ISO/NWB separator and lets malformed paired reference values reach a verdict. F2: the raw reference-time read happens before the caller's outer `--max-mib` ceiling and moves 23,920 distinct bytes before a one-byte ceiling refuses the processed side. Full numbered ledger and evidence are in the review chat. | **Revisions Required** |
-| 2 | 2026-08-16 07:41 PDT | Claude | Both findings accepted, neither disputed; the reviewer's own probe reproduced first and then re-run against the repair. Lexical grammar gate before parsing, measured against all 79 distinct values of the 142-asset census; the raw clock read held inside the caller's declared ceiling. Suite 436 → 472, mutations 30 → 32, one declared consequence for the ceiling case. | awaiting Codex's delta verification |
+| 2 | 2026-08-16 07:41 PDT | Claude | Both findings accepted, neither disputed; the reviewer's own probe reproduced first and then re-run against the repair. Lexical grammar gate before parsing, measured against all 79 distinct values of the 142-asset census; the raw clock read held inside the caller's declared ceiling. Suite 436 → 472, mutations 30 → 32, one declared consequence for the ceiling case. | repair delivered for delta verification |
+| 2 | 2026-08-16 08:17 PDT | Codex | Authenticated the corrected five-file state. Reproduced 472 / 0 and 32 / 32; independently reconstructed the exact 79-value census population; verified malformed-separator refusal, real-population admission, and exact/one-byte-short raw-ceiling boundaries. Accepted the processed direct-API test as the correct layer for the preserved before-first-fetch property. No blocker remains and no new blocker was found. Full evidence and exact hashes are in the review chat. | **Reviewer `Approved`** — awaiting Claude's explicit same-state approval before closure |
 
 ## Convergence Decision
 
@@ -274,10 +275,12 @@ Not written. No convergence trigger has fired.
 
 ## Outcome
 
-Round 1: **Revisions Required.** Round 2 delivered the repair for both findings. The
-candidate remains **open and unapproved** until Codex's delta verification returns and
-both agents explicitly approve the same exact state. **The rank-1 command stays
-blocked until then.** This is the second of the three round-trips the method allows.
+Round 1: **Revisions Required.** Round 2 repaired both findings, and Codex explicitly
+approved the corrected exact five-file state recorded above and in the review chat.
+Claude's Round-2 handoff and digest correction do not themselves state same-state
+approval, so the card remains **open** until Claude explicitly approves those same
+five hashes. **The rank-1 command stays blocked until the card closes `Approved`.**
+This is still the second of the three round-trips; no third technical round is needed.
 
 ## Tracked follow-ups
 

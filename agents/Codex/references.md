@@ -118,11 +118,11 @@ Open NWB host-recording collection with 2,048 assets, approximately 49.7 TB, and
 
 ### NWB and HDMF format specifications — ragged-array index dtype and timestamp origin
 
-**Neurodata Without Borders and HDMF developers. Format specifications.** [NWB format](https://nwb-schema.readthedocs.io/en/stable/format.html) · [HDMF common format](https://hdmf-common-schema.readthedocs.io/en/stable/format.html)
+**Neurodata Without Borders and HDMF developers. Format specifications.** [NWB format](https://nwb-schema.readthedocs.io/en/stable/format.html) · [NWB 2.9.0 root schema](https://github.com/NeurodataWithoutBorders/nwb-schema/blob/2.9.0/core/nwb.file.yaml) · [HDMF common format](https://hdmf-common-schema.readthedocs.io/en/stable/format.html)
 
 The NWB `Units/spike_times_index` field extends the HDMF `VectorIndex` type. The HDMF common schema specifies unsigned-integer storage for `VectorIndex`, so a floating-point ragged index is not schema-valid merely because all stored values happen to be whole numbers. The NWB schema separately defines root `timestamps_reference_time` as the date-time corresponding to time zero for all timestamps and specifies an ISO-8601 extended date-time with a timezone offset.
 
-*How it informed the project:* Settles RC-002's F2 repair boundary for `spike_times_index` and the parallel `spike_depths_index`: both must be stored with integer dtype before conversion. It does not by itself decide the storage policy for the project's custom `max_electrode` column. For RC-004, it confirms that comparing the two assets' declared reference instants is a necessary common-clock condition and supplies the strict external grammar the reader says it authenticates.
+*How it informed the project:* Settles RC-002's F2 repair boundary for `spike_times_index` and the parallel `spike_depths_index`: both must be stored with integer dtype before conversion. It does not by itself decide the storage policy for the project's custom `max_electrode` column. For RC-004, the version-pinned 2.9.0 root schema confirms that comparing the two assets' declared reference instants is a necessary common-clock condition and defines that field as ISO-8601 extended date-time with an offset, including `Z` and `+02:00` examples. That supplies the strict external grammar the reader says it authenticates.
 
 ### Python 3.12 `datetime.fromisoformat` — deliberately wider separator grammar
 

@@ -1,8 +1,8 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 34 · 2026-08-16 06:20 PDT**
+**Rewritten at the end of Codex Session 35 · 2026-08-16 08:19 PDT**
 
-**Next Codex session will be Session 35. The next count-based progress report is due in Session 40.**
+**Next Codex session will be Session 36. The next count-based progress report is due in Session 40.**
 
 ## Current phase and immovable boundary
 
@@ -11,76 +11,68 @@ no candidate has a drift, noise or effective-SNR value; no donor, host-specific
 pool, exposure schedule, placement configuration, template array, Rung 0,
 generation or sorter result exists.
 
-RC-001's drift specification and RC-003's bounded archive reader are closed
-`Approved` historical states. RC-004's candidate is open and **not approved**.
-Do not run the rank-1 candidate command until RC-004 receives explicit same-state
-approval.
+RC-001's drift specification and RC-003's bounded archive reader remain closed
+`Approved` historical states. RC-004's technical review is complete and Codex
+has explicitly approved its corrected exact state, but the card is still open:
+Claude has not yet explicitly approved those same hashes. Do not run the rank-1
+candidate command until Claude supplies that approval and RC-004 closes
+`Approved`.
 
-## RC-004 Round 1 — Revisions Required
+## RC-004 Round 2 — reviewer Approved, owner approval still required
 
-Claude handed off a five-file candidate that keeps affirmative per-asset
-conversion authentication, replaces raw/processed converter-version equality
-with equality of their declared root `timestamps_reference_time` instants, and
-keeps both versions reportable but non-voting.
+Claude's repair closes both Round-1 blockers:
 
-Codex authenticated the candidate hashes recorded in RC-004 and reviewed the
-full 760-insertion / 148-deletion surface from RC-003's approved `51cb436` state.
-The owner evidence reproduces:
+1. `reference_instant` now applies a whole-value ISO/NWB lexical gate before
+   `datetime.fromisoformat`. The malformed `Q` separator is refused, while all
+   79 distinct reference strings recorded across the 142 census assets remain
+   admitted as timezone-aware instants.
+2. `read_provenance` now holds the caller's declared ceiling around the raw file
+   open and provenance read. A below-file ceiling refuses before any distinct
+   byte moves or the raw clock is printed.
 
-- acceptance suite: **436 checks, 0 failed**;
-- repair mutation harness: **30 of 30 caught**, unmutated control green;
-- runbook-checker mutation harness: **18 of 18 caught**;
-- packet consistency: ten implemented steps agree, drift measurement pending;
-- RC-003 Round-1 verifier green; Round-2 verifier has exactly the two declared
-  version-equality failures and no others.
+Codex authenticated and explicitly approved this exact five-file state:
 
-The full Round-1 pass found two blockers.
+- `Reproducibility Packet/scripts/utils/archive_units.py` — `9ef16f58…`;
+- `Reproducibility Packet/scripts/measure_host_drift.py` — `156f6f0f…`;
+- `agents/Claude/tools/test_measure_host_drift.py` — `c508233d…`;
+- `agents/Claude/tools/mutate_rc002_repairs.py` — `97860ad9…`;
+- `agents/Claude/tools/verify_rc003_round2_repairs.py` — `f4ee4ae6…`.
 
-### RC-004-F1 — permissive timestamp grammar
+Evidence reproduced against those bytes:
 
-`archive_units.reference_instant` calls `datetime.fromisoformat` directly.
-Python intentionally accepts any one Unicode character in place of the ISO
-date/time separator. A local synthetic pair carrying
-`2021-05-10Q14:33:49.023776-04:00` on both assets is accepted and reaches a drift
-record. NWB requires an ISO-8601 extended date-time with an offset, so a malformed
-input becomes a verdict. This violates A2.4 and blocking-severity item 1.
+- owner acceptance suite: **472 checks, 0 failed**, 82 cases;
+- repair mutation harness: unmutated control 472 / 0, **32 of 32 caught**;
+- Round-1 probe no longer reproduces either counterexample;
+- new `agents/Codex/tools/probe_rc004_round2.py` at `f6b2aa6f…` passes five
+  independent checks: exact census-set reconstruction, full-population
+  admission, malformed-separator refusal, exact-ceiling admission and
+  one-byte-short pre-transfer refusal;
+- RC-003 Round-1 verifier remains green; the Round-2 verifier has only its two
+  declared superseded version-equality failures; packet consistency remains ten
+  implemented steps agreeing and the drift command pending; changed Python
+  sources byte-compile and `git diff --check` is clean.
 
-Required repair boundary: validate the strict NWB/ISO lexical form before
-parsing and add adversarial near-miss coverage, including the non-ISO separator,
-that requires a named input error with no report or record.
+The processed-side before-first-fetch property is correctly retained at the
+direct API layer. The raw read is now earlier and larger, so no whole-command
+ceiling can admit it while refusing the processed asset's first smaller fetch.
+This is a faithful split of the two boundaries, not a weakening.
 
-### RC-004-F2 — raw reference time outside caller ceiling
-
-`measure_host_drift.main` reads and prints raw provenance/reference time before
-passing `--max-mib` only to the processed `read_band_units` call.
-`read_provenance` has no caller-ceiling argument and explicitly runs before any
-outer ceiling exists. Under `--max-mib 0.000001 --plan-only`, a local synthetic
-fixture reads and prints the raw clock and moves **23,920 distinct raw bytes**
-before the processed side refuses the one-byte ceiling. This violates the exact
-pre-review condition 5, A2.5 and blocking-severity item 3.
-
-Required repair boundary: hold the caller's ceiling before the raw
-reference-time read, correct the help/narrative, and add a below-minimum refusal
-test proving the raw reference value is not read or printed before refusal.
-
-Both constructions live in `agents/Codex/tools/probe_rc004_round1.py`, SHA-256
-`a48b5c5e500a268d79bab0515f415e34efa428f4459fc8b34cddd1119ded6305`.
-The probe is local and synthetic; it reads no archive, network resource or
-candidate asset. No third blocker was found. The microsecond resolution and root
-`session_start_time` substitution remain follow-up/preference class.
-
-## Active review and immediate owner
+## Remaining gate and immediate owner
 
 `chats/Claude-Codex/Session Reference Time Pair Check Review/Session Reference
-Time Pair Check Review - Active.md` contains the complete numbered Round-1
-ledger. RC-004's status is `Revisions Required` and its exact five-file candidate
-is unapproved.
+Time Pair Check Review - Active.md` contains Codex's explicit exact-state
+approval and full evidence. The append was hard-gated against the verified
+455-line UTF-8 tail; the new header occurs exactly once after that count and the
+physical tail ends in the required separator. A boundary correction noting the
+official NWB web read was separately hard-gated against the 523-line tail and
+also occurs exactly once after it.
 
-**Immediate owner:** Claude responds to F1 and F2 delta-only under the superseding
-review method, updates the stable candidate, tests, mutations and hashes, and
-hands the exact state back. **Immediate Codex role:** perform the Round-2 delta
-review only after that handoff. Candidate execution stays blocked in the
-meantime.
+**Immediate owner: Claude.** Claude must explicitly approve the same five hashes.
+His Round-2 handoff and digest correction publish the candidate but do not count
+as same-state approval. Once he approves, RC-004 can close `Approved` without a
+third technical round; only then can Claude proceed to the separately governed
+rank-1 plan-only measurement. Codex should not redo the technical review unless
+the candidate bytes move.
 
 `chats/Claude-Codex-Human/Review Method Change/` remains active by Randy's
 instruction. No new Randy decision is needed.
@@ -102,21 +94,22 @@ not rejected. Do not read their spike payload or run the proposed containment
 diagnostic out of order; recovering that class needs separate evidence if the
 pinned order reaches it.
 
-## Approved foundation
+## Approved foundation and public state
 
-RC-003 remains historical approval at its recorded exact nine-file state. RC-001
-remains approved on Draft 24 `c35987fe…`, drift utility `eace4cd35…`, and owner
-harness `946df906…`. All six Claim Sheet amendments remain `In force`; contract
-hashes remain `2feda611…` and `679918f7…`. The real-arm donor-matching prose
-remains same-state approved at Draft 6 `51adae4b…`. None of those approvals
-authorizes host-dependent placement or matching, generation or sorting.
+RC-003 remains historical approval at its recorded exact nine-file state.
+RC-001 remains approved on Draft 24 `c35987fe…`, drift utility `eace4cd35…`, and
+owner harness `946df906…`. All six Claim Sheet amendments remain `In force`;
+contract hashes remain `2feda611…` and `679918f7…`. The real-arm donor-matching
+prose remains same-state approved at Draft 6 `51adae4b…`. None authorizes
+host-dependent placement or matching, generation or sorting.
 
-Root `README.md` now carries one lean public heartbeat for the two RC-004 Round-1
-blockers. No public result is claimed.
+No root `README.md` entry was added this session. The reviewer approval is not
+yet card closure, so the public heartbeat remains at the Round-1 blockers until
+the owner supplies the missing approval and the gate actually closes.
 
 ## Downstream gates remain separate
 
-1. RC-004 implementation approval;
+1. Claude's explicit RC-004 same-state approval and card closure;
 2. rank-1 candidate plan-only measurement in the pinned order;
 3. exposure-schedule/placement specification, implementation, tests and approval;
 4. matcher implementation, exhaustive/mutation tests and approval;
@@ -127,5 +120,6 @@ blockers. No public result is claimed.
 9. generation authorization;
 10. Rung 0/sorter execution authorization.
 
-`agents/Codex/Session Summaries/HumanReport34.md` contains the complete Round-1
-review, evidence, append verification and next-owner boundary.
+`agents/Codex/Session Summaries/HumanReport35.md` contains the complete Round-2
+review, evidence, append verification, approval distinction and next-owner
+boundary.
