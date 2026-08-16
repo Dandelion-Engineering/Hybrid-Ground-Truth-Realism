@@ -316,6 +316,26 @@ def band_bounds():
     return BAND_ROW_LO * ROW_PITCH_UM, BAND_ROW_HI * ROW_PITCH_UM
 
 
+UNSET = object()
+
+# What the real assets carry. Session 7 read /general from one raw NWB per
+# subject across 21 assets of DANDI 000409 and found this string on 20 of them,
+# with "v0.9.1" on the twenty-first. The fixtures default to it because the
+# command authenticates the conversion toolchain rather than recording it.
+DEFAULT_PROVENANCE = {
+    "general/source_script": "Created using NeuroConv v0.9.2",
+    "general/lab": "cortexlab",
+}
+
+
+def _write_provenance(handle, provenance):
+    """Write a fixture's conversion-provenance datasets."""
+    dt = h5py.string_dtype(encoding="utf-8")
+    for nwb_path, value in (provenance or {}).items():
+        dataset = handle.create_dataset(nwb_path, data=value, dtype=dt)
+        dataset.attrs["file_name"] = "%s.py" % nwb_path.rsplit("/", 1)[-1]
+
+
 def _write_electrode_table(handle, rows):
     """Write an NWB-shaped electrodes table."""
     group = handle.create_group("general/extracellular_ephys/electrodes")
@@ -331,7 +351,7 @@ def _write_electrode_table(handle, rows):
 
 
 def write_raw(path, rows, t_first_s, t_last_s, timing_source="timestamps",
-              series_names=None):
+              series_names=None, provenance=UNSET):
     """Write a raw-asset-shaped file: an electrode table and AP series timing.
 
     Args:
@@ -343,10 +363,17 @@ def write_raw(path, rows, t_first_s, t_last_s, timing_source="timestamps",
             ``"starting_time"`` writes the nominal-rate alternative instead,
             which the reader must refuse.
         series_names: explicit AP series names, defaulting to one per probe.
+        provenance: mapping of NWB path to stored string. It defaults to the
+            shape the 21 measured assets of this dandiset carry, because the
+            command now authenticates it on the raw asset as well; pass an
+            explicit mapping, or an empty one, to build the fixtures that must
+            be refused.
     """
     names = series_names or ["ElectricalSeries%sAP" % probe for probe in PROBES]
+    provenance = DEFAULT_PROVENANCE if provenance is UNSET else provenance
     with h5py.File(path, "w") as handle:
         _write_electrode_table(handle, rows)
+        _write_provenance(handle, provenance)
         acquisition = handle.create_group("acquisition")
         for name in names:
             node = acquisition.create_group(name)
@@ -434,7 +461,7 @@ def fragment_ragged_columns(path, chunk_elements=64, filler_elements=8192):
 
 
 def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
-                    depth_dtype=np.float64, index_mutator=None, provenance=None,
+                    depth_dtype=np.float64, index_mutator=None, provenance=UNSET,
                     time_dtype=np.float64, chunk_elements=None):
     """Write a processed-asset-shaped file: an electrode table and a units table.
 
@@ -453,9 +480,11 @@ def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
             the transfer bound uses when it can.
         index_mutator: optional callable taking the two index lists and
             returning the pair actually written, for the malformed-index cases.
-        provenance: optional mapping of NWB path to stored string, for the
-            conversion-provenance fixture.
+        provenance: mapping of NWB path to stored string, defaulting to the
+            measured shape. ``general/source_script`` is authenticated rather
+            than recorded, so a fixture that omits it must do so deliberately.
     """
+    provenance = DEFAULT_PROVENANCE if provenance is UNSET else provenance
     times = np.concatenate([u["times"] for u in units]) if units else np.zeros(0)
     depths = np.concatenate([u["depths"] for u in units]) if units else np.zeros(0)
     counts = [len(u["times"]) for u in units]
@@ -466,9 +495,7 @@ def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
     dt = h5py.string_dtype(encoding="utf-8")
     with h5py.File(path, "w") as handle:
         _write_electrode_table(handle, rows)
-        for nwb_path, value in (provenance or {}).items():
-            dataset = handle.create_dataset(nwb_path, data=value, dtype=dt)
-            dataset.attrs["file_name"] = "%s.py" % nwb_path.rsplit("/", 1)[-1]
+        _write_provenance(handle, provenance)
         node = handle.create_group("units")
         node.create_dataset("probe_name",
                             data=np.array([u["probe"] for u in units], dtype=object),
@@ -1118,18 +1145,50 @@ def case_unknown_probe_is_refused(h, tmp):
     h.check("unknown_probe/no report", not os.path.exists(out))
 
 
-def case_ambiguous_series_is_refused(h, tmp):
-    """Two AP series matching one probe stops rather than guessing the clock."""
+def case_series_name_containing_the_probe_is_not_ownership(h, tmp):
+    """A different probe's stream cannot supply this probe's clock, RC-003-F2.
+
+    ``select_ap_series`` matched on ``probe in entry["name"]``. Asked for
+    ``Probe00``, a file carrying ``ElectricalSeriesProbe000AP`` and
+    ``ElectricalSeriesProbe01AP`` selected the first one and reached a passing
+    verdict on a clock that belongs to a different probe. Nothing about that
+    file is malformed -- the substring rule is what is wrong -- so it is a
+    fixture rather than a mutation. The name is now decomposed and the probe
+    token has to match exactly, so this file has *no* series for ``Probe00``
+    and stops as an input error.
+    """
     rows = default_electrodes()
     units = band_units()
-    names = ["ElectricalSeriesProbe00AP", "ElectricalSeriesProbe00CopyAP"]
+    names = ["ElectricalSeriesProbe000AP", "ElectricalSeriesProbe01AP"]
     result = run_case(
-        tmp, "ambiguous_series",
+        tmp, "impostor_series",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S, series_names=names),
         lambda p: write_processed(p, rows, units))
-    h.check("ambiguous/refused", "AP series match probe" in str(result["status"]),
+    h.check("impostor/refused", "belong to probe" in str(result["status"]),
             str(result["status"]))
-    h.check("ambiguous/no report", result["text"] is None)
+    h.check("impostor/names the decomposition", "Probe000" in str(result["status"]),
+            str(result["status"]))
+    h.check("impostor/not a drift rejection",
+            "not a drift rejection" in str(result["status"]), str(result["status"]))
+    h.check("impostor/no report", result["text"] is None)
+    h.check("impostor/no record", result["record"] is None)
+
+
+def case_exact_series_ownership_still_selects(h, tmp):
+    """The exact rule still finds each probe's own stream, on both probes.
+
+    A tightening that refuses the impostor and also refuses the real thing would
+    pass the case above and stop every candidate. The clean fixture's two names
+    are the two the thirteen pinned candidates actually carry.
+    """
+    h.equal("ownership/probe00", CLI.series_probe("ElectricalSeriesProbe00AP"), "Probe00")
+    h.equal("ownership/probe01", CLI.series_probe("ElectricalSeriesProbe01AP"), "Probe01")
+    h.equal("ownership/impostor", CLI.series_probe("ElectricalSeriesProbe000AP"), "Probe000")
+    h.equal("ownership/lf_band", CLI.series_probe("ElectricalSeriesProbe00LF"), "Probe00")
+    h.equal("ownership/undecomposable", CLI.series_probe("SomethingElse"), None)
+    entries = [{"name": "ElectricalSeriesProbe00AP"}, {"name": "ElectricalSeriesProbe01AP"}]
+    h.equal("ownership/selects_probe01",
+            CLI.select_ap_series(entries, "Probe01")["name"], "ElectricalSeriesProbe01AP")
 
 
 def case_missing_session_is_refused(h, tmp):
@@ -1263,7 +1322,8 @@ def case_report_is_ascii_and_complete(h, tmp):
                      "discarded_s", "head_partial_s", "spikes before origin",
                      "in-band rows and labels", "included rows and labels",
                      "Q95_null", "deterministic replay", "own_worst", "band_win",
-                     "raw_electrodes", "raw_timing", "processed_units"):
+                     "raw_provenance", "raw_electrodes", "raw_timing",
+                     "processed_units"):
         h.check("report/carries %r" % required, required in text)
     h.check("report/sources are ascii",
             all(ord(char) < 128
@@ -1273,24 +1333,23 @@ def case_report_is_ascii_and_complete(h, tmp):
 
 
 def case_io_counts_every_read(h, tmp):
-    """The reported transfer is all three reads, not only the units table."""
+    """The reported transfer is all four reads, not only the units table."""
     rows = default_electrodes()
     units = band_units()
+    sources = ("raw_provenance", "raw_electrodes", "raw_timing", "processed_units")
     result = run_case(
         tmp, "io_counts",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
         lambda p: write_processed(p, rows, units))
     io_record = result["record"]["io"]
     h.equal("io/status", result["status"], 0)
-    for source in ("raw_electrodes", "raw_timing", "processed_units"):
+    for source in sources:
         h.check("io/%s counted" % source, io_record[source]["bytes"] > 0)
         h.check("io/%s requested" % source, io_record[source]["requests"] > 0)
     h.equal("io/total bytes", io_record["bytes"],
-            sum(io_record[source]["bytes"]
-                for source in ("raw_electrodes", "raw_timing", "processed_units")))
+            sum(io_record[source]["bytes"] for source in sources))
     h.equal("io/total requests", io_record["requests"],
-            sum(io_record[source]["requests"]
-                for source in ("raw_electrodes", "raw_timing", "processed_units")))
+            sum(io_record[source]["requests"] for source in sources))
 
 
 def case_only_band_units_are_read(h, tmp):
@@ -1314,12 +1373,12 @@ def case_only_band_units_are_read(h, tmp):
 
 
 
-def case_provenance_is_recorded_not_required(h, tmp):
-    """Conversion provenance present on the asset is reported verbatim."""
+def case_provenance_is_reported_verbatim(h, tmp):
+    """Conversion provenance present on both assets is reported and recorded."""
     rows = default_electrodes()
     units = band_units()
     provenance = {
-        "general/source_script": "ibl-to-nwb 54030ac4eb40a74978ac1f6ef6e966278b9d3f34",
+        "general/source_script": "Created using NeuroConv v0.9.1",
         "general/lab": "cortexlab",
         "general/institution": "test fixture",
     }
@@ -1337,48 +1396,183 @@ def case_provenance_is_recorded_not_required(h, tmp):
     h.check("provenance/file_name attribute carried",
             record["provenance"].get("general/source_script@file_name")
             == "source_script.py")
+    h.check("provenance/raw side recorded too",
+            record["raw_provenance"].get("general/source_script")
+            == DEFAULT_PROVENANCE["general/source_script"])
+    # Two keys must not render to one label. They did: clipped to nine
+    # characters, general/source_script and general/source_script@file_name
+    # were both "source_sc", so the report showed two values under one name.
+    text = result["text"] or ""
+    for key in ("general/source_script", "general/source_script@file_name",
+                "general/lab", "general/institution"):
+        h.check("provenance/report names %s whole" % key, key in text)
+    h.check("provenance/disagreement is reported not gated",
+            record["provenance_authentication"]["values_agree"] is False,
+            "the two assets carry v0.9.1 and v0.9.2 and the run still passed")
 
 
-def case_provenance_cost_is_inside_the_plan(h, tmp):
-    """A megabyte-sized provenance value is counted by the plan and capped when kept.
+def case_missing_processed_provenance_is_an_input_error(h, tmp):
+    """A processed asset with no conversion provenance stops, RC-003-F1.
 
-    This is RC-002-F1-R2, which closed that card unapproved. ``source_provenance``
-    reads complete stored datasets, and it used to be called *after*
-    ``read_band_units`` had enforced its memory ceiling: a schema-valid file
-    whose ``general/source_script`` held 4,200,030 characters was admitted under
-    a 174,368-byte transfer bound and then transferred 4,232,336 bytes. The read
-    now happens in preflight, where the reader's spend is still being counted,
-    so the cost is inside ``spent_bytes`` and therefore inside the bound; and
-    what is retained is capped, because a variable-length string has no stored
-    size to refuse on before reading it.
+    The selection document says an asset whose conversion provenance and values
+    do not establish the common session clock is an input error to resolve, not
+    a drift rejection. The command recorded provenance and gated on none of it,
+    so this fixture -- schema-valid, complete, and carrying no statement of what
+    produced it -- reached ``passed=True`` with an empty provenance record. The
+    session-time origin the grid is anchored on is a property of the converter,
+    so an asset that names no converter cannot establish it.
     """
     rows = default_electrodes()
     units = band_units()
-    big = "# generated conversion source\n" + ("x = 123456789\n" * 300000)
     result = run_case(
-        tmp, "provenance_cost",
+        tmp, "no_processed_provenance",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units, provenance={}))
+    status = str(result["status"])
+    h.check("no_processed_provenance/refused", "carries no general/source_script" in status,
+            status)
+    h.check("no_processed_provenance/named as an input error", "input error" in status,
+            status)
+    h.check("no_processed_provenance/no report", result["text"] is None)
+    h.check("no_processed_provenance/no record", result["record"] is None)
+
+
+def case_missing_raw_provenance_is_an_input_error(h, tmp):
+    """The raw asset is authenticated too; it supplies the grid's extent."""
+    rows = default_electrodes()
+    units = band_units()
+    result = run_case(
+        tmp, "no_raw_provenance",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S, provenance={}),
+        lambda p: write_processed(p, rows, units))
+    status = str(result["status"])
+    h.check("no_raw_provenance/refused", "carries no general/source_script" in status,
+            status)
+    h.check("no_raw_provenance/names the raw asset", "raw asset" in status, status)
+    h.check("no_raw_provenance/no report", result["text"] is None)
+
+
+def case_foreign_conversion_is_an_input_error(h, tmp):
+    """Provenance that names a different toolchain is not the pinned one."""
+    rows = default_electrodes()
+    units = band_units()
+    result = run_case(
+        tmp, "foreign_conversion",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(
+            p, rows, units,
+            provenance={"general/source_script": "exported by a local script v3"}))
+    status = str(result["status"])
+    h.check("foreign_conversion/refused", "does not identify the pinned" in status, status)
+    h.check("foreign_conversion/quotes the value", "local script v3" in status, status)
+    h.check("foreign_conversion/no report", result["text"] is None)
+
+
+def case_provenance_token_is_case_insensitive(h, tmp):
+    """The measured value's capitalisation is not what the rule turns on.
+
+    ``NeuroConv`` is how the 21 measured assets spell it. Requiring that exact
+    capitalisation would make a lower-cased spelling of the same toolchain an
+    input error, which is a rejection on typography rather than on provenance.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    result = run_case(
+        tmp, "provenance_case",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(
+            p, rows, units,
+            provenance={"general/source_script": "created using neuroconv v0.9.2"}))
+    h.equal("provenance_case/status", result["status"], 0)
+
+
+def case_vlen_provenance_is_refused_before_it_is_spent(h, tmp):
+    """A two-million-character variable-length value costs kilobytes, RC-003-F3.
+
+    RC-002-F1-R2 was an accounting defect: the provenance read sat after the
+    ceiling, so its bytes were in none of the plan's terms. Moving it into
+    preflight fixed the accounting and *not* the spend -- the value was still
+    read in full and only then reported, so a two-million-character
+    ``general/source_script`` moved 2,028,208 bytes before a one-byte ceiling
+    could refuse anything. HDF5 will not state a variable-length value's size in
+    advance, but h5py asks the reader for the heap collection's bytes before
+    they move, so the request is refused rather than the result measured.
+
+    The two numbers this case pins are the ones that separate the two repairs:
+    the bytes that actually moved, and the fact that the run stopped instead of
+    passing with a truncated marker.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    big = "# generated conversion source\n" + ("x = 123456789\n" * 145000)
+    budget = archive_units.PROVENANCE_MAX_BYTES
+    h.check("vlen_refusal/fixture_is_far_over_the_budget", len(big) > 20 * budget,
+            "%d characters against a %d-byte budget" % (len(big), budget))
+    result = run_case(
+        tmp, "vlen_provenance",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
         lambda p: write_processed(p, rows, units,
                                   provenance={"general/source_script": big}))
-    h.equal("provenance_cost/status", result["status"], 0)
+    status = str(result["status"])
+    h.check("vlen_refusal/run_stopped", "not read whole" in status, status)
+    h.check("vlen_refusal/named_as_an_input_error", "input error" in status, status)
+    h.check("vlen_refusal/no_report", result["text"] is None)
+    touched = distinct_bytes(result["processed"])
+    h.check("vlen_refusal/matched_a_reader", touched > 0, touched)
+    h.check("vlen_refusal/spend_is_far_below_the_value",
+            touched < len(big) // 4,
+            "%d distinct bytes touched against a %d-character value" % (touched, len(big)))
+
+
+def case_budget_admits_a_value_it_can_afford(h, tmp):
+    """A large-but-affordable provenance value is read, and its cost is in the plan.
+
+    The refusal above would also be produced by a rule that refused every
+    variable-length value, which would reject every real asset. This is the
+    other side: a value one order of magnitude larger than the measured ones and
+    still inside the budget is read whole, authenticated, and paid for inside
+    the plan's own terms -- which is the RC-002-F1-R2 property, kept.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    budget = archive_units.PROVENANCE_MAX_BYTES
+    big = "Created using NeuroConv v0.9.2\n" + "x" * (budget // 2)
+    h.check("budget_admits/fixture_is_inside_the_budget", len(big) < budget,
+            "%d characters against %d" % (len(big), budget))
+    # 4 KiB blocks, deliberately. The whole-suite invariant compares the
+    # distinct bytes touched against the plan's block-derived bound, and at the
+    # 1 MiB default one block covers this whole fixture, so the comparison is
+    # true whatever the plan says about preflight. At 4 KiB the preflight reads
+    # are many blocks and a plan that forgets them is short by a measurable
+    # amount -- which is what makes this case, and not only its own named
+    # assertion, notice a plan blind to what preflight spent.
+    result = run_case(
+        tmp, "affordable_provenance",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units,
+                                  provenance={"general/source_script": big}),
+        argv_extra=("--block-kb", "4"))
+    h.equal("budget_admits/status", result["status"], 0)
     record = result["record"]
     plan = record["plan"]
     spent = distinct_bytes(result["processed"])
-    h.check("provenance_cost/transfer_inside_the_bound",
+    h.equal("budget_admits/value_read_whole",
+            record["provenance"]["general/source_script"], big)
+    h.check("budget_admits/transfer_inside_the_bound",
             spent <= plan["cache_bound_bytes"],
             "%d touched against %d bounded" % (spent, plan["cache_bound_bytes"]))
-    h.check("provenance_cost/preflight_spend_counted",
+    h.check("budget_admits/preflight_spend_counted",
             plan["spent_bytes"] >= len(big),
             "spent_bytes %d against a %d-character value"
             % (plan["spent_bytes"], len(big)))
-    h.check("provenance_cost/peak_covers_the_transfer",
+    h.check("budget_admits/peak_covers_the_transfer",
             plan["peak_resident_bytes"] >= spent,
             "peak %d against %d transferred" % (plan["peak_resident_bytes"], spent))
-    value = record["provenance"]["general/source_script"]
-    h.check("provenance_cost/retained_value_is_capped",
-            len(value) < len(big) and "truncated" in value, value[-90:])
-    h.check("provenance_cost/cap_is_the_modules",
-            str(archive_units.PROVENANCE_MAX_BYTES) in value, value[-90:])
+    text = result["text"] or ""
+    h.check("budget_admits/report_clips_the_rendered_value", big not in text,
+            "a %d-character value must not be pasted whole into the report" % len(big))
+    h.check("budget_admits/report_still_shows_the_head",
+            "Created using NeuroConv v0.9.2" in text, text[:0])
 
 
 def case_oversize_stored_provenance_is_not_read(h, tmp):
@@ -1400,21 +1594,70 @@ def case_oversize_stored_provenance_is_not_read(h, tmp):
         handle.create_dataset("general/source_script", data=np.bytes_(big))
         handle.create_dataset("general/lab", data="cortexlab",
                               dtype=h5py.string_dtype(encoding="utf-8"))
-    with h5py.File(path, "r") as handle:
+    reader = archive_units.BoundedReader(LocalFile(path, os.path.getsize(path)))
+    with h5py.File(reader, "r") as handle:
         node = handle["general/source_script"]
         h.check("stored_provenance/file_really_holds_it", len(node[()]) == len(big),
                 "%d bytes" % len(node[()]))
         h.check("stored_provenance/size_is_readable",
                 archive_units._stored_value_bytes(node) == len(big),
                 "%s" % archive_units._stored_value_bytes(node))
-        out = archive_units.source_provenance(handle)
+        out = archive_units.source_provenance(handle, reader)
     value = out["general/source_script"]
     h.check("stored_provenance/not_read", value.startswith("<not read:"), value[:90])
+    h.check("stored_provenance/refused_before_the_read_not_by_the_budget",
+            "stored bytes exceeds" in value, value[:90])
     h.check("stored_provenance/names_the_size", str(len(big)) in value, value[:90])
     h.check("stored_provenance/names_the_cap",
             str(archive_units.PROVENANCE_MAX_BYTES) in value, value[:90])
     h.check("stored_provenance/retained_is_small", len(value) < 200, len(value))
     h.equal("stored_provenance/small_value_untouched", out["general/lab"], "cortexlab")
+    h.check("stored_provenance/refusal_is_not_authenticatable",
+            not archive_units.provenance_is_complete(value), value[:60])
+
+
+def case_a_cached_value_is_still_capped(h, tmp):
+    """A value HDF5 serves from its own cache bypasses the budget, and is still bounded.
+
+    The budget bounds what h5py *asks the reader for*. It does not bound what
+    HDF5 hands back out of its own global-heap cache, and the two are not the
+    same: after one read of a 2,000,000-character variable-length value, a
+    second read of it costs **16 bytes** through the reader, so a budget of
+    1,000 does not refuse it. That is not reachable through the command's own
+    call sequence -- nothing reads ``general/*`` before ``source_provenance``,
+    and every provenance read there is under the budget -- but it is reachable
+    whenever HDF5 has the collection for another reason, and a bound that holds
+    only because of a layout accident is not a bound.
+
+    What holds regardless is the retention cap: the value is capped on the way
+    into the returned dict and the marker names its real length, so it is not
+    authenticatable. This case exists because the cap looked unreachable under
+    the budget and was one edit away from being deleted as dead.
+    """
+    case_dir = os.path.join(tmp, "cached_provenance")
+    os.makedirs(case_dir, exist_ok=True)
+    path = os.path.join(case_dir, "provenance.nwb")
+    big = "q" * 2000000
+    with h5py.File(path, "w") as handle:
+        handle.create_dataset("general/source_script", data=big,
+                              dtype=h5py.string_dtype(encoding="utf-8"))
+    reader = archive_units.BoundedReader(LocalFile(path, os.path.getsize(path)))
+    with h5py.File(reader, "r") as handle:
+        node = handle["general/source_script"]
+        with reader.budget(4000000):
+            first = node[()]
+        h.equal("cached_cap/first_read_is_whole", len(first), len(big))
+        before = reader.n_bytes
+        out = archive_units.source_provenance(handle, reader, max_bytes=1000)
+        spent = reader.n_bytes - before
+    value = out["general/source_script"]
+    h.check("cached_cap/second_read_bypassed_the_budget", spent < 1000,
+            "%d bytes through the reader for a %d-character value" % (spent, len(big)))
+    h.check("cached_cap/retained_value_is_capped", len(value) < 2000,
+            "%d characters retained" % len(value))
+    h.check("cached_cap/names_the_real_length", str(len(big)) in value, value[-90:])
+    h.check("cached_cap/is_not_authenticatable",
+            not archive_units.provenance_is_complete(value), value[-90:])
 
 
 def case_null_distribution_is_reported(h, tmp):
@@ -2262,6 +2505,7 @@ def case_report_names_the_new_confirmations(h, tmp):
     text = result["text"] or ""
     h.equal("confirmations/status", result["status"], 0)
     for required in ("structural columns", "asset pair identity",
+                     "conversion provenance", "raw asset provenance",
                      "AP timestamp coverage", "stored payload", "block transfer",
                      "peak resident arrays", "live python structures",
                      "hdf5 chunk cache", "combined peak resident",
@@ -2295,7 +2539,8 @@ CASES = (
     case_missing_timestamps_is_refused,
     case_containment_violation_is_refused,
     case_unknown_probe_is_refused,
-    case_ambiguous_series_is_refused,
+    case_series_name_containing_the_probe_is_not_ownership,
+    case_exact_series_ownership_still_selects,
     case_missing_session_is_refused,
     case_plan_only_transfers_less,
     case_band_edges_are_inclusive,
@@ -2304,8 +2549,14 @@ CASES = (
     case_report_is_ascii_and_complete,
     case_io_counts_every_read,
     case_only_band_units_are_read,
-    case_provenance_is_recorded_not_required,
-    case_provenance_cost_is_inside_the_plan,
+    case_provenance_is_reported_verbatim,
+    case_missing_processed_provenance_is_an_input_error,
+    case_missing_raw_provenance_is_an_input_error,
+    case_foreign_conversion_is_an_input_error,
+    case_provenance_token_is_case_insensitive,
+    case_vlen_provenance_is_refused_before_it_is_spent,
+    case_budget_admits_a_value_it_can_afford,
+    case_a_cached_value_is_still_capped,
     case_oversize_stored_provenance_is_not_read,
     case_null_distribution_is_reported,
     case_fractional_ragged_offsets_are_refused,

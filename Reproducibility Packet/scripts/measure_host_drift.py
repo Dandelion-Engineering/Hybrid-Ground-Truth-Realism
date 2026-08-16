@@ -48,13 +48,24 @@ covers the processed asset's read, and every read that read performs is inside
 its plan: the electrode table, the unit scalars, the column descriptions, the
 conversion provenance, the column layouts and the chunk index are all read while
 the reader's spend is still being counted, and the per-unit slices after the
-check are what the plan sizes. It does **not** cover the two reads on the *raw*
-asset that precede it -- one electrode table, and two timestamps from each end
-of each AP series. Those are bounded by construction rather than by a ceiling:
-neither grows with the recording's length or its spike count. Their actual cost
-is measured and reported beside the processed one, under ``raw_electrodes`` and
-``raw_timing``, so the transcript states all three rather than the one the
-ceiling governs.
+check are what the plan sizes. It does **not** cover the three reads on the
+*raw* asset that precede it -- one electrode table, two timestamps from each end
+of each AP series, and the conversion provenance. Those are bounded by
+construction rather than by a ceiling: none of them grows with the recording's
+length or its spike count, and the provenance read is bounded a second time by
+the per-path budget ``utils.archive_units`` enforces. Their actual cost is
+measured and reported beside the processed one, under ``raw_electrodes``,
+``raw_timing`` and ``raw_provenance``, so the transcript states all four rather
+than the one the ceiling governs.
+
+**Both assets are authenticated against the conversion toolchain before
+anything is measured.** The bin grid is anchored on a session-time origin that
+is a property of the converter rather than of the arrays, and the raw file
+supplies the extent while the processed file supplies the spikes. Each must
+carry a ``general/source_script`` naming the pinned toolchain; an asset that
+carries none, or one this command could not read whole, stops the run as an
+input error. Recording provenance is not confirming it, and a file with no
+provenance at all used to reach a verdict.
 
 Example
 -------
@@ -77,6 +88,7 @@ step and says so; the exemption ends with the first execution.
 import argparse
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -95,6 +107,25 @@ GATES = {"strict": "threshold_strict_um", "relaxed": "threshold_relaxed_um"}
 # order was found under that definition. Supplying a different one here would
 # redefine which units the gate measures after the candidates are known.
 BAND_MAX_GAP_UM = 40.0
+
+# How an acquisition series names the probe it belongs to. Substring matching
+# was the previous rule and it is not ownership: asked for ``Probe00``, a file
+# holding ``ElectricalSeriesProbe000AP`` and ``ElectricalSeriesProbe01AP``
+# selected the first and took a different probe's clock. The name is decomposed
+# instead, and the probe token has to match exactly. The thirteen candidate
+# assets in the pinned order carry exactly two series names between them --
+# ``ElectricalSeriesProbe00AP`` and ``ElectricalSeriesProbe01AP``, from
+# ``results/host_timing_index.jsonl`` -- so this decomposition is checked
+# against every asset the order can reach rather than against a guess about the
+# converter.
+#
+# **What it authenticates is the name.** A series whose name and contents
+# disagree -- one labelled for this probe but carrying another's channels -- is
+# not caught here, and closing that would mean resolving each series'
+# ``electrodes`` region in ``screen_host_timing.read_series_timing``, which is
+# outside this command and has already produced a recorded index. It is named
+# rather than left implied.
+SERIES_NAME = re.compile(r"^ElectricalSeries(?P<probe>.+?)(?P<band>AP|LF)$")
 
 
 def resolve_assets(assets, session):
@@ -148,6 +179,21 @@ def resolve_assets(assets, session):
     return raw, processed
 
 
+def series_probe(name):
+    """Return the probe token an acquisition series name claims, or None.
+
+    Args:
+        name: the series name as stored in the file's acquisition group.
+
+    Returns:
+        The probe token, or None when the name does not decompose. A name that
+        does not decompose owns no probe here: it is reported with the others so
+        an unexpected naming convention is diagnosable rather than silent.
+    """
+    match = SERIES_NAME.match(name)
+    return match.group("probe") if match else None
+
+
 def select_ap_series(series, probe):
     """Pick the one AP acquisition series belonging to a probe.
 
@@ -159,15 +205,27 @@ def select_ap_series(series, probe):
         The matching series entry.
 
     Raises:
-        SystemExit: unless exactly one series carries the probe's name. Guessing
-            which stream a probe's clock comes from is not an option here: the
-            bin grid's extent is read from it.
+        SystemExit: unless exactly one series decomposes to exactly this probe.
+            Guessing which stream a probe's clock comes from is not an option
+            here: the bin grid's extent is read from it, and a stream whose name
+            merely *contains* the probe token belongs to a different probe.
+
+    Note:
+        The live failure is zero matches. Two matches cannot arise from one
+        acquisition group, because the decomposition is injective on the name
+        and HDF5 names within a group are unique; the ``!= 1`` form is a guard
+        against a caller assembling the list some other way, not a second check
+        with a reachable fixture.
     """
-    matches = [entry for entry in series if probe in entry["name"]]
+    matches = [entry for entry in series if series_probe(entry["name"]) == probe]
     if len(matches) != 1:
         raise SystemExit(
-            "[fatal] %d AP series match probe %r, expected exactly one: %s"
-            % (len(matches), probe, [entry["name"] for entry in series]))
+            "[fatal] %d AP series belong to probe %r, expected exactly one; the file's AP "
+            "series decompose as %s. A series whose name only contains the probe token is a "
+            "different stream and cannot supply this probe's clock, so this is an input "
+            "error, not a drift rejection"
+            % (len(matches), probe,
+               [(entry["name"], series_probe(entry["name"])) for entry in series]))
     return matches[0]
 
 
@@ -339,7 +397,7 @@ def build_report(record):
     add("numpy                 %s" % record["numpy_version"])
     add("archive transfer      %d bytes in %d requests, total across both assets"
         % (record["io"]["bytes"], record["io"]["requests"]))
-    for source in ("raw_electrodes", "raw_timing", "processed_units"):
+    for source in ("raw_provenance", "raw_electrodes", "raw_timing", "processed_units"):
         add("  %-19s %d bytes in %d requests"
             % (source, record["io"][source]["bytes"], record["io"][source]["requests"]))
     add("")
@@ -355,6 +413,7 @@ def build_report(record):
     add("  depth column unit         %s" % record["checks"]["depth_unit"])
     add("  electrode tables agree    %s" % record["checks"]["electrode_tables"])
     add("  asset pair identity       %s" % record["checks"]["asset_pair"])
+    add("  conversion provenance     %s" % record["checks"]["conversion_provenance"])
     add("  AP timing source          %s" % record["checks"]["timing_source"])
     add("  AP timestamp coverage     %s" % record["checks"]["timestamp_coverage"])
     add("  spike containment         %s" % record["checks"]["containment"])
@@ -362,13 +421,25 @@ def build_report(record):
     add("  spike_times description   %s" % record["descriptions"].get("spike_times"))
     add("  depth description         %s"
         % record["descriptions"].get("spike_distances_from_probe_tip_um"))
-    for key in sorted(record["provenance"]):
-        add("  provenance %-14s %s" % (key.split("/")[-1][:14], record["provenance"][key]))
+    # The key is printed whole. Clipping it to a fixed width rendered
+    # general/source_script and general/source_script@file_name as the same
+    # nine characters, so two different values sat under one label and the
+    # reader could not tell which was which.
+    for label, source in (("processed", "provenance"), ("raw", "raw_provenance")):
+        add("  %s asset provenance" % label)
+        for key in sorted(record[source]):
+            add("    %-32s %s"
+                % (key, archive_units.ascii_safe(record[source][key], 160)))
     add("")
-    add("  The session-time origin is pinned to the conversion repository commit named in")
-    add("  the selection document, not inferred here. Containment is a consistency check:")
-    add("  it cannot identify a clock offset or scale, and the two slack values below are")
-    add("  what it leaves unchecked at the endpoints, not a bound on internal agreement.")
+    add("  Provenance values are rendered ASCII-only and clipped at 160 characters; the")
+    add("  records file carries them in full. The conversion provenance check above")
+    add("  requires both assets to name the pinned conversion toolchain -- it does not")
+    add("  confirm the repository commit, because no asset in this dandiset carries one.")
+    add("  The session-time origin is pinned to that commit in the selection document,")
+    add("  not inferred here.")
+    add("  Containment is a consistency check: it cannot identify a clock offset or scale,")
+    add("  and the two slack values below are what it leaves unchecked at the endpoints,")
+    add("  not a bound on internal agreement.")
     add("")
 
     clock = record["clock"]
@@ -635,6 +706,16 @@ def main(argv=None):
     block_bytes = args.block_kb * 1024
     print("[drift] %s %s session %s" % (subject, args.probe, args.session), flush=True)
 
+    raw_prov = archive_units.read_provenance(dandi.blob_url(raw_asset),
+                                             raw_asset["size"], block_bytes)
+    try:
+        raw_auth = archive_units.authenticate_provenance(
+            raw_prov["provenance"], "raw asset %s" % raw_asset["path"])
+    except ValueError as exc:
+        raise SystemExit("[fatal] input error: %s" % exc)
+    print("[drift] raw conversion provenance %s"
+          % archive_units.ascii_safe(raw_auth["value"], 120), flush=True)
+
     raw = read_electrode_table(dandi.blob_url(raw_asset), raw_asset["size"], block_bytes)
     if args.probe not in raw["probes"]:
         raise SystemExit("[fatal] raw electrode table has no probe %r; it has %s"
@@ -737,12 +818,14 @@ def main(argv=None):
         })
 
     io_total = {
+        "raw_provenance": raw_prov["io"],
         "raw_electrodes": raw["io"],
         "raw_timing": timing["io"],
         "processed_units": read["io"],
-        "bytes": raw["io"]["bytes"] + timing["io"]["bytes"] + read["io"]["bytes"],
-        "requests": (raw["io"]["requests"] + timing["io"]["requests"]
-                     + read["io"]["requests"]),
+        "bytes": (raw_prov["io"]["bytes"] + raw["io"]["bytes"] + timing["io"]["bytes"]
+                  + read["io"]["bytes"]),
+        "requests": (raw_prov["io"]["requests"] + raw["io"]["requests"]
+                     + timing["io"]["requests"] + read["io"]["requests"]),
     }
 
     record = {
@@ -768,6 +851,14 @@ def main(argv=None):
         "descriptions": read["descriptions"],
         "integer_dtypes": read["integer_dtypes"],
         "provenance": read["provenance"],
+        "raw_provenance": raw_prov["provenance"],
+        "provenance_authentication": {
+            "raw": {key: raw_auth[key] for key in ("path", "token", "source")},
+            "processed": {key: read["provenance_authentication"][key]
+                          for key in ("path", "token", "source")},
+            "values_agree": (raw_auth["value"]
+                             == read["provenance_authentication"]["value"]),
+        },
         "n_units_on_probe": read["n_units_on_probe"],
         "n_units_total": read["n_units_total"],
         "clock": {"t_first_s": t_first_s, "t_last_s": t_last_s},
@@ -792,6 +883,13 @@ def main(argv=None):
                                    % (series.get("n_timestamps"), series.get("shape")[0])),
             "containment": ("all loaded spikes inside [t_first_s, t_last_s]"
                             if containment else "no spikes loaded"),
+            "conversion_provenance": (
+                "both assets' %s name %r; raw %r, processed %r"
+                % (archive_units.REQUIRED_PROVENANCE_PATH,
+                   archive_units.CONVERSION_SOURCE_TOKEN,
+                   archive_units.ascii_safe(raw_auth["value"], 60),
+                   archive_units.ascii_safe(
+                       read["provenance_authentication"]["value"], 60))),
             "replay": replay_note,
         },
         "sets": {

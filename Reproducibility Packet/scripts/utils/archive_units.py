@@ -53,6 +53,29 @@ invisible to the plan and could transfer megabytes a caller had been told would
 not be transferred; the rule the repair leaves behind is the general one, and it
 is what the harness now checks on every fixture that performs a read.
 
+**Accounted is not bounded, which is the distinction the second repair turns
+on.** Moving the provenance read into preflight made its cost appear in the
+plan, but the plan is written after the read: a two-million-character
+variable-length value was still transferred in full and only then reported, so
+the number a caller was given was honest about a spend that had already
+happened. What HDF5 will not tell you in advance about such a value is its size;
+what it does do is *ask this module's reader* for the bytes before they move.
+:class:`BoundedReader` therefore refuses the request rather than measuring the
+result, and :func:`source_provenance` reads every provenance path under a pinned
+per-path budget. The cost is knowable before it is spent because the spend is
+capped, not because the value announced itself.
+
+**One provenance path is authenticated rather than recorded.** The session-time
+origin the drift grid is anchored on is a property of the converter, so an asset
+that does not state what produced it cannot establish it. ``general/source_script``
+must be present, must have been read whole, and must name the pinned conversion
+toolchain; a file carrying none at all used to reach a drift verdict with an
+empty provenance record, which is a malformed input becoming a verdict. What
+that check can and cannot establish is written at
+:data:`REQUIRED_PROVENANCE_PATH`, and the honest half of it is that no asset in
+this dandiset carries the conversion repository's commit, so no check here
+confirms it.
+
 **What it validates, and why validation lives here rather than in the caller.**
 Four properties have to hold before a drift number computed from these arrays
 means anything, and every one of them is a property of the file rather than of
@@ -97,6 +120,8 @@ Nothing here computes, thresholds, or interprets a drift value. This module
 reads and checks; ``utils.band_drift`` measures.
 """
 
+import contextlib
+import io
 import sys
 
 import numpy as np
@@ -116,9 +141,10 @@ DEPTH_COLUMN = "spike_distances_from_probe_tip_um"
 # the whole description is reported verbatim beside the verdict.
 DEPTH_UNIT_PHRASE = "micrometers"
 
-# Read verbatim and reported, never gated on: the converter provenance that
-# fixes the session-time origin is a claim about the conversion repository at a
-# pinned commit, not something an asset can be made to prove about itself.
+# The conversion provenance the selection document's clock claim rests on. The
+# session-time origin is a property of the converter, not of the recorded
+# arrays, so the asset's own statement of what produced it is the only
+# asset-level evidence that this file came off the documented conversion path.
 PROVENANCE_PATHS = (
     "general/source_script",
     "general/session_start_time",
@@ -126,12 +152,181 @@ PROVENANCE_PATHS = (
     "general/lab",
 )
 
-# The per-value cap on conversion provenance, pinned here rather than passed in,
-# because a value read from a candidate must not be able to choose the number
-# that decides whether reading it was allowed. It is deliberately far above any
-# plausible real value: IBL's source_script is a conversion script, and the
-# largest of the four paths on a real asset is kilobytes.
+# The one path that is required rather than recorded, and the pinned token its
+# value is authenticated against.
+#
+# **What this authenticates, and what it cannot.** Session 7 read /general from
+# one raw NWB per subject across 21 assets of DANDI 000409 -- the donor
+# library's 12 subjects and the 9 that own the current candidate hosts -- and
+# every one carried general/source_script, reading "Created using NeuroConv
+# v0.9.2" on 20 of them and "v0.9.1" on the remaining one
+# (results/subject_provenance.json). So the toolchain token is checkable against
+# a measurement rather than against an assumption. The pinned *commit* of
+# catalystneuro/IBL-to-nwb is not: no asset in that survey carries it, so no
+# check here can confirm it, and pretending otherwise would be the check
+# claiming more than it does. What this rule establishes is that the asset
+# states it was produced by the documented conversion toolchain; that the
+# toolchain at the pinned commit exports the shared session-time coordinate is
+# the selection document's claim about the repository and stays there.
+REQUIRED_PROVENANCE_PATH = "general/source_script"
+CONVERSION_SOURCE_TOKEN = "neuroconv"
+
+# The per-value budget on conversion provenance, pinned here rather than passed
+# in, because a value read from a candidate must not be able to choose the
+# number that decides whether reading it was allowed. It is deliberately far
+# above any plausible real value -- the measured values above are about thirty
+# characters -- and it bounds the value's own bytes *and* the structural reads
+# that reach it, so the spend on one path is at most this number.
 PROVENANCE_MAX_BYTES = 65536
+
+# The two self-describing forms a provenance value can take when it was not read
+# whole. They are prefixes rather than free text so that
+# :func:`provenance_is_complete` can decide the question mechanically, and so
+# that an authentication can refuse to run on a value it did not fully see.
+PROVENANCE_UNREAD_PREFIX = "<not read:"
+PROVENANCE_TRUNCATED_PREFIX = "<truncated:"
+
+
+class ReadBudgetExceeded(ValueError):
+    """Raised when a read would spend more than the budget in force allows.
+
+    It is a :class:`ValueError` because every other statement this module makes
+    about a malformed or oversized asset is one, and :func:`read_band_units`'s
+    caller converts that class into an input error rather than a drift verdict.
+    """
+
+
+class BoundedReader(io.RawIOBase):
+    """A transparent proxy over a range reader that can refuse a read before it happens.
+
+    **Why a proxy rather than a size check.** HDF5 will state the stored size of
+    a fixed-length value, so an oversized one can be refused by asking. It will
+    not state the size of a variable-length string: the characters live in the
+    global heap and the dataset stores only heap references, so h5py 3.16.0
+    reports 16 bytes of storage for a 4.2 MB value. Asking is therefore not
+    available for the representation IBL actually uses, and an accounting repair
+    -- moving the read to where the plan can count it -- makes the spend
+    *visible* without making it *refusable*. What is still available is the
+    request: h5py asks this object for the heap collection's bytes before they
+    move, so a proxy that checks the requested length against a budget and
+    raises can decline the read at a cost of the structural bytes already spent
+    reaching it. Measured on a 2,035,936-byte value under a 65,536-byte budget:
+    7,904 bytes moved, against 2,028,208 with no budget in force.
+
+    The proxy is transparent when no budget is in force, which is every read
+    outside :func:`source_provenance`. It forwards the reader's own counters, so
+    a caller reads ``n_bytes`` and ``n_requests`` from either object and gets
+    the same numbers.
+
+    Attributes:
+        n_bytes: the wrapped reader's transferred-byte counter.
+        n_requests: the wrapped reader's request counter.
+    """
+
+    def __init__(self, inner):
+        """Wrap ``inner``, which must be a seekable binary reader."""
+        self._inner = inner
+        self._budget = None
+        self._remaining = None
+
+    @contextlib.contextmanager
+    def budget(self, n_bytes):
+        """Refuse, inside this block, any read larger than what is left of ``n_bytes``.
+
+        Args:
+            n_bytes: the budget for the whole block, covering every read made
+                inside it.
+
+        Yields:
+            None. On exit the previous budget, normally none at all, is restored
+            whether or not the block raised.
+        """
+        previous = (self._budget, self._remaining)
+        self._budget = self._remaining = int(n_bytes)
+        try:
+            yield
+        finally:
+            self._budget, self._remaining = previous
+
+    def _charge(self, n_bytes):
+        """Refuse or account for a read of ``n_bytes`` before it is delegated."""
+        if self._remaining is None:
+            return
+        if n_bytes is None or n_bytes < 0:
+            raise ReadBudgetExceeded(
+                "a read to end-of-file was requested under a %d-byte budget"
+                % self._budget)
+        if n_bytes > self._remaining:
+            raise ReadBudgetExceeded(
+                "a %d-byte read exceeds the %d bytes left of a %d-byte budget"
+                % (n_bytes, self._remaining, self._budget))
+        self._remaining -= n_bytes
+
+    def readable(self):
+        """Return True; this proxy is read-only."""
+        return True
+
+    def seekable(self):
+        """Return True; h5py seeks constantly."""
+        return True
+
+    def writable(self):
+        """Return False; nothing here writes."""
+        return False
+
+    def seek(self, offset, whence=io.SEEK_SET):
+        """Seek the wrapped reader. Seeking spends nothing and is never refused."""
+        return self._inner.seek(offset, whence)
+
+    def tell(self):
+        """Return the wrapped reader's position."""
+        return self._inner.tell()
+
+    def read(self, n=-1):
+        """Read ``n`` bytes, refusing before delegating when a budget forbids it."""
+        self._charge(n)
+        return self._inner.read(n)
+
+    def readinto(self, buffer):
+        """Read into ``buffer``, refusing before delegating when a budget forbids it."""
+        self._charge(len(buffer))
+        return self._inner.readinto(buffer)
+
+    def close(self):
+        """Close the wrapped reader, then this proxy."""
+        try:
+            self._inner.close()
+        finally:
+            super(BoundedReader, self).close()
+
+    @property
+    def n_bytes(self):
+        """The wrapped reader's transferred-byte counter."""
+        return self._inner.n_bytes
+
+    @property
+    def n_requests(self):
+        """The wrapped reader's request counter."""
+        return self._inner.n_requests
+
+
+def ascii_safe(text, limit=200):
+    """Return an ASCII-only, length-limited rendering of a value read from a file.
+
+    Args:
+        text: the decoded value.
+        limit: how many characters to keep.
+
+    Returns:
+        The value with every non-ASCII character escaped and the tail replaced
+        by an ellipsis when it was longer than ``limit``. Provenance strings
+        come from the asset rather than from this project, and both the report
+        and this console are ASCII-only, so a value is rendered rather than
+        printed.
+    """
+    clipped = text[:limit]
+    safe = clipped.encode("ascii", "backslashreplace").decode("ascii")
+    return safe if len(text) <= limit else safe + "..."
 
 
 def _decode(values):
@@ -245,42 +440,45 @@ def _capped(text, max_bytes):
     """
     if len(text) <= max_bytes:
         return text
-    return ("%s<truncated: %d characters read, %d-character provenance cap>"
-            % (text[:max_bytes], len(text), max_bytes))
+    return ("%s%s %d characters read, %d-character provenance cap>"
+            % (text[:max_bytes], PROVENANCE_TRUNCATED_PREFIX, len(text), max_bytes))
 
 
-def source_provenance(handle, max_bytes=PROVENANCE_MAX_BYTES):
-    """Read whatever conversion provenance the asset carries, without gating on it.
+def source_provenance(handle, reader, max_bytes=PROVENANCE_MAX_BYTES):
+    """Read the asset's conversion provenance under an enforced read budget.
 
     Args:
         handle: an open :class:`h5py.File`.
-        max_bytes: the pinned per-value cap. A value whose stored size the file
-            will report, above the cap, is not read at all. A value whose size
-            the file will not report is read and then retained only up to the
-            cap. Either way what this function returns is bounded, and it says
-            in the value itself which of the two happened.
+        reader: the :class:`BoundedReader` the file was opened on. It is
+            required rather than optional. Without it a variable-length value
+            cannot be refused before its bytes move, and an unbounded read of a
+            value whose size HDF5 will not state is the exact defect this
+            argument exists to prevent.
+        max_bytes: the pinned per-value budget, covering each path's value and
+            the structural reads that reach it.
 
     Returns:
         A dict from path to its stored value as a string, omitting paths the
-        file does not carry and replacing an oversized value with a marker
-        naming its size and the cap. Values are recorded for the report; no
-        value here is required to hold, because the session-time convention this
-        project relies on is pinned to a conversion-repository commit rather
-        than asserted by the asset.
+        file does not carry. A value the budget refused, or whose stated stored
+        size was already over the budget, is replaced by a marker beginning with
+        :data:`PROVENANCE_UNREAD_PREFIX` that names what was refused and why, so
+        a refusal is distinguishable from a short value and
+        :func:`authenticate_provenance` can decline to authenticate on one.
 
     Note:
-        **This reads the file, so it belongs in preflight, and that is a repair
-        rather than a preference.** An earlier version was called after
-        :func:`read_band_units` had already enforced its memory ceiling, which
-        made every byte it transferred invisible to the plan: a schema-valid
-        file carrying a 4,200,030-character ``general/source_script`` was
-        admitted under a 174,368-byte transfer bound and a 267,001-byte peak,
-        and then transferred and retained 4,232,336 bytes. It is now called
-        before the reader's spend is captured, so its cost is inside
-        ``spent_bytes`` and therefore inside ``cache_bound_bytes`` and
-        ``peak_resident_bytes``. The cap is the second half of the repair: for a
-        variable-length string there is no pre-read size to refuse on, so the
-        bound that can still be enforced is on what is retained.
+        **Two repairs live here and they are different repairs.** The first was
+        one of accounting: this function was called after
+        :func:`read_band_units` had enforced its memory ceiling, so a
+        schema-valid file carrying a 4,200,030-character
+        ``general/source_script`` was admitted under a 174,368-byte transfer
+        bound and then transferred 4,232,336 bytes. Moving the call into
+        preflight put those bytes inside ``spent_bytes`` and therefore inside
+        the plan. But an accounted spend is not a refused one: with the read
+        still unbounded, a two-million-character value was *spent* and only then
+        reported, so the cost became visible without becoming preventable. The
+        second repair is the budget, which refuses the read at the request
+        rather than measuring it afterwards. Both were needed; neither is the
+        other.
     """
     out = {}
     for path in PROVENANCE_PATHS:
@@ -289,24 +487,126 @@ def source_provenance(handle, max_bytes=PROVENANCE_MAX_BYTES):
         node = handle[path]
         stored = _stored_value_bytes(node)
         if stored is not None and stored > max_bytes:
-            out[path] = ("<not read: %d stored bytes exceeds the %d-byte provenance cap>"
-                         % (stored, max_bytes))
+            out[path] = ("%s %d stored bytes exceeds the %d-byte provenance budget>"
+                         % (PROVENANCE_UNREAD_PREFIX, stored, max_bytes))
             continue
         try:
-            value = node[()]
+            with reader.budget(max_bytes):
+                value = node[()]
+        except ReadBudgetExceeded as exc:
+            out[path] = "%s %s>" % (PROVENANCE_UNREAD_PREFIX, exc)
+            continue
         except (TypeError, ValueError):
             continue
         if isinstance(value, bytes):
             value = value.decode()
         out[path] = _capped(str(value), max_bytes)
         for key in ("file_name", "software", "version"):
-            attr = node.attrs.get(key)
+            try:
+                with reader.budget(max_bytes):
+                    attr = node.attrs.get(key)
+            except ReadBudgetExceeded as exc:
+                out["%s@%s" % (path, key)] = "%s %s>" % (PROVENANCE_UNREAD_PREFIX, exc)
+                continue
             if attr is None:
                 continue
             if isinstance(attr, bytes):
                 attr = attr.decode()
             out["%s@%s" % (path, key)] = _capped(str(attr), max_bytes)
     return out
+
+
+def provenance_is_complete(value):
+    """Return True when a provenance value was read whole rather than refused or capped.
+
+    Args:
+        value: one entry from :func:`source_provenance`.
+
+    Returns:
+        False when the value is a refusal marker or carries a truncation marker,
+        True otherwise. A value that was not read whole is not evidence about
+        what produced the asset, so authentication treats it as absent rather
+        than as a string to search.
+    """
+    return not (value.startswith(PROVENANCE_UNREAD_PREFIX)
+                or PROVENANCE_TRUNCATED_PREFIX in value)
+
+
+def authenticate_provenance(provenance, source):
+    """Confirm one asset states it came off the documented conversion toolchain.
+
+    The selection document pins the session-time origin to a conversion
+    repository at a named commit and says in terms that an asset whose
+    conversion provenance and values do not establish that common clock is an
+    input error to resolve rather than a drift rejection. Recording the
+    provenance is not that confirmation: a file carrying none at all was
+    reaching a drift verdict with an empty provenance record, which is a
+    malformed input becoming a verdict.
+
+    Args:
+        provenance: the dict :func:`source_provenance` returned.
+        source: how to name the asset in the error, e.g. ``"raw asset X"``.
+
+    Returns:
+        A dict with ``path``, ``value``, ``token`` and ``source``, for the
+        record and the report.
+
+    Raises:
+        ValueError: if the required path is absent, was not read whole, or names
+            a toolchain other than the pinned one. All three are input errors:
+            they say the asset is not the one the clock claim is about, not that
+            the candidate drifted.
+    """
+    value = provenance.get(REQUIRED_PROVENANCE_PATH)
+    if value is None:
+        raise ValueError(
+            "%s carries no %s, so nothing in it states what produced it; the session-time "
+            "origin this project reads from it is a property of the converter, and an asset "
+            "that does not name one cannot establish it"
+            % (source, REQUIRED_PROVENANCE_PATH))
+    if not provenance_is_complete(value):
+        raise ValueError(
+            "%s carries a %s that was not read whole under the %d-byte provenance budget "
+            "(%s), and a value this command did not fully see is not evidence about what "
+            "produced the asset"
+            % (source, REQUIRED_PROVENANCE_PATH, PROVENANCE_MAX_BYTES, ascii_safe(value)))
+    if CONVERSION_SOURCE_TOKEN not in value.lower():
+        raise ValueError(
+            "%s names %r as its %s, which does not identify the pinned conversion toolchain "
+            "%r; every one of the 21 assets of this dandiset measured in Session 7 named it, "
+            "so an asset that does not is outside the conversion path the session clock is "
+            "pinned to"
+            % (source, ascii_safe(value), REQUIRED_PROVENANCE_PATH, CONVERSION_SOURCE_TOKEN))
+    return {"path": REQUIRED_PROVENANCE_PATH, "value": value,
+            "token": CONVERSION_SOURCE_TOKEN, "source": source}
+
+
+def read_provenance(url, size, block_bytes):
+    """Read one asset's conversion provenance and nothing else.
+
+    The processed asset's provenance is read inside :func:`read_band_units`,
+    where it is part of that read's plan. The raw asset supplies the clock's
+    endpoints and its own electrode table, so its provenance has to be
+    authenticated too, and this is the read that fetches it.
+
+    Args:
+        url: direct S3 URL of the NWB blob.
+        size: the blob's size in bytes.
+        block_bytes: range-request block size.
+
+    Returns:
+        A dict with ``provenance`` and ``io`` (request count and bytes). The
+        cost is bounded by construction -- at most
+        :data:`PROVENANCE_MAX_BYTES` per path plus the file's own structural
+        reads -- rather than by a ceiling, and it does not grow with the
+        recording's length or its spike count.
+    """
+    remote = RemoteFile(url, size, block=block_bytes)
+    reader = BoundedReader(remote)
+    with h5py.File(reader, "r") as handle:
+        provenance = source_provenance(handle, reader)
+    return {"provenance": provenance,
+            "io": {"requests": remote.n_requests, "bytes": remote.n_bytes}}
 
 
 def read_integer_column(node, name, require_integer_dtype=False):
@@ -884,7 +1184,8 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
             ``max_bytes``.
     """
     remote = RemoteFile(url, size, block=block_bytes)
-    with h5py.File(remote, "r") as handle:
+    reader = BoundedReader(remote)
+    with h5py.File(reader, "r") as handle:
         electrodes = read_flat_electrodes(handle)
         scalars = read_unit_scalars(handle)
         check_ragged_alignment(scalars)
@@ -892,8 +1193,13 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         # Read here, in preflight, and never after the ceiling is enforced.
         # source_provenance reads complete stored datasets, so a call placed
         # after the check spends bytes the plan has already promised were
-        # bounded -- which is exactly what it used to do.
-        provenance = source_provenance(handle)
+        # bounded -- which is exactly what it used to do. The budget is the
+        # other half: preflight makes the spend accounted, the budget makes it
+        # refusable, and a value that cannot be refused is not bounded merely
+        # because someone counted it.
+        provenance = source_provenance(handle, reader)
+        authentication = authenticate_provenance(
+            provenance, "processed asset %s" % url.rsplit("/", 1)[-1])
 
         depth_description = descriptions.get(DEPTH_COLUMN)
         if not depth_description or DEPTH_UNIT_PHRASE not in depth_description.lower():
@@ -940,6 +1246,7 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
             "plan": plan,
             "descriptions": descriptions,
             "provenance": provenance,
+            "provenance_authentication": authentication,
             "electrodes": electrodes,
             "unit_electrodes": unit_electrodes,
             "band_units": band_units,

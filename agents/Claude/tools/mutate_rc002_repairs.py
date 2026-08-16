@@ -11,9 +11,11 @@ requires the cases named beside it to fail. The unmutated control copy must pass
 One mutation per copy, so no mutation can mask or amplify another.
 
 **What this harness covers, stated exactly rather than as "every repair".** It
-covers F1, F2, F3, F4 and F6 from Codex's Round-1 ledger, the Round-2 repairs
-F1-R1a, F1-R1b, F2-R1 and F6-R1, and the three parts of the F1-R2 repair made
-after RC-002 closed unapproved. **It does not cover F5, and cannot.** F5's
+covers F1, F2, F3, F4 and F6 from Codex's RC-002 Round-1 ledger, the Round-2
+repairs F1-R1a, F1-R1b, F2-R1 and F6-R1, the three parts of the F1-R2 repair
+made after RC-002 closed unapproved, and the four RC-003 Round-1 repairs --
+provenance authentication on each asset, exact AP-series ownership, and the
+per-path read budget. **It does not cover F5, and cannot.** F5's
 repair was not an edit: it was moving the command into the packet and declaring
 it pending in the runbook checker. This harness reverts one anchored string in
 one file per copy, and neither half of F5 is a string it can revert. The
@@ -36,6 +38,19 @@ is not a case written for provenance but the invariant ``run_case`` now applies
 to every fixture that reaches a record. The defect that closed RC-002 would fail
 this suite today without anyone having to look for it.
 
+**And it is the entry that caught a regression in this suite during the RC-003
+repair, which is the strongest thing the harness has done.** The fixture F1d
+used to rely on carried a 4.2 MB provenance value; the RC-003 repair refuses
+that value, so the case was rewritten at a size the budget admits -- and at 32 KB
+under the default 1 MiB blocks, one block covers the whole fixture, the
+invariant's comparison is true whatever the plan says, and F1d went undetected.
+Nothing else noticed: the suite was green at 321 checks and every other mutation
+was still caught. The case now runs at 4 KiB blocks, where the preflight reads
+are many blocks and a plan blind to them is short by a measurable amount. **The
+lesson is not about block sizes.** It is that a repair somewhere else can
+silently remove the coverage a mutation depends on, and the only thing that says
+so is running the mutations again after the repair.
+
 Three more of the entries are worth reading rather than counting. The F1 mutation
 puts the ceiling back on the stored payload, which is the exact defect Codex
 reproduced in Round 1. The F1b mutation puts the ceiling back on the two memory
@@ -45,6 +60,16 @@ the suite notices is not a refusal but a raise: without the check the command
 does not reach a verdict, it crashes -- so either the case's own assertion or
 the harness recording the exception counts as noticing, and both names are
 listed.
+
+**The RC-003 entries divide the two halves of one property, and that division
+is the finding.** F1h removes the read budget and the suite still stops the run
+-- because the retention cap catches the oversized value afterwards -- so the
+mutation is caught by the *spend*, not by the verdict: `vlen_refusal` fails on
+how many bytes moved, and nothing else does. That is exactly Codex's RC-003-F3
+in miniature: an accounted spend and a refused one are different properties, and
+a suite that only watched the verdict would have called the unbounded read
+fixed. F1e is the mirror: it removes the retention cap, which the budget makes
+look unreachable until HDF5 serves a cached value for sixteen bytes.
 
 **One entry is platform-conditional and says so here rather than pretending
 otherwise.** F6c removes the path-alias resolution and leaves a plain string
@@ -121,16 +146,44 @@ MUTATIONS = [
     ("F1d the plan is blind to what preflight already spent", UNITS,
      "                             block_bytes, size, spent_bytes=remote.n_bytes,",
      "                             block_bytes, size, spent_bytes=0,",
-     [("provenance_cost/transfer_inside_the_bound",
-       "case_provenance_cost_is_inside_the_plan/raised")]),
+     [("budget_admits/transfer_inside_the_bound",
+       "case_budget_admits_a_value_it_can_afford/raised")]),
     ("F1e an oversized provenance value is retained whole", UNITS,
      "        out[path] = _capped(str(value), max_bytes)",
      "        out[path] = str(value)",
-     [("provenance_cost/retained_value_is_capped",)]),
+     [("cached_cap/retained_value_is_capped",)]),
     ("F1f a value whose stored size is readable is read anyway", UNITS,
      "        stored = _stored_value_bytes(node)",
      "        stored = None",
-     [("stored_provenance/not_read",)]),
+     [("stored_provenance/refused_before_the_read_not_by_the_budget",)]),
+    # The four RC-003 Round-1 repairs. F1g and F1i are the two halves of
+    # provenance authentication; F1h is the budget; F2d is series ownership.
+    ("F1g the processed asset's provenance is recorded, not authenticated", UNITS,
+     '        authentication = authenticate_provenance(\n'
+     '            provenance, "processed asset %s" % url.rsplit("/", 1)[-1])',
+     '        authentication = {"path": REQUIRED_PROVENANCE_PATH, "value": "",\n'
+     '                          "token": CONVERSION_SOURCE_TOKEN, "source": "unchecked"}',
+     [("no_processed_provenance/refused",), ("foreign_conversion/refused",)]),
+    ("F1h the provenance read is unbounded again", UNITS,
+     "            with reader.budget(max_bytes):\n                value = node[()]",
+     "            if True:\n                value = node[()]",
+     # Not the verdict: the retention cap still stops the run. What changes is
+     # how many bytes moved to get there, which is the whole point of RC-003-F3.
+     [("vlen_refusal/spend_is_far_below_the_value",)]),
+    ("F1i the raw asset's provenance is not authenticated", CLI,
+     '    try:\n'
+     '        raw_auth = archive_units.authenticate_provenance(\n'
+     '            raw_prov["provenance"], "raw asset %s" % raw_asset["path"])\n'
+     '    except ValueError as exc:\n'
+     '        raise SystemExit("[fatal] input error: %s" % exc)',
+     '    raw_auth = {"path": archive_units.REQUIRED_PROVENANCE_PATH, "value": "",\n'
+     '                "token": archive_units.CONVERSION_SOURCE_TOKEN,\n'
+     '                "source": "unchecked"}',
+     [("no_raw_provenance/refused", "case_missing_raw_provenance_is_an_input_error/raised")]),
+    ("F2d AP-series ownership is a substring again", CLI,
+     '    matches = [entry for entry in series if series_probe(entry["name"]) == probe]',
+     '    matches = [entry for entry in series if probe in entry["name"]]',
+     [("impostor/refused",)]),
     ("F2c a floating-point ragged index is accepted when whole", UNITS,
      "    if require_integer_dtype:", "    if False:",
      [("float_index/refused",), ("fractional_offsets/refused",)]),
