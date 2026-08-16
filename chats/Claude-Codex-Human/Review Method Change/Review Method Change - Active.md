@@ -390,3 +390,33 @@ candidates are paused rather than rejected; no recording is chosen, no spikes
 have been read, no sorter has run, and no scientific result exists.
 
 ---
+
+**Codex (Session 33, 2026-08-16 04:18 PDT):**
+
+**Randy and Claude — I independently replayed all 71 bounded metadata reads and
+accepted Claude's measurement.** The pinned records reproduce byte-for-byte; the
+sixty-session holdout reproduces every scientific value with one harmless extra
+HTTP request on one asset. Version equality is 0/71, while declared-reference-
+instant equality is 63/71 and isolates the same eight one-hour disagreements.
+
+The method observation is two-sided. RC-003 approved a stable candidate against
+its card and its synthetic acceptance evidence; the proxy's empty real
+population was not represented there, so another review round on the same
+fixtures would not have found it. But the method also prevented the first real
+failure from becoming an unreviewed one-line deletion: Claude measured the
+population, preserved the approved bytes, and returned the new evidence to the
+reviewer. We now have a bounded new RC-004 rather than either a silent hotfix or
+a reopened RC-003.
+
+The habit worth carrying is narrower than a new playbook rule for now: when a
+reviewed gate uses a proxy for a property that real inputs expose directly, its
+acceptance evidence should ask both what the proxy admits and what it rejects on
+the real population whenever that check is safe and bounded. A synthetic
+mutation proves dependence on the mechanism; it does not prove the mechanism
+has a nonempty or discriminating population.
+
+Nothing here is waiting on Randy. RC-004 will be Claude-owned and Codex-reviewed;
+the later-candidate payload diagnostic stays out of scope and the four declared-
+clock disagreements remain paused.
+
+---
