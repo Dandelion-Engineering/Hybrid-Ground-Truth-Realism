@@ -1,8 +1,8 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 33 · 2026-08-16 04:19 PDT**
+**Rewritten at the end of Codex Session 34 · 2026-08-16 06:20 PDT**
 
-**Next Codex session will be Session 34. The next count-based progress report is due in Session 40.**
+**Next Codex session will be Session 35. The next count-based progress report is due in Session 40.**
 
 ## Current phase and immovable boundary
 
@@ -12,128 +12,107 @@ pool, exposure schedule, placement configuration, template array, Rung 0,
 generation or sorter result exists.
 
 RC-001's drift specification and RC-003's bounded archive reader are closed
-`Approved` historical states. The first real plan-only use of RC-003 exposed a
-new real-input defect in one approved pair condition. **Do not run the candidate
-command again until a new RC-004 state has explicit same-state approval.**
+`Approved` historical states. RC-004's candidate is open and **not approved**.
+Do not run the rank-1 candidate command until RC-004 receives explicit same-state
+approval.
 
-## The Session-33 finding
+## RC-004 Round 1 — Revisions Required
 
-Claude ran the pinned rank-1 plan-only command on CSHL047 / Probe01, session
-`b52182e7-39f6-4914-9717-136db589706e`, under `--gate strict`. It authenticated
-the raw source statement, derived the CA1 band and raw AP extent, then stopped
-before reading any unit: raw names NeuroConv 0.9.2, processed names 0.9.4.
+Claude handed off a five-file candidate that keeps affirmative per-asset
+conversion authentication, replaces raw/processed converter-version equality
+with equality of their declared root `timestamps_reference_time` instants, and
+keeps both versions reportable but non-voting.
 
-Claude measured the pair-version condition on the eleven distinct pinned-order
-sessions plus a deterministic sixty-session holdout from the other 448 paired
-sessions. Codex independently reconstructed the 459-session sampling frame,
-verified the sixty-session draw exactly, and reran all 71 bounded remote reads.
-The pinned report/records reproduced byte-for-byte. The holdout reproduced every
-scientific and metadata value; one asset used one extra HTTP request while
-transferring the same bytes.
+Codex authenticated the candidate hashes recorded in RC-004 and reviewed the
+full 760-insertion / 148-deletion surface from RC-003's approved `51cb436` state.
+The owner evidence reproduces:
 
-Accepted combined result:
+- acceptance suite: **436 checks, 0 failed**;
+- repair mutation harness: **30 of 30 caught**, unmutated control green;
+- runbook-checker mutation harness: **18 of 18 caught**;
+- packet consistency: ten implemented steps agree, drift measurement pending;
+- RC-003 Round-1 verifier green; Round-2 verifier has exactly the two declared
+  version-equality failures and no others.
 
-- raw → processed converter pair: 0.9.1 → 0.9.4 on 1; 0.9.2 → 0.9.4 on 70;
+The full Round-1 pass found two blockers.
+
+### RC-004-F1 — permissive timestamp grammar
+
+`archive_units.reference_instant` calls `datetime.fromisoformat` directly.
+Python intentionally accepts any one Unicode character in place of the ISO
+date/time separator. A local synthetic pair carrying
+`2021-05-10Q14:33:49.023776-04:00` on both assets is accepted and reaches a drift
+record. NWB requires an ISO-8601 extended date-time with an offset, so a malformed
+input becomes a verdict. This violates A2.4 and blocking-severity item 1.
+
+Required repair boundary: validate the strict NWB/ISO lexical form before
+parsing and add adversarial near-miss coverage, including the non-ISO separator,
+that requires a named input error with no report or record.
+
+### RC-004-F2 — raw reference time outside caller ceiling
+
+`measure_host_drift.main` reads and prints raw provenance/reference time before
+passing `--max-mib` only to the processed `read_band_units` call.
+`read_provenance` has no caller-ceiling argument and explicitly runs before any
+outer ceiling exists. Under `--max-mib 0.000001 --plan-only`, a local synthetic
+fixture reads and prints the raw clock and moves **23,920 distinct raw bytes**
+before the processed side refuses the one-byte ceiling. This violates the exact
+pre-review condition 5, A2.5 and blocking-severity item 3.
+
+Required repair boundary: hold the caller's ceiling before the raw
+reference-time read, correct the help/narrative, and add a below-minimum refusal
+test proving the raw reference value is not read or printed before refusal.
+
+Both constructions live in `agents/Codex/tools/probe_rc004_round1.py`, SHA-256
+`a48b5c5e500a268d79bab0515f415e34efa428f4459fc8b34cddd1119ded6305`.
+The probe is local and synthetic; it reads no archive, network resource or
+candidate asset. No third blocker was found. The microsecond resolution and root
+`session_start_time` substitution remain follow-up/preference class.
+
+## Active review and immediate owner
+
+`chats/Claude-Codex/Session Reference Time Pair Check Review/Session Reference
+Time Pair Check Review - Active.md` contains the complete numbered Round-1
+ledger. RC-004's status is `Revisions Required` and its exact five-file candidate
+is unapproved.
+
+**Immediate owner:** Claude responds to F1 and F2 delta-only under the superseding
+review method, updates the stable candidate, tests, mutations and hashes, and
+hands the exact state back. **Immediate Codex role:** perform the Round-2 delta
+review only after that handoff. Candidate execution stays blocked in the
+meantime.
+
+`chats/Claude-Codex-Human/Review Method Change/` remains active by Randy's
+instruction. No new Randy decision is needed.
+
+## Real-input context that must not be lost
+
+The first RC-003 rank-1 plan-only attempt stopped before unit payload because raw
+names NeuroConv 0.9.2 and processed names 0.9.4. Claude and Codex independently
+measured 71 paired sessions:
+
 - converter-version agreement: **0 / 71**;
-- parsed reference-instant delta: **0 seconds on 63; +3,600 seconds on 8**;
-- no other delta, no session-ID mismatch, and
-  `session_start_time == timestamps_reference_time` on all 142 assets;
-- the eight differences are all NYU daylight-window sessions, but that pattern
-  is descriptive and no daylight-saving mechanism was measured.
+- declared-reference-instant delta: **0 seconds on 63; +3,600 seconds on 8**;
+- no other delta; within-asset `session_start_time == timestamps_reference_time`
+  on all 142 assets; no session-ID mismatch.
 
-Evidence hashes:
+The eight one-hour cases are a descriptive NYU daylight-window pattern, not a
+measured daylight-saving mechanism. Pinned ranks 5, 7, 9 and 13 remain paused,
+not rejected. Do not read their spike payload or run the proposed containment
+diagnostic out of order; recovering that class needs separate evidence if the
+pinned order reaches it.
 
-- `agents/Claude/tools/probe_conversion_pairs.py` —
-  `10ad5053a06ba35d32d17540a6511f459e2e6f72cd3fcbe613bbdc9af10873ec`;
-- pinned report / records — `a9b1498682e616151d72913ccf4c98c2087c5bd611f2040290928251f681e952`
-  / `54929196a9c520d9f72c84ce316e1c8121e01e22aa897c2f0b4c2f1a5d609430`;
-- holdout report / records — `fc5ec92d60f9b9e2563b57f63a439866254293f3c3d8fbc169af3b13b079d712`
-  / `9917c10cd354e15bb5bdc80a46f022adcd1cd05a04ff9ad1d91eb65377950a41`.
+## Approved foundation
 
-## Agreed RC-004 direction — pre-review, not approval
+RC-003 remains historical approval at its recorded exact nine-file state. RC-001
+remains approved on Draft 24 `c35987fe…`, drift utility `eace4cd35…`, and owner
+harness `946df906…`. All six Claim Sheet amendments remain `In force`; contract
+hashes remain `2feda611…` and `679918f7…`. The real-arm donor-matching prose
+remains same-state approved at Draft 6 `51adae4b…`. None of those approvals
+authorizes host-dependent placement or matching, generation or sorting.
 
-Claude owns the stable candidate and RC-004; Codex reviews it. RC-004 is a new
-card based on evidence unavailable during RC-003, not a successor to closed
-RC-003. **No RC-004 candidate or card exists yet.**
-
-The agreed direction:
-
-- keep whole-positive per-asset `general/source_script` authentication;
-- keep both converter versions in the report and add 0.9.4 to the measured
-  record;
-- remove only converter-version equality's voting role;
-- directly read both root `/timestamps_reference_time` values under bounded
-  I/O and compare them as timezone-aware instants;
-- a disagreement, missing/refused/malformed value or timezone-naive value is a
-  pausing input error before any unit payload, report or drift verdict;
-- equal instants written with different UTC offsets must pass;
-- reference-time equality remains one necessary declared condition, not proof
-  of the shared clock by itself; per-asset source authentication and later
-  containment remain distinct evidence;
-- clock reads must be inside the request/transfer budgets and the caller's outer
-  transfer ceiling, and their spend must be represented in the plan/report.
-
-The card must digest every changed implementation, test, mutation and runbook
-state. No Claim Sheet amendment is needed: §16.4 already makes an unestablished
-common clock a pausing input error and does not commit to version equality.
-
-## Do not read the later affected candidates now
-
-The one-hour declared-reference disagreements include pinned ranks 5, 7, 9 and
-13: NYU-65, NYU-45, NYU-39 and NYU-48. **They remain paused, not rejected.**
-
-Claude proposed comparing raw AP extent with processed spike-time range on
-NYU-65 to learn whether the stored arrays align despite the metadata. Codex did
-not authorize that read now. It is rank 5, rank 1 remains unresolved, and the
-diagnostic is unnecessary to repair rank 1. Even aligned numeric ranges would
-not erase the files' declared reference-instant disagreement; recovering that
-class would need a separate evidence-backed rule when the pinned order reaches
-it. Do not reveal later-candidate payload out of order and do not place this
-diagnostic inside RC-004.
-
-## Approved foundation and current code state
-
-RC-003 remains closed `Approved` at its recorded exact nine-file state. The two
-primary approved hashes are unchanged:
-
-- `Reproducibility Packet/scripts/utils/archive_units.py` —
-  `96a31b3d46e18a7f387cc5d9d5c3fe37984f1346139477deb57f8f062ce1556e`;
-- `Reproducibility Packet/scripts/measure_host_drift.py` —
-  `0bf08153fde8b48a6485596c6b8375920fe56d33a66fd0a35c41833f484335e5`.
-
-That state still gates on pair-version equality. Treat it as authenticated
-history, not as authorization to continue candidate execution after the new
-evidence. RC-001 remains approved on Draft 24 `c35987fe…`, drift utility
-`eace4cd35…`, and owner harness `946df906…`.
-
-All six Claim Sheet amendments remain `In force`. Contract hashes remain:
-
-- `Claim Sheet.md` — `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365`;
-- `Accessible Claim Sheet.md` — `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`.
-
-The real-arm donor-matching prose remains same-state approved at Draft 6
-`51adae4bd19ffc2ef72445e474371b56eee04d93883c6da1d59fedbca553f282`.
-Sections 1–16 of Claude's selection document remain approved. None of those
-approvals authorizes exact host-dependent placement or matching, generation or
-sorting.
-
-## Active records and next action
-
-- `chats/Claude-Codex/Session Clock Agreement/Session Clock Agreement -
-  Active.md` holds Claude's measurement and Codex's independent acceptance,
-  RC-004 boundary and no-NYU-65 ruling.
-- `chats/Claude-Codex-Human/Review Method Change/Review Method Change -
-  Active.md` remains active by Randy's instruction. Its newest observation says
-  a synthetic review can prove dependence on a proxy without showing the proxy
-  has a nonempty or discriminating real population. No Randy decision is needed.
-- Root `README.md` already carries Claude's accurate public heartbeat for the
-  0/71 proxy failure and 8/71 declared-clock disagreements. Do not duplicate it.
-- The Phase-1 director contract-review request remains open and nonblocking.
-
-**Immediate owner:** Claude creates a stable RC-004 candidate and card, then
-hands it to Codex with explicit approval. **Immediate Codex role:** perform the
-Round-1 full-artifact review only after that handoff. Until then there is no
-formal review and no executable candidate state.
+Root `README.md` now carries one lean public heartbeat for the two RC-004 Round-1
+blockers. No public result is claimed.
 
 ## Downstream gates remain separate
 
@@ -148,5 +127,5 @@ formal review and no executable candidate state.
 9. generation authorization;
 10. Rung 0/sorter execution authorization.
 
-`agents/Codex/Session Summaries/HumanReport33.md` contains the complete replay,
-decision, card boundary, append checks and next-owner reasoning.
+`agents/Codex/Session Summaries/HumanReport34.md` contains the complete Round-1
+review, evidence, append verification and next-owner boundary.

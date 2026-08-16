@@ -116,13 +116,21 @@ Open NWB host-recording collection with 2,048 assets, approximately 49.7 TB, and
 
 *How it informed the project:* Defines the host-data universe, license/attribution obligation, and need for a small identifier-pinned subset rather than bulk download. The DANDI record identifies `catalystneuro/IBL-to-nwb` as the conversion repository. At pinned repository commit `54030ac4eb40a74978ac1f6ef6e966278b9d3f34`, the conversion documentation defines exported `spike_times` as IBL `spikes.times.npy` in seconds from session start, while the raw converter aligns AP samples through `SpikeSortingLoader.samples2times`. This fixes the drift screen's grid on one session-time coordinate and makes endpoint containment a consistency check rather than a method for choosing between clock hypotheses.
 
-### NWB and HDMF format specifications — ragged-array index dtype
+### NWB and HDMF format specifications — ragged-array index dtype and timestamp origin
 
 **Neurodata Without Borders and HDMF developers. Format specifications.** [NWB format](https://nwb-schema.readthedocs.io/en/stable/format.html) · [HDMF common format](https://hdmf-common-schema.readthedocs.io/en/stable/format.html)
 
-The NWB `Units/spike_times_index` field extends the HDMF `VectorIndex` type. The HDMF common schema specifies unsigned-integer storage for `VectorIndex`, so a floating-point ragged index is not schema-valid merely because all stored values happen to be whole numbers.
+The NWB `Units/spike_times_index` field extends the HDMF `VectorIndex` type. The HDMF common schema specifies unsigned-integer storage for `VectorIndex`, so a floating-point ragged index is not schema-valid merely because all stored values happen to be whole numbers. The NWB schema separately defines root `timestamps_reference_time` as the date-time corresponding to time zero for all timestamps and specifies an ISO-8601 extended date-time with a timezone offset.
 
-*How it informed the project:* Settles RC-002's F2 repair boundary for `spike_times_index` and the parallel `spike_depths_index`: both must be stored with integer dtype before conversion. It does not by itself decide the storage policy for the project's custom `max_electrode` column.
+*How it informed the project:* Settles RC-002's F2 repair boundary for `spike_times_index` and the parallel `spike_depths_index`: both must be stored with integer dtype before conversion. It does not by itself decide the storage policy for the project's custom `max_electrode` column. For RC-004, it confirms that comparing the two assets' declared reference instants is a necessary common-clock condition and supplies the strict external grammar the reader says it authenticates.
+
+### Python 3.12 `datetime.fromisoformat` — deliberately wider separator grammar
+
+**Python Software Foundation. `datetime.fromisoformat` documentation.** [Python 3.12 documentation](https://docs.python.org/3.12/library/datetime.html#datetime.datetime.fromisoformat)
+
+Documents that the parser accepts any single Unicode character in place of the ISO date/time `T` separator, in addition to other deliberate exceptions.
+
+*How it informed the project:* Produced RC-004 Round-1's malformed-value counterexample: `2021-05-10Q14:33:49.023776-04:00` is accepted by the implementation, compares equal across a pair, and reaches a drift verdict even though the candidate claims to require an ISO-8601/NWB reference-time value.
 
 ## Pending verification
 

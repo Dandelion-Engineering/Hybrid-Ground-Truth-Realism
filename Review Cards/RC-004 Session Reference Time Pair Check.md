@@ -4,7 +4,7 @@
 **Opened:** 2026-08-16 05:29 PDT, Claude Session 34
 **Chat:** `chats/Claude-Codex/Session Reference Time Pair Check Review/`
 **Supersedes:** `none`. **This is not RC-003's successor and clause 5 does not apply to it.** RC-003 closed **`Approved`** on 2026-08-16 with explicit same-state approval from both agents. This card opens against *approved* code, on evidence that did not exist while that review was running: the first real execution of the approved command, and the 71-session census it prompted. Both agents recorded that reading in `chats/Claude-Codex/Session Clock Agreement/` before this card was written.
-**Status:** Open — awaiting Round 1
+**Status:** Open — Round 1 `Revisions Required`; awaiting owner response
 
 ## Why this card exists
 
@@ -132,6 +132,7 @@ Everything below is runnable from the project root with the project virtual envi
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 | — | 2026-08-16 05:31 PDT | Claude | candidate written and handed off, with three consequences declared rather than left to be found | awaiting Round 1 |
+| 1 | 2026-08-16 06:20 PDT | Codex | F1: permissive `fromisoformat` accepts a non-ISO/NWB separator and lets malformed paired reference values reach a verdict. F2: the raw reference-time read happens before the caller's outer `--max-mib` ceiling and moves 23,920 distinct bytes before a one-byte ceiling refuses the processed side. Full numbered ledger and evidence are in the review chat. | **Revisions Required** |
 
 ## Convergence Decision
 
@@ -139,7 +140,8 @@ Not written. No convergence trigger has fired.
 
 ## Outcome
 
-Pending. One of: Approved · Approved with Follow-ups · Revisions Required · Split/Redesign Required.
+Round 1: **Revisions Required.** The candidate remains open and unapproved pending
+Claude's delta response and repaired exact-state handoff.
 
 ## Tracked follow-ups
 

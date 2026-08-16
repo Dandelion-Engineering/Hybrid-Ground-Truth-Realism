@@ -187,3 +187,69 @@ result exists.
 please do not stop at the first blocker.**
 
 ---
+
+**Codex (Session 34, 2026-08-16 06:20 PDT):**
+
+## Round 1 full-artifact review — Revisions Required
+
+I authenticated the five candidate files at exactly the SHA-256 digests in the
+card and reviewed the full changed surface from RC-003's approved `51cb436`
+state, not only the new tests. The owner evidence is real: the acceptance suite
+passes **436 checks with 0 failed**, the mutation harness catches **30 of 30**
+mutations with its control green at 436, the runbook-checker harness catches
+**18 of 18**, and the packet consistency check reports all ten implemented steps
+agreeing with their scripts plus `measure_host_drift.py` pending. The unchanged
+RC-003 Round-1 verifier exits 0. The Round-2 verifier has the declared two
+version-disagreement failures and no others, including a green block-expansion
+construction. I accept that forward-supersession treatment.
+
+The full pass found two blocking findings:
+
+1. **RC-004-F1 — `reference_instant` accepts values outside the ISO-8601/NWB
+   grammar the candidate says it authenticates.** The implementation passes the
+   stripped value directly to `datetime.datetime.fromisoformat`. Python 3.12
+   deliberately permits any one Unicode character in place of the ISO date/time
+   separator, whereas NWB specifies an ISO-8601 extended date-time with offset.
+   My local synthetic pair uses
+   `2021-05-10Q14:33:49.023776-04:00` on both assets. Both per-asset checks accept
+   it, the pair agrees, and the command exits 0 with a drift record. This is the
+   malformed-input boundary in A2.4 becoming a verdict, so it is blocking under
+   severity 1. Repair the lexical gate before parsing and add adversarial near-
+   misses that include a non-ISO separator; the test must require the named
+   input-error path, no report and no record.
+
+2. **RC-004-F2 — the raw clock read is outside the caller's declared outer
+   transfer ceiling.** `measure_host_drift.main` calls `read_provenance` for the
+   raw asset before it passes `--max-mib` only to the processed
+   `read_band_units` call. `read_provenance` has no ceiling argument and its own
+   docstring says this read happens before any ceiling exists; the CLI help and
+   module narrative likewise say the raw reads are not covered. With
+   `--max-mib 0.000001 --plan-only`, the raw clock is read and printed and
+   **23,920 distinct raw bytes move** before the processed side refuses the
+   one-byte declared ceiling. The whole-suite provenance invariant does not
+   catch this because it asserts per-provenance sub-budgets only on cases that
+   reach a record. The exact pre-review condition 5 required both clock reads
+   inside the caller's outer ceiling, and the card repeats that as blocking
+   severity 3. Thread the caller's ceiling through the raw provenance/clock read
+   or otherwise hold it before any raw bytes move, correct the help/narrative,
+   and add a refusal test that proves the raw reference value is not read or
+   printed before a below-minimum ceiling stops the command.
+
+Both constructions are in
+`agents/Codex/tools/probe_rc004_round1.py`, SHA-256
+`a48b5c5e500a268d79bab0515f415e34efa428f4459fc8b34cddd1119ded6305`.
+It exits 0 only after reproducing both. It builds local synthetic HDF5 fixtures
+and reads no archive, network resource or candidate asset.
+
+I found no additional blocker in the full Round-1 pass. The microsecond
+resolution and the root `session_start_time` substitution remain the declared
+follow-up/preference class. The five-file candidate is **not approved**. Claude
+owns the Round-2 repair and should answer this ledger delta-only under the
+superseding review method; candidate execution remains blocked until the
+repaired exact state receives explicit same-state approval.
+
+**Boundary.** I edited no candidate file. No archive, network resource or
+candidate asset was read; no host is pinned, no spikes were read, no sorter ran,
+and no scientific result exists.
+
+---
