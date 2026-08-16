@@ -38,11 +38,13 @@ Run from the project root with the project virtual environment:
 """
 
 import argparse
+import contextlib
 import datetime
 import hashlib
 import importlib.util
 import io
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -74,6 +76,105 @@ DEPTH_DESCRIPTION = ("Distance from the probe tip for each spike in micrometers,
                      "computed from waveform center of mass. 0 = probe tip, values "
                      "increase toward brain surface.")
 TIME_DESCRIPTION = "the spike times for each unit in seconds"
+
+# Every distinct ``timestamps_reference_time`` the archive really carries.
+#
+# **This is the population, not a fixture.** It is the 79 distinct values of
+# the 142 assets ``probe_conversion_pairs.py`` read across 71 sessions of
+# DANDI 000409, taken from ``conversion_pairs_pinned_2026-08-16.json`` and
+# ``conversion_pairs_sample60_2026-08-16.json`` in this folder and frozen here
+# so the suite stays self-contained. Codex replayed all 71 independently and
+# reproduced every value.
+#
+# **Why the suite carries it at all.** RC-004 exists because a rule that
+# passed three review rounds and twenty-six mutations admitted 0 of these 71
+# sessions, and nothing in a synthetic harness could have said so: a mutation
+# proves a check depends on its mechanism, never that the check has a
+# non-empty population. RC-004-F1 then tightened the grammar this field is
+# read under, and a tightening is exactly the change that can empty a
+# population again. The case that consumes this list is the one that says it
+# did not.
+MEASURED_REFERENCE_TIMES = (
+    "2019-12-07T16:19:38.121000+00:00",
+    "2019-12-08T20:01:23.391000+00:00",
+    "2019-12-09T17:31:23.762000+00:00",
+    "2019-12-11T11:02:46+00:00",
+    "2020-01-08T15:52:42-05:00",
+    "2020-01-09T15:43:57-05:00",
+    "2020-01-21T13:52:24-05:00",
+    "2020-01-21T14:03:44+00:00",
+    "2020-01-22T08:28:49-05:00",
+    "2020-01-22T10:50:59+00:00",
+    "2020-01-22T15:39:54-05:00",
+    "2020-01-23T15:12:02+00:00",
+    "2020-01-28T11:34:01.365875-08:00",
+    "2020-02-01T15:49:28.905174-08:00",
+    "2020-02-11T14:25:12-05:00",
+    "2020-02-18T14:24:19-05:00",
+    "2020-02-20T13:15:02-05:00",
+    "2020-02-24T14:41:02-05:00",
+    "2020-02-28T10:07:18-05:00",
+    "2020-03-03T14:27:51-05:00",
+    "2020-03-04T13:14:42.728981-08:00",
+    "2020-03-12T11:27:09.707868-07:00",
+    "2020-03-22T12:56:40-04:00",
+    "2020-05-23T12:31:58.311253-04:00",
+    "2020-07-13T18:56:18+01:00",
+    "2020-07-26T08:42:16-04:00",
+    "2020-08-19T11:43:13.897987-04:00",
+    "2020-08-19T12:43:13.897987-04:00",
+    "2020-09-10T14:19:38.570886+01:00",
+    "2020-09-16T08:11:47-04:00",
+    "2020-09-20T19:12:54.571582+01:00",
+    "2020-10-07T18:20:13.449770+01:00",
+    "2020-11-25T13:17:54.132432+00:00",
+    "2020-12-06T19:05:47.902000+00:00",
+    "2020-12-07T19:34:42.945000+00:00",
+    "2020-12-08T16:37:47.025234+00:00",
+    "2021-01-16T19:51:02-05:00",
+    "2021-01-19T17:15:10+00:00",
+    "2021-01-21T17:05:26-05:00",
+    "2021-01-25T15:32:41.052960-05:00",
+    "2021-04-13T10:28:53.043796-04:00",
+    "2021-04-13T11:28:53.043796-04:00",
+    "2021-05-10T14:33:49.023776-04:00",
+    "2021-05-10T15:33:49.023776-04:00",
+    "2021-06-14T13:29:00.626588-04:00",
+    "2021-06-22T13:25:20.389828-04:00",
+    "2021-06-22T14:25:20.389828-04:00",
+    "2021-07-02T14:28:23.348923-04:00",
+    "2021-07-02T15:28:23.348923-04:00",
+    "2021-07-19T13:24:23.683992-04:00",
+    "2021-07-19T14:24:23.683992-04:00",
+    "2021-07-20T09:58:58.347567-04:00",
+    "2021-07-20T10:58:58.347567-04:00",
+    "2021-11-09T19:32:47.033823+00:00",
+    "2022-02-20T16:09:07.326998+00:00",
+    "2022-04-14T16:36:16.565033-07:00",
+    "2022-05-07T15:58:28.902138+01:00",
+    "2022-06-16T11:49:20.330000+01:00",
+    "2022-06-17T15:27:55.990000+01:00",
+    "2022-08-02T16:36:06.329463-07:00",
+    "2022-08-16T16:11:36.075354-07:00",
+    "2022-08-20T17:11:20-07:00",
+    "2022-09-12T14:33:06-04:00",
+    "2022-09-12T15:33:06-04:00",
+    "2022-10-05T16:28:57+01:00",
+    "2022-10-07T16:14:14.729838+01:00",
+    "2022-10-18T17:41:58+01:00",
+    "2022-10-28T16:46:29+01:00",
+    "2022-11-16T16:48:59.454308+00:00",
+    "2023-02-01T16:39:26-08:00",
+    "2023-02-07T13:41:46-08:00",
+    "2023-04-06T16:08:54.319363+01:00",
+    "2023-06-13T10:42:35.707675+01:00",
+    "2023-07-12T14:17:48.191150-07:00",
+    "2023-07-14T15:17:40.935162-07:00",
+    "2023-08-15T17:10:15.346939-07:00",
+    "2023-08-16T16:43:15.074954-07:00",
+    "2023-08-29T16:43:29-07:00",
+    "2023-09-01T13:56:04.163286-07:00",
+)
 
 
 # Every local reader built during a case, so the suite can ask afterwards which
@@ -663,7 +764,7 @@ class Harness:
 
 
 def run_case(tmp_root, name, raw_writer, processed_writer, argv_extra=(),
-             gate="strict", session=None):
+             gate="strict", session=None, capture=False):
     """Build one fixture pair, run the command, and return its outcome.
 
     Args:
@@ -674,11 +775,17 @@ def run_case(tmp_root, name, raw_writer, processed_writer, argv_extra=(),
         argv_extra: extra command-line arguments.
         gate: which pre-declared threshold to apply.
         session: session identifier, defaulting to the case name.
+        capture: collect the command's stdout instead of letting it through,
+            for a case that has to assert something was *not* printed. Off by
+            default, so the suite's console output is unchanged for every case
+            that does not ask for it.
 
     Returns:
         A dict with ``status`` (0, or the SystemExit message), ``out`` (the
-        report path), ``text`` (its contents or None) and ``record`` (the JSON
-        record or None).
+        report path), ``text`` (its contents or None), ``record`` (the JSON
+        record or None) and ``stdout`` (the captured transcript, or None when
+        ``capture`` is off -- None rather than "" so a case cannot assert a
+        phrase is absent from a transcript it never collected).
     """
     import json
     session = session_id(session or name)
@@ -696,10 +803,20 @@ def run_case(tmp_root, name, raw_writer, processed_writer, argv_extra=(),
             "--assets-cache", os.path.join(case_dir, "assets.json"),
             "--gate", gate, "--out", out, "--records", records]
     argv.extend(argv_extra)
-    try:
-        status = CLI.main(argv)
-    except SystemExit as exc:
-        status = str(exc.code)
+    transcript = None
+    if capture:
+        buffer = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buffer):
+                status = CLI.main(argv)
+        except SystemExit as exc:
+            status = str(exc.code)
+        transcript = buffer.getvalue()
+    else:
+        try:
+            status = CLI.main(argv)
+        except SystemExit as exc:
+            status = str(exc.code)
     text = None
     if os.path.exists(out):
         with open(out, "r", encoding="utf-8") as handle:
@@ -751,6 +868,7 @@ def run_case(tmp_root, name, raw_writer, processed_writer, argv_extra=(),
                     % (name, spend["transfer_bytes"], label,
                        spend["transfer_budget_bytes"]))
     return {"status": status, "out": out, "text": text, "record": record,
+            "stdout": transcript,
             "raw": raw_path, "processed": processed_path, "dir": case_dir}
 
 
@@ -903,15 +1021,29 @@ def case_transfer_ceiling_refuses(h, tmp):
 
 
 def case_ceiling_refuses_before_the_bytes_move(h, tmp):
-    """The declared ceiling refuses a fetch rather than reporting one, RC-003-F3.
+    """The declared ceiling refuses a fetch rather than reporting one.
 
-    The ceiling used to be checked once, against a plan written after preflight
-    had already read the electrode table, the unit scalars, the descriptions and
-    the provenance. Those reads are counted -- they land in ``spent_bytes`` and
-    so inside the plan -- but counted is not refused, which is the distinction
-    the whole finding turns on. Held open as a transfer budget for the entire
-    read, the same ceiling stops the first fetch instead of the last: **zero
-    distinct bytes**, against 2,081,456 on the same construction before.
+    RC-003-F3 is why the ceiling is held open at all: it used to be checked
+    once, against a plan written after preflight had already read the electrode
+    table, the unit scalars, the descriptions and the provenance. Those reads
+    are counted -- they land in ``spent_bytes`` and so inside the plan -- but
+    counted is not refused, which is the distinction the whole finding turns on.
+
+    **RC-004-F2 moved which asset this case meets first, and that is the point
+    of the change rather than an accident of it.** The raw asset's provenance
+    and clock read used to sit outside the ceiling entirely: at a one-byte
+    ceiling the reviewer measured 23,920 distinct raw bytes moving, and the
+    declared reference time being read and printed, before the processed side
+    refused anything. The ceiling now covers that read too, so the run stops on
+    the raw asset with nothing fetched from either file. Codex's Round-1 F2
+    asked for exactly this: proof that the raw reference value is neither read
+    nor printed before a below-minimum ceiling stops the command.
+
+    The processed read's own before-the-first-fetch refusal is not lost with
+    it -- no whole-command ceiling can admit the raw asset's ten kilobytes and
+    still refuse the processed asset's first eight bytes -- so it is asserted
+    directly against the reader in
+    ``case_the_processed_ceiling_still_refuses_before_its_first_fetch``.
     """
     rows = default_electrodes()
     units = band_units()
@@ -919,12 +1051,161 @@ def case_ceiling_refuses_before_the_bytes_move(h, tmp):
         tmp, "ceiling_early",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
         lambda p: write_processed(p, rows, units),
-        argv_extra=["--max-mib", "0.000001"])
+        argv_extra=["--max-mib", "0.000001"], capture=True)
     status = str(result["status"])
     h.check("ceiling_early/refused", "declared ceiling transfer budget" in status, status)
     h.check("ceiling_early/named as an input error", "input error" in status, status)
+    h.check("ceiling_early/names the raw asset", "_desc-raw" in status, status)
     h.equal("ceiling_early/nothing_moved", distinct_bytes(result["processed"]), 0)
+    h.equal("ceiling_early/nothing_moved_on_the_raw_asset",
+            distinct_bytes(result["raw"]), 0)
+    # Not read is the stronger claim and the byte count above carries it; this
+    # is the one Codex asked for by name, and it guards the transcript against
+    # a later change that prints a declared value from somewhere else.
+    h.check("ceiling_early/the raw clock is not printed",
+            result["stdout"] is not None
+            and "counts its times from" not in result["stdout"],
+            repr(result["stdout"]))
     h.check("ceiling_early/no report", result["text"] is None)
+
+
+def case_the_processed_ceiling_still_refuses_before_its_first_fetch(h, tmp):
+    """RC-003-F3's property, asserted where it lives now that F2 moved the order.
+
+    ``read_band_units`` enters the caller's ceiling before it opens the file, so
+    a ceiling below the first fetch refuses with **zero distinct bytes
+    transferred** rather than reporting a spend afterwards. The whole-command
+    case that used to assert this now stops on the raw asset first, because
+    RC-004-F2 put that read inside the same ceiling; the property did not
+    change and this is where it is checked.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    case_dir = os.path.join(tmp, "processed_ceiling")
+    os.makedirs(case_dir, exist_ok=True)
+    path = os.path.join(case_dir, "processed.nwb")
+    write_processed(path, rows, units)
+    lo, hi = band_bounds()
+    del READERS[:]
+    refusal = None
+    try:
+        archive_units.read_band_units(path, os.path.getsize(path), 1024 * 1024,
+                                      PROBES[0], lo, hi, max_bytes=1,
+                                      plan_only=True)
+    except Exception as exc:  # the exception type is what is asserted below
+        refusal = exc
+    h.check("processed_ceiling/refused", refusal is not None,
+            "a 1-byte ceiling admitted the read")
+    h.check("processed_ceiling/refused by the budget and not by something else",
+            isinstance(refusal, archive_units.ReadBudgetExceeded), repr(refusal))
+    h.equal("processed_ceiling/named the refusing scope",
+            getattr(refusal, "scope", None), archive_units.PREFLIGHT_SCOPE)
+    h.equal("processed_ceiling/nothing_moved", distinct_bytes(path), 0)
+    del READERS[:]
+
+
+def case_a_non_iso_separator_is_an_input_error(h, tmp):
+    """A value the parser accepts and ISO-8601 does not is refused, RC-004-F1.
+
+    ``datetime.fromisoformat`` permits any single character where ISO-8601 puts
+    ``T``, so ``2021-05-10Q14:33:49.023776-04:00`` parsed, carried an offset,
+    agreed with the identical value on the other asset, and reached a drift
+    verdict with a report and a record. NWB states this field as an ISO-8601
+    timestamp; a value that is not one is a malformed input, and the two assets
+    agreeing about a malformed value is not evidence that they share a clock.
+
+    **Both halves carry the same bad value on purpose.** A fixture that spoiled
+    only one would be refused by the pair comparison and would say nothing about
+    the grammar; this one is admitted by every rule except the one under test.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    separator = "2021-05-10Q14:33:49.023776-04:00"
+    h.check("non_iso/fixture parses without the grammar",
+            datetime.datetime.fromisoformat(separator).utcoffset() is not None,
+            "the fixture must be one the parser accepts, or it tests nothing")
+    h.check("non_iso/the grammar refuses it",
+            archive_units.reference_instant(separator) is None, separator)
+    result = run_case(
+        tmp, "non_iso",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S, reference_time=separator),
+        lambda p: write_processed(p, rows, units, reference_time=separator))
+    status = str(result["status"])
+    h.check("non_iso/refused", "is not an ISO-8601 timestamp" in status, status)
+    h.check("non_iso/named as an input error", "input error" in status, status)
+    h.check("non_iso/quotes the value", separator in status, status)
+    h.check("non_iso/names the raw asset as the one at fault",
+            "raw asset" in status, status)
+    h.check("non_iso/states the form required",
+            archive_units.REFERENCE_TIME_FORM_TEXT in status, status)
+    h.check("non_iso/no report", result["text"] is None)
+    h.check("non_iso/no record", result["record"] is None)
+    # The adversarial near misses, at the API rather than through the command,
+    # because the command costs a fixture pair each and the rule is one function.
+    # Each is a value the parser would take and ISO-8601 does not.
+    for near in ("2021-05-10 14:33:49.023776-04:00",
+                 "2021-05-10t14:33:49.023776-04:00",
+                 "2021-05-10_14:33:49.023776-04:00",
+                 "2021-05-10T14:33:49.023776-0400",
+                 "2021-05-10T14:33:49.023776-04:00 (US/Eastern)",
+                 "session start 2021-05-10T14:33:49.023776-04:00"):
+        h.check("non_iso/near miss refused %s" % near,
+                archive_units.reference_instant(near) is None, near)
+    # And the mirror, which is the direction this whole card was opened in:
+    # the tightening must not refuse legitimate ISO-8601 spellings.
+    for good in ("2021-05-10T14:33:49.023776-04:00",
+                 "2021-05-10T18:33:49.023776+00:00",
+                 "2021-05-10T18:33:49Z",
+                 "2021-05-10T18:33:49.5+00:00",
+                 "2021-05-10T18:33+00:00",
+                 "2021-05-10T18:33:49+00",
+                 "  2021-05-10T18:33:49+00:00  "):
+        h.check("non_iso/still admitted %s" % good,
+                archive_units.reference_instant(good) is not None, good)
+    # A value the grammar admits and the calendar does not is still refused,
+    # because the grammar bounds the shape and the parser validates the values.
+    for impossible in ("2021-13-10T14:33:49-04:00", "2021-05-10T25:33:49-04:00",
+                       "2021-02-31T14:33:49-04:00"):
+        h.check("non_iso/impossible date refused %s" % impossible,
+                archive_units.reference_instant(impossible) is None, impossible)
+
+
+def case_the_grammar_admits_every_measured_reference_time(h, tmp):
+    """The tightened grammar admits all 142 assets this dandiset really carries.
+
+    **This is the case RC-004 exists to have.** The rule this card replaced was
+    correct, well-tested, adversarially reviewed across three rounds, defended
+    by twenty-six mutations -- and admitted 0 of the 71 sessions it would ever
+    see, because every check it passed ran on fixtures we wrote. RC-004-F1's
+    repair is a *tightening* of the field that replaced it, which is the change
+    that can empty a population, so the repair is measured against the real one
+    rather than argued about.
+
+    ``MEASURED_REFERENCE_TIMES`` is the frozen census; see its comment for where
+    it came from. Nothing here reads the archive.
+    """
+    h.equal("measured_grammar/the census is the size it says it is",
+            len(MEASURED_REFERENCE_TIMES), 79)
+    refused = [value for value in MEASURED_REFERENCE_TIMES
+               if archive_units.reference_instant(value) is None]
+    h.equal("measured_grammar/none of the measured values is refused", refused, [])
+    aware = [value for value in MEASURED_REFERENCE_TIMES
+             if archive_units.reference_instant(value).utcoffset() is not None]
+    h.equal("measured_grammar/every admitted value is an instant",
+            len(aware), len(MEASURED_REFERENCE_TIMES))
+    # The four lexical shapes the census found, counted here so a later change
+    # to this list is visible as a change to what the population contains
+    # rather than as a silently different set of the same size.
+    shapes = {}
+    for value in MEASURED_REFERENCE_TIMES:
+        key = re.sub(r"[0-9]", "9", value)
+        shapes[key] = shapes.get(key, 0) + 1
+    h.equal("measured_grammar/the four measured shapes", shapes, {
+        "9999-99-99T99:99:99+99:99": 9,
+        "9999-99-99T99:99:99-99:99": 22,
+        "9999-99-99T99:99:99.999999+99:99": 19,
+        "9999-99-99T99:99:99.999999-99:99": 29,
+    })
 
 
 def case_pre_origin_spikes_counted(h, tmp):
@@ -3208,6 +3489,9 @@ CASES = (
     case_plan_bytes_follow_stored_itemsize,
     case_transfer_ceiling_refuses,
     case_ceiling_refuses_before_the_bytes_move,
+    case_the_processed_ceiling_still_refuses_before_its_first_fetch,
+    case_a_non_iso_separator_is_an_input_error,
+    case_the_grammar_admits_every_measured_reference_time,
     case_pre_origin_spikes_counted,
     case_head_partial_reported,
     case_grid_extent_is_t_last,

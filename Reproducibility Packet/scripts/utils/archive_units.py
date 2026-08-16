@@ -259,6 +259,42 @@ CONVERSION_SOURCE_FORM = re.compile(
     r"^created using neuroconv v(?P<version>\d+(?:\.\d+)*)$")
 CONVERSION_SOURCE_FORM_TEXT = "Created using NeuroConv v<version>"
 
+# The lexical form a reference time must take before it is parsed at all.
+#
+# **Why a grammar and not just the parser.**
+# :meth:`datetime.datetime.fromisoformat` is deliberately more permissive
+# than ISO-8601 on the pinned interpreter (CPython 3.12.10): it accepts any
+# single character in the date/time separator's place, so
+# ``2021-05-10Q14:33:49.023776-04:00`` parses, carries an offset, and used
+# to reach a drift verdict. NWB states
+# this field as an ISO-8601 timestamp, and a value that is not one is a
+# malformed input rather than a clock this command may read. The parser is
+# still what validates the *values* -- month 13, hour 25, 31 February -- so
+# this expression only has to bound the shape.
+#
+# **What it admits, measured rather than chosen.** All 142 assets read
+# across the 71 sessions of Session 33's census carry exactly four shapes:
+# ``YYYY-MM-DDThh:mm:ss[.ffffff]`` followed by ``+hh:mm`` or ``-hh:mm``.
+# This expression is deliberately a little wider than that population --
+# seconds may be omitted, the fraction may be any number of digits, ``Z``
+# and a whole-hour offset are accepted -- because those are ISO-8601
+# extended forms a later converter could legitimately emit, and refusing
+# one would be the pessimistic mirror of the defect this card repairs. It
+# does not accept the basic-format offset ``+hhmm``. ISO-8601 requires the
+# date and time halves of one representation to use the same format, basic
+# or extended; applying that consistency to the offset as well is a reading
+# rather than a quoted clause, it is stated here rather than defended, and
+# no measured asset spells its offset that way.
+#
+# **The offset is not required here.** It is required one line below, by
+# the parsed value carrying a ``utcoffset``, so that the shape rule and the
+# offset rule stay one enforcer each rather than two enforcers of one
+# property that no single change could ever defeat.
+REFERENCE_TIME_FORM = re.compile(
+    r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?"
+    r"(?:Z|[+-]\d{2}(?::\d{2})?)?\Z")
+REFERENCE_TIME_FORM_TEXT = "YYYY-MM-DDThh:mm[:ss[.ffffff]][+/-]hh:mm"
+
 # The versions that measurement found: reported, and deliberately NOT gated on.
 #
 # **The list grew because the measurement did, and the growth is the whole
@@ -287,11 +323,13 @@ MEASURED_CONVERSION_VERSIONS = ("0.9.1", "0.9.2", "0.9.4")
 PROVENANCE_MAX_BYTES = 65536
 
 # The block size the *raw* asset's provenance read uses, capped below whatever
-# the caller passed. That read is the one with no plan behind it -- it happens
-# before any ceiling exists and its cost is reported rather than bounded by one
-# -- so its transfer bound should not scale with a block size chosen for a bulk
-# payload read on a different file. At 64 KiB the bound is 393,216 bytes
-# instead of the 5,308,416 a 1 MiB block would make it.
+# the caller passed. That read is the one with no *plan* behind it -- there is
+# no band to size and nothing to compare a footprint against -- so its transfer
+# bound should not scale with a block size chosen for a bulk payload read on a
+# different file. At 64 KiB the bound is 393,216 bytes instead of the 5,308,416
+# a 1 MiB block would make it. Since RC-004-F2 the caller's declared ceiling is
+# held open around that read as well, so this bound is the inner of two and not
+# the only one.
 PROVENANCE_BLOCK_BYTES = 65536
 
 # Labels for the two nested read budgets, so a refusal says which one
@@ -899,6 +937,14 @@ def reference_instant(value):
         whitespace; None otherwise.
 
     Note:
+        **The shape is gated before the value is parsed, RC-004-F1.**
+        :meth:`datetime.datetime.fromisoformat` accepts any single character
+        where ISO-8601 puts ``T``, so ``2021-05-10Q14:33:49.023776-04:00``
+        parsed, carried an offset, agreed with its pair and reached a drift
+        verdict. :data:`REFERENCE_TIME_FORM` bounds the shape first; the
+        parser still validates the values inside it, and the two are
+        different jobs rather than one done twice.
+
         **A value without an offset is refused rather than assumed local.** An
         instant is a point in time; a wall-clock reading without an offset is
         not one, and choosing an offset for it -- UTC, or the machine's -- would
@@ -914,9 +960,14 @@ def reference_instant(value):
         measured disagreement in this dandiset is 3,600 s, nine orders of
         magnitude above that, so the resolution is stated rather than defended.
     """
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    if REFERENCE_TIME_FORM.match(text) is None:
+        return None
     try:
-        parsed = datetime.datetime.fromisoformat(value.strip())
-    except (TypeError, ValueError):
+        parsed = datetime.datetime.fromisoformat(text)
+    except ValueError:
         return None
     return parsed if parsed.utcoffset() is not None else None
 
@@ -1033,10 +1084,13 @@ def authenticate_provenance(provenance, source):
     if instant is None:
         raise ValueError(
             "%s states %r as its %s, which is not an ISO-8601 timestamp naming a UTC "
-            "offset. A wall-clock reading with no offset is not an instant, and choosing "
-            "one for it would invent the quantity the two assets are compared on; all 142 "
-            "assets measured across 71 sessions of this dandiset carry an offset"
-            % (source, ascii_safe(reference_value), REFERENCE_TIME_PATH))
+            "offset. The value must take the form %r before it is parsed at all, because "
+            "the parser accepts any character where ISO-8601 puts the T; and a wall-clock "
+            "reading with no offset is not an instant, so choosing one for it would invent "
+            "the quantity the two assets are compared on. All 142 assets measured across "
+            "71 sessions of this dandiset satisfy both"
+            % (source, ascii_safe(reference_value), REFERENCE_TIME_PATH,
+               REFERENCE_TIME_FORM_TEXT))
     return {"path": REQUIRED_PROVENANCE_PATH, "value": value, "version": version,
             "form": CONVERSION_SOURCE_FORM_TEXT, "token": CONVERSION_SOURCE_TOKEN,
             "version_is_measured": version in MEASURED_CONVERSION_VERSIONS,
@@ -1162,12 +1216,24 @@ def _ceiling_budget(reader, max_bytes):
     ceiling refuses anything -- the refusal was correct and it was late. Held
     open around the whole read, the same number refuses before the first fetch.
 
-    **It cannot make anything infeasible, which is the argument that licenses
-    it.** ``peak_resident_bytes`` contains ``cache_bound_bytes``, which is an
-    upper bound on the distinct bytes the read fetches, so any read the ceiling
-    check admits has already transferred no more than ``max_bytes``. Refusing a
-    fetch that would cross ``max_bytes`` therefore refuses only reads the later
-    check would have refused anyway -- earlier, and before the bytes move.
+    **In :func:`read_band_units` it cannot make anything infeasible, and that is
+    the argument that licenses it there.** ``peak_resident_bytes`` contains
+    ``cache_bound_bytes``, which is an upper bound on the distinct bytes the
+    read fetches, so any read the plan check admits has already transferred no
+    more than ``max_bytes``. Refusing a fetch that would cross ``max_bytes``
+    therefore refuses only reads the later check would have refused anyway --
+    earlier, and before the bytes move.
+
+    **That argument does not carry to :func:`read_provenance`, and RC-004-F2 is
+    where it stopped carrying.** There is no plan behind that read and so no
+    later check to be redundant with, which makes the ceiling there a genuine
+    tightening: a declared ceiling smaller than the cost of opening the raw
+    asset now refuses a run that used to reach the processed read. That is the
+    class a declared ceiling exists to refuse rather than a cost this function
+    hides, it surfaces as an input error naming the ceiling, and at the
+    command's 1024 MiB default it cannot fire. Stated here because the sentence
+    above was written when :func:`read_band_units` was the only caller, and a
+    universal claim that acquires a second caller is a claim about it too.
 
     Args:
         reader: the :class:`BoundedReader` the file is opened on.
@@ -1183,7 +1249,7 @@ def _ceiling_budget(reader, max_bytes):
         yield
 
 
-def read_provenance(url, size, block_bytes):
+def read_provenance(url, size, block_bytes, max_bytes=None):
     """Read one asset's conversion provenance and nothing else.
 
     The processed asset's provenance is read inside :func:`read_band_units`,
@@ -1195,20 +1261,41 @@ def read_provenance(url, size, block_bytes):
         url: direct S3 URL of the NWB blob.
         size: the blob's size in bytes.
         block_bytes: range-request block size.
+        max_bytes: the caller's declared ceiling, held open as a transfer
+            budget around the whole call -- the file's superblock included --
+            or None for no ceiling. **RC-004-F2 is what put it here.** The
+            reference time this read fetches is half of the pair condition, and
+            it was moving 23,920 distinct bytes of the raw asset before a
+            declared ceiling of one byte refused the processed side. A budget
+            the caller declared and a read that escapes it are the same defect
+            class RC-003 closed one layer down.
 
     Returns:
         A dict with ``provenance``, ``provenance_io`` (both budgets and what
         each actually spent) and ``io`` (request count and bytes for the whole
         call, opening the file included). The provenance read itself is bounded
-        before it happens rather than by a ceiling afterwards, and neither bound
-        grows with the recording's length or its spike count.
+        before it happens rather than after it, and neither of its own two
+        bounds grows with the recording's length or its spike count.
 
     Note:
+        **This read is inside the caller's ceiling, and the ceiling is entered
+        before the file is opened.** ``_ceiling_budget`` is held open around
+        the open and the provenance read together, exactly as
+        :func:`read_band_units` holds it, so a fetch that would cross the
+        declared ceiling is refused before its bytes move rather than reported
+        after them. **It is a tightening and it can refuse a run that used to
+        reach a verdict** -- one whose declared ceiling is smaller than the cost
+        of opening the raw asset and reading two short values. That is the
+        class the ceiling exists to refuse, it is reported as an input error
+        naming the ceiling, and at the command's 1024 MiB default it cannot
+        fire.
+
         **The block size is capped here rather than taken from the caller.**
-        This is the one read in the command with no plan behind it: it happens
-        before any ceiling exists, so its transfer bound is the only thing
-        standing between a malformed asset and an unbounded spend. A bound
-        denominated in blocks cannot be smaller than a block, so a 1 MiB block
+        This read has no *plan* behind it -- no band, no footprint to compare
+        against -- so its own transfer bound is what stands between a malformed
+        asset and an unbounded spend inside whatever ceiling the caller
+        declared. A bound denominated in blocks cannot be smaller than a block,
+        so a 1 MiB block
         chosen for a bulk payload read on a *different* file would make this
         read's bound 5,308,416 bytes for the sake of about eighty characters
         across two required paths. At :data:`PROVENANCE_BLOCK_BYTES` it is
@@ -1216,7 +1303,12 @@ def read_provenance(url, size, block_bytes):
     """
     remote = RemoteFile(url, size, block=min(int(block_bytes), PROVENANCE_BLOCK_BYTES))
     reader = BoundedReader(remote)
-    with h5py.File(reader, "r") as handle:
+    # The ceiling is entered before the file is opened, so it covers every byte
+    # this call fetches. last_spend is read inside it, while the provenance
+    # scope is still the most recently closed one -- reading it after the
+    # ceiling scope exits would report the ceiling's spend under the
+    # provenance label.
+    with _ceiling_budget(reader, max_bytes), h5py.File(reader, "r") as handle:
         provenance = source_provenance(handle, reader)
         spend = reader.last_spend
     return {"provenance": provenance,

@@ -48,17 +48,21 @@ covers the processed asset's read, and every read that read performs is inside
 its plan: the electrode table, the unit scalars, the column descriptions, the
 conversion provenance, the column layouts and the chunk index are all read while
 the reader's spend is still being counted, and the per-unit slices after the
-check are what the plan sizes. It does **not** cover the three reads on the
-*raw* asset that precede it -- one electrode table, two timestamps from each end
-of each AP series, and the conversion provenance. Those are bounded by
-construction rather than by a ceiling: none of them grows with the recording's
-length or its spike count, and the provenance read is bounded twice more by
-``utils.archive_units`` -- once on what it may ask for and once on the distinct
-bytes its reader may fetch, which are different quantities whenever the reader
-fetches in blocks. Their actual cost is measured and reported beside the
-processed one, under ``raw_electrodes``, ``raw_timing`` and ``raw_provenance``,
-and each provenance read reports both budgets beside what it spent, so the
-transcript states all four costs rather than the one the ceiling governs.
+check are what the plan sizes. **It also covers the raw asset's provenance and
+clock read**, which is held inside the same declared ceiling from before its
+file is opened: that read fetches half of the pair condition, and a read the
+caller's ceiling does not cover is the defect class the ceiling exists to
+close. It does **not** cover the other two reads on the *raw* asset -- one
+electrode table, and two timestamps from each end of each AP series. Those are
+bounded by construction rather than by a ceiling: neither grows with the
+recording's length or its spike count. The provenance read is bounded twice
+more inside the ceiling by ``utils.archive_units`` -- once on what it may ask
+for and once on the distinct bytes its reader may fetch, which are different
+quantities whenever the reader fetches in blocks. Every read's actual cost is
+measured and reported, under ``raw_electrodes``, ``raw_timing`` and
+``raw_provenance``, and each provenance read reports both of its own budgets
+beside what it spent, so the transcript states all four costs rather than only
+the ones the ceiling governs.
 
 **Both assets are authenticated before anything is measured, and the two have
 to declare the same session-time origin.** The bin grid is anchored on that
@@ -720,9 +724,13 @@ def parse_args(argv=None):
                         help="refuse the processed asset's read if its combined peak "
                              "resident bound -- block cache, converted arrays, live "
                              "structures and HDF5's own chunk cache together -- exceeds "
-                             "this many MiB. The two raw-asset reads that precede it are "
-                             "bounded by construction, not by this ceiling, and their "
-                             "cost is reported separately")
+                             "this many MiB. It is also held open as a transfer budget "
+                             "around the raw asset's provenance and clock read, which "
+                             "happens first, so a ceiling below the cost of opening that "
+                             "file refuses before any of its bytes move. The raw "
+                             "electrode-table and timing reads are bounded by "
+                             "construction, not by this ceiling, and every read's cost "
+                             "is reported separately")
     parser.add_argument("--plan-only", action="store_true",
                         help="report what the band's slices would cost, and stop")
     args = parser.parse_args(argv)
@@ -750,8 +758,16 @@ def main(argv=None):
     block_bytes = args.block_kb * 1024
     print("[drift] %s %s session %s" % (subject, args.probe, args.session), flush=True)
 
-    raw_prov = archive_units.read_provenance(dandi.blob_url(raw_asset),
-                                             raw_asset["size"], block_bytes)
+    # The declared ceiling is passed here, not only to the processed read.
+    # RC-004-F2: this read fetches the raw half of the pair condition, and it
+    # used to move its bytes outside the ceiling the caller declared.
+    try:
+        raw_prov = archive_units.read_provenance(
+            dandi.blob_url(raw_asset), raw_asset["size"], block_bytes,
+            max_bytes=int(args.max_mib * 1024 * 1024))
+    except ValueError as exc:
+        raise SystemExit("[fatal] input error reading %s: %s"
+                         % (raw_asset["path"], exc))
     try:
         raw_auth = archive_units.authenticate_provenance(
             raw_prov["provenance"], "raw asset %s" % raw_asset["path"])

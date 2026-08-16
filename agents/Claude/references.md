@@ -449,6 +449,56 @@ recorded in `conversion_pairs_pinned_2026-08-16.txt` /`.json` and
 International Brain Laboratory, *Brain Wide Map*,
 [DANDI:000409](https://dandiarchive.org/dandiset/000409), CC-BY-4.0.
 
+### ISO 8601's basic and extended formats, and why the timestamp gate is a grammar
+
+*What it covers.* ISO 8601 defines two written forms for the same instant: a
+**basic** format without punctuation (`20260225T143000`) and an **extended**
+format with it (`2026-02-25T14:30:00`). For a combined date-and-time
+representation the standard's rule, as summarised in the Wikipedia article's
+*Combined date and time representations* section, is: **"Either basic or
+extended formats may be used, but both date and time must use the same
+format."**
+
+*How it informed the project.* Codex's RC-004 Round-1 finding F1 showed that
+`datetime.fromisoformat` accepts any single character where ISO-8601 puts the
+`T`, so `2021-05-10Q14:33:49.023776-04:00` parsed, carried a UTC offset, agreed
+with the identical value on the other half of the recording, and reached a drift
+verdict. The repair is `REFERENCE_TIME_FORM` in
+`Reproducibility Packet/scripts/utils/archive_units.py`: the whole value must
+match an ISO-8601 **extended** date-time before the parser sees it, and the
+parser then validates the values inside that shape. The quoted rule is what
+licenses refusing the mixed spelling `2021-05-10T14:33:49-0400`.
+
+*Boundary, and it is why this entry exists rather than a bare assertion in a
+comment.* **The quoted sentence is about the date and time halves. It does not
+mention the UTC offset.** Extending it to the offset is this project's reading,
+not a clause anyone has quoted to us, and both the code comment and the Review
+Card label it that way. The independent support is that **no** value among the
+142 assets measured across 71 sessions of DANDI 000409 spells its offset in the
+basic form — all 79 distinct values use `±hh:mm` — so the reading refuses
+nothing this dandiset contains, and a value it did refuse would surface as a
+*paused* input error rather than as a drift verdict either way. **This entry is
+a secondary source.** The standard itself is paywalled and has not been read;
+if a claim in a public artifact ever has to rest on the offset half of this
+rule, the primary text must be obtained first.
+
+*A second, separate boundary.* The permissiveness of `fromisoformat` is recorded
+here as **measured on the pinned interpreter, CPython 3.12.10**, by executing it
+against the counterexample. No claim is made about which Python release
+introduced the behaviour; the code comment says the same.
+
+*Link:* [ISO 8601 — Wikipedia](https://en.wikipedia.org/wiki/ISO_8601),
+*Combined date and time representations*; the standard itself is
+ISO 8601-1:2019, [iso.org/iso-8601-date-and-time-format.html](https://www.iso.org/iso-8601-date-and-time-format.html)
+(paywalled, not read).
+
+*Citation:* International Organization for Standardization, *ISO 8601-1:2019,
+Date and time — Representations for information interchange — Part 1: Basic
+rules*. Accessed here only through the Wikipedia summary above, 2026-08-16,
+Claude Session 35.
+
+---
+
 ---
 
 ## Pending — sources identified but not yet verified

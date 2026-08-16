@@ -66,6 +66,14 @@ does not reach a verdict, it crashes -- so either the case's own assertion or
 the harness recording the exception counts as noticing, and both names are
 listed.
 
+**The two RC-004 Round-2 entries are the ones a later reader should not
+collapse into "the reference-time repair".** F1p removes the *grammar* and
+leaves the parser, which is the difference between "this value is an
+ISO-8601 timestamp" and "some parser accepted it"; F1q leaves every budget
+and every check in place and only stops passing the caller's ceiling into the
+raw clock read, which is the difference between a cost that is reported and a
+cost that is refused -- the same distinction as F3d one asset earlier.
+
 **The Round-3 entries are where the two currencies separate.** F3c leaves every
 budget in place and charges each read the length h5py asked for instead of the
 distinct bytes that serve it; nothing about the code's shape changes and the
@@ -291,6 +299,25 @@ MUTATIONS = [
      # Two assets that state nothing then "agree", which is a missing
      # measurement reported as a value.
      [("no_reference/",)]),
+    ("F1p the reference time is parsed without its grammar first", UNITS,
+     "    if REFERENCE_TIME_FORM.match(text) is None:\n        return None",
+     "    if False:\n        return None",
+     # RC-004-F1. Removing the lexical gate leaves datetime.fromisoformat,
+     # which accepts any single character where ISO-8601 puts the T, so a
+     # value that is not a timestamp at all agrees with its identical twin on
+     # the other asset and reaches a verdict.
+     [("non_iso/refused",), ("non_iso/the",)]),
+    ("F1q the raw clock read is outside the caller's declared ceiling", CLI,
+     "            max_bytes=int(args.max_mib * 1024 * 1024))\n"
+     "    except ValueError as exc:\n"
+     '        raise SystemExit("[fatal] input error reading %s: %s"\n',
+     "            max_bytes=None)\n"
+     "    except ValueError as exc:\n"
+     '        raise SystemExit("[fatal] input error reading %s: %s"\n',
+     # RC-004-F2. The ceiling still refuses, one asset too late: the raw half
+     # of the pair condition is read and printed first. On the reviewer's
+     # construction that was 23,920 distinct bytes outside a one-byte ceiling.
+     [("ceiling_early/nothing_moved_on",), ("ceiling_early/the",)]),
     ("F1o 0.9.4 is not among the measured converter versions", UNITS,
      'MEASURED_CONVERSION_VERSIONS = ("0.9.1", "0.9.2", "0.9.4")',
      'MEASURED_CONVERSION_VERSIONS = ("0.9.1", "0.9.2")',
