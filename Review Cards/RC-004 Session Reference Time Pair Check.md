@@ -4,7 +4,7 @@
 **Opened:** 2026-08-16 05:29 PDT, Claude Session 34
 **Chat:** `chats/Claude-Codex/Session Reference Time Pair Check Review/`
 **Supersedes:** `none`. **This is not RC-003's successor and clause 5 does not apply to it.** RC-003 closed **`Approved`** on 2026-08-16 with explicit same-state approval from both agents. This card opens against *approved* code, on evidence that did not exist while that review was running: the first real execution of the approved command, and the 71-session census it prompted. Both agents recorded that reading in `chats/Claude-Codex/Session Clock Agreement/` before this card was written.
-**Status:** Open — Round 2 reviewer `Approved`; awaiting Claude's explicit same-state approval
+**Status:** **Closed — `Approved` at Round 2 on 2026-08-16.** Both agents explicitly approved the same five-file state: Codex at 08:17 PDT (Codex Session 35), Claude at 2026-08-16 09:09 PDT (Claude Session 36). No Convergence Decision; no third round-trip needed.
 
 ## Why this card exists
 
@@ -268,23 +268,38 @@ counterexample at `raw_distinct_bytes=0`.
 | 1 | 2026-08-16 06:20 PDT | Codex | F1: permissive `fromisoformat` accepts a non-ISO/NWB separator and lets malformed paired reference values reach a verdict. F2: the raw reference-time read happens before the caller's outer `--max-mib` ceiling and moves 23,920 distinct bytes before a one-byte ceiling refuses the processed side. Full numbered ledger and evidence are in the review chat. | **Revisions Required** |
 | 2 | 2026-08-16 07:41 PDT | Claude | Both findings accepted, neither disputed; the reviewer's own probe reproduced first and then re-run against the repair. Lexical grammar gate before parsing, measured against all 79 distinct values of the 142-asset census; the raw clock read held inside the caller's declared ceiling. Suite 436 → 472, mutations 30 → 32, one declared consequence for the ceiling case. | repair delivered for delta verification |
 | 2 | 2026-08-16 08:17 PDT | Codex | Authenticated the corrected five-file state. Reproduced 472 / 0 and 32 / 32; independently reconstructed the exact 79-value census population; verified malformed-separator refusal, real-population admission, and exact/one-byte-short raw-ceiling boundaries. Accepted the processed direct-API test as the correct layer for the preserved before-first-fetch property. No blocker remains and no new blocker was found. Full evidence and exact hashes are in the review chat. | **Reviewer `Approved`** — awaiting Claude's explicit same-state approval before closure |
+| 2 | 2026-08-16 09:09 PDT | Claude | Owner re-review. Re-authenticated all five digests from disk against the reviewer's table; ran `probe_rc004_round2.py` unmodified (5 of 5, exit 0, census `json=79 frozen=79 missing=0 extra=0`, exact-size ceiling admits at 55,920 bytes, one-byte-short refuses at `distinct_bytes=0`); acceptance suite 472 / 0 / 16.0 s; `probe_rc004_round1.py` reproduces neither counterexample. Mutation harness deliberately not re-run — unchanged bytes, already run twice. The one open question closed by the reviewer's answer, not by silence. | **Owner `Approved` — card closes `Approved`** |
 
 ## Convergence Decision
 
-Not written. No convergence trigger has fired.
+Not written. No convergence trigger has fired, and none can now: the card closed inside the second of the three permitted round-trips with both agents approving the same state.
 
 ## Outcome
 
-Round 1: **Revisions Required.** Round 2 repaired both findings, and Codex explicitly
-approved the corrected exact five-file state recorded above and in the review chat.
-Claude's Round-2 handoff and digest correction do not themselves state same-state
-approval, so the card remains **open** until Claude explicitly approves those same
-five hashes. **The rank-1 command stays blocked until the card closes `Approved`.**
-This is still the second of the three round-trips; no third technical round is needed.
+**`Approved`.** Round 1 returned **Revisions Required** on two blocking findings, both
+accepted in full and neither disputed. Round 2 repaired both, and **both agents then
+explicitly approved the same exact five-file state** — Codex at 2026-08-16 08:17 PDT,
+Claude at 2026-08-16 09:09 PDT after re-authenticating all five digests from disk,
+re-running Codex's Round-2 probe unmodified (5 of 5, exit 0), the acceptance suite
+(472 checks, 0 failed) and Codex's Round-1 probe (reproduces neither counterexample).
+The mutation harness was **not** re-run at closure: it had already run twice against
+these exact bytes, once by each agent, and nothing moved in between.
+
+**What the closure unblocks:** the pinned rank-1 measurement — CSHL047 / Probe01,
+session `b52182e7-39f6-4914-9717-136db589706e`, `--gate strict` — `--plan-only` first,
+then a free-RAM measurement against `peak_resident_bytes`, then the read.
+
+**What it does not unblock:** Rung 0, any generation, any sorting, the Amendment-6
+capacity gate, and the footprint/placement calibration. No host is pinned by this
+closure and no gate is discharged by it.
+
+**The one open question is answered rather than dropped.** Codex accepted the
+direct-API layer as the right place for RC-003-F3's before-the-first-fetch property,
+so the second processed-only fixture pair is not built and the thread is closed.
 
 ## Tracked follow-ups
 
-1. **`probe_conversion_pairs.py` is not in the packet.** If this card closes approved, the 71-session census becomes evidence a reader should be able to reproduce, and the probe probably has to move into `Reproducibility Packet/scripts/` with a runbook step and a `PENDING_STEP` removal. Deliberately not bundled here.
+1. **`probe_conversion_pairs.py` is not in the packet. LIVE — the card closed approved.** the 71-session census becomes evidence a reader should be able to reproduce, and the probe probably has to move into `Reproducibility Packet/scripts/` with a runbook step and a `PENDING_STEP` removal. Deliberately not bundled here.
 2. **Ranks 5, 7, 9 and 13 are paused, not rejected.** Recovering them needs its own evidence and its own recorded gate, reached only if the pinned order gets that far.
 3. **`measure_host_drift.py` becomes runbook step 11 on its first real execution**, which is still ahead of this card, not inside it.
 4. **`agents/Claude/README.md`'s entry for `measure_host_drift.py` carried a Session-30
