@@ -347,6 +347,102 @@ This produced the main change in Draft 4 of `agents/Codex/Tier A Real-Arm Donor 
 
 ---
 
+### What an NWB timestamp is counted from, in the format's own words
+
+**What it covers.** The NWB format fixes a single root-level instant,
+`timestamps_reference_time`, and defines every time value in the file as seconds
+relative to it; by default it is the same value as `session_start_time`. PyNWB's
+own tutorial states it as "the session start time is the reference time for all
+timestamps in the file. For instance, an event with a timestamp of 0 in the file
+means the event occurred exactly at the session start time."
+
+**How it informed the project.** It is what makes the raw/processed
+reference-time comparison a statement about the *coordinate* rather than about a
+label. This project reads its band from the raw asset and its spikes from the
+processed one, and Section 16.4's whole clock argument is that the two numbers
+live in one coordinate. Under this definition, two assets that declare different
+reference instants are declaring that the same stored number denotes two
+different moments -- so the comparison is the direct form of the property that
+Session 32's converter-version equality was standing in for. It is also what
+makes the measured one-hour disagreement (entry below) a clock statement rather
+than a cosmetic metadata difference, and what licenses the proposed rule change:
+compare the instants, not the version of the library that wrote them.
+
+*Boundary:* the definition says what the files *declare*. It does not say that
+any particular asset's stored arrays honour the declaration, which is why
+per-asset provenance and endpoint containment stay in the evidence set and why
+reference-time agreement is stated as necessary rather than sufficient.
+
+*Citation:* Neurodata Without Borders, *NWB Format Specification* (`NWBFile`,
+`timestamps_reference_time` / `session_start_time`),
+[nwb-schema.readthedocs.io](https://nwb-schema.readthedocs.io/en/stable/format_description.html);
+quoted wording from PyNWB, *NWB File Basics*,
+[pynwb.readthedocs.io/en/stable/tutorials/general/plot_file.html](https://pynwb.readthedocs.io/en/stable/tutorials/general/plot_file.html)
+(read 2026-08-16). The assets read here all declare `nwb_version` 2.9.0.
+
+---
+
+### DANDI 000409's two halves are always written by different converter versions, and eight of seventy-one disagree about the session clock (this project's own result)
+
+**What it covers.** A bounded metadata read of both halves of 71 paired sessions
+-- the 11 distinct sessions of the pinned Tier A host order, plus a
+deterministic 60-session sample of the other 448, drawn by SHA-256 rank on a
+pinned seed and excluding the 11 the hypothesis was formed on. Per asset:
+`general/source_script` under the archive reader's own request and transfer
+budgets, and `/session_start_time`, `/timestamps_reference_time`,
+`/general/session_id` and the root `nwb_version` attribute under a second
+declared budget. 74,186,752 bytes in 1,132 requests; no payload, no electrode
+table, no spike times.
+
+Two results, and they point opposite ways.
+
+1. **The converter-version pair is uniform and uniformly unequal.** Every raw
+   asset was written by NeuroConv 0.9.1 (1 of 71) or 0.9.2 (70 of 71); every
+   processed asset by 0.9.4. **Version agreement holds on 0 of 71 sessions.**
+2. **The declared clock agrees on 63 of 71, and the eight exceptions take
+   exactly one value.** `processed - raw` on `timestamps_reference_time` is
+   either `+0.0 s` or `+3600.0 s` and nothing else, never the other sign, with
+   both halves still labelling the same UTC offset. All eight are NYU subjects
+   whose declared local time falls in the US-Eastern daylight window; the two
+   NYU sessions at `-05:00` agree, and the five non-NYU sessions at `-04:00`
+   agree. `session_start_time` equals `timestamps_reference_time` on all 142
+   assets, so the two comparisons never disagree.
+
+**How it informed the project.** Session 32 added a rule requiring the two halves
+to name the same converter version, from a reviewer finding, on evidence drawn
+from 21 *raw* assets -- no processed asset's `source_script` had ever been read.
+The first real candidate command stopped on it at rank 1. This measurement shows
+the rule admits **nothing** in this dandiset, so no Tier A host could ever be
+pinned while it stands; and that the property it stood in for is directly
+readable and behaves differently, separating 63 sound sessions from 8 with a
+genuine one-hour clock disagreement that version equality cannot see, because
+those 8 carry the same version pair as the other 63. The proposal that follows
+from it -- keep per-asset authentication, replace pair-version equality with
+pair reference-instant equality, and pause rather than reject a disagreeing
+candidate under Section 16.4 -- is open to Codex in
+`chats/Claude-Codex/Session Clock Agreement/`.
+
+*Boundary, and it is the load-bearing part:* the pattern is **described, not
+explained**. A daylight-saving handling difference between the two conversion
+passes fits every number, but no mechanism was measured and none is claimed.
+Nor does this establish that the eight sessions' stored *arrays* disagree: the
+declared instants differ, and whether the numeric spike times were shifted with
+them is a separate question that endpoint containment against the raw AP extent
+would settle cheaply and that has not been run. Those eight candidates are
+paused, not rejected. No host is pinned, no drift value exists, and no candidate
+payload was read.
+
+*Citation:* Dandelion Engineering, *Hybrid Ground Truth Realism*, Claude Session
+33 (2026-08-16). Conversion-provenance and declared-clock census over 71 paired
+sessions of DANDI 000409, by `agents/Claude/tools/probe_conversion_pairs.py`
+(SHA-256 `10ad5053a06ba35d32d17540a6511f459e2e6f72cd3fcbe613bbdc9af10873ec`);
+recorded in `conversion_pairs_pinned_2026-08-16.txt` /`.json` and
+`conversion_pairs_sample60_2026-08-16.txt` /`.json` beside it. Source data:
+International Brain Laboratory, *Brain Wide Map*,
+[DANDI:000409](https://dandiarchive.org/dandiset/000409), CC-BY-4.0.
+
+---
+
 ## Pending — sources identified but not yet verified
 
 These are named in `Literature Foundation.md` §5.4 and are **not** citable until an entry appears above.

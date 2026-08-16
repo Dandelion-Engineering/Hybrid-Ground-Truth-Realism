@@ -1,0 +1,13 @@
+# The eleven distinct sessions of the pinned Tier A host order (ranks 1-13;
+# CSHL047 b52182e7 and NYU-12 a8a8af78 each appear twice under two probes).
+b52182e7-39f6-4914-9717-136db589706e
+a8a8af78-16de-4841-ab07-fde4b5281a03
+7af49c00-63dd-4fed-b2e0-1b3bd945b20b
+a2ec6341-c55f-48a0-a23b-0ef2f5b1d71e
+034e726f-b35f-41e0-8d6c-a22cc32391fb
+51e53aff-1d5d-4182-a684-aba783d50ae5
+2d5f6d81-38c4-4bdc-ac3c-302ea4d5f46e
+6ed57216-498d-48a6-b48b-a243a34710ea
+4b7fbad4-f6de-43b4-9b15-c7c7ef44db4b
+c99d53e6-c317-4c53-99ba-070b26673ac4
+3d59aa1a-b4ba-47fe-b9cf-741b5fdb0c7b

@@ -340,3 +340,53 @@ Across RC-002 and RC-003, the method therefore did the cumulative job clause 5 w
 Nothing here is waiting on Randy. No archive, network resource or candidate asset was read in this review; RC-003 approval only removes the implementation gate for the separately governed first candidate measurement.
 
 ---
+
+**Claude (Session 33, 2026-08-16 03:32 PDT):**
+
+**Randy and Codex - the archive reader passed review and then failed on its first
+real input, and I think that is the most useful thing the method has produced so
+far.** RC-003 closed `Approved` at Round 3 across three rounds, two agents, 382
+checks, 26 repair sabotages and 18 checker sabotages. I ran the approved command
+on the pinned rank-1 candidate. It stopped on a rule the review had put there.
+
+**The rule requires the two halves of a recording to name the same version of the
+conversion software. Measured across 71 recordings of this dataset, it passes 0
+of them.** Every raw half was written by one version and every processed half by
+another - always, without exception. No candidate could ever have been chosen
+while it stood.
+
+**Randy, the method observation is about what review can and cannot reach, and I
+want to state it carefully because it is not a criticism of the review.** Every
+check that rule passed ran against fixtures we wrote ourselves. Mutation testing
+proves a check depends on the repair it was written for; it says nothing about
+whether the check's population is empty, because the population lives in the
+data and not in the harness. Codex has said twice that mutation evidence proves
+named checks depend on named repairs rather than proving the property. This is a
+third thing neither of us named: a check can be correct, well-tested,
+adversarially reviewed, and admit nothing at all.
+
+**The second half is what makes it worth a note rather than a shrug.** The
+property that rule was standing in for is readable directly - the files state the
+instant their timings are counted from - and on the same 71 recordings it
+disagrees on exactly 8, always by exactly one hour, always in one direction, all
+in one laboratory's daylight-saving sessions. **Those 8 carry the same software
+version pair as the other 63.** So the proxy was simultaneously too strict to
+admit anything and too blind to see the real defect. That is a shape worth
+recognizing: when a check stands in for a property, the question is not "is it
+conservative" but "what does it admit and reject on the real population".
+
+**And one thing about who decides.** The obvious move was to delete the version
+condition, since it is one line and it is blocking everything. I did not, and the
+reason is the method rather than politeness: the condition exists because of a
+blocker Codex raised, the evidence that overturns it did not exist during his
+review, and an agent that discovers an input error and rules on its disposition
+in the same session has reviewed itself. The measurement is his to check and the
+repair is proposed rather than made. **Both approved files are still at the
+digests he approved.**
+
+**Nothing here is waiting on you, Randy.** The proposal is open in
+`chats/Claude-Codex/Session Clock Agreement/`. Four of the thirteen shortlisted
+candidates are paused rather than rejected; no recording is chosen, no spikes
+have been read, no sorter has run, and no scientific result exists.
+
+---

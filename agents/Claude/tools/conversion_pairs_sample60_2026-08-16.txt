@@ -1,0 +1,625 @@
+# Conversion provenance and declared clock, both halves of each session
+
+dandiset            000409 (draft)
+sessions read       60
+requested block     65536 bytes (capped at 65536 for these reads)
+provenance budget   65536 bytes requested
+clock budget        1048576 bytes requested
+
+metadata read       61931520 bytes in 945 requests
+
+## Per session
+
+subject    session                              raw ver  proc ver  ver=  ref=  start=
+-------------------------------------------------------------------------------------
+ZM-2245    cb2ad999-a6cb-42ff-bf71-1774c57e5308 0.9.2    0.9.4     NO    yes   yes  
+SWC-058    f1db6257-85ef-4385-b415-2d078ec75df2 0.9.2    0.9.4     NO    yes   yes  
+ibl-witten-29 af55d16f-0e31-4073-bdb5-26da54914aa2 0.9.2    0.9.4     NO    yes   yes  
+NR-0031    caa5dddc-9290-4e27-9f5e-575ba3598614 0.9.2    0.9.4     NO    yes   yes  
+NYU-47     15948667-747b-4702-9d53-354ac70e9119 0.9.2    0.9.4     NO    NO    NO   
+SWC-060    875c1e5c-f7ec-45ac-ab82-ecfe7276a707 0.9.2    0.9.4     NO    yes   yes  
+CSH-ZAD-022 a66f1593-dafd-4982-9b66-f9554b6c86b5 0.9.2    0.9.4     NO    yes   yes  
+CSH-ZAD-025 20c112a1-8a42-44e0-a4cd-e5b932f7bda9 0.9.2    0.9.4     NO    yes   yes  
+ZM-1898    53738f95-bd08-4d9d-9133-483fdb19e8da 0.9.2    0.9.4     NO    yes   yes  
+MFD-07     11163613-a6c9-4975-9586-84dc00481547 0.9.2    0.9.4     NO    yes   yes  
+DY-008     ee13c19e-2790-4418-97ca-48f02e8013bb 0.9.2    0.9.4     NO    yes   yes  
+PL015      64977c74-9c04-437a-9ea1-50386c4996db 0.9.2    0.9.4     NO    yes   yes  
+SWC-043    c6db3304-c906-400c-aa0f-45dd3945b2ea 0.9.2    0.9.4     NO    yes   yes  
+CSH-ZAD-011 03cf52f6-fba6-4743-a42e-dd1ac3072343 0.9.2    0.9.4     NO    yes   yes  
+ZM-2240    510b1a50-825d-44ce-86f6-9678f5396e02 0.9.2    0.9.4     NO    yes   yes  
+MFD-05     ca4ecb4c-4b60-4723-9b9e-2c54a6290a53 0.9.2    0.9.4     NO    yes   yes  
+SWC-065    1425bd6f-c625-4f6a-b237-dc5bcfc42c87 0.9.2    0.9.4     NO    yes   yes  
+NR-0024    7cc74598-9c1b-436b-84fa-0bf89f31adf6 0.9.2    0.9.4     NO    yes   yes  
+NYU-40     5157810e-0fff-4bcf-b19d-32d4e39c7dfc 0.9.2    0.9.4     NO    NO    NO   
+DY-013     e535fb62-e245-4a48-b119-88ce62a6fe67 0.9.2    0.9.4     NO    yes   yes  
+SWC-039    768a371d-7e88-47f8-bf21-4a6a6570dd6e 0.9.2    0.9.4     NO    yes   yes  
+UCLA048    dc962048-89bb-4e6a-96a9-b062a2be1426 0.9.2    0.9.4     NO    yes   yes  
+PL033      75db708a-9952-4452-a5b1-a851d88f8e28 0.9.2    0.9.4     NO    yes   yes  
+CSHL052    83e77b4b-dfa0-4af9-968b-7ea0c7a0c7e4 0.9.2    0.9.4     NO    yes   yes  
+NYU-21     ebe2efe3-e8a1-451a-8947-76ef42427cc9 0.9.2    0.9.4     NO    NO    NO   
+KS016      dd87e278-999d-478b-8cbd-b5bf92b84763 0.9.2    0.9.4     NO    yes   yes  
+CSHL054    a71175be-d1fd-47a3-aa93-b830ea3634a1 0.9.2    0.9.4     NO    yes   yes  
+NR-0031    642c97ea-fe89-4ec9-8629-5e492ea4019d 0.9.2    0.9.4     NO    yes   yes  
+CSH-ZAD-029 993c7024-0abc-4028-ad30-d397ad55b084 0.9.2    0.9.4     NO    yes   yes  
+PL037      d23b005f-46f5-4fe1-870c-f55f6eb9533d 0.9.2    0.9.4     NO    yes   yes  
+CSHL045    7939711b-8b4d-4251-b698-b97c1eaa846e 0.9.2    0.9.4     NO    yes   yes  
+DY-010     931a70ae-90ee-448e-bedb-9d41f3eda647 0.9.2    0.9.4     NO    yes   yes  
+SWC-042    66d98e6e-bcd9-4e78-8fbb-636f7e808b29 0.9.2    0.9.4     NO    yes   yes  
+NYU-45     537677fe-1e24-4755-948c-fa4a4e8ecce5 0.9.2    0.9.4     NO    NO    NO   
+PL050      2584ce3c-db10-4076-89cb-5d313138dd38 0.9.2    0.9.4     NO    yes   yes  
+MFD-07     c46b8def-620d-4d70-9397-be5694255f73 0.9.2    0.9.4     NO    yes   yes  
+PL033      2ab7d2c2-bcb7-4ae6-9626-f3786c22d970 0.9.2    0.9.4     NO    yes   yes  
+DY-011     36280321-555b-446d-9b7d-c2e17991e090 0.9.2    0.9.4     NO    yes   yes  
+KS044      a6fe44a8-07ab-49b8-81f9-e18575aa85cc 0.9.2    0.9.4     NO    yes   yes  
+KS016      16c3667b-e0ea-43fb-9ad4-8dcd1e6c40e1 0.9.2    0.9.4     NO    yes   yes  
+ibl-witten-27 73918ae1-e4fd-4c18-b132-00cb555b1ad2 0.9.2    0.9.4     NO    yes   yes  
+NR-0024    f4eb56a4-8bf8-4bbc-a8f3-6e6535134bad 0.9.2    0.9.4     NO    yes   yes  
+ZM-2240    259927fd-7563-4b03-bc5d-17b4d0fa7a55 0.9.2    0.9.4     NO    yes   yes  
+NR-0027    195443eb-08e9-4a18-a7e1-d105b2ce1429 0.9.2    0.9.4     NO    yes   yes  
+KS014      b9c205c3-feac-485b-a89d-afc96d9cb280 0.9.2    0.9.4     NO    yes   yes  
+PL034      87ad026d-5b95-4022-8d59-c260870d830f 0.9.2    0.9.4     NO    yes   yes  
+ibl-witten-27 c728f6fd-58e2-448d-aefb-a72c637b604c 0.9.2    0.9.4     NO    yes   yes  
+UCLA049    0841d188-8ef2-4f20-9828-76a94d5343a4 0.9.2    0.9.4     NO    yes   yes  
+UCLA044    91bac580-76ed-41ab-ac07-89051f8d7f6e 0.9.2    0.9.4     NO    yes   yes  
+KS043      9468fa93-21ae-4984-955c-e8402e280c83 0.9.2    0.9.4     NO    yes   yes  
+KS096      8928f98a-b411-497e-aa4b-aa752434686d 0.9.2    0.9.4     NO    yes   yes  
+PL033      4546cd60-fa2a-4d20-a9b6-d091e01d16f2 0.9.2    0.9.4     NO    yes   yes  
+ZFM-01936  d0ea3148-948d-4817-94f8-dcaf2342bbbe 0.9.2    0.9.4     NO    yes   yes  
+SWC-054    6c6983ef-7383-4989-9183-32b1a300d17a 0.9.2    0.9.4     NO    yes   yes  
+CSHL052    85dc2ebd-8aaf-46b0-9284-a197aee8b16f 0.9.2    0.9.4     NO    yes   yes  
+KS094      752456f3-9f47-4fbf-bd44-9d131c0f41aa 0.9.2    0.9.4     NO    yes   yes  
+MFD-05     7dd27c2f-9544-448d-918d-be0f9837b0e0 0.9.2    0.9.4     NO    yes   yes  
+CSHL059    d2f5a130-b981-4546-8858-c94ae1da75ff 0.9.2    0.9.4     NO    yes   yes  
+PL031      fbd28ea6-3251-48e0-b215-2c51ec5185f7 0.9.2    0.9.4     NO    yes   yes  
+PL017      8b1f4024-3d96-4ee7-95f9-8a1dfd4ce4ef 0.9.2    0.9.4     NO    yes   yes  
+
+## Distributions
+
+  raw -> processed version  0.9.2 -> 0.9.4       60 session(s)
+
+  version agrees            0 of 60
+  timestamps_reference_time agrees  56 of 60 (undetermined 0)
+  session_start_time agrees 56 of 60 (undetermined 0)
+
+## Values, as read
+
+ZM-2245  cb2ad999-a6cb-42ff-bf71-1774c57e5308
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-01-21T14:03:44+00:00
+  processed reference time 2020-01-21T14:03:44+00:00
+  raw       session start  2020-01-21T14:03:44+00:00
+  processed session start  2020-01-21T14:03:44+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+SWC-058  f1db6257-85ef-4385-b415-2d078ec75df2
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-12-08T16:37:47.025234+00:00
+  processed reference time 2020-12-08T16:37:47.025234+00:00
+  raw       session start  2020-12-08T16:37:47.025234+00:00
+  processed session start  2020-12-08T16:37:47.025234+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+ibl-witten-29  af55d16f-0e31-4073-bdb5-26da54914aa2
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2021-06-14T13:29:00.626588-04:00
+  processed reference time 2021-06-14T13:29:00.626588-04:00
+  raw       session start  2021-06-14T13:29:00.626588-04:00
+  processed session start  2021-06-14T13:29:00.626588-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NR-0031  caa5dddc-9290-4e27-9f5e-575ba3598614
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-07-14T15:17:40.935162-07:00
+  processed reference time 2023-07-14T15:17:40.935162-07:00
+  raw       session start  2023-07-14T15:17:40.935162-07:00
+  processed session start  2023-07-14T15:17:40.935162-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NYU-47  15948667-747b-4702-9d53-354ac70e9119
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2021-06-22T13:25:20.389828-04:00
+  processed reference time 2021-06-22T14:25:20.389828-04:00
+  raw       session start  2021-06-22T13:25:20.389828-04:00
+  processed session start  2021-06-22T14:25:20.389828-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+SWC-060  875c1e5c-f7ec-45ac-ab82-ecfe7276a707
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-11-25T13:17:54.132432+00:00
+  processed reference time 2020-11-25T13:17:54.132432+00:00
+  raw       session start  2020-11-25T13:17:54.132432+00:00
+  processed session start  2020-11-25T13:17:54.132432+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSH-ZAD-022  a66f1593-dafd-4982-9b66-f9554b6c86b5
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-05-23T12:31:58.311253-04:00
+  processed reference time 2020-05-23T12:31:58.311253-04:00
+  raw       session start  2020-05-23T12:31:58.311253-04:00
+  processed session start  2020-05-23T12:31:58.311253-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSH-ZAD-025  20c112a1-8a42-44e0-a4cd-e5b932f7bda9
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-07-26T08:42:16-04:00
+  processed reference time 2020-07-26T08:42:16-04:00
+  raw       session start  2020-07-26T08:42:16-04:00
+  processed session start  2020-07-26T08:42:16-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+ZM-1898  53738f95-bd08-4d9d-9133-483fdb19e8da
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2019-12-11T11:02:46+00:00
+  processed reference time 2019-12-11T11:02:46+00:00
+  raw       session start  2019-12-11T11:02:46+00:00
+  processed session start  2019-12-11T11:02:46+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+MFD-07  11163613-a6c9-4975-9586-84dc00481547
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-09-01T13:56:04.163286-07:00
+  processed reference time 2023-09-01T13:56:04.163286-07:00
+  raw       session start  2023-09-01T13:56:04.163286-07:00
+  processed session start  2023-09-01T13:56:04.163286-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+DY-008  ee13c19e-2790-4418-97ca-48f02e8013bb
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-03-04T13:14:42.728981-08:00
+  processed reference time 2020-03-04T13:14:42.728981-08:00
+  raw       session start  2020-03-04T13:14:42.728981-08:00
+  processed session start  2020-03-04T13:14:42.728981-08:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL015  64977c74-9c04-437a-9ea1-50386c4996db
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-02-20T16:09:07.326998+00:00
+  processed reference time 2022-02-20T16:09:07.326998+00:00
+  raw       session start  2022-02-20T16:09:07.326998+00:00
+  processed session start  2022-02-20T16:09:07.326998+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+SWC-043  c6db3304-c906-400c-aa0f-45dd3945b2ea
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-09-20T19:12:54.571582+01:00
+  processed reference time 2020-09-20T19:12:54.571582+01:00
+  raw       session start  2020-09-20T19:12:54.571582+01:00
+  processed session start  2020-09-20T19:12:54.571582+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSH-ZAD-011  03cf52f6-fba6-4743-a42e-dd1ac3072343
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-03-22T12:56:40-04:00
+  processed reference time 2020-03-22T12:56:40-04:00
+  raw       session start  2020-03-22T12:56:40-04:00
+  processed session start  2020-03-22T12:56:40-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+ZM-2240  510b1a50-825d-44ce-86f6-9678f5396e02
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-01-23T15:12:02+00:00
+  processed reference time 2020-01-23T15:12:02+00:00
+  raw       session start  2020-01-23T15:12:02+00:00
+  processed session start  2020-01-23T15:12:02+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+MFD-05  ca4ecb4c-4b60-4723-9b9e-2c54a6290a53
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-08-16T16:43:15.074954-07:00
+  processed reference time 2023-08-16T16:43:15.074954-07:00
+  raw       session start  2023-08-16T16:43:15.074954-07:00
+  processed session start  2023-08-16T16:43:15.074954-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+SWC-065  1425bd6f-c625-4f6a-b237-dc5bcfc42c87
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-05-07T15:58:28.902138+01:00
+  processed reference time 2022-05-07T15:58:28.902138+01:00
+  raw       session start  2022-05-07T15:58:28.902138+01:00
+  processed session start  2022-05-07T15:58:28.902138+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NR-0024  7cc74598-9c1b-436b-84fa-0bf89f31adf6
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-02-01T16:39:26-08:00
+  processed reference time 2023-02-01T16:39:26-08:00
+  raw       session start  2023-02-01T16:39:26-08:00
+  processed session start  2023-02-01T16:39:26-08:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NYU-40  5157810e-0fff-4bcf-b19d-32d4e39c7dfc
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2021-04-13T10:28:53.043796-04:00
+  processed reference time 2021-04-13T11:28:53.043796-04:00
+  raw       session start  2021-04-13T10:28:53.043796-04:00
+  processed session start  2021-04-13T11:28:53.043796-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+DY-013  e535fb62-e245-4a48-b119-88ce62a6fe67
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-03-12T11:27:09.707868-07:00
+  processed reference time 2020-03-12T11:27:09.707868-07:00
+  raw       session start  2020-03-12T11:27:09.707868-07:00
+  processed session start  2020-03-12T11:27:09.707868-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+SWC-039  768a371d-7e88-47f8-bf21-4a6a6570dd6e
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-09-10T14:19:38.570886+01:00
+  processed reference time 2020-09-10T14:19:38.570886+01:00
+  raw       session start  2020-09-10T14:19:38.570886+01:00
+  processed session start  2020-09-10T14:19:38.570886+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+UCLA048  dc962048-89bb-4e6a-96a9-b062a2be1426
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-08-16T16:11:36.075354-07:00
+  processed reference time 2022-08-16T16:11:36.075354-07:00
+  raw       session start  2022-08-16T16:11:36.075354-07:00
+  processed session start  2022-08-16T16:11:36.075354-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL033  75db708a-9952-4452-a5b1-a851d88f8e28
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-10-07T16:14:14.729838+01:00
+  processed reference time 2022-10-07T16:14:14.729838+01:00
+  raw       session start  2022-10-07T16:14:14.729838+01:00
+  processed session start  2022-10-07T16:14:14.729838+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSHL052  83e77b4b-dfa0-4af9-968b-7ea0c7a0c7e4
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-02-20T13:15:02-05:00
+  processed reference time 2020-02-20T13:15:02-05:00
+  raw       session start  2020-02-20T13:15:02-05:00
+  processed session start  2020-02-20T13:15:02-05:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NYU-21  ebe2efe3-e8a1-451a-8947-76ef42427cc9
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-08-19T11:43:13.897987-04:00
+  processed reference time 2020-08-19T12:43:13.897987-04:00
+  raw       session start  2020-08-19T11:43:13.897987-04:00
+  processed session start  2020-08-19T12:43:13.897987-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+KS016  dd87e278-999d-478b-8cbd-b5bf92b84763
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2019-12-09T17:31:23.762000+00:00
+  processed reference time 2019-12-09T17:31:23.762000+00:00
+  raw       session start  2019-12-09T17:31:23.762000+00:00
+  processed session start  2019-12-09T17:31:23.762000+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSHL054  a71175be-d1fd-47a3-aa93-b830ea3634a1
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-02-11T14:25:12-05:00
+  processed reference time 2020-02-11T14:25:12-05:00
+  raw       session start  2020-02-11T14:25:12-05:00
+  processed session start  2020-02-11T14:25:12-05:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NR-0031  642c97ea-fe89-4ec9-8629-5e492ea4019d
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-07-12T14:17:48.191150-07:00
+  processed reference time 2023-07-12T14:17:48.191150-07:00
+  raw       session start  2023-07-12T14:17:48.191150-07:00
+  processed session start  2023-07-12T14:17:48.191150-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSH-ZAD-029  993c7024-0abc-4028-ad30-d397ad55b084
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-09-16T08:11:47-04:00
+  processed reference time 2020-09-16T08:11:47-04:00
+  raw       session start  2020-09-16T08:11:47-04:00
+  processed session start  2020-09-16T08:11:47-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL037  d23b005f-46f5-4fe1-870c-f55f6eb9533d
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-04-06T16:08:54.319363+01:00
+  processed reference time 2023-04-06T16:08:54.319363+01:00
+  raw       session start  2023-04-06T16:08:54.319363+01:00
+  processed session start  2023-04-06T16:08:54.319363+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSHL045  7939711b-8b4d-4251-b698-b97c1eaa846e
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-02-28T10:07:18-05:00
+  processed reference time 2020-02-28T10:07:18-05:00
+  raw       session start  2020-02-28T10:07:18-05:00
+  processed session start  2020-02-28T10:07:18-05:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+DY-010  931a70ae-90ee-448e-bedb-9d41f3eda647
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-01-28T11:34:01.365875-08:00
+  processed reference time 2020-01-28T11:34:01.365875-08:00
+  raw       session start  2020-01-28T11:34:01.365875-08:00
+  processed session start  2020-01-28T11:34:01.365875-08:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+SWC-042  66d98e6e-bcd9-4e78-8fbb-636f7e808b29
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-07-13T18:56:18+01:00
+  processed reference time 2020-07-13T18:56:18+01:00
+  raw       session start  2020-07-13T18:56:18+01:00
+  processed session start  2020-07-13T18:56:18+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NYU-45  537677fe-1e24-4755-948c-fa4a4e8ecce5
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2021-07-20T09:58:58.347567-04:00
+  processed reference time 2021-07-20T10:58:58.347567-04:00
+  raw       session start  2021-07-20T09:58:58.347567-04:00
+  processed session start  2021-07-20T10:58:58.347567-04:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL050  2584ce3c-db10-4076-89cb-5d313138dd38
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-06-13T10:42:35.707675+01:00
+  processed reference time 2023-06-13T10:42:35.707675+01:00
+  raw       session start  2023-06-13T10:42:35.707675+01:00
+  processed session start  2023-06-13T10:42:35.707675+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+MFD-07  c46b8def-620d-4d70-9397-be5694255f73
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-08-29T16:43:29-07:00
+  processed reference time 2023-08-29T16:43:29-07:00
+  raw       session start  2023-08-29T16:43:29-07:00
+  processed session start  2023-08-29T16:43:29-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL033  2ab7d2c2-bcb7-4ae6-9626-f3786c22d970
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-10-28T16:46:29+01:00
+  processed reference time 2022-10-28T16:46:29+01:00
+  raw       session start  2022-10-28T16:46:29+01:00
+  processed session start  2022-10-28T16:46:29+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+DY-011  36280321-555b-446d-9b7d-c2e17991e090
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-02-01T15:49:28.905174-08:00
+  processed reference time 2020-02-01T15:49:28.905174-08:00
+  raw       session start  2020-02-01T15:49:28.905174-08:00
+  processed session start  2020-02-01T15:49:28.905174-08:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+KS044  a6fe44a8-07ab-49b8-81f9-e18575aa85cc
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-12-07T19:34:42.945000+00:00
+  processed reference time 2020-12-07T19:34:42.945000+00:00
+  raw       session start  2020-12-07T19:34:42.945000+00:00
+  processed session start  2020-12-07T19:34:42.945000+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+KS016  16c3667b-e0ea-43fb-9ad4-8dcd1e6c40e1
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2019-12-08T20:01:23.391000+00:00
+  processed reference time 2019-12-08T20:01:23.391000+00:00
+  raw       session start  2019-12-08T20:01:23.391000+00:00
+  processed session start  2019-12-08T20:01:23.391000+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+ibl-witten-27  73918ae1-e4fd-4c18-b132-00cb555b1ad2
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2021-01-21T17:05:26-05:00
+  processed reference time 2021-01-21T17:05:26-05:00
+  raw       session start  2021-01-21T17:05:26-05:00
+  processed session start  2021-01-21T17:05:26-05:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NR-0024  f4eb56a4-8bf8-4bbc-a8f3-6e6535134bad
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-02-07T13:41:46-08:00
+  processed reference time 2023-02-07T13:41:46-08:00
+  raw       session start  2023-02-07T13:41:46-08:00
+  processed session start  2023-02-07T13:41:46-08:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+ZM-2240  259927fd-7563-4b03-bc5d-17b4d0fa7a55
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-01-22T10:50:59+00:00
+  processed reference time 2020-01-22T10:50:59+00:00
+  raw       session start  2020-01-22T10:50:59+00:00
+  processed session start  2020-01-22T10:50:59+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+NR-0027  195443eb-08e9-4a18-a7e1-d105b2ce1429
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-08-20T17:11:20-07:00
+  processed reference time 2022-08-20T17:11:20-07:00
+  raw       session start  2022-08-20T17:11:20-07:00
+  processed session start  2022-08-20T17:11:20-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+KS014  b9c205c3-feac-485b-a89d-afc96d9cb280
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2019-12-07T16:19:38.121000+00:00
+  processed reference time 2019-12-07T16:19:38.121000+00:00
+  raw       session start  2019-12-07T16:19:38.121000+00:00
+  processed session start  2019-12-07T16:19:38.121000+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL034  87ad026d-5b95-4022-8d59-c260870d830f
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-10-18T17:41:58+01:00
+  processed reference time 2022-10-18T17:41:58+01:00
+  raw       session start  2022-10-18T17:41:58+01:00
+  processed session start  2022-10-18T17:41:58+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+ibl-witten-27  c728f6fd-58e2-448d-aefb-a72c637b604c
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2021-01-16T19:51:02-05:00
+  processed reference time 2021-01-16T19:51:02-05:00
+  raw       session start  2021-01-16T19:51:02-05:00
+  processed session start  2021-01-16T19:51:02-05:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+UCLA049  0841d188-8ef2-4f20-9828-76a94d5343a4
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-08-02T16:36:06.329463-07:00
+  processed reference time 2022-08-02T16:36:06.329463-07:00
+  raw       session start  2022-08-02T16:36:06.329463-07:00
+  processed session start  2022-08-02T16:36:06.329463-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+UCLA044  91bac580-76ed-41ab-ac07-89051f8d7f6e
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-04-14T16:36:16.565033-07:00
+  processed reference time 2022-04-14T16:36:16.565033-07:00
+  raw       session start  2022-04-14T16:36:16.565033-07:00
+  processed session start  2022-04-14T16:36:16.565033-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+KS043  9468fa93-21ae-4984-955c-e8402e280c83
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-12-06T19:05:47.902000+00:00
+  processed reference time 2020-12-06T19:05:47.902000+00:00
+  raw       session start  2020-12-06T19:05:47.902000+00:00
+  processed session start  2020-12-06T19:05:47.902000+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+KS096  8928f98a-b411-497e-aa4b-aa752434686d
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-06-17T15:27:55.990000+01:00
+  processed reference time 2022-06-17T15:27:55.990000+01:00
+  raw       session start  2022-06-17T15:27:55.990000+01:00
+  processed session start  2022-06-17T15:27:55.990000+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL033  4546cd60-fa2a-4d20-a9b6-d091e01d16f2
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-10-05T16:28:57+01:00
+  processed reference time 2022-10-05T16:28:57+01:00
+  raw       session start  2022-10-05T16:28:57+01:00
+  processed session start  2022-10-05T16:28:57+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+ZFM-01936  d0ea3148-948d-4817-94f8-dcaf2342bbbe
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2021-01-19T17:15:10+00:00
+  processed reference time 2021-01-19T17:15:10+00:00
+  raw       session start  2021-01-19T17:15:10+00:00
+  processed session start  2021-01-19T17:15:10+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+SWC-054  6c6983ef-7383-4989-9183-32b1a300d17a
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-10-07T18:20:13.449770+01:00
+  processed reference time 2020-10-07T18:20:13.449770+01:00
+  raw       session start  2020-10-07T18:20:13.449770+01:00
+  processed session start  2020-10-07T18:20:13.449770+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSHL052  85dc2ebd-8aaf-46b0-9284-a197aee8b16f
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-02-18T14:24:19-05:00
+  processed reference time 2020-02-18T14:24:19-05:00
+  raw       session start  2020-02-18T14:24:19-05:00
+  processed session start  2020-02-18T14:24:19-05:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+KS094  752456f3-9f47-4fbf-bd44-9d131c0f41aa
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-06-16T11:49:20.330000+01:00
+  processed reference time 2022-06-16T11:49:20.330000+01:00
+  raw       session start  2022-06-16T11:49:20.330000+01:00
+  processed session start  2022-06-16T11:49:20.330000+01:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+MFD-05  7dd27c2f-9544-448d-918d-be0f9837b0e0
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2023-08-15T17:10:15.346939-07:00
+  processed reference time 2023-08-15T17:10:15.346939-07:00
+  raw       session start  2023-08-15T17:10:15.346939-07:00
+  processed session start  2023-08-15T17:10:15.346939-07:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+CSHL059  d2f5a130-b981-4546-8858-c94ae1da75ff
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2020-03-03T14:27:51-05:00
+  processed reference time 2020-03-03T14:27:51-05:00
+  raw       session start  2020-03-03T14:27:51-05:00
+  processed session start  2020-03-03T14:27:51-05:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL031  fbd28ea6-3251-48e0-b215-2c51ec5185f7
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2022-11-16T16:48:59.454308+00:00
+  processed reference time 2022-11-16T16:48:59.454308+00:00
+  raw       session start  2022-11-16T16:48:59.454308+00:00
+  processed session start  2022-11-16T16:48:59.454308+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
+PL017  8b1f4024-3d96-4ee7-95f9-8a1dfd4ce4ef
+  raw       source_script  Created using NeuroConv v0.9.2
+  processed source_script  Created using NeuroConv v0.9.4
+  raw       reference time 2021-11-09T19:32:47.033823+00:00
+  processed reference time 2021-11-09T19:32:47.033823+00:00
+  raw       session start  2021-11-09T19:32:47.033823+00:00
+  processed session start  2021-11-09T19:32:47.033823+00:00
+  nwb_version raw / processed  2.9.0 / 2.9.0
+
