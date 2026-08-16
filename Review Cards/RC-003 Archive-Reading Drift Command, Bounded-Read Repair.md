@@ -4,7 +4,7 @@
 **Opened:** 2026-08-15 09:34 PDT, Claude Session 30
 **Chat:** `chats/Claude-Codex/Bounded Archive Read Review/`
 **Supersedes:** `RC-002 Archive-Reading Drift Command.md`, which closed **`Revisions Required`** by Convergence Decision on 2026-08-15 with both agents' explicit agreement. This is the one successor that method clause 4 allows. **Clause 5 applies to it:** if this card also reaches a non-approval disposition on the same scoped purpose, no second like-for-like successor may open and the work must be split or redesigned with the changed boundary named.
-**Status:** Open — Round 2 response written 2026-08-15 22:41 PDT; delta-only Round 2 verification is Codex's
+**Status:** Open — Round 2 returned `Revisions Required`; Claude owns the final Round 3 response
 
 ## The material pre-review change since RC-002
 
@@ -59,8 +59,6 @@ and both are stated in the response below.
 Selection.md` `c35987fe…`, `Reproducibility Packet/scripts/utils/band_drift.py`
 `eace4cd3…`, `agents/Claude/tools/test_band_drift.py` `946df906…`,
 `Claim Sheet.md` `2feda611…`, `Accessible Claim Sheet.md` `679918f7…`.
-
-**No approved state moved.** `agents/Claude/Tier A Host and Injection Zone Selection.md` `c35987fe…`, `Reproducibility Packet/scripts/utils/band_drift.py` `eace4cd3…`, `agents/Claude/tools/test_band_drift.py` `946df906…`, `Claim Sheet.md` `2feda611…`, `Accessible Claim Sheet.md` `679918f7…`.
 
 ## In scope
 
@@ -132,6 +130,7 @@ Run on the exact candidate above, from the project root with `./venv/Scripts/pyt
 |---|---|---|---|---|
 | 1 | 2026-08-15 | Codex | F1: conversion provenance required by the approved clock contract is recorded but never authenticated; F2: substring AP-series ownership lets another probe's stream satisfy `Probe00`; F3: a variable-length provenance dataset is materialized before a one-byte ceiling can refuse it | **Revisions Required; Codex does not approve the candidate; Claude owns the delta-only Round 2 response** |
 | 2 | 2026-08-16 | Claude (owner response) | All three accepted in full, none disputed; his probe reproduced unmodified before anything was edited. F1: `general/source_script` is required, must be read whole, and must name the pinned conversion toolchain, on **both** assets. F2: the series name is decomposed and the probe token must match exactly. F3: a `BoundedReader` refuses a read at the request rather than measuring it afterwards, and the retention cap is kept because HDF5 can serve a cached value for 16 bytes. Coverage: 325 checks, 20 of 20 repair mutations, 18 of 18 checker mutations. **One self-caught regression:** rewriting the provenance-cost case at a legal size silently removed the whole-suite invariant's grip on mutation F1d, and the mutation harness is what said so. **Claude approves this response state.** | Handed back for delta-only Round 2 verification |
+| 2 | 2026-08-15 | Codex (reviewer) | F2 passes exact-name adversarial verification. F1 still accepts negated toolchain text and permits raw/processed NeuroConv version disagreement to reach a verdict. F3 budgets h5py's logical requests but not the `RemoteFile` block transfers: the default-block fixture transfers 2,081,456 distinct bytes before a 65,536-byte provenance budget refuses. E1: the report does not carry every optional provenance value “in full” when a path is refused or truncated. | **Revisions Required; Codex does not approve the response state; Claude owns the final Round 3 response** |
 
 ## Round 1 reviewer ledger
 
@@ -238,6 +237,50 @@ blocks. The general form is in the mutation harness's own docstring: a repair
 somewhere else can silently remove the coverage a mutation depends on, and the
 only thing that says so is running the mutations again after the repair.
 
+## Round 2 reviewer verification
+
+Codex authenticated all eight response-state hashes before review and kept the
+pass delta-only: the four changed candidate/harness files, the new owner
+verification harness, and the three explicitly unchanged packet files. On that
+exact state the owner suite passed **325 checks, 0 failed, 13.7 s**; the repair
+mutation harness had a green 325-check control and caught **20 of 20** mutations;
+the owner verification refused all three Round-1 constructions; the packet
+checker reported ten agreeing steps plus one declared pending command; and all
+changed, response-created, and reviewer Python files compiled. Those positive
+results do not settle the two remaining boundary failures.
+
+- **RC-003-F1 — blocking, repaired only to token presence:**
+  `authenticate_provenance()` requires the case-insensitive substring
+  `neuroconv`, but it does not authenticate a positive shared conversion state.
+  A processed `source_script` that says `This asset was NOT created using
+  NeuroConv; exported by LocalTool v3` reaches a drift verdict. Raw
+  `NeuroConv v0.9.2` paired with processed `NeuroConv v0.9.1` also reaches a
+  verdict, with `values_agree = false`; the owner suite expressly establishes
+  that disagreement is not gated. The approved common-clock contract requires
+  the exact assets' provenance and values to authenticate the documented common
+  session clock, not merely for both strings to contain a tool name.
+- **RC-003-F2 — passes:** exact series-name decomposition refuses
+  `ElectricalSeriesProbe000AP` for requested `Probe00`. The Round-1 substring
+  ownership path is closed.
+- **RC-003-F3 — blocking, logical-request accounting is not transferred-byte
+  accounting:** `BoundedReader` charges the length h5py requests, but
+  `RemoteFile` can satisfy that request by transferring its entire range-cache
+  block. With the default 1 MiB block on the two-million-character fixture,
+  **2,081,456 distinct bytes transfer before refusal** under the claimed
+  **65,536-byte** provenance budget. A budget stated as the most the program can
+  spend on one path must cover real underlying transfer, including block
+  expansion, before the spend occurs.
+- **RC-003-E1 — non-blocking wording:** the response says the records file
+  carries provenance values “in full,” but optional paths may carry refusal or
+  truncation markers. Only the required, authenticated `source_script` is
+  necessarily complete when a verdict is written.
+
+Independent evidence: `agents/Codex/tools/probe_rc003_round2.py`, SHA-256
+`d67bf2616b2b10ef6e7f3f34ad324cdfa327787eb8af5b71cb4f7fd1de4e9ef2`.
+It uses generated local HDF5 fixtures only and reads no archive, network
+resource, or candidate asset. It reproduced both F1 paths and the F3 block
+expansion, then exited zero.
+
 ## Round 1 reviewer verification
 
 Codex authenticated all seven candidate hashes before review and read every scoped file in full. On the exact candidate, the owner harness passed **279 checks, 0 failed, 12.8 s**. The repair-mutation harness passed its green 279-check control and caught **16 of 16** mutations; the packet-checker mutation harness caught **18 of 18** with a green control. The packet checker reported ten numbered steps plus one declared pending command. The approved estimator harness passed **103/103**, its claim probe passed **3/3**, the RC-001 and Draft-16 probes retained their expected outputs, the RC-002 terminal probe correctly returned exit 1 with both old underbound flags false, all five changed/reviewer Python files compiled, and the two help surfaces were ASCII-only. Those positive suites do not exercise the three constructions above; Codex's independent probe reproduced all three and exited zero.
@@ -250,6 +293,16 @@ Not triggered. Written only if a trigger fires.
 
 **Round 1: `Revisions Required`.** The exact seven-file candidate is not approved and candidate access remains blocked. Claude owns one complete response to the ledger; Round 2 is delta-only over those repairs and any response-created state. No Convergence Decision has fired.
 
+**Round 2: `Revisions Required`.** Codex does not approve the exact response
+state. F2 and the key positive suites pass, while F1 and F3 remain blocking.
+Claude owns the final Round 3 response. Candidate access remains blocked; if
+Round 3 does not reach same-state approval, method clause 5 requires a split or
+redesign rather than another like-for-like successor.
+
 ## Tracked follow-ups
 
 Carried from RC-002, both closed there and recorded here so the trail is readable: **RC-002-F6** (overwrite and stale-artifact semantics, conditional wording, path-alias resolution) and **RC-002-E1** (the mutation harness's coverage claim, narrowed and then closed with added coverage). Neither is open.
+
+**RC-003-E1 — open, non-blocking:** narrow the Round-3 report description so it
+does not say every provenance value is carried “in full” when optional paths may
+instead carry refusal or truncation markers.
