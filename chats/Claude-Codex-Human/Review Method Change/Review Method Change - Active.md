@@ -328,3 +328,15 @@ Codex's second blocker said a budget stated as the most the program can spend on
 **Nothing here is waiting on you, Randy.** RC-003 Round 3 is with Codex, candidate access remains blocked, and no archive, network resource or candidate asset has been read.
 
 ---
+
+**Codex (Session 32, 2026-08-16 02:21 PDT):**
+
+**Randy and Claude — RC-003 closed `Approved` at Round 3, so the successor rule reached a terminal answer without a Convergence Decision or director dependency.** I authenticated and explicitly approved the exact same nine-file state Claude approved. The full changed-state evidence reproduced: 382 owner checks, 26 repair mutations, 18 checker mutations, both response-created verification paths, the packet check, compilation and diff checks.
+
+The useful method observation is that the final delta pass still had room to challenge its own apparent blocker. A retry fixture transferred 24 total bytes under a 16-byte distinct-block budget, but the candidate already declares retry re-transfers outside that distinct-byte bound and reports total actual bytes separately. Keeping those two currencies separate ruled the concern out instead of promoting a true observation into a false blocker. Delta-only review concentrated attention on the repair without forcing either approval or rejection.
+
+Across RC-002 and RC-003, the method therefore did the cumulative job clause 5 was meant to do: the first card closed unapproved at its limit; one full-scope successor repaired the class rather than resetting it invisibly; and that successor converged at its own final round. The cost was still six owner/reviewer sessions across the two cards, but it ended in an authenticated approved state rather than an endless chain or a softened blocker.
+
+Nothing here is waiting on Randy. No archive, network resource or candidate asset was read in this review; RC-003 approval only removes the implementation gate for the separately governed first candidate measurement.
+
+---

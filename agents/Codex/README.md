@@ -20,14 +20,15 @@ agents/Codex/
 │  ├── probe_rc003_round1.py
 │  └── probe_rc003_round2.py
 ├── Session Summaries/
-│  └── HumanReport1.md … HumanReport31.md
+│  └── HumanReport1.md … HumanReport32.md
 └── Progress Reports/
    ├── Progress Report Phase 1 Close.md
    ├── Progress Report Amendment Compute Schedule.md
    ├── Progress Report Session 8.md
    ├── Progress Report Amendment Real Control Donor Exclusion.md
    ├── Progress Report Session 16.md
-   └── Progress Report Session 24.md
+   ├── Progress Report Session 24.md
+   └── Progress Report Session 32.md
 ```
 
 ## What each file owns
@@ -44,19 +45,19 @@ agents/Codex/
 - **`tools/probe_rc003_round1.py`** — independent RC-003 full-pass evidence. It shows that absent conversion provenance reaches a verdict, a substring-matched `Probe000` AP series can supply `Probe00`'s clock and reach a verdict, and a variable-length provenance value spends about 2.03 MB before a one-byte ceiling refuses it. A separate object-size diagnostic did not establish another blocker. It uses generated local HDF5 files only and reads no archive, candidate asset or network data.
 - **`tools/probe_rc003_round2.py`** — independent RC-003 delta-pass evidence. It shows that negated NeuroConv text and mismatched raw/processed NeuroConv versions still reach a verdict, and that the default one-megabyte range cache transfers 2,081,456 distinct bytes before the claimed 65,536-byte provenance budget refuses the value. It uses generated local HDF5 files only and reads no archive, candidate asset or network data.
 - **`Session Summaries/HumanReport<N>.md`** — permanent detailed session reports for the director.
-- **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 24 count-based report; the next cadence report is Session 32.
+- **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 32 count-based report; the next cadence report is Session 40.
 
 ## Shared work outside this folder
 
 - `chats/Claude-Codex/Phase 0 Literature Comparison/`, `Claim Sheet Review/`, `Study Guide Pass 1 Review/`, `Compute Environment Update/`, `Reproducibility Packet Review/`, and `Tier A Donor Matching Rule/` are concluded.
-- `chats/Claude-Codex/Tier A Selection Review/` is concluded on the director's method transition. Its successor, `chats/Claude-Codex/Tier A Selection Section 16 Review/`, is also concluded: RC-001 closed `Approved` at Round 3 with exact same-state approval of Draft 24 and both implementation states. No Convergence Decision was needed. The archive CLI remains a separate gate under successor RC-003; candidate measurement remains later and blocked.
+- `chats/Claude-Codex/Tier A Selection Review/` is concluded on the director's method transition. Its successor, `chats/Claude-Codex/Tier A Selection Section 16 Review/`, is also concluded: RC-001 closed `Approved` at Round 3 with exact same-state approval of Draft 24 and both implementation states. No Convergence Decision was needed. The separately reviewed archive CLI is now approved under RC-003; the first candidate measurement remains a later, separately governed action.
 - `chats/Claude-Codex/Archive-Reading Drift Command Review/` is concluded. RC-002 closed unapproved at the Convergence Decision with both agents explicitly agreeing on `Revisions Required`; its frozen state was repaired outside formal review.
-- `chats/Claude-Codex/Bounded Archive Read Review/` is active under successor RC-003. Codex returned Round 2 `Revisions Required`: exact series-name association passes, but token-only provenance authentication accepts negated toolchain text and raw/processed version disagreement, while logical-request budgeting does not cover default range-cache block transfers. Claude owns the final Round 3 response; candidate reading remains blocked.
+- `chats/Claude-Codex/Bounded Archive Read Review/` is concluded. Successor RC-003 closed `Approved` at Round 3 on the exact nine-file state both agents approved. Whole-statement provenance authentication, raw/processed converter-version agreement, exact series association, and pre-transfer distinct-block budgeting all pass. No Convergence Decision was needed, and no candidate asset was opened during review.
 - `chats/Claude-Codex-Human/Review Method Change/` is active at Randy's request. The bounded agent-only Convergence Decision, successor-card lineage, and forced redesign after repeated non-approval are now agreed and written into the superseding review method. Codex accepts Claude's two applications; one stale quality-checklist reference to human triage was mechanically corrected.
 - `Claim Sheet.md` and `Accessible Claim Sheet.md` are synchronized at SHA-256 `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365` / `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`. Amendments 1–6 are `In force`. The matching-rule prose, implementation/tests, host-dependent exact configuration, and manipulation gate remain separate approvals.
 - `Study Guide/Pass 1 - Conceptual Foundation.tex` and PDF are approved Phase 1 artifacts. Pass 2 remains a Phase 3 deliverable.
 - `director_requests.md` contains one open non-blocking Phase 1 contract-review item. No new director action is needed.
-- Root `README.md` is the append-only public live-run page. Codex Session 31 records the RC-003 Round-2 decision and two remaining blocker constructions. The project remains in progress with no candidate measurement or result.
+- Root `README.md` is the append-only public live-run page. Codex Session 32 records RC-003's exact-state approval while preserving the boundary that no candidate measurement or result exists. The project remains in progress.
 - The Reproducibility Packet is co-owned. Its design-stage runbook remains same-state approved at ten steps. Codex owns Rung 0, the sorter-panel decision, inference/negative-control harness, Tier A's independent balance/manipulation gate, and the two-part placement calibration.
 
 ## Current technical boundaries
@@ -66,9 +67,9 @@ agents/Codex/
 - Same-state-approved matcher Draft 6 uses common U-derived scaling for amplitude/effective-SNR/depth, donor-equal global no-reuse assignment, and no region term. It computes T and `N` once from a pinned target manifest, preserves the full sixteen-key Z removal, makes joint block-placement failure reject the host, and tests exact insertion/session/subject-count equality before falling back at the same provenance stage to the contract's literal insertion-count floor.
 - Before T is measured or any host-specific manifest/pool is opened, an exact exposure-schedule/placement specification and synthetic tests must pin the nuisance seed, amplitude target, and commanded-placement construction. Matcher implementation/test review follows as another same-state gate.
 - The derived CCF label layer is opt-in; recognized white-matter/fibre-tract labels remain non-injectable. Any non-CA1 zone change must define the removal set across parent/descendant labels before matching.
-- RC-001 is closed `Approved` on Draft 24 `c35987fe…`, utility `eace4cd35…`, and harness `946df906…`. The gate uses eleven consecutive one-minute medians; the universal half-bin cutoff is withdrawn; within-bin transmission depends on depth ranks and episode placement; and neither missed nor transmitted sub-minute motion is treated as a one-way safety property. The owner harness passes 103 checks, Codex's probe passes thirteen checks including 93,184 exhaustive small cases, and the utility's executable AST is unchanged from Round 2. The archive CLI is now under RC-003; candidate measurement remains blocked.
-- RC-002 closed unapproved at its Convergence Decision, with both agents agreeing on `Revisions Required`. Its one allowed successor, RC-003, is open after Round 2. The exact-name F2 repair passes. F1 still accepts negated NeuroConv text and mismatched raw/processed versions; F3 budgets h5py logical requests but not real cache-block transfers, measured at 2,081,456 bytes under a 65,536-byte provenance budget. The broad response evidence remains green at 325 owner checks, 20/20 repair mutations, 18/18 checker mutations, and all three Round-1 constructions refused, but Codex's Round-2 probe `d67bf261…` reproduces both remaining blockers. Claude owns the final Round 3 response; failure to reach approval then forces a split or redesign under method clause 5. No candidate asset was opened.
+- RC-001 is closed `Approved` on Draft 24 `c35987fe…`, utility `eace4cd35…`, and harness `946df906…`. The gate uses eleven consecutive one-minute medians; the universal half-bin cutoff is withdrawn; within-bin transmission depends on depth ranks and episode placement; and neither missed nor transmitted sub-minute motion is treated as a one-way safety property. The owner harness passes 103 checks, Codex's probe passes thirteen checks including 93,184 exhaustive small cases, and the utility's executable AST is unchanged from Round 2.
+- RC-002 closed unapproved at its Convergence Decision, with both agents agreeing on `Revisions Required`. Its one allowed successor, RC-003, closed `Approved` at Round 3 on the exact nine-file state recorded in the card. F1 now requires complete affirmative conversion statements and raw/processed version agreement; F2 uses exact series-name decomposition; F3 separates logical request bytes, newly transferred distinct cache-block bytes, and actual total bytes while holding the outer ceiling across the whole read. Codex independently reran 382/382 owner checks, 26/26 repair mutations, 18/18 checker mutations, both repair verifiers, and the packet checker. No Convergence Decision was needed and no candidate asset was opened.
 - `.gitattributes` makes repository-wide checkout bytes explicit and is same-state approved by both agents. All paths default to `-text`; 17 framework files and 11 legacy packet outputs intentionally reconstruct CRLF. A temporary `core.autocrlf=true` clone matched all 153 reviewed tracked files byte-for-byte.
-- No host is pinned, no candidate drift value has been read, and no dependency install, raw-data read, Rung 0, generation, or sorter run has occurred.
+- No host is pinned, no candidate drift value has been read, and no dependency install, raw-data read, Rung 0, generation, or sorter run has occurred. Claude owns the first separately governed plan-only measurement of pinned candidate CSHL047/Probe01 under the strict gate after a fresh machine-headroom check.
 
 For resumption, read `Summary of Only Necessary Context.md`, then the latest human report. Use `references.md` rather than memory for citations.

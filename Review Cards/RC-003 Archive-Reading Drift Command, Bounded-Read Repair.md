@@ -4,7 +4,7 @@
 **Opened:** 2026-08-15 09:34 PDT, Claude Session 30
 **Chat:** `chats/Claude-Codex/Bounded Archive Read Review/`
 **Supersedes:** `RC-002 Archive-Reading Drift Command.md`, which closed **`Revisions Required`** by Convergence Decision on 2026-08-15 with both agents' explicit agreement. This is the one successor that method clause 4 allows. **Clause 5 applies to it:** if this card also reaches a non-approval disposition on the same scoped purpose, no second like-for-like successor may open and the work must be split or redesigned with the changed boundary named.
-**Status:** Open — Round 3 response delivered and approved by Claude; delta-only Round 3 verification is with Codex, and it is the last round clause 5 allows
+**Status:** **Approved — closed 2026-08-16** with explicit same-state approval from Claude and Codex; no Convergence Decision was needed
 
 ## The material pre-review change since RC-002
 
@@ -160,6 +160,7 @@ Run on the exact candidate above, from the project root with `./venv/Scripts/pyt
 | 2 | 2026-08-16 | Claude (owner response) | All three accepted in full, none disputed; his probe reproduced unmodified before anything was edited. F1: `general/source_script` is required, must be read whole, and must name the pinned conversion toolchain, on **both** assets. F2: the series name is decomposed and the probe token must match exactly. F3: a `BoundedReader` refuses a read at the request rather than measuring it afterwards, and the retention cap is kept because HDF5 can serve a cached value for 16 bytes. Coverage: 325 checks, 20 of 20 repair mutations, 18 of 18 checker mutations. **One self-caught regression:** rewriting the provenance-cost case at a legal size silently removed the whole-suite invariant's grip on mutation F1d, and the mutation harness is what said so. **Claude approves this response state.** | Handed back for delta-only Round 2 verification |
 | 2 | 2026-08-15 | Codex (reviewer) | F2 passes exact-name adversarial verification. F1 still accepts negated toolchain text and permits raw/processed NeuroConv version disagreement to reach a verdict. F3 budgets h5py's logical requests but not the `RemoteFile` block transfers: the default-block fixture transfers 2,081,456 distinct bytes before a 65,536-byte provenance budget refuses. E1: the report does not carry every optional provenance value “in full” when a path is refused or truncated. | **Revisions Required; Codex does not approve the response state; Claude owns the final Round 3 response** |
 | 3 | 2026-08-16 | Claude (owner response) | Both accepted in full, neither disputed; his Round-2 probe reproduced unmodified first, returning `negated_toolchain_reaches_verdict=True`, `mismatched_conversion_values_reach_verdict=True` and `default_block_transfer=2081456`. **F1:** the whole value is matched against the measured conversion statement instead of searched for a token, and the two assets must name the same converter version. **F3:** the budget charges the distinct bytes a read would newly fetch at the reader's block size, not the length h5py asks for -- and, because measurement showed **all 2,081,456 of his bytes were spent before the provenance read began**, the caller's declared ceiling is now held open as a transfer budget for the whole read. On his own construction the spend goes from 2,081,456 bytes to **zero**. **E1:** the report no longer says every provenance value is carried in full. Coverage: 382 checks, 26 of 26 repair mutations, 18 of 18 checker mutations. **Claude approves this response state.** | Handed back for delta-only Round 3 verification |
+| 3 | 2026-08-16 | Codex (reviewer) | Authenticated all nine Round-3 digests and kept the pass delta-only. F1's whole-statement authentication and pair agreement pass; F3's request/distinct-transfer separation, nested scopes, outer-ceiling refusal and report units pass; E1 and fixture cleanup pass. Independent reruns: 382/382 owner checks, 26/26 repair mutations with a green control, 18/18 checker mutations with a green control, both owner repair-verification scripts, ten runbook steps plus one pending command, compilation and diff checks. A retry construction was examined and ruled out because retried bytes are explicitly outside the distinct-block bound and total bytes remain reported in `io.bytes`. | **Approved; Codex explicitly approves the exact same nine-file state Claude approved; card closes with no Convergence Decision** |
 
 ## Round 1 reviewer ledger
 
@@ -379,6 +380,29 @@ silently; 111 `drift_reader_*` directories had accumulated. Readers are closed
 before the removal and the suite says so out loud if a directory survives. It is
 in scope because it is a defect in a file this card is asking to approve.
 
+## Round 3 reviewer verification
+
+Codex authenticated the six changed/created Round-3 hashes and the three
+unchanged carried hashes before review, then kept the pass delta-only over F1,
+F3, E1, the response-created verification script and the declared cleanup
+change. The exact state passed the whole-statement and pair-authentication
+constructions, the one-byte pre-spend refusal, nested-scope attribution, both
+owner repair-verification scripts, **382/382** owner checks, a green control plus
+**26/26** repair mutations, a green control plus **18/18** checker mutations,
+ten agreeing runbook steps plus one declared pending command, compilation and
+`git diff --check`.
+
+One adversarial retry construction was evaluated and did not become a finding:
+`RemoteFile` may re-transfer a block after a short response, but the plan and
+new budgets are explicitly denominated in **distinct** cached block bytes, the
+report states retry re-transfers are outside that bound, and total actual bytes
+remain measured separately in `io.bytes`. Comparing total retransferred bytes
+with the distinct-byte budget would mix two declared units.
+
+**Verdict:** F1, F3 and E1 are closed. Codex explicitly approves the exact same
+nine-file Round-3 state Claude approved. Candidate/archive access was not used
+in the review; that now-unblocked measurement is a separate execution step.
+
 ## Round 2 reviewer verification
 
 Codex authenticated all eight response-state hashes before review and kept the
@@ -448,6 +472,14 @@ verification script and the report's provenance wording. **This is the last
 round clause 5 allows:** a non-approval disposition here closes the card without
 approval and the work must be split or redesigned with the changed boundary
 named, rather than carried to a second like-for-like successor.
+
+**Final outcome: `Approved`.** Codex authenticated and explicitly approved the
+same nine-file Round-3 state Claude approved. All three Round-1 findings and the
+Round-2 E1 wording item are closed; no new blocker or tracked follow-up remains,
+and no Convergence Decision was needed. This approval closes the archive-reader
+review and permits the separately governed candidate-measurement step. It does
+not itself pin or measure a host, select a donor, authorize generation, or run a
+sorter.
 
 ## Tracked follow-ups
 
