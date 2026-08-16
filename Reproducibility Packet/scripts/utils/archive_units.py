@@ -53,27 +53,37 @@ invisible to the plan and could transfer megabytes a caller had been told would
 not be transferred; the rule the repair leaves behind is the general one, and it
 is what the harness now checks on every fixture that performs a read.
 
-**Accounted is not bounded, which is the distinction the second repair turns
-on.** Moving the provenance read into preflight made its cost appear in the
-plan, but the plan is written after the read: a two-million-character
-variable-length value was still transferred in full and only then reported, so
-the number a caller was given was honest about a spend that had already
-happened. What HDF5 will not tell you in advance about such a value is its size;
-what it does do is *ask this module's reader* for the bytes before they move.
-:class:`BoundedReader` therefore refuses the request rather than measuring the
-result, and :func:`source_provenance` reads every provenance path under a pinned
-per-path budget. The cost is knowable before it is spent because the spend is
-capped, not because the value announced itself.
+**Accounted is not bounded, and a request is not a transfer.** Those are two
+distinct repairs and the module needed both. Moving the provenance read into
+preflight made its cost appear in the plan, but the plan is written after the
+read: a two-million-character variable-length value was still transferred in
+full and only then reported, so the number a caller was given was honest about a
+spend that had already happened. HDF5 will not state such a value's size in
+advance, but it does *ask this module's reader* for the bytes before they move,
+so :class:`BoundedReader` refuses the request rather than measuring the result.
+That bounded what the read asks for -- and not what the read costs. The reader
+underneath fetches whole blocks, so at a 1 MiB block a sixteen-byte request for
+an unfetched byte spends a mebibyte, and a budget of 65,536 bytes stated as the
+most one path could spend was unreachable rather than merely unenforced. The
+proxy therefore models the block cache and charges each read the distinct bytes
+it would newly fetch, against a second budget denominated in blocks and derived
+in :func:`provenance_transfer_budget`. **Both budgets refuse before delegating,
+and both are reported beside what they actually spent**, so ``--plan-only``
+states the bound before the run rather than the spend after it.
 
-**One provenance path is authenticated rather than recorded.** The session-time
-origin the drift grid is anchored on is a property of the converter, so an asset
-that does not state what produced it cannot establish it. ``general/source_script``
-must be present, must have been read whole, and must name the pinned conversion
-toolchain; a file carrying none at all used to reach a drift verdict with an
-empty provenance record, which is a malformed input becoming a verdict. What
-that check can and cannot establish is written at
-:data:`REQUIRED_PROVENANCE_PATH`, and the honest half of it is that no asset in
-this dandiset carries the conversion repository's commit, so no check here
+**One provenance path is authenticated rather than recorded, and the pair has to
+agree.** The session-time origin the drift grid is anchored on is a property of
+the converter, so an asset that does not state what produced it cannot establish
+it. ``general/source_script`` must be present, must have been read whole, and
+must *be* the conversion statement the measured assets carry -- matched end to
+end, because a search for the tool's name alone said yes to a value reading
+"NOT created using NeuroConv", and a negated occurrence is not provenance. The
+raw and processed halves of one session must then name the same converter
+version, because the clock claim is that both halves share one coordinate and
+two converter versions is not evidence that they do. What those checks can and
+cannot establish is written at :data:`REQUIRED_PROVENANCE_PATH` and
+:func:`authenticate_provenance_pair`, and the honest half of it is that no asset
+in this dandiset carries the conversion repository's commit, so no check here
 confirms it.
 
 **What it validates, and why validation lives here rather than in the caller.**
@@ -122,6 +132,7 @@ reads and checks; ``utils.band_drift`` measures.
 
 import contextlib
 import io
+import re
 import sys
 
 import numpy as np
@@ -171,13 +182,53 @@ PROVENANCE_PATHS = (
 REQUIRED_PROVENANCE_PATH = "general/source_script"
 CONVERSION_SOURCE_TOKEN = "neuroconv"
 
-# The per-value budget on conversion provenance, pinned here rather than passed
-# in, because a value read from a candidate must not be able to choose the
-# number that decides whether reading it was allowed. It is deliberately far
-# above any plausible real value -- the measured values above are about thirty
-# characters -- and it bounds the value's own bytes *and* the structural reads
-# that reach it, so the spend on one path is at most this number.
+# The positive form the measured values take, matched end to end rather than
+# searched for. Searching for the token above is not authentication: a value
+# reading "This asset was NOT created using NeuroConv; exported by LocalTool v3"
+# contains the token and denies the statement, so the search answered yes to a
+# file that says no. A negated occurrence is not provenance. The whole value
+# must be the sentence all 21 measured assets carry -- case-insensitively, and
+# with surrounding whitespace stripped, because a rejection on capitalisation
+# or on a trailing newline would be a rejection on typography -- and the
+# version it names is captured rather than matched against a list.
+CONVERSION_SOURCE_FORM = re.compile(
+    r"^created using neuroconv v(?P<version>\d+(?:\.\d+)*)$")
+CONVERSION_SOURCE_FORM_TEXT = "Created using NeuroConv v<version>"
+
+# The versions that measurement found: reported, and deliberately NOT gated on.
+# Session 7's 21 assets carry two of them, and the one reading v0.9.1 belongs to
+# NYU-39, a host subject -- so this dandiset is not uniform in its converter
+# version and a third one is not by itself evidence of a different clock.
+# Gating on this tuple would be a threshold taken from a 21-asset sample of
+# *raw* assets and applied to processed assets this project has never read.
+# What is gated instead is the form above, which all 21 satisfy, and agreement
+# between the two halves of one session, which is the property the common-clock
+# claim actually needs -- see :func:`authenticate_provenance_pair`.
+MEASURED_CONVERSION_VERSIONS = ("0.9.1", "0.9.2")
+
+# The budget on what reading conversion provenance may *ask for*, and so on what
+# it may materialize, cumulative across the whole call. Pinned here rather than
+# passed in, because a value read from a candidate must not be able to choose
+# the number that decides whether reading it was allowed. It is deliberately far
+# above any plausible real value -- the measured values are about thirty
+# characters -- and a refused read spends none of it, so one oversized value
+# does not stop the paths after it from being read.
 PROVENANCE_MAX_BYTES = 65536
+
+# The block size the *raw* asset's provenance read uses, capped below whatever
+# the caller passed. That read is the one with no plan behind it -- it happens
+# before any ceiling exists and its cost is reported rather than bounded by one
+# -- so its transfer bound should not scale with a block size chosen for a bulk
+# payload read on a different file. At 64 KiB the bound is 327,680 bytes
+# instead of the 4,259,840 a 1 MiB block would make it.
+PROVENANCE_BLOCK_BYTES = 65536
+
+# Labels for the two nested read budgets, so a refusal says which one
+# refused. They are constants because :func:`source_provenance`'s handler
+# compares against one of them, and a handler that compared against a literal
+# would silently stop matching if the label were reworded.
+PROVENANCE_SCOPE = "provenance"
+PREFLIGHT_SCOPE = "declared ceiling"
 
 # The two self-describing forms a provenance value can take when it was not read
 # whole. They are prefixes rather than free text so that
@@ -187,13 +238,64 @@ PROVENANCE_UNREAD_PREFIX = "<not read:"
 PROVENANCE_TRUNCATED_PREFIX = "<truncated:"
 
 
+def provenance_transfer_budget(block_bytes):
+    """Return the distinct-transfer budget for one conversion-provenance read.
+
+    **Why there is a second budget at all.** :data:`PROVENANCE_MAX_BYTES`
+    bounds the request; it does not bound the transfer that serves the
+    request, because the reader underneath fetches whole fixed-size blocks.
+    At the command's default 1 MiB block a sixteen-byte read of a byte
+    nothing has fetched yet costs a whole mebibyte, and a
+    two-million-character value under a 65,536-byte request budget moved
+    2,081,456 distinct bytes -- essentially the whole generated file --
+    before the refusal. At that block size the stated number was not merely
+    unenforced, it was unreachable: nothing can be read for less than one
+    block.
+
+    **The value is derived rather than chosen: the request budget, plus one
+    block per provenance path.** The first term is what proves a legal value
+    can always be read wherever it sits -- a value of at most ``C`` bytes
+    starting at an arbitrary offset spans at most ``ceil(C / B) + 1`` blocks,
+    which is at most ``C + 2B`` bytes -- and the second leaves ``2B`` over
+    for the object headers, heap collections and group links that reach the
+    four paths. The result cannot be smaller than one block, and that is a
+    property of the caller's ``--block-kb`` rather than of this rule.
+
+    Args:
+        block_bytes: the reader's block size, or 0 when it fetches exactly
+            what it is asked for.
+
+    Returns:
+        The budget in bytes, or None for a reader that does not fetch in
+        blocks -- there the transfer equals the request and
+        :data:`PROVENANCE_MAX_BYTES` already bounds it, so a second budget
+        would be the same number under another name.
+    """
+    if not block_bytes:
+        return None
+    return PROVENANCE_MAX_BYTES + len(PROVENANCE_PATHS) * int(block_bytes)
+
+
 class ReadBudgetExceeded(ValueError):
-    """Raised when a read would spend more than the budget in force allows.
+    """Raised when a read would spend more than a budget in force allows.
 
     It is a :class:`ValueError` because every other statement this module makes
     about a malformed or oversized asset is one, and :func:`read_band_units`'s
     caller converts that class into an input error rather than a drift verdict.
+
+    Attributes:
+        scope: which budget refused, since budgets nest. A refusal by the
+            provenance budget is a statement about one value and is recorded as
+            a marker; a refusal by the ceiling is a statement about the whole
+            read and must not be swallowed by the code handling the former.
+            Without this the two are one exception type and the inner handler
+            catches both.
     """
+
+    def __init__(self, message, scope=None):
+        """Record the refusing scope's label alongside the message."""
+        ValueError.__init__(self, message)
+        self.scope = scope
 
 
 class BoundedReader(io.RawIOBase):
@@ -208,10 +310,34 @@ class BoundedReader(io.RawIOBase):
     -- moving the read to where the plan can count it -- makes the spend
     *visible* without making it *refusable*. What is still available is the
     request: h5py asks this object for the heap collection's bytes before they
-    move, so a proxy that checks the requested length against a budget and
-    raises can decline the read at a cost of the structural bytes already spent
-    reaching it. Measured on a 2,035,936-byte value under a 65,536-byte budget:
-    7,904 bytes moved, against 2,028,208 with no budget in force.
+    move, so a proxy that checks the requested length and raises can decline the
+    read before those bytes move.
+
+    **Two budgets, because a request and the transfer that serves it are not the
+    same size.** Charging only the requested length bounds what is
+    *materialized* and not what is *transferred*: the reader underneath fetches
+    whole fixed-size blocks and keeps them, so a sixteen-byte read of a byte
+    nothing has fetched yet costs a whole block. Measured on a
+    two-million-character value under a 65,536-byte request budget at a 1 MiB
+    block, 2,081,456 distinct bytes moved before the refusal. This proxy
+    therefore models the reader's block cache: before delegating any read it
+    computes which blocks that read would *newly* fetch, charges their whole
+    size against a second, transfer-denominated budget, and refuses rather than
+    delegating when the charge does not fit.
+
+    **Why the model is exact, and conservative where it is not.** Every read
+    h5py makes on this file goes through this object, and a block-caching reader
+    fetches exactly the blocks covering the range it is asked for, so the set of
+    blocks recorded here is the set the reader holds. A refused read spends
+    nothing and is recorded as fetching nothing. A read is charged for the range
+    it requests, clamped to the file's size the way the reader clamps it, and
+    the blocks it marks as fetched are the same clamped range -- so the model
+    never credits the cache with a block the reader did not fetch.
+
+    A reader that declares no block size does not expand a read: its transfer is
+    its request, and the request budget already bounds it. The attributes the
+    model reads are ``block`` and ``size``, both of which
+    :class:`utils.remote_hdf5.RemoteFile` publishes.
 
     The proxy is transparent when no budget is in force, which is every read
     outside :func:`source_provenance`. It forwards the reader's own counters, so
@@ -221,46 +347,142 @@ class BoundedReader(io.RawIOBase):
     Attributes:
         n_bytes: the wrapped reader's transferred-byte counter.
         n_requests: the wrapped reader's request counter.
+        block_bytes: the wrapped reader's block size, or 0 if it declares none.
+        last_spend: what the most recently closed budget block spent, as a dict
+            of both budgets and both amounts. It is how a caller reports a bound
+            and the spend inside it without reaching into this object's state.
     """
 
     def __init__(self, inner):
         """Wrap ``inner``, which must be a seekable binary reader."""
         self._inner = inner
-        self._budget = None
-        self._remaining = None
+        self._block = int(getattr(inner, "block", 0) or 0)
+        self._size = int(getattr(inner, "size", 0) or 0)
+        self._fetched = set()
+        self._scopes = []
+        self.last_spend = None
+
+    @property
+    def block_bytes(self):
+        """The wrapped reader's block size, or 0 when it fetches what it is asked for."""
+        return self._block
 
     @contextlib.contextmanager
-    def budget(self, n_bytes):
-        """Refuse, inside this block, any read larger than what is left of ``n_bytes``.
+    def budget(self, read_bytes, transfer_bytes=None, label="budget"):
+        """Refuse, inside this block, any read that would exceed either budget.
+
+        **Budgets nest, and every enclosing one is charged.** The provenance
+        read sits inside the ceiling the caller declared, and a scheme where the
+        inner budget replaced the outer would leave the outer blind to exactly
+        the reads the inner one permitted. Each scope keeps its own pair of
+        remainders; a read is refused unless it fits in all of them, and it is
+        charged to all of them only once it has.
 
         Args:
-            n_bytes: the budget for the whole block, covering every read made
-                inside it.
+            read_bytes: the budget on what may be asked for, and therefore on
+                what may be materialized, covering every read made inside the
+                block. None bounds nothing, for a scope that only bounds
+                transfer.
+            transfer_bytes: the budget on the distinct bytes the reader
+                underneath may newly fetch. None means the request is the
+                transfer, which is true of a reader that declares no block size.
+            label: what to name this scope when it is the one that refuses, so a
+                handler for one budget's refusals does not silently absorb
+                another's.
 
         Yields:
-            None. On exit the previous budget, normally none at all, is restored
-            whether or not the block raised.
+            None. On exit this scope is removed whether or not the block raised,
+            and ``last_spend`` records what it spent against each of its
+            budgets.
         """
-        previous = (self._budget, self._remaining)
-        self._budget = self._remaining = int(n_bytes)
+        limit = read_bytes if transfer_bytes is None else transfer_bytes
+        scope = {
+            "label": label,
+            "read_budget": None if read_bytes is None else int(read_bytes),
+            "read_remaining": None if read_bytes is None else int(read_bytes),
+            "transfer_budget": None if limit is None else int(limit),
+            "transfer_remaining": None if limit is None else int(limit),
+        }
+        self._scopes.append(scope)
         try:
             yield
         finally:
-            self._budget, self._remaining = previous
+            self._scopes.pop()
+            self.last_spend = {
+                "label": scope["label"],
+                "read_budget_bytes": scope["read_budget"],
+                "read_bytes": (None if scope["read_budget"] is None
+                               else scope["read_budget"] - scope["read_remaining"]),
+                "transfer_budget_bytes": scope["transfer_budget"],
+                "transfer_bytes": (None if scope["transfer_budget"] is None
+                                   else scope["transfer_budget"]
+                                   - scope["transfer_remaining"]),
+                "block_bytes": self._block,
+            }
+
+    def _block_span(self, position, n_bytes):
+        """Return the block indices a read of ``n_bytes`` at ``position`` would fetch."""
+        if not self._block or self._size <= 0:
+            return ()
+        length = min(n_bytes, max(0, self._size - position))
+        if length <= 0:
+            return ()
+        return range(position // self._block,
+                     (position + length - 1) // self._block + 1)
+
+    def _block_size(self, index):
+        """Return how many bytes block ``index`` holds; the last one is short."""
+        return max(0, min(self._block, self._size - index * self._block))
+
+    def _transfer_cost(self, position, n_bytes):
+        """Return the distinct bytes a read at ``position`` would newly fetch."""
+        if not self._block:
+            return min(n_bytes, max(0, self._size - position))
+        return sum(self._block_size(index)
+                   for index in self._block_span(position, n_bytes)
+                   if index not in self._fetched)
 
     def _charge(self, n_bytes):
-        """Refuse or account for a read of ``n_bytes`` before it is delegated."""
-        if self._remaining is None:
+        """Refuse or account for a read of ``n_bytes`` before it is delegated.
+
+        Every enclosing scope is tested before any of them is charged, so a
+        refusal leaves every budget exactly as it was and nothing moves.
+        """
+        position = self._inner.tell()
+        wanted = self._size if n_bytes is None or n_bytes < 0 else n_bytes
+        if not self._scopes:
+            self._fetched.update(self._block_span(position, wanted))
             return
-        if n_bytes is None or n_bytes < 0:
-            raise ReadBudgetExceeded(
-                "a read to end-of-file was requested under a %d-byte budget"
-                % self._budget)
-        if n_bytes > self._remaining:
-            raise ReadBudgetExceeded(
-                "a %d-byte read exceeds the %d bytes left of a %d-byte budget"
-                % (n_bytes, self._remaining, self._budget))
-        self._remaining -= n_bytes
+        cost = self._transfer_cost(position, wanted)
+        for scope in reversed(self._scopes):
+            if scope["read_remaining"] is not None:
+                if n_bytes is None or n_bytes < 0:
+                    raise ReadBudgetExceeded(
+                        "a read to end-of-file was requested under a %d-byte %s read "
+                        "budget" % (scope["read_budget"], scope["label"]),
+                        scope["label"])
+                if n_bytes > scope["read_remaining"]:
+                    raise ReadBudgetExceeded(
+                        "a %d-byte read exceeds the %d bytes left of a %d-byte %s read "
+                        "budget" % (n_bytes, scope["read_remaining"],
+                                    scope["read_budget"], scope["label"]),
+                        scope["label"])
+            if scope["transfer_remaining"] is not None and cost > scope["transfer_remaining"]:
+                raise ReadBudgetExceeded(
+                    "a %d-byte read at offset %d would transfer %d distinct bytes at the "
+                    "reader's %d-byte block size, and %d bytes are left of a %d-byte %s "
+                    "transfer budget; the size of a request is not the size of the "
+                    "transfer that serves it"
+                    % (n_bytes, position, cost, self._block,
+                       scope["transfer_remaining"], scope["transfer_budget"],
+                       scope["label"]),
+                    scope["label"])
+        for scope in self._scopes:
+            if scope["read_remaining"] is not None:
+                scope["read_remaining"] -= n_bytes
+            if scope["transfer_remaining"] is not None:
+                scope["transfer_remaining"] -= cost
+        self._fetched.update(self._block_span(position, wanted))
 
     def readable(self):
         """Return True; this proxy is read-only."""
@@ -454,8 +676,11 @@ def source_provenance(handle, reader, max_bytes=PROVENANCE_MAX_BYTES):
             cannot be refused before its bytes move, and an unbounded read of a
             value whose size HDF5 will not state is the exact defect this
             argument exists to prevent.
-        max_bytes: the pinned per-value budget, covering each path's value and
-            the structural reads that reach it.
+        max_bytes: the pinned budget on what this call may ask for, cumulative
+            over every path, every attribute and every structural read inside
+            it. The transfer budget is derived from the reader's own block size
+            by :func:`provenance_transfer_budget`; both are readable afterwards
+            from ``reader.last_spend`` together with what they spent.
 
     Returns:
         A dict from path to its stored value as a string, omitting paths the
@@ -477,43 +702,84 @@ def source_provenance(handle, reader, max_bytes=PROVENANCE_MAX_BYTES):
         still unbounded, a two-million-character value was *spent* and only then
         reported, so the cost became visible without becoming preventable. The
         second repair is the budget, which refuses the read at the request
-        rather than measuring it afterwards. Both were needed; neither is the
-        other.
+        rather than measuring it afterwards. **The third is that a request is
+        not a transfer**: the budget above bounded what h5py asked for while
+        the reader underneath fetched whole blocks, so a value refused under a
+        65,536-byte budget still moved 2,081,456 distinct bytes at a 1 MiB
+        block. The block-denominated budget is what closes that, and the reason
+        one budget scope now covers the whole call rather than one read is that
+        a per-read bound says nothing about the total a scattered file can cost.
+
+        **A refused read spends neither budget**, so an oversized or unreachable
+        value does not stop the paths after it from being read; and the required
+        path is read first, so the budget is never consumed before the one path
+        a verdict depends on has had it.
     """
     out = {}
-    for path in PROVENANCE_PATHS:
-        if path not in handle:
-            continue
-        node = handle[path]
-        stored = _stored_value_bytes(node)
-        if stored is not None and stored > max_bytes:
-            out[path] = ("%s %d stored bytes exceeds the %d-byte provenance budget>"
-                         % (PROVENANCE_UNREAD_PREFIX, stored, max_bytes))
-            continue
-        try:
-            with reader.budget(max_bytes):
-                value = node[()]
-        except ReadBudgetExceeded as exc:
-            out[path] = "%s %s>" % (PROVENANCE_UNREAD_PREFIX, exc)
-            continue
-        except (TypeError, ValueError):
-            continue
-        if isinstance(value, bytes):
-            value = value.decode()
-        out[path] = _capped(str(value), max_bytes)
-        for key in ("file_name", "software", "version"):
+    with reader.budget(max_bytes, provenance_transfer_budget(reader.block_bytes),
+                       label=PROVENANCE_SCOPE):
+        for path in PROVENANCE_PATHS:
             try:
-                with reader.budget(max_bytes):
-                    attr = node.attrs.get(key)
+                if path not in handle:
+                    continue
+                node = handle[path]
             except ReadBudgetExceeded as exc:
-                out["%s@%s" % (path, key)] = "%s %s>" % (PROVENANCE_UNREAD_PREFIX, exc)
+                # Resolving the path is itself a read, so it is inside the
+                # budget rather than beside it. A bound that covered the value
+                # and not the traversal that reaches it would be a bound on
+                # part of the spend it names. Only this scope's refusals are
+                # recorded as markers -- an enclosing budget refusing here is a
+                # statement about the whole read and is re-raised.
+                _own_refusal(exc)
+                out[path] = "%s %s>" % (PROVENANCE_UNREAD_PREFIX, exc)
                 continue
-            if attr is None:
+            stored = _stored_value_bytes(node)
+            if stored is not None and stored > max_bytes:
+                out[path] = ("%s %d stored bytes exceeds the %d-byte provenance budget>"
+                             % (PROVENANCE_UNREAD_PREFIX, stored, max_bytes))
                 continue
-            if isinstance(attr, bytes):
-                attr = attr.decode()
-            out["%s@%s" % (path, key)] = _capped(str(attr), max_bytes)
+            try:
+                value = node[()]
+            except ReadBudgetExceeded as exc:
+                _own_refusal(exc)
+                out[path] = "%s %s>" % (PROVENANCE_UNREAD_PREFIX, exc)
+                continue
+            except (TypeError, ValueError):
+                continue
+            if isinstance(value, bytes):
+                value = value.decode()
+            out[path] = _capped(str(value), max_bytes)
+            for key in ("file_name", "software", "version"):
+                try:
+                    attr = node.attrs.get(key)
+                except ReadBudgetExceeded as exc:
+                    _own_refusal(exc)
+                    out["%s@%s" % (path, key)] = ("%s %s>"
+                                                  % (PROVENANCE_UNREAD_PREFIX, exc))
+                    continue
+                if attr is None:
+                    continue
+                if isinstance(attr, bytes):
+                    attr = attr.decode()
+                out["%s@%s" % (path, key)] = _capped(str(attr), max_bytes)
     return out
+
+
+def _own_refusal(exc):
+    """Re-raise a budget refusal that belongs to an enclosing scope.
+
+    Args:
+        exc: the :class:`ReadBudgetExceeded` just caught.
+
+    Raises:
+        ReadBudgetExceeded: unmodified, when it was not the provenance budget
+            that refused. A ceiling refusal recorded as "this value could not be
+            read" would turn a statement about the whole read into a marker
+            beside one path, which is a failure that reports itself as a
+            success.
+    """
+    if getattr(exc, "scope", None) != PROVENANCE_SCOPE:
+        raise exc
 
 
 def provenance_is_complete(value):
@@ -532,6 +798,24 @@ def provenance_is_complete(value):
                 or PROVENANCE_TRUNCATED_PREFIX in value)
 
 
+def conversion_version(value):
+    """Return the converter version a provenance value names, or None.
+
+    Args:
+        value: one asset's ``general/source_script``, as read.
+
+    Returns:
+        The version string when the whole value is the measured conversion
+        statement, ignoring surrounding whitespace and capitalisation, and None
+        otherwise. Returning None for anything else is what makes a *negated*
+        occurrence of the toolchain's name a failure rather than a pass: the
+        name appears in "NOT created using NeuroConv" too, and a search cannot
+        tell the two apart.
+    """
+    match = CONVERSION_SOURCE_FORM.match(value.strip().lower())
+    return match.group("version") if match else None
+
+
 def authenticate_provenance(provenance, source):
     """Confirm one asset states it came off the documented conversion toolchain.
 
@@ -548,14 +832,27 @@ def authenticate_provenance(provenance, source):
         source: how to name the asset in the error, e.g. ``"raw asset X"``.
 
     Returns:
-        A dict with ``path``, ``value``, ``token`` and ``source``, for the
-        record and the report.
+        A dict with ``path``, ``value``, ``version``, ``form``, ``token``,
+        ``version_is_measured`` and ``source``, for the record and the report.
 
     Raises:
-        ValueError: if the required path is absent, was not read whole, or names
-            a toolchain other than the pinned one. All three are input errors:
+        ValueError: if the required path is absent, was not read whole, or is
+            not the measured conversion statement. All three are input errors:
             they say the asset is not the one the clock claim is about, not that
             the candidate drifted.
+
+    Note:
+        **A token search is not authentication, which is the repair here.** The
+        first version required the case-insensitive substring ``neuroconv``
+        anywhere in the value, and a value reading ``This asset was NOT created
+        using NeuroConv; exported by LocalTool v3`` satisfied it: the search
+        answered yes to a file that says no. The whole value is now matched
+        against :data:`CONVERSION_SOURCE_FORM`, which is the exact sentence all
+        21 assets measured in Session 7 carry, so what is authenticated is a
+        positive statement rather than the presence of a word inside an
+        arbitrary one. The version the sentence names is captured and reported;
+        it is not matched against :data:`MEASURED_CONVERSION_VERSIONS`, for the
+        reason recorded there.
     """
     value = provenance.get(REQUIRED_PROVENANCE_PATH)
     if value is None:
@@ -570,15 +867,101 @@ def authenticate_provenance(provenance, source):
             "(%s), and a value this command did not fully see is not evidence about what "
             "produced the asset"
             % (source, REQUIRED_PROVENANCE_PATH, PROVENANCE_MAX_BYTES, ascii_safe(value)))
-    if CONVERSION_SOURCE_TOKEN not in value.lower():
+    version = conversion_version(value)
+    if version is None:
         raise ValueError(
-            "%s names %r as its %s, which does not identify the pinned conversion toolchain "
-            "%r; every one of the 21 assets of this dandiset measured in Session 7 named it, "
-            "so an asset that does not is outside the conversion path the session clock is "
-            "pinned to"
-            % (source, ascii_safe(value), REQUIRED_PROVENANCE_PATH, CONVERSION_SOURCE_TOKEN))
-    return {"path": REQUIRED_PROVENANCE_PATH, "value": value,
-            "token": CONVERSION_SOURCE_TOKEN, "source": source}
+            "%s states %r as its %s, which is not the conversion statement %r that every "
+            "one of the 21 assets of this dandiset measured in Session 7 carries. The "
+            "whole value is matched rather than searched for %r, because a value that "
+            "denies the toolchain contains its name too, so an asset outside the "
+            "conversion path the session clock is pinned to is not admitted by naming it"
+            % (source, ascii_safe(value), REQUIRED_PROVENANCE_PATH,
+               CONVERSION_SOURCE_FORM_TEXT, CONVERSION_SOURCE_TOKEN))
+    return {"path": REQUIRED_PROVENANCE_PATH, "value": value, "version": version,
+            "form": CONVERSION_SOURCE_FORM_TEXT, "token": CONVERSION_SOURCE_TOKEN,
+            "version_is_measured": version in MEASURED_CONVERSION_VERSIONS,
+            "source": source}
+
+
+def authenticate_provenance_pair(first, second):
+    """Confirm two assets of one session state the same conversion version.
+
+    Authenticating each asset separately establishes that each came off the
+    documented toolchain. It does not establish that they came off *one*
+    conversion, and the clock claim is about exactly that: the raw asset supplies
+    the grid's extent while the processed asset supplies the spikes, so a drift
+    number is only meaningful if the two share a session-time coordinate. Two
+    different converter versions on the two halves is not evidence that they do.
+
+    **This is the strict branch of a choice, and the alternative was to admit
+    the difference with a justification.** There is no such justification
+    available here: this project has no measurement of what differs between
+    NeuroConv versions, and Session 7's survey read one *raw* asset per subject,
+    so it says nothing about whether a session's two halves are converted
+    together. Requiring agreement is the position that does not rest on an
+    assumption, and its failure mode is the recoverable one: Section 16.4 of the
+    selection document makes an input error pause the pinned order rather than
+    reject the candidate, so a real disagreement stops the run, is reported with
+    both values, and is resolved by amendment against evidence this project
+    would then have.
+
+    Args:
+        first: an :func:`authenticate_provenance` result, normally the raw one.
+        second: the other asset's result.
+
+    Returns:
+        A dict with ``version``, ``versions_agree`` (necessarily True, because
+        the run stops otherwise) and ``version_is_measured``.
+
+    Raises:
+        ValueError: if the two versions differ. It is an input error about the
+            asset pair, not a drift verdict.
+    """
+    if first["version"] != second["version"]:
+        raise ValueError(
+            "%s states conversion version %s and %s states %s. The session-time origin "
+            "the bin grid is anchored on is a property of the converter, and the two "
+            "halves of one session have to share it: the raw asset supplies the extent "
+            "and the processed asset supplies the spikes. Two converter versions is not "
+            "evidence that they share one coordinate, and nothing this command has "
+            "measured says the difference is harmless. Resolve it as an input error, "
+            "which pauses the pinned order rather than rejecting the candidate"
+            % (first["source"], first["version"], second["source"], second["version"]))
+    return {"version": first["version"], "versions_agree": True,
+            "version_is_measured": first["version"] in MEASURED_CONVERSION_VERSIONS}
+
+
+@contextlib.contextmanager
+def _ceiling_budget(reader, max_bytes):
+    """Hold the caller's declared ceiling open as a transfer budget, or nothing.
+
+    **Why the ceiling belongs here and not only after the plan.** The ceiling
+    used to be checked once, against a plan written after preflight had already
+    read the electrode table, the unit scalars, the descriptions and the
+    provenance. On a fixture whose metadata is scattered across a 2 MB file at a
+    1 MiB block, that is 2,081,456 distinct bytes spent before a one-byte
+    ceiling refuses anything -- the refusal was correct and it was late. Held
+    open around the whole read, the same number refuses before the first fetch.
+
+    **It cannot make anything infeasible, which is the argument that licenses
+    it.** ``peak_resident_bytes`` contains ``cache_bound_bytes``, which is an
+    upper bound on the distinct bytes the read fetches, so any read the ceiling
+    check admits has already transferred no more than ``max_bytes``. Refusing a
+    fetch that would cross ``max_bytes`` therefore refuses only reads the later
+    check would have refused anyway -- earlier, and before the bytes move.
+
+    Args:
+        reader: the :class:`BoundedReader` the file is opened on.
+        max_bytes: the declared ceiling, or None for no ceiling at all.
+
+    Yields:
+        None.
+    """
+    if max_bytes is None:
+        yield
+        return
+    with reader.budget(None, int(max_bytes), label=PREFLIGHT_SCOPE):
+        yield
 
 
 def read_provenance(url, size, block_bytes):
@@ -595,17 +978,29 @@ def read_provenance(url, size, block_bytes):
         block_bytes: range-request block size.
 
     Returns:
-        A dict with ``provenance`` and ``io`` (request count and bytes). The
-        cost is bounded by construction -- at most
-        :data:`PROVENANCE_MAX_BYTES` per path plus the file's own structural
-        reads -- rather than by a ceiling, and it does not grow with the
-        recording's length or its spike count.
+        A dict with ``provenance``, ``provenance_io`` (both budgets and what
+        each actually spent) and ``io`` (request count and bytes for the whole
+        call, opening the file included). The provenance read itself is bounded
+        before it happens rather than by a ceiling afterwards, and neither bound
+        grows with the recording's length or its spike count.
+
+    Note:
+        **The block size is capped here rather than taken from the caller.**
+        This is the one read in the command with no plan behind it: it happens
+        before any ceiling exists, so its transfer bound is the only thing
+        standing between a malformed asset and an unbounded spend. A bound
+        denominated in blocks cannot be smaller than a block, so a 1 MiB block
+        chosen for a bulk payload read on a *different* file would make this
+        read's bound 4,259,840 bytes for the sake of about thirty characters.
+        At :data:`PROVENANCE_BLOCK_BYTES` it is 327,680.
     """
-    remote = RemoteFile(url, size, block=block_bytes)
+    remote = RemoteFile(url, size, block=min(int(block_bytes), PROVENANCE_BLOCK_BYTES))
     reader = BoundedReader(remote)
     with h5py.File(reader, "r") as handle:
         provenance = source_provenance(handle, reader)
+        spend = reader.last_spend
     return {"provenance": provenance,
+            "provenance_io": spend,
             "io": {"requests": remote.n_requests, "bytes": remote.n_bytes}}
 
 
@@ -1146,7 +1541,7 @@ def _slice_bounds(index, row):
 
 
 def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
-                    max_bytes=None, plan_only=False):
+                    max_bytes=None, plan_only=False, expect_conversion=None):
     """Read the pinned band's per-unit spike times and per-spike depths.
 
     Args:
@@ -1159,17 +1554,28 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         depth_hi_um: the pinned band's upper ``rel_y`` bound, inclusive.
         max_bytes: refuse the read if ``peak_resident_bytes`` -- the block cache,
             the converted arrays and the live Python structures together --
-            would exceed this many bytes. That single quantity is what a free-RAM
+            would exceed this many bytes. It is also held open as a transfer
+            budget for the whole call, so a read that would push the distinct
+            bytes fetched past it is refused *before* it fetches rather than
+            reported afterwards; see :func:`_ceiling_budget` for why that cannot
+            refuse anything the later check would have admitted. That single quantity is what a free-RAM
             measurement has to be compared against, and because it contains the
             block-transfer bound it also refuses everything a transfer-only
             ceiling would have refused. None means no ceiling, which is the
             caller taking responsibility for the whole footprint.
         plan_only: resolve and validate the index and the band membership, then
             return without reading any spike data.
+        expect_conversion: the raw asset's :func:`authenticate_provenance`
+            result, when the caller has one. Given it, this read also requires
+            the two assets to state the same converter version, and it does so
+            in preflight -- before the plan, and before a single spike is read
+            -- because a pair check run after the payload would cost the whole
+            read to reject the asset.
 
     Returns:
         A dict carrying ``probe``, ``band`` (the two bounds), ``plan`` (from
         :func:`plan_transfer`), ``descriptions``, ``provenance``,
+        ``provenance_io`` (the two provenance budgets and what each spent),
         ``electrodes``, ``unit_electrodes`` (every unit on the probe),
         ``band_units`` (the in-band subset, each with ``times`` and ``depths``
         arrays unless ``plan_only``), ``n_units_on_probe``,
@@ -1185,7 +1591,10 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
     """
     remote = RemoteFile(url, size, block=block_bytes)
     reader = BoundedReader(remote)
-    with h5py.File(reader, "r") as handle:
+    # The ceiling is entered before the file is opened, so it covers every byte
+    # this call fetches -- the superblock included -- rather than only the ones
+    # spent after a plan exists to compare against.
+    with _ceiling_budget(reader, max_bytes), h5py.File(reader, "r") as handle:
         electrodes = read_flat_electrodes(handle)
         scalars = read_unit_scalars(handle)
         check_ragged_alignment(scalars)
@@ -1198,8 +1607,11 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         # refusable, and a value that cannot be refused is not bounded merely
         # because someone counted it.
         provenance = source_provenance(handle, reader)
+        provenance_io = reader.last_spend
         authentication = authenticate_provenance(
             provenance, "processed asset %s" % url.rsplit("/", 1)[-1])
+        pair = (authenticate_provenance_pair(expect_conversion, authentication)
+                if expect_conversion is not None else None)
 
         depth_description = descriptions.get(DEPTH_COLUMN)
         if not depth_description or DEPTH_UNIT_PHRASE not in depth_description.lower():
@@ -1247,6 +1659,8 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
             "descriptions": descriptions,
             "provenance": provenance,
             "provenance_authentication": authentication,
+            "provenance_pair": pair,
+            "provenance_io": provenance_io,
             "electrodes": electrodes,
             "unit_electrodes": unit_electrodes,
             "band_units": band_units,

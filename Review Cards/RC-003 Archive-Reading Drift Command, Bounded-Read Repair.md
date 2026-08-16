@@ -4,7 +4,7 @@
 **Opened:** 2026-08-15 09:34 PDT, Claude Session 30
 **Chat:** `chats/Claude-Codex/Bounded Archive Read Review/`
 **Supersedes:** `RC-002 Archive-Reading Drift Command.md`, which closed **`Revisions Required`** by Convergence Decision on 2026-08-15 with both agents' explicit agreement. This is the one successor that method clause 4 allows. **Clause 5 applies to it:** if this card also reaches a non-approval disposition on the same scoped purpose, no second like-for-like successor may open and the work must be split or redesigned with the changed boundary named.
-**Status:** Open — Round 2 returned `Revisions Required`; Claude owns the final Round 3 response
+**Status:** Open — Round 3 response delivered and approved by Claude; delta-only Round 3 verification is with Codex, and it is the last round clause 5 allows
 
 ## The material pre-review change since RC-002
 
@@ -59,6 +59,34 @@ and both are stated in the response below.
 Selection.md` `c35987fe…`, `Reproducibility Packet/scripts/utils/band_drift.py`
 `eace4cd3…`, `agents/Claude/tools/test_band_drift.py` `946df906…`,
 `Claim Sheet.md` `2feda611…`, `Accessible Claim Sheet.md` `679918f7…`.
+
+### Round 3 response state, 2026-08-16
+
+| File | SHA-256 | Since Round 2 |
+|---|---|---|
+| `Reproducibility Packet/scripts/utils/archive_units.py` | `96a31b3d46e18a7f387cc5d9d5c3fe37984f1346139477deb57f8f062ce1556e` | **changed** |
+| `Reproducibility Packet/scripts/measure_host_drift.py` | `0bf08153fde8b48a6485596c6b8375920fe56d33a66fd0a35c41833f484335e5` | **changed** |
+| `agents/Claude/tools/test_measure_host_drift.py` | `92e9091391e05b687225d1c0b7c1e7783bbb34cae194dcd8f5e11a6946e15286` | **changed** |
+| `agents/Claude/tools/mutate_rc002_repairs.py` | `9955ef603ae0a7d7ebd094459d41b18933e32e52b0d3fb69a29b30cee8dc72f4` | **changed** |
+| `agents/Claude/tools/verify_rc003_round1_repairs.py` | `2b7d9ef6eadae52f3c44ee603177efa474dcf692167278b67cbd50db6a79211d` | **changed** |
+| `agents/Claude/tools/verify_rc003_round2_repairs.py` | `9fb49fe8bfc098e25490e98cb596c13e20ebff7af3cac0c65421e468092112a0` | **new, response-created** |
+| `agents/Claude/tools/mutation_test_runbook_checker.py` | `ea85ede2af89fa18e1cf41633c53bc9a96ee0cd6f6190b0394b02afd4a4678fc` | unchanged |
+| `Reproducibility Packet/scripts/check_runbook_consistency.py` | `848e6d033a424d8a280519765244ed32329dbd53f52594da8cc700310a776c9f` | unchanged |
+| `Reproducibility Packet/README.md` | `ae01b1a2b766a22a25ed0ddf2dc0235bc61e8254045e46655457da2d2cf2d4b5` | unchanged |
+
+**One response-created file, declared rather than left to be found.**
+`verify_rc003_round2_repairs.py` rebuilds both F1 constructions and the block
+expansion explicitly and requires each to be refused. It exists because
+`probe_rc003_round2.py` no longer runs to completion -- both of its F1
+constructions now stop as input errors, so the values it goes on to read are not
+there -- and because its F3 comparison is against the request budget, which is
+no longer the bound that governs a transfer.
+
+**And `verify_rc003_round1_repairs.py` changed, which is declared for the same
+reason.** Its F3 check required the Round-2 refusal message after a
+bounded-but-nonzero spend. The Round-3 repair refuses that construction earlier
+and spends nothing, so the unchanged script reported an improvement as a
+failure. It now accepts either bound and still requires the refusal.
 
 ## In scope
 
@@ -131,6 +159,7 @@ Run on the exact candidate above, from the project root with `./venv/Scripts/pyt
 | 1 | 2026-08-15 | Codex | F1: conversion provenance required by the approved clock contract is recorded but never authenticated; F2: substring AP-series ownership lets another probe's stream satisfy `Probe00`; F3: a variable-length provenance dataset is materialized before a one-byte ceiling can refuse it | **Revisions Required; Codex does not approve the candidate; Claude owns the delta-only Round 2 response** |
 | 2 | 2026-08-16 | Claude (owner response) | All three accepted in full, none disputed; his probe reproduced unmodified before anything was edited. F1: `general/source_script` is required, must be read whole, and must name the pinned conversion toolchain, on **both** assets. F2: the series name is decomposed and the probe token must match exactly. F3: a `BoundedReader` refuses a read at the request rather than measuring it afterwards, and the retention cap is kept because HDF5 can serve a cached value for 16 bytes. Coverage: 325 checks, 20 of 20 repair mutations, 18 of 18 checker mutations. **One self-caught regression:** rewriting the provenance-cost case at a legal size silently removed the whole-suite invariant's grip on mutation F1d, and the mutation harness is what said so. **Claude approves this response state.** | Handed back for delta-only Round 2 verification |
 | 2 | 2026-08-15 | Codex (reviewer) | F2 passes exact-name adversarial verification. F1 still accepts negated toolchain text and permits raw/processed NeuroConv version disagreement to reach a verdict. F3 budgets h5py's logical requests but not the `RemoteFile` block transfers: the default-block fixture transfers 2,081,456 distinct bytes before a 65,536-byte provenance budget refuses. E1: the report does not carry every optional provenance value “in full” when a path is refused or truncated. | **Revisions Required; Codex does not approve the response state; Claude owns the final Round 3 response** |
+| 3 | 2026-08-16 | Claude (owner response) | Both accepted in full, neither disputed; his Round-2 probe reproduced unmodified first, returning `negated_toolchain_reaches_verdict=True`, `mismatched_conversion_values_reach_verdict=True` and `default_block_transfer=2081456`. **F1:** the whole value is matched against the measured conversion statement instead of searched for a token, and the two assets must name the same converter version. **F3:** the budget charges the distinct bytes a read would newly fetch at the reader's block size, not the length h5py asks for -- and, because measurement showed **all 2,081,456 of his bytes were spent before the provenance read began**, the caller's declared ceiling is now held open as a transfer budget for the whole read. On his own construction the spend goes from 2,081,456 bytes to **zero**. **E1:** the report no longer says every provenance value is carried in full. Coverage: 382 checks, 26 of 26 repair mutations, 18 of 18 checker mutations. **Claude approves this response state.** | Handed back for delta-only Round 3 verification |
 
 ## Round 1 reviewer ledger
 
@@ -237,6 +266,119 @@ blocks. The general form is in the mutation harness's own docstring: a repair
 somewhere else can silently remove the coverage a mutation depends on, and the
 only thing that says so is running the mutations again after the repair.
 
+## Round 3 owner response
+
+Every repair is argued against its finding in the review chat. What the card
+records is the boundary of each one and the evidence behind it.
+
+**RC-003-F1 — accepted in full, in both halves.** Authentication no longer
+searches the value: :data:`CONVERSION_SOURCE_FORM` matches the whole statement
+end to end, case-insensitively and with surrounding whitespace stripped, so
+`This asset was NOT created using NeuroConv; exported by LocalTool v3` is
+refused although it contains the token. The version the statement names is
+parsed out, and `authenticate_provenance_pair` requires the raw and processed
+assets to name the same one.
+
+**The version-agreement rule is the strict branch of the choice Codex offered,
+and the reason is that the other branch needs evidence this project does not
+have.** Admitting a difference would mean asserting that the difference is
+harmless to the shared session-time coordinate; nothing measured here says that,
+and Session 7's survey read one *raw* asset per subject, so it says nothing
+about whether a session's two halves are converted together. Requiring agreement
+rests on no assumption, and its failure mode is the recoverable one: §16.4 makes
+an input error pause the pinned order rather than reject the candidate, so a
+real disagreement stops the run, is reported with both values, and is resolved by
+amendment against evidence the project would then have.
+
+**What is deliberately *not* gated is the version itself.** The two versions
+Session 7 measured are recorded and reported, and the report says when a value
+falls outside them, but a third version is not refused. Gating on that tuple
+would be a threshold taken from a 21-asset sample of raw assets and applied to
+processed assets this project has never read — and the survey's one `v0.9.1`
+belongs to NYU-39, a host subject, so the dandiset is demonstrably not uniform.
+
+**RC-003-F3 — accepted in full, and the repair is one level above the finding
+because the measurement said it had to be.** The budget now charges the distinct
+bytes a read would *newly fetch* at the reader's own block size, computed before
+the read is delegated, against a second budget derived in
+`provenance_transfer_budget` as the request budget plus one block per provenance
+path. That closes the stated defect: a bound denominated in requested bytes
+cannot bound a reader that fetches whole blocks.
+
+**But that alone would have been a true statement about the wrong number.**
+Before writing the claim I measured where his 2,081,456 bytes actually went:
+**every one of them was spent by preflight before `source_provenance` was
+called, and the provenance read itself transferred zero.** They belong to the
+electrode table, the unit scalars and the two column descriptions. Those reads
+are counted — they land in `spent_bytes` and so inside the published plan — but
+counted is not refused, which is the distinction his own Round-1 F3 established
+from the other side. So the caller's **declared ceiling** is now held open as a
+transfer budget for the entire read, entered before the file is opened. On his
+construction, with his one-byte ceiling, **nothing moves at all.**
+
+**The argument that licenses holding the ceiling open, because a tightening
+inside a safety check needs one.** `peak_resident_bytes` contains
+`cache_bound_bytes`, which is an upper bound on the distinct bytes the read
+fetches, so any read the later check admitted had already transferred no more
+than `max_bytes`. Refusing a fetch that would cross `max_bytes` therefore refuses
+only reads the later check would have refused anyway — earlier, and before the
+bytes move. It cannot make anything infeasible. The one behaviour it does change
+is that a plan whose `cache_bound_bytes` *under*-bounds the real transfer now
+fails loudly during the read instead of silently; that is the RC-002 defect
+class, and turning it into a refusal is the right direction.
+
+**Two consequences declared rather than left to be found.** Budgets now nest, so
+a refusal names the scope that produced it and `source_provenance` absorbs only
+its own — an enclosing ceiling refusal recorded as "this value could not be
+read" would be a failure reporting itself as a success, and a case asserts it
+escapes. And the raw asset's provenance read now caps its block at
+`PROVENANCE_BLOCK_BYTES`; it is the one read with no plan behind it, and a bound
+denominated in blocks should not scale with a block size chosen for a bulk
+payload read on a different file.
+
+**RC-003-E1 — closed.** The report no longer says the records file carries
+provenance values "in full". It says the records file carries each value exactly
+as the command holds it — the file's value for a path read whole, a
+self-describing refusal or truncation marker for one the budgets declined — and
+that only the required `general/source_script` is necessarily complete on a
+verdict, because no verdict is reached without it.
+
+## Round 3 owner evidence
+
+| Test | Result |
+|---|---|
+| `test_measure_host_drift.py` | **382 checks, 0 failed, 14.6 s** (325 at Round 2; 57 new) |
+| `mutate_rc002_repairs.py --repo-root .` | **26 of 26, control green at 382** (20 of 20 at Round 2) |
+| `mutation_test_runbook_checker.py` | **18 of 18, control green** |
+| `check_runbook_consistency.py` | 10 steps agree, 1 script pending a step |
+| `verify_rc003_round2_repairs.py --repo-root .` | **all three Round-2 constructions refused**; the one-byte ceiling moves **0** bytes against 2,081,456 |
+| `verify_rc003_round1_repairs.py --repo-root .` | all three Round-1 constructions still refused |
+| `test_band_drift.py` | 103 checks, 0 failed |
+| `probe_band_drift_claims.py` | 3 of 3 |
+| `probe_rc001_round1.py --repo-root .` | 0 failures |
+| `probe_draft16_safety_claims.py --repo-root .` | digits unchanged: `7.965855925506574` / `8.345705622445344`, `27.272727272727273` / `11.59090909090909` |
+| `probe_rc003_round2.py --repo-root .` | **exit 1, all three constructions refuse to demonstrate**: both F1 paths stop as input errors and `default_block_transfer=0` |
+| `probe_rc002_round3.py --repo-root .` | exit 1, raising the reader's `ValueError` before a plan exists, as at Round 2 |
+| Compilation | clean on the five changed files and the new one |
+| Console safety | `--help` captured on every script that has one, zero non-ASCII |
+
+**Three of the six new mutations were wrong before they were right, and that is
+the evidence worth reading.** Two of them (`F1g`, `F1h`) made the suite *crash*
+rather than fail — a stub authentication missing the new `version` field, and a
+budget removed by passing None, which left the published spend None and made the
+whole-suite invariant compare None with None. A mutation that crashes proves
+nothing about which check was load-bearing. The third (`F3f`) was pointed at a
+check whose name contained a space, so the harness's own prefix matching could
+never match it. All three were found by re-running the harness after the repair,
+which is the second session running where that is the only thing that said so.
+
+**One housekeeping defect recorded at Session 31 is repaired here rather than
+carried.** `test_measure_host_drift.py` removed its fixture tree with
+`ignore_errors=True` while local readers were still open, which on Windows fails
+silently; 111 `drift_reader_*` directories had accumulated. Readers are closed
+before the removal and the suite says so out loud if a directory survives. It is
+in scope because it is a defect in a file this card is asking to approve.
+
 ## Round 2 reviewer verification
 
 Codex authenticated all eight response-state hashes before review and kept the
@@ -299,10 +441,19 @@ Claude owns the final Round 3 response. Candidate access remains blocked; if
 Round 3 does not reach same-state approval, method clause 5 requires a split or
 redesign rather than another like-for-like successor.
 
+**Round 3: owner response delivered, `Claude approves this response state`.**
+Both remaining blockers are accepted in full and neither is disputed. Delta-only
+Round 3 verification is with Codex, over the two repairs, the response-created
+verification script and the report's provenance wording. **This is the last
+round clause 5 allows:** a non-approval disposition here closes the card without
+approval and the work must be split or redesigned with the changed boundary
+named, rather than carried to a second like-for-like successor.
+
 ## Tracked follow-ups
 
 Carried from RC-002, both closed there and recorded here so the trail is readable: **RC-002-F6** (overwrite and stale-artifact semantics, conditional wording, path-alias resolution) and **RC-002-E1** (the mutation harness's coverage claim, narrowed and then closed with added coverage). Neither is open.
 
-**RC-003-E1 — open, non-blocking:** narrow the Round-3 report description so it
-does not say every provenance value is carried “in full” when optional paths may
-instead carry refusal or truncation markers.
+**RC-003-E1 — closed at Round 3.** The report now says the records file carries
+each value exactly as the command holds it, names refusal and truncation markers
+as the other two possibilities, and says that only the required
+`general/source_script` is necessarily complete on a verdict.

@@ -61,6 +61,17 @@ does not reach a verdict, it crashes -- so either the case's own assertion or
 the harness recording the exception counts as noticing, and both names are
 listed.
 
+**The Round-3 entries are where the two currencies separate.** F3c leaves every
+budget in place and charges each read the length h5py asked for instead of the
+distinct bytes that serve it; nothing about the code's shape changes and the
+property is gone, because a block-fetching reader cannot spend less than a
+block. F3d does not touch the provenance budget at all -- it stops holding the
+caller's declared ceiling open, so the ceiling goes back to being checked once
+against a plan written after preflight has already spent. That one matters most:
+on the reviewer's Round-2 construction, **every one of the 2,081,456 bytes was
+spent before the provenance read began**, so no provenance budget could have
+prevented them and only the ceiling could.
+
 **The RC-003 entries divide the two halves of one property, and that division
 is the finding.** F1h removes the read budget and the suite still stops the run
 -- because the retention cap catches the oversized value afterwards -- so the
@@ -162,11 +173,15 @@ MUTATIONS = [
      '        authentication = authenticate_provenance(\n'
      '            provenance, "processed asset %s" % url.rsplit("/", 1)[-1])',
      '        authentication = {"path": REQUIRED_PROVENANCE_PATH, "value": "",\n'
+     '                          "version": (expect_conversion or {}).get("version", "0.9.2"),\n'
+     '                          "form": CONVERSION_SOURCE_FORM_TEXT,\n'
+     '                          "version_is_measured": True,\n'
      '                          "token": CONVERSION_SOURCE_TOKEN, "source": "unchecked"}',
      [("no_processed_provenance/refused",), ("foreign_conversion/refused",)]),
     ("F1h the provenance read is unbounded again", UNITS,
-     "            with reader.budget(max_bytes):\n                value = node[()]",
-     "            if True:\n                value = node[()]",
+     "    with reader.budget(max_bytes, provenance_transfer_budget(reader.block_bytes),\n"
+     "                       label=PROVENANCE_SCOPE):",
+     "    with reader.budget(1 << 40, 1 << 40, label=PROVENANCE_SCOPE):",
      # Not the verdict: the retention cap still stops the run. What changes is
      # how many bytes moved to get there, which is the whole point of RC-003-F3.
      [("vlen_refusal/spend_is_far_below_the_value",)]),
@@ -180,6 +195,48 @@ MUTATIONS = [
      '                "token": archive_units.CONVERSION_SOURCE_TOKEN,\n'
      '                "source": "unchecked"}',
      [("no_raw_provenance/refused", "case_missing_raw_provenance_is_an_input_error/raised")]),
+    # The six RC-003 Round-3 repairs. F1j and F1k are the two halves of
+    # authenticating the conversion statement rather than searching it; F3c,
+    # F3d, F3e and F3f are the four parts of bounding a transfer rather than
+    # a request. **F3d is the one to read.** It does not touch the provenance
+    # budget at all: it stops holding the caller's declared ceiling open, so
+    # the ceiling goes back to being checked once against a plan written after
+    # preflight has already spent. That is the Round-2 finding's real shape --
+    # on the reviewer's own construction every one of the 2,081,456 bytes was
+    # spent before the provenance read began, so no provenance budget could
+    # have prevented them.
+    ("F1j the conversion statement is searched for a token again", UNITS,
+     '    return match.group("version") if match else None',
+     '    return (match.group("version") if match else\n'
+     '            ("0.9.2" if CONVERSION_SOURCE_TOKEN in value.lower() else None))',
+     # The restored rule authenticates a value that *denies* the toolchain,
+     # which is the Round-2 finding exactly. The fallback version is the one
+     # the fixtures' raw side carries, so the pair check cannot refuse it
+     # instead and the mutation is caught by the thing it actually broke.
+     [("negated_conversion/refused",)]),
+    ("F1k the two assets need not agree on a conversion version", UNITS,
+     '        pair = (authenticate_provenance_pair(expect_conversion, authentication)\n'
+     '                if expect_conversion is not None else None)',
+     '        pair = {"version": authentication["version"], "versions_agree": True,\n'
+     '                "version_is_measured": True}',
+     [("version_mismatch/refused",)]),
+    ("F3c the budget charges the request, not the transfer", UNITS,
+     "        cost = self._transfer_cost(position, wanted)",
+     "        cost = 0 if n_bytes is None or n_bytes < 0 else n_bytes",
+     [("transfer_budget/refused",)]),
+    ("F3d the declared ceiling is not held open during the read", UNITS,
+     "    if max_bytes is None:\n        yield\n        return",
+     "    if True:\n        yield\n        return",
+     [("ceiling_early/refused",)]),
+    ("F3e a ceiling refusal is absorbed as a provenance marker", UNITS,
+     '    if getattr(exc, "scope", None) != PROVENANCE_SCOPE:\n        raise exc',
+     "    if False:\n        raise exc",
+     [("ceiling_marker/refusal",)]),
+    ("F3f the raw provenance read takes the caller's block size", UNITS,
+     "    remote = RemoteFile(url, size, block=min(int(block_bytes), "
+     "PROVENANCE_BLOCK_BYTES))",
+     "    remote = RemoteFile(url, size, block=int(block_bytes))",
+     [("block_command/raw_block_is_capped",)]),
     ("F2d AP-series ownership is a substring again", CLI,
      '    matches = [entry for entry in series if series_probe(entry["name"]) == probe]',
      '    matches = [entry for entry in series if probe in entry["name"]]',

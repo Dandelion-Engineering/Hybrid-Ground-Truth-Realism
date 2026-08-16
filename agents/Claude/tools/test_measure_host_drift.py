@@ -693,6 +693,25 @@ def run_case(tmp_root, name, raw_writer, processed_writer, argv_extra=(),
                     "planned bound of %d. A read the plan does not cover is the defect "
                     "class that closed RC-002, and it fails here rather than in review."
                     % (name, touched, planned))
+        # The RC-003-F3 invariant, on every case that reaches a record and on
+        # both assets: what each provenance read asked for and what it actually
+        # transferred must both be inside the budget the command published for
+        # it. The first number was already bounded; the second is the one whose
+        # bound was stated and not enforced, because the reader fetches whole
+        # blocks and a request is not the transfer that serves it.
+        for label, spend in (record.get("provenance_io") or {}).items():
+            if spend["read_bytes"] > spend["read_budget_bytes"]:
+                raise AssertionError(
+                    "case %r asked for %d bytes of %s provenance against a published "
+                    "budget of %d." % (name, spend["read_bytes"], label,
+                                       spend["read_budget_bytes"]))
+            if spend["transfer_bytes"] > spend["transfer_budget_bytes"]:
+                raise AssertionError(
+                    "case %r transferred %d distinct bytes reading %s provenance "
+                    "against a published budget of %d. A budget on the request is not "
+                    "a budget on the transfer, and this is where the difference fails."
+                    % (name, spend["transfer_bytes"], label,
+                       spend["transfer_budget_bytes"]))
     return {"status": status, "out": out, "text": text, "record": record,
             "raw": raw_path, "processed": processed_path, "dir": case_dir}
 
@@ -822,17 +841,52 @@ def case_plan_bytes_follow_stored_itemsize(h, tmp):
 
 
 def case_transfer_ceiling_refuses(h, tmp):
-    """A band larger than the declared ceiling stops before any spike is read."""
+    """A band larger than the declared ceiling stops before any spike is read.
+
+    The ceiling is enforced twice and this case is the later one: a value that
+    admits the whole of preflight and is still below the plan's combined peak,
+    so what refuses is the plan check rather than the transfer budget the
+    ceiling is also held open as. ``case_ceiling_refuses_before_the_bytes_move``
+    is the earlier one.
+    """
     rows = default_electrodes()
     units = band_units()
     result = run_case(
         tmp, "ceiling",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
         lambda p: write_processed(p, rows, units),
-        argv_extra=["--max-mib", "0.001"])
+        argv_extra=["--max-mib", "0.1"])
     h.check("ceiling/refused", "above the declared ceiling" in str(result["status"]),
             str(result["status"]))
+    h.check("ceiling/refused by the plan not by the budget",
+            "declared ceiling transfer budget" not in str(result["status"]),
+            str(result["status"]))
     h.check("ceiling/no report", result["text"] is None)
+
+
+def case_ceiling_refuses_before_the_bytes_move(h, tmp):
+    """The declared ceiling refuses a fetch rather than reporting one, RC-003-F3.
+
+    The ceiling used to be checked once, against a plan written after preflight
+    had already read the electrode table, the unit scalars, the descriptions and
+    the provenance. Those reads are counted -- they land in ``spent_bytes`` and
+    so inside the plan -- but counted is not refused, which is the distinction
+    the whole finding turns on. Held open as a transfer budget for the entire
+    read, the same ceiling stops the first fetch instead of the last: **zero
+    distinct bytes**, against 2,081,456 on the same construction before.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    result = run_case(
+        tmp, "ceiling_early",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units),
+        argv_extra=["--max-mib", "0.000001"])
+    status = str(result["status"])
+    h.check("ceiling_early/refused", "declared ceiling transfer budget" in status, status)
+    h.check("ceiling_early/named as an input error", "input error" in status, status)
+    h.equal("ceiling_early/nothing_moved", distinct_bytes(result["processed"]), 0)
+    h.check("ceiling_early/no report", result["text"] is None)
 
 
 def case_pre_origin_spikes_counted(h, tmp):
@@ -1378,7 +1432,7 @@ def case_provenance_is_reported_verbatim(h, tmp):
     rows = default_electrodes()
     units = band_units()
     provenance = {
-        "general/source_script": "Created using NeuroConv v0.9.1",
+        "general/source_script": "Created using NeuroConv v0.9.2",
         "general/lab": "cortexlab",
         "general/institution": "test fixture",
     }
@@ -1406,9 +1460,22 @@ def case_provenance_is_reported_verbatim(h, tmp):
     for key in ("general/source_script", "general/source_script@file_name",
                 "general/lab", "general/institution"):
         h.check("provenance/report names %s whole" % key, key in text)
-    h.check("provenance/disagreement is reported not gated",
-            record["provenance_authentication"]["values_agree"] is False,
-            "the two assets carry v0.9.1 and v0.9.2 and the run still passed")
+    pair = record["provenance_authentication"]["pair"]
+    h.equal("provenance/version parsed from the statement", pair["version"], "0.9.2")
+    h.check("provenance/version is one of the measured two",
+            pair["version_is_measured"] is True, pair)
+    h.check("provenance/pair agreement is what was enforced",
+            pair["versions_agree"] is True, pair)
+    for label in ("raw", "processed"):
+        spend = record["provenance_io"][label]
+        h.check("provenance/%s budgets are published" % label,
+                spend["read_budget_bytes"] == archive_units.PROVENANCE_MAX_BYTES
+                and spend["transfer_budget_bytes"] >= spend["read_budget_bytes"],
+                spend)
+        h.check("provenance/%s report states both budgets" % label,
+                "%d of %d bytes requested" % (spend["read_bytes"],
+                                              spend["read_budget_bytes"]) in text,
+                spend)
 
 
 def case_missing_processed_provenance_is_an_input_error(h, tmp):
@@ -1463,9 +1530,101 @@ def case_foreign_conversion_is_an_input_error(h, tmp):
             p, rows, units,
             provenance={"general/source_script": "exported by a local script v3"}))
     status = str(result["status"])
-    h.check("foreign_conversion/refused", "does not identify the pinned" in status, status)
+    h.check("foreign_conversion/refused", "is not the conversion statement" in status,
+            status)
     h.check("foreign_conversion/quotes the value", "local script v3" in status, status)
     h.check("foreign_conversion/no report", result["text"] is None)
+
+
+def case_negated_conversion_statement_is_an_input_error(h, tmp):
+    """A value that denies the toolchain contains its name, RC-003-F1 Round 2.
+
+    The first repair required the case-insensitive substring ``neuroconv``
+    anywhere in the value. ``This asset was NOT created using NeuroConv;
+    exported by LocalTool v3`` contains it, so the search answered yes to a file
+    that says no and the asset reached ``passed=True``. A token search is not
+    authentication: the whole value is matched against the statement the
+    measured assets carry, so what is confirmed is a positive claim rather than
+    the presence of a word inside an arbitrary sentence.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    denial = "This asset was NOT created using NeuroConv; exported by LocalTool v3"
+    h.check("negated_conversion/fixture_contains_the_old_token",
+            archive_units.CONVERSION_SOURCE_TOKEN in denial.lower(),
+            "the construction is only a construction if the substring rule admits it")
+    result = run_case(
+        tmp, "negated_conversion",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units,
+                                  provenance={"general/source_script": denial}))
+    status = str(result["status"])
+    h.check("negated_conversion/refused",
+            "is not the conversion statement" in status, status)
+    h.check("negated_conversion/named as an input error", "input error" in status, status)
+    h.check("negated_conversion/quotes the value", "LocalTool v3" in status, status)
+    h.check("negated_conversion/no report", result["text"] is None)
+    h.check("negated_conversion/no record", result["record"] is None)
+
+
+def case_conversion_version_mismatch_is_an_input_error(h, tmp):
+    """Two converter versions on one session's two halves stop the run.
+
+    Each asset authenticating separately says each came off the documented
+    toolchain; it does not say they came off *one* conversion, which is what the
+    clock claim needs -- the raw asset supplies the grid's extent and the
+    processed asset supplies the spikes. Both values here are legitimate
+    NeuroConv statements and both appear in this dandiset; what is refused is
+    the pair. The refusal is an input error, so Section 16.4 pauses the pinned
+    order rather than recording a drift rejection.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    result = run_case(
+        tmp, "version_mismatch",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S,
+                            provenance={"general/source_script":
+                                        "Created using NeuroConv v0.9.2"}),
+        lambda p: write_processed(p, rows, units,
+                                  provenance={"general/source_script":
+                                              "Created using NeuroConv v0.9.1"}))
+    status = str(result["status"])
+    h.check("version_mismatch/refused", "states conversion version 0.9.2" in status,
+            status)
+    h.check("version_mismatch/names the other version", "states 0.9.1" in status, status)
+    h.check("version_mismatch/named as an input error", "input error" in status, status)
+    h.check("version_mismatch/no report", result["text"] is None)
+    h.check("version_mismatch/no record", result["record"] is None)
+
+
+def case_the_pair_check_runs_before_the_payload(h, tmp):
+    """A disagreeing pair is refused in preflight, not after the spikes are read.
+
+    A pair check placed after the read would be correct and would cost the whole
+    payload to reject the asset. This measures the difference directly: the
+    distinct bytes touched on the refused fixture must stay below what the same
+    fixture costs when it is read for a verdict.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    agreed = run_case(
+        tmp, "pair_preflight_ok",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units))
+    full = distinct_bytes(agreed["processed"])
+    refused = run_case(
+        tmp, "pair_preflight_refused",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units,
+                                  provenance={"general/source_script":
+                                              "Created using NeuroConv v0.9.1"}))
+    spent = distinct_bytes(refused["processed"])
+    h.equal("pair_preflight/verdict reached when they agree", agreed["status"], 0)
+    h.check("pair_preflight/refused when they do not", "input error" in str(refused["status"]),
+            str(refused["status"]))
+    h.check("pair_preflight/matched a reader", spent > 0, spent)
+    h.check("pair_preflight/costs less than a full read", spent < full,
+            "%d distinct bytes refusing against %d reading" % (spent, full))
 
 
 def case_provenance_token_is_case_insensitive(h, tmp):
@@ -1536,7 +1695,11 @@ def case_budget_admits_a_value_it_can_afford(h, tmp):
     rows = default_electrodes()
     units = band_units()
     budget = archive_units.PROVENANCE_MAX_BYTES
-    big = "Created using NeuroConv v0.9.2\n" + "x" * (budget // 2)
+    # The bulk sits on an optional path. ``general/source_script`` is
+    # authenticated against the whole conversion statement, so padding *it* would
+    # be refused for its form rather than admitted for its size, and the case
+    # would stop proving anything about the budget.
+    big = "test fixture, padded: " + "x" * (budget // 2)
     h.check("budget_admits/fixture_is_inside_the_budget", len(big) < budget,
             "%d characters against %d" % (len(big), budget))
     # 4 KiB blocks, deliberately. The whole-suite invariant compares the
@@ -1549,15 +1712,17 @@ def case_budget_admits_a_value_it_can_afford(h, tmp):
     result = run_case(
         tmp, "affordable_provenance",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
-        lambda p: write_processed(p, rows, units,
-                                  provenance={"general/source_script": big}),
+        lambda p: write_processed(
+            p, rows, units,
+            provenance={"general/source_script": "Created using NeuroConv v0.9.2",
+                        "general/institution": big}),
         argv_extra=("--block-kb", "4"))
     h.equal("budget_admits/status", result["status"], 0)
     record = result["record"]
     plan = record["plan"]
     spent = distinct_bytes(result["processed"])
     h.equal("budget_admits/value_read_whole",
-            record["provenance"]["general/source_script"], big)
+            record["provenance"]["general/institution"], big)
     h.check("budget_admits/transfer_inside_the_bound",
             spent <= plan["cache_bound_bytes"],
             "%d touched against %d bounded" % (spent, plan["cache_bound_bytes"]))
@@ -1573,6 +1738,16 @@ def case_budget_admits_a_value_it_can_afford(h, tmp):
             "a %d-character value must not be pasted whole into the report" % len(big))
     h.check("budget_admits/report_still_shows_the_head",
             "Created using NeuroConv v0.9.2" in text, text[:0])
+    spend = record["provenance_io"]["processed"]
+    # Not "at least the value's length": HDF5 serves a global-heap collection it
+    # has already read without asking this reader again, so a 32 KB value can be
+    # returned whole for a fraction of that in requests. What the budget governs
+    # is what was asked for, and that is what is checked.
+    h.check("budget_admits/request_spend_inside_its_budget",
+            0 < spend["read_bytes"] <= spend["read_budget_bytes"],
+            "%d characters, spend %s" % (len(big), spend))
+    h.check("budget_admits/transfer_spend_inside_its_budget",
+            0 < spend["transfer_bytes"] <= spend["transfer_budget_bytes"], spend)
 
 
 def case_oversize_stored_provenance_is_not_read(h, tmp):
@@ -1614,6 +1789,255 @@ def case_oversize_stored_provenance_is_not_read(h, tmp):
     h.equal("stored_provenance/small_value_untouched", out["general/lab"], "cortexlab")
     h.check("stored_provenance/refusal_is_not_authenticatable",
             not archive_units.provenance_is_complete(value), value[:60])
+
+
+def case_transfer_budget_refuses_at_the_block_layer(h, tmp):
+    """A budget on the request does not bound the transfer, RC-003-F3 Round 2.
+
+    The first repair charged the length h5py asks for. The reader underneath
+    fetches whole fixed-size blocks and keeps them, so a sixteen-byte read of a
+    byte nothing has fetched yet costs a whole block: on the two-million-character
+    construction at the command's default 1 MiB block, 2,081,456 distinct bytes
+    moved before a 65,536-byte budget refused the value. A request and the
+    transfer that serves it are different quantities, and only one of them was
+    being bounded.
+
+    This measures the difference directly and on the proxy itself, which is
+    where the property lives. One read of sixteen bytes at an offset nothing has
+    touched: under a transfer budget smaller than a block it is refused and
+    **nothing moves**; under a transfer budget of one block it succeeds and
+    exactly one block moves. The request is the same sixteen bytes in both.
+    """
+    case_dir = os.path.join(tmp, "transfer_budget")
+    os.makedirs(case_dir, exist_ok=True)
+    path = os.path.join(case_dir, "blob.bin")
+    block = 4096
+    with open(path, "wb") as handle:
+        handle.write(b"z" * (block * 8))
+    size = os.path.getsize(path)
+    offset = block * 5
+
+    del READERS[:]
+    reader = archive_units.BoundedReader(BlockLocalFile(path, size, block=block))
+    refused = None
+    with reader.budget(65536, block // 2):
+        reader.seek(offset)
+        try:
+            reader.read(16)
+        except archive_units.ReadBudgetExceeded as exc:
+            refused = str(exc)
+    spend = reader.last_spend
+    moved = distinct_bytes(path)
+    h.check("transfer_budget/refused", refused is not None and "distinct bytes" in refused,
+            repr(refused))
+    h.check("transfer_budget/names_the_block_size",
+            refused is not None and "%d-byte block size" % block in refused, repr(refused))
+    h.check("transfer_budget/request_alone_would_have_been_admitted",
+            16 <= spend["read_budget_bytes"],
+            "the sixteen-byte request is far inside the 65536-byte request budget")
+    h.equal("transfer_budget/nothing_moved", moved, 0)
+    h.equal("transfer_budget/nothing_charged", spend["transfer_bytes"], 0)
+    reader.close()
+
+    del READERS[:]
+    allowed = archive_units.BoundedReader(BlockLocalFile(path, size, block=block))
+    with allowed.budget(65536, block):
+        allowed.seek(offset)
+        data = allowed.read(16)
+    spend = allowed.last_spend
+    h.equal("transfer_budget/one_block_budget_admits_the_read", len(data), 16)
+    h.equal("transfer_budget/charged_the_whole_block", spend["transfer_bytes"], block)
+    h.equal("transfer_budget/charged_the_request_separately", spend["read_bytes"], 16)
+    h.equal("transfer_budget/one_block_moved", distinct_bytes(path), block)
+    allowed.close()
+    del READERS[:]
+
+
+def case_provenance_transfer_is_bounded_at_the_default_block(h, tmp):
+    """Codex's own construction, measured against the bound that governs it.
+
+    A two-million-character variable-length ``general/source_script`` read
+    through a block-caching reader at the command's default 1 MiB block. What
+    the module now publishes for this read is
+    :func:`archive_units.provenance_transfer_budget` of that block size, and the
+    distinct bytes the file gives up must be inside it. The 65,536-byte figure
+    is the budget on the *request*, and comparing a transfer against it was
+    comparing two different quantities -- which is the finding, from the other
+    side.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    case_dir = os.path.join(tmp, "provenance_block_expansion")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    big = "p" * 2000000
+    write_processed(processed, rows, units,
+                    provenance={"general/source_script": big})
+    size = os.path.getsize(processed)
+    block = 1024 * 1024
+    budget = archive_units.provenance_transfer_budget(block)
+    # First without a ceiling, so what refuses is the provenance budget alone.
+    del READERS[:]
+    archive_units.RemoteFile = BlockLocalFile
+    refused = None
+    try:
+        archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                      plan_only=True)
+    except ValueError as exc:
+        refused = str(exc)
+    finally:
+        archive_units.RemoteFile = LocalFile
+    touched = distinct_bytes(processed)
+    h.check("block_expansion/refused", refused is not None and "not read whole" in refused,
+            repr(refused))
+    h.check("block_expansion/fixture_is_larger_than_the_budget_it_is_read_under",
+            size > archive_units.PROVENANCE_MAX_BYTES,
+            "%d-byte fixture against a %d-byte request budget"
+            % (size, archive_units.PROVENANCE_MAX_BYTES))
+    h.check("block_expansion/matched_a_reader", touched > 0, touched)
+    h.check("block_expansion/whole_file_transfer_inside_the_transfer_budget",
+            touched <= budget,
+            "%d distinct bytes against a %d-byte provenance transfer budget"
+            % (touched, budget))
+    h.check("block_expansion/budget_is_block_denominated",
+            budget >= block, "%d against a %d-byte block" % (budget, block))
+
+    # Then with the one-byte ceiling of the reviewer's own construction, which
+    # measured 2,081,456 distinct bytes spent before the refusal. Every one of
+    # those bytes was spent by preflight *before* the provenance read, so the
+    # provenance budget could not have prevented them and the ceiling is what
+    # had to reach them.
+    del READERS[:]
+    archive_units.RemoteFile = BlockLocalFile
+    ceiling_refused = None
+    try:
+        archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                      max_bytes=1, plan_only=True)
+    except ValueError as exc:
+        ceiling_refused = str(exc)
+    finally:
+        archive_units.RemoteFile = LocalFile
+    h.check("block_expansion/one_byte_ceiling_refuses",
+            ceiling_refused is not None
+            and "declared ceiling transfer budget" in ceiling_refused,
+            repr(ceiling_refused))
+    h.equal("block_expansion/one_byte_ceiling_moves_nothing",
+            distinct_bytes(processed), 0)
+    del READERS[:]
+
+
+def case_command_reports_a_block_readers_expansion(h, tmp):
+    """Run the whole command over a block-caching reader so the invariant sees one.
+
+    Every other end-to-end case runs on :class:`LocalFile`, which fetches
+    exactly what it is asked for -- so its transfer equals its request and the
+    whole-suite provenance invariant is comparing a quantity against itself.
+    This case is the one that gives that invariant a reader whose transfer is
+    larger than its request, which is the only shape in which the RC-003-F3
+    defect exists at all.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    archive_units.RemoteFile = BlockLocalFile
+    try:
+        result = run_case(
+            tmp, "block_reader_command",
+            lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+            lambda p: write_processed(p, rows, units),
+            argv_extra=("--block-kb", "4"))
+    finally:
+        archive_units.RemoteFile = LocalFile
+    h.equal("block_command/status", result["status"], 0)
+    record = result["record"]
+    for label in ("raw", "processed"):
+        spend = record["provenance_io"][label]
+        h.check("block_command/%s reader declares a block" % label,
+                spend["block_bytes"] > 0, spend)
+        h.check("block_command/%s transfer inside its budget" % label,
+                spend["transfer_bytes"] <= spend["transfer_budget_bytes"], spend)
+    # The raw asset's reader is opened for provenance and nothing else, so every
+    # block it touches is new and the expansion is visible: a thirty-character
+    # value costs whole blocks.
+    raw_spend = record["provenance_io"]["raw"]
+    h.check("block_command/raw transfer exceeds the request",
+            raw_spend["transfer_bytes"] > raw_spend["read_bytes"],
+            "a block reader cannot serve a request for less than a block: %s"
+            % (raw_spend,))
+    # The processed asset's reader has already fetched these blocks in
+    # preflight, so the model charges nothing for them. That is the other half
+    # of the same property: the budget is on *distinct* bytes, and a block the
+    # reader is holding is not fetched twice.
+    processed_spend = record["provenance_io"]["processed"]
+    h.check("block_command/processed credits the blocks preflight already fetched",
+            processed_spend["transfer_bytes"] < processed_spend["read_bytes"],
+            processed_spend)
+    # And the cap on the raw read's block, measured where it can be seen: at the
+    # command's own 1 MiB default the reader this read opens must still use the
+    # smaller block, because this is the read with no plan behind it and its
+    # bound is block-denominated. Asserting it inside the case above would prove
+    # nothing -- 4 KiB is under the cap however the cap is written.
+    del READERS[:]
+    case_dir = os.path.join(tmp, "block_reader_command")
+    archive_units.RemoteFile = BlockLocalFile
+    try:
+        raw_only = archive_units.read_provenance(
+            os.path.join(case_dir, "raw.nwb"),
+            os.path.getsize(os.path.join(case_dir, "raw.nwb")), 1024 * 1024)
+    finally:
+        archive_units.RemoteFile = LocalFile
+    h.equal("block_command/raw_block_is_capped",
+            READERS[-1].block, archive_units.PROVENANCE_BLOCK_BYTES)
+    h.equal("block_command/raw_bound_follows_the_capped_block",
+            raw_only["provenance_io"]["transfer_budget_bytes"],
+            archive_units.provenance_transfer_budget(
+                archive_units.PROVENANCE_BLOCK_BYTES))
+    h.check("block_command/capped_bound_is_far_below_the_callers",
+            raw_only["provenance_io"]["transfer_budget_bytes"]
+            < archive_units.provenance_transfer_budget(1024 * 1024),
+            raw_only["provenance_io"])
+    del READERS[:]
+
+
+def case_a_ceiling_refusal_is_not_recorded_as_a_provenance_marker(h, tmp):
+    """An enclosing budget's refusal must escape the handler for this one's.
+
+    Budgets nest, and both raise the same exception class. The provenance read
+    records its *own* refusals as self-describing markers and carries on, which
+    is right: one unreadable optional value is not a reason to stop. Applying
+    that to a refusal raised by the enclosing ceiling would turn a statement
+    about the whole read into a note beside one path -- a failure reporting
+    itself as a success -- so the refusing scope is named on the exception and
+    only the provenance scope's own refusals are absorbed.
+    """
+    case_dir = os.path.join(tmp, "ceiling_marker")
+    os.makedirs(case_dir, exist_ok=True)
+    path = os.path.join(case_dir, "provenance.nwb")
+    with h5py.File(path, "w") as handle:
+        handle.create_dataset("general/source_script",
+                              data="Created using NeuroConv v0.9.2",
+                              dtype=h5py.string_dtype(encoding="utf-8"))
+        handle.create_dataset("general/lab", data="cortexlab",
+                              dtype=h5py.string_dtype(encoding="utf-8"))
+    del READERS[:]
+    reader = archive_units.BoundedReader(LocalFile(path, os.path.getsize(path)))
+    escaped = None
+    with h5py.File(reader, "r") as handle:
+        with reader.budget(None, 8, label=archive_units.PREFLIGHT_SCOPE):
+            try:
+                recorded = archive_units.source_provenance(handle, reader)
+            except archive_units.ReadBudgetExceeded as exc:
+                escaped = exc
+                recorded = None
+    h.check("ceiling_marker/refusal escaped the provenance handler", escaped is not None,
+            "source_provenance returned %r instead of re-raising" % (recorded,))
+    h.equal("ceiling_marker/named the refusing scope",
+            getattr(escaped, "scope", None), archive_units.PREFLIGHT_SCOPE)
+    h.check("ceiling_marker/the two scopes have distinct labels",
+            archive_units.PREFLIGHT_SCOPE != archive_units.PROVENANCE_SCOPE,
+            "a label that matched would make the handler absorb both")
+    reader.close()
+    del READERS[:]
 
 
 def case_a_cached_value_is_still_capped(h, tmp):
@@ -2521,6 +2945,7 @@ CASES = (
     case_plan_only_reads_no_spikes,
     case_plan_bytes_follow_stored_itemsize,
     case_transfer_ceiling_refuses,
+    case_ceiling_refuses_before_the_bytes_move,
     case_pre_origin_spikes_counted,
     case_head_partial_reported,
     case_grid_extent_is_t_last,
@@ -2553,9 +2978,16 @@ CASES = (
     case_missing_processed_provenance_is_an_input_error,
     case_missing_raw_provenance_is_an_input_error,
     case_foreign_conversion_is_an_input_error,
+    case_negated_conversion_statement_is_an_input_error,
+    case_conversion_version_mismatch_is_an_input_error,
+    case_the_pair_check_runs_before_the_payload,
     case_provenance_token_is_case_insensitive,
     case_vlen_provenance_is_refused_before_it_is_spent,
     case_budget_admits_a_value_it_can_afford,
+    case_transfer_budget_refuses_at_the_block_layer,
+    case_provenance_transfer_is_bounded_at_the_default_block,
+    case_command_reports_a_block_readers_expansion,
+    case_a_ceiling_refusal_is_not_recorded_as_a_provenance_marker,
     case_a_cached_value_is_still_capped,
     case_oversize_stored_provenance_is_not_read,
     case_null_distribution_is_reported,
@@ -2617,8 +3049,22 @@ def main():
                               "%s: %s" % (type(exc).__name__, exc))
                 traceback.print_exc()
     finally:
+        # Close every local reader a case left open before the tree is removed.
+        # On Windows an open handle makes rmtree fail, and ignore_errors=True
+        # makes it fail *silently*: 111 drift_reader_* directories had
+        # accumulated in the system temp folder by Session 31 because of this.
+        # Recorded then rather than repaired, because the file was mid-review;
+        # repaired here because it is the same file being handed over.
+        for reader in READERS:
+            try:
+                reader.close()
+            except OSError:
+                pass
+        del READERS[:]
         if not args.keep:
             shutil.rmtree(tmp, ignore_errors=True)
+            if os.path.exists(tmp):
+                print("[warn] fixture directory survived removal: %s" % tmp)
 
     elapsed = time.time() - started
     print("")

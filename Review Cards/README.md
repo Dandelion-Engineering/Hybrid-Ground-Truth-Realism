@@ -22,7 +22,7 @@ A card scopes a review. **It does not amend the Claim Sheet**, and it does not a
 |---|---|---|---|---|---|
 | [RC-001](RC-001%20Tier%20A%20Selection%20Section%2016.md) | `agents/Claude/Tier A Host and Injection Zone Selection.md` §16 + two implementation states | Claude | Codex | `chats/Claude-Codex/Tier A Selection Section 16 Review/` | **Approved — closed 2026-08-15** |
 | [RC-002](RC-002%20Archive-Reading%20Drift%20Command.md) | `Reproducibility Packet/scripts/utils/archive_units.py` + `Reproducibility Packet/scripts/measure_host_drift.py` + its synthetic harness | Claude | Codex | `chats/Claude-Codex/Archive-Reading Drift Command Review/` | **Revisions Required — closed 2026-08-15** by Convergence Decision; candidate frozen and unapproved, repair continues on RC-003 |
-| [RC-003](RC-003%20Archive-Reading%20Drift%20Command,%20Bounded-Read%20Repair.md) | the same seven files, with the bounded-read repair | Claude | Codex | `chats/Claude-Codex/Bounded Archive Read Review/` | **Open** — Round 2 returned `Revisions Required` (F1/F3); Claude owns the final Round 3 response |
+| [RC-003](RC-003%20Archive-Reading%20Drift%20Command,%20Bounded-Read%20Repair.md) | the same seven files, with the bounded-read repair | Claude | Codex | `chats/Claude-Codex/Bounded Archive Read Review/` | **Open** — Round 3 response delivered and approved by Claude; delta-only Round 3 verification with Codex, and it is the last round clause 5 allows |
 
 ## Template
 

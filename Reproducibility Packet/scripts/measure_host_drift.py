@@ -52,20 +52,26 @@ check are what the plan sizes. It does **not** cover the three reads on the
 *raw* asset that precede it -- one electrode table, two timestamps from each end
 of each AP series, and the conversion provenance. Those are bounded by
 construction rather than by a ceiling: none of them grows with the recording's
-length or its spike count, and the provenance read is bounded a second time by
-the per-path budget ``utils.archive_units`` enforces. Their actual cost is
-measured and reported beside the processed one, under ``raw_electrodes``,
-``raw_timing`` and ``raw_provenance``, so the transcript states all four rather
-than the one the ceiling governs.
+length or its spike count, and the provenance read is bounded twice more by
+``utils.archive_units`` -- once on what it may ask for and once on the distinct
+bytes its reader may fetch, which are different quantities whenever the reader
+fetches in blocks. Their actual cost is measured and reported beside the
+processed one, under ``raw_electrodes``, ``raw_timing`` and ``raw_provenance``,
+and each provenance read reports both budgets beside what it spent, so the
+transcript states all four costs rather than the one the ceiling governs.
 
-**Both assets are authenticated against the conversion toolchain before
-anything is measured.** The bin grid is anchored on a session-time origin that
-is a property of the converter rather than of the arrays, and the raw file
-supplies the extent while the processed file supplies the spikes. Each must
-carry a ``general/source_script`` naming the pinned toolchain; an asset that
-carries none, or one this command could not read whole, stops the run as an
-input error. Recording provenance is not confirming it, and a file with no
-provenance at all used to reach a verdict.
+**Both assets are authenticated against the conversion statement before
+anything is measured, and the pair has to agree.** The bin grid is anchored on a
+session-time origin that is a property of the converter rather than of the
+arrays, and the raw file supplies the extent while the processed file supplies
+the spikes. Each asset's ``general/source_script`` must *be* the conversion
+statement every measured asset of this dandiset carries -- matched end to end,
+because searching it for the tool's name admitted a value that denied it -- and
+the two must name the same converter version, because the clock claim is that
+both halves share one coordinate. An asset that carries none, one this command
+could not read whole, one that states something else, and a pair that disagrees
+are all input errors that stop the run. Recording provenance is not confirming
+it, and a file with no provenance at all used to reach a verdict.
 
 Example
 -------
@@ -400,6 +406,19 @@ def build_report(record):
     for source in ("raw_provenance", "raw_electrodes", "raw_timing", "processed_units"):
         add("  %-19s %d bytes in %d requests"
             % (source, record["io"][source]["bytes"], record["io"][source]["requests"]))
+    add("provenance budgets    stated before the read, not measured after it")
+    for label in ("raw", "processed"):
+        spend = record["provenance_io"][label]
+        # The transfer budget is denominated in blocks, so the block size is
+        # part of the number and is printed with it. A reader that fetches
+        # exactly what it is asked for has no block size, and printing "0-byte
+        # block" for that would read as a measurement rather than as its
+        # absence.
+        basis = ("at a %d-byte block" % spend["block_bytes"] if spend["block_bytes"]
+                 else "through a reader that fetches exactly what it is asked for")
+        add("  %-19s %d of %d bytes requested, %d of %d distinct bytes transferred %s"
+            % (label, spend["read_bytes"], spend["read_budget_bytes"],
+               spend["transfer_bytes"], spend["transfer_budget_bytes"], basis))
     add("")
     add("Every number below is measured from the two assets named above. The bin grid,")
     add("the inclusion rule, the permutation count, the master seed and the threshold")
@@ -431,12 +450,17 @@ def build_report(record):
             add("    %-32s %s"
                 % (key, archive_units.ascii_safe(record[source][key], 160)))
     add("")
-    add("  Provenance values are rendered ASCII-only and clipped at 160 characters; the")
-    add("  records file carries them in full. The conversion provenance check above")
-    add("  requires both assets to name the pinned conversion toolchain -- it does not")
-    add("  confirm the repository commit, because no asset in this dandiset carries one.")
-    add("  The session-time origin is pinned to that commit in the selection document,")
-    add("  not inferred here.")
+    add("  Provenance values are rendered ASCII-only and clipped at 160 characters here;")
+    add("  the records file carries each value exactly as this command holds it, which is")
+    add("  the file's value for a path read whole and a self-describing refusal or")
+    add("  truncation marker for one the budgets declined. Only the required")
+    add("  general/source_script is necessarily complete on a verdict, because no verdict")
+    add("  is reached without it. The conversion provenance check above matches each")
+    add("  asset's whole value against the measured conversion statement and requires the")
+    add("  two assets to name the same converter version -- it does not confirm the")
+    add("  repository commit, because no asset in this dandiset carries one. The")
+    add("  session-time origin is pinned to that commit in the selection document, not")
+    add("  inferred here.")
     add("  Containment is a consistency check: it cannot identify a clock offset or scale,")
     add("  and the two slack values below are what it leaves unchecked at the endpoints,")
     add("  not a bound on internal agreement.")
@@ -713,8 +737,13 @@ def main(argv=None):
             raw_prov["provenance"], "raw asset %s" % raw_asset["path"])
     except ValueError as exc:
         raise SystemExit("[fatal] input error: %s" % exc)
-    print("[drift] raw conversion provenance %s"
-          % archive_units.ascii_safe(raw_auth["value"], 120), flush=True)
+    print("[drift] raw conversion provenance %s (version %s), read under a %d-byte "
+          "request budget and a %d-byte transfer budget, spending %d and %d"
+          % (archive_units.ascii_safe(raw_auth["value"], 120), raw_auth["version"],
+             raw_prov["provenance_io"]["read_budget_bytes"],
+             raw_prov["provenance_io"]["transfer_budget_bytes"],
+             raw_prov["provenance_io"]["read_bytes"],
+             raw_prov["provenance_io"]["transfer_bytes"]), flush=True)
 
     raw = read_electrode_table(dandi.blob_url(raw_asset), raw_asset["size"], block_bytes)
     if args.probe not in raw["probes"]:
@@ -737,7 +766,8 @@ def main(argv=None):
         read = archive_units.read_band_units(
             dandi.blob_url(processed_asset), processed_asset["size"], block_bytes,
             args.probe, band["depth_lo_um"], band["depth_hi_um"],
-            max_bytes=int(args.max_mib * 1024 * 1024), plan_only=args.plan_only)
+            max_bytes=int(args.max_mib * 1024 * 1024), plan_only=args.plan_only,
+            expect_conversion=raw_auth)
     except ValueError as exc:
         # Every ValueError this reader raises is a statement about the asset,
         # not about drift. Converting it here keeps the two apart in the exit
@@ -853,12 +883,19 @@ def main(argv=None):
         "provenance": read["provenance"],
         "raw_provenance": raw_prov["provenance"],
         "provenance_authentication": {
-            "raw": {key: raw_auth[key] for key in ("path", "token", "source")},
-            "processed": {key: read["provenance_authentication"][key]
-                          for key in ("path", "token", "source")},
-            "values_agree": (raw_auth["value"]
-                             == read["provenance_authentication"]["value"]),
+            "raw": {key: raw_auth[key] for key in
+                    ("path", "token", "form", "version", "version_is_measured",
+                     "source")},
+            "processed": {key: read["provenance_authentication"][key] for key in
+                          ("path", "token", "form", "version", "version_is_measured",
+                           "source")},
+            # Necessarily agreeing, because a disagreement stops the run before
+            # this record exists. It is recorded as a statement of what was
+            # enforced, not as a check this record could have failed.
+            "pair": read["provenance_pair"],
         },
+        "provenance_io": {"raw": raw_prov["provenance_io"],
+                          "processed": read["provenance_io"]},
         "n_units_on_probe": read["n_units_on_probe"],
         "n_units_total": read["n_units_total"],
         "clock": {"t_first_s": t_first_s, "t_last_s": t_last_s},
@@ -884,9 +921,15 @@ def main(argv=None):
             "containment": ("all loaded spikes inside [t_first_s, t_last_s]"
                             if containment else "no spikes loaded"),
             "conversion_provenance": (
-                "both assets' %s name %r; raw %r, processed %r"
+                "both assets' %s match %r and name one version, %s (%s); raw %r, "
+                "processed %r"
                 % (archive_units.REQUIRED_PROVENANCE_PATH,
-                   archive_units.CONVERSION_SOURCE_TOKEN,
+                   archive_units.CONVERSION_SOURCE_FORM_TEXT,
+                   read["provenance_pair"]["version"],
+                   "measured in Session 7"
+                   if read["provenance_pair"]["version_is_measured"]
+                   else "outside the two versions measured in Session 7, which is "
+                        "reported and not gated",
                    archive_units.ascii_safe(raw_auth["value"], 60),
                    archive_units.ascii_safe(
                        read["provenance_authentication"]["value"], 60))),

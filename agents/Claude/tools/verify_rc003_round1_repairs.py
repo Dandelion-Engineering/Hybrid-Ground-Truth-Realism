@@ -136,8 +136,15 @@ def main(argv=None):
         finally:
             units_module.RemoteFile = owner.LocalFile
         touched = owner.distinct_bytes(processed)
+        # The refusal is the requirement; which bound produces it is not, and it
+        # moved between rounds. At Round 2 the provenance budget refused the
+        # value after the structural reads had already fetched their blocks. At
+        # Round 3 the caller's one-byte ceiling is held open for the whole read,
+        # so the first fetch is refused and the spend is zero. Requiring the
+        # Round-2 message here would report that improvement as a regression.
         f3_bounded = (refused is not None
-                      and "not read whole" in refused
+                      and ("not read whole" in refused
+                           or "declared ceiling transfer budget" in refused)
                       and touched < 100000)
         print("F3 vlen_bytes_touched=%d (Codex measured 2028208) bounded=%s"
               % (touched, f3_bounded))
