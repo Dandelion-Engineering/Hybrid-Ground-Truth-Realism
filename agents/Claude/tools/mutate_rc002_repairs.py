@@ -1,4 +1,9 @@
-"""Undo one RC-002 repair at a time and confirm the acceptance suite notices.
+"""Undo one reviewed repair at a time and confirm the acceptance suite notices.
+
+**The file's name records where it started, not what it covers.** It began as
+the RC-002 mutation set and now carries the RC-003 and RC-004 entries too; the
+name is left alone because three other artifacts cite it by path, and a rename
+would be churn in exchange for nothing a reader of this paragraph lacks.
 
 A harness written *after* a repair can encode the repair rather than the
 property it is supposed to establish: every case passes, and would have passed
@@ -81,6 +86,20 @@ in miniature: an accounted spend and a refused one are different properties, and
 a suite that only watched the verdict would have called the unbounded read
 fixed. F1e is the mirror: it removes the retention cap, which the budget makes
 look unreachable until HDF5 serves a cached value for sixteen bytes.
+
+**The RC-004 entries are the ones whose absence was the finding.** The rule
+they mutate replaced a proxy -- equality of the two halves' NeuroConv version --
+that was reviewed across three rounds, defended by twenty-six mutations here,
+and admitted **0 of the 71 sessions** of DANDI 000409 that were eventually
+measured. No mutation could have found that, and none of these claims to: a
+mutation proves a check depends on the mechanism it names, and says nothing
+about whether the check's population on real inputs is non-empty or
+discriminating. What F1k, F1L, F1m, F1n and F1o do prove is narrower and still
+worth having: that the reference-instant comparison, the timezone requirement,
+the instants-not-strings comparison, the per-asset requirement and the measured
+version record each carry their own weight in the suite. **The population
+question is answered by the 71-session census in ``probe_conversion_pairs.py``
+and its two recorded reports, not here.**
 
 **One entry is platform-conditional and says so here rather than pretending
 otherwise.** F6c removes the path-alias resolution and leaves a plain string
@@ -172,11 +191,21 @@ MUTATIONS = [
     ("F1g the processed asset's provenance is recorded, not authenticated", UNITS,
      '        authentication = authenticate_provenance(\n'
      '            provenance, "processed asset %s" % url.rsplit("/", 1)[-1])',
+     # The stub carries every key the record and the pair check consume, and
+     # borrows the raw asset's declared instant so the pair still agrees. A
+     # mutation that crashed on a missing key would be "caught" by the wrong
+     # thing, which is the same defect class as a test that passes for the
+     # wrong reason.
      '        authentication = {"path": REQUIRED_PROVENANCE_PATH, "value": "",\n'
      '                          "version": (expect_conversion or {}).get("version", "0.9.2"),\n'
      '                          "form": CONVERSION_SOURCE_FORM_TEXT,\n'
      '                          "version_is_measured": True,\n'
-     '                          "token": CONVERSION_SOURCE_TOKEN, "source": "unchecked"}',
+     '                          "token": CONVERSION_SOURCE_TOKEN, "source": "unchecked",\n'
+     '                          "reference_path": REFERENCE_TIME_PATH,\n'
+     '                          "reference_value": (expect_conversion or {}).get(\n'
+     '                              "reference_value", ""),\n'
+     '                          "reference_instant": (expect_conversion or {}).get(\n'
+     '                              "reference_instant")}',
      [("no_processed_provenance/refused",), ("foreign_conversion/refused",)]),
     ("F1h the provenance read is unbounded again", UNITS,
      "    with reader.budget(max_bytes, provenance_transfer_budget(reader.block_bytes),\n"
@@ -191,9 +220,17 @@ MUTATIONS = [
      '            raw_prov["provenance"], "raw asset %s" % raw_asset["path"])\n'
      '    except ValueError as exc:\n'
      '        raise SystemExit("[fatal] input error: %s" % exc)',
+     '    raw_reference = raw_prov["provenance"].get(\n'
+     '        archive_units.REFERENCE_TIME_PATH, "1970-01-01T00:00:00+00:00")\n'
      '    raw_auth = {"path": archive_units.REQUIRED_PROVENANCE_PATH, "value": "",\n'
+     '                "version": "0.9.2",\n'
+     '                "form": archive_units.CONVERSION_SOURCE_FORM_TEXT,\n'
+     '                "version_is_measured": True,\n'
      '                "token": archive_units.CONVERSION_SOURCE_TOKEN,\n'
-     '                "source": "unchecked"}',
+     '                "source": "unchecked",\n'
+     '                "reference_path": archive_units.REFERENCE_TIME_PATH,\n'
+     '                "reference_value": raw_reference,\n'
+     '                "reference_instant": archive_units.reference_instant(raw_reference)}',
      [("no_raw_provenance/refused", "case_missing_raw_provenance_is_an_input_error/raised")]),
     # The six RC-003 Round-3 repairs. F1j and F1k are the two halves of
     # authenticating the conversion statement rather than searching it; F3c,
@@ -210,16 +247,54 @@ MUTATIONS = [
      '    return (match.group("version") if match else\n'
      '            ("0.9.2" if CONVERSION_SOURCE_TOKEN in value.lower() else None))',
      # The restored rule authenticates a value that *denies* the toolchain,
-     # which is the Round-2 finding exactly. The fallback version is the one
-     # the fixtures' raw side carries, so the pair check cannot refuse it
-     # instead and the mutation is caught by the thing it actually broke.
+     # which is the Round-2 finding exactly. The fallback version is one this
+     # dandiset really carries, so nothing downstream refuses the fixture for a
+     # second reason and the mutation is caught by the thing it actually broke.
+     # It used to matter more: while the pair check was version equality, a
+     # fallback the raw side did not carry would have been refused there.
      [("negated_conversion/refused",)]),
-    ("F1k the two assets need not agree on a conversion version", UNITS,
+    # The five RC-004 entries. F1k removes the pair check outright; F1L, F1m and
+    # F1n remove one property each of the reference-instant rule that replaced
+    # converter-version equality; F1o removes the measured-version record the
+    # report's "among the versions measured" sentence rests on.
+    ("F1k the pair need not declare one session-time origin", UNITS,
      '        pair = (authenticate_provenance_pair(expect_conversion, authentication)\n'
      '                if expect_conversion is not None else None)',
-     '        pair = {"version": authentication["version"], "versions_agree": True,\n'
-     '                "version_is_measured": True}',
-     [("version_mismatch/refused",)]),
+     '        pair = {"reference_instant_utc":\n'
+     '                    instant_text(authentication["reference_instant"]),\n'
+     '                "reference_instants_agree": True, "reference_delta_s": 0.0,\n'
+     '                "raw_version": (expect_conversion or {}).get("version", ""),\n'
+     '                "processed_version": authentication["version"],\n'
+     '                "versions_agree": True, "versions_are_measured": True}',
+     [("reference_shift/refused",), ("pair_preflight/refused",)]),
+    ("F1L a reference time with no UTC offset is accepted", UNITS,
+     "    return parsed if parsed.utcoffset() is not None else None",
+     "    return parsed",
+     # A naive value reaching the comparison makes Python refuse to order the
+     # two datetimes at all, so the command dies with a TypeError rather than a
+     # named input error. Either the case's own assertion or the harness
+     # recording that exception counts as noticing, and both names are listed.
+     [("naive_reference/",
+       "case_timezone_naive_reference_time_is_an_input_error/raised")]),
+    ("F1m the pair compares declared text, not instants", UNITS,
+     '    if first["reference_instant"] != second["reference_instant"]:',
+     '    if first["reference_value"] != second["reference_value"]:',
+     # The pessimistic mirror: one instant written at two offsets is two
+     # strings, and a text comparison pauses a candidate with no disagreement.
+     [("offsets/",)]),
+    ("F1n a missing reference time is filled in rather than refused", UNITS,
+     '    reference_value = provenance.get(REFERENCE_TIME_PATH)\n'
+     '    if reference_value is None:',
+     '    reference_value = provenance.get(REFERENCE_TIME_PATH,\n'
+     '                                     "1970-01-01T00:00:00+00:00")\n'
+     '    if False:',
+     # Two assets that state nothing then "agree", which is a missing
+     # measurement reported as a value.
+     [("no_reference/",)]),
+    ("F1o 0.9.4 is not among the measured converter versions", UNITS,
+     'MEASURED_CONVERSION_VERSIONS = ("0.9.1", "0.9.2", "0.9.4")',
+     'MEASURED_CONVERSION_VERSIONS = ("0.9.1", "0.9.2")',
+     [("version_pair/both",)]),
     ("F3c the budget charges the request, not the transfer", UNITS,
      "        cost = self._transfer_cost(position, wanted)",
      "        cost = 0 if n_bytes is None or n_bytes < 0 else n_bytes",

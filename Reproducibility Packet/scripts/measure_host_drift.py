@@ -60,18 +60,29 @@ processed one, under ``raw_electrodes``, ``raw_timing`` and ``raw_provenance``,
 and each provenance read reports both budgets beside what it spent, so the
 transcript states all four costs rather than the one the ceiling governs.
 
-**Both assets are authenticated against the conversion statement before
-anything is measured, and the pair has to agree.** The bin grid is anchored on a
-session-time origin that is a property of the converter rather than of the
-arrays, and the raw file supplies the extent while the processed file supplies
+**Both assets are authenticated before anything is measured, and the two have
+to declare the same session-time origin.** The bin grid is anchored on that
+origin, and the raw file supplies the extent while the processed file supplies
 the spikes. Each asset's ``general/source_script`` must *be* the conversion
 statement every measured asset of this dandiset carries -- matched end to end,
 because searching it for the tool's name admitted a value that denied it -- and
-the two must name the same converter version, because the clock claim is that
-both halves share one coordinate. An asset that carries none, one this command
-could not read whole, one that states something else, and a pair that disagrees
-are all input errors that stop the run. Recording provenance is not confirming
-it, and a file with no provenance at all used to reach a verdict.
+each asset's root ``timestamps_reference_time`` must be a timezone-aware
+ISO-8601 instant, which NWB defines as the point every stored time in that file
+is counted from. An asset that carries neither, one this command could not read
+whole, one that states something else, one whose reference time names no UTC
+offset, and a pair whose two instants differ are all input errors that stop the
+run. Recording provenance is not confirming it, and a file with no provenance at
+all used to reach a verdict.
+
+**The pair check used to compare converter versions and it admitted nothing.**
+Measured across 71 sessions of this dandiset, every raw asset was written by
+NeuroConv 0.9.1 or 0.9.2 and every processed asset by 0.9.4 -- agreement 0 of
+71, so no candidate could have passed. The declared reference instants agree on
+63 of the same 71 and differ by exactly one hour on 8, and those 8 carry the
+same version pair as the 63. The versions are still parsed and still reported;
+they no longer decide anything. **Agreeing instants are a necessary declared
+condition and not an identification of the clock** -- the same limit the
+selection document already states for endpoint containment.
 
 Example
 -------
@@ -433,6 +444,7 @@ def build_report(record):
     add("  electrode tables agree    %s" % record["checks"]["electrode_tables"])
     add("  asset pair identity       %s" % record["checks"]["asset_pair"])
     add("  conversion provenance     %s" % record["checks"]["conversion_provenance"])
+    add("  session reference time    %s" % record["checks"]["reference_time"])
     add("  AP timing source          %s" % record["checks"]["timing_source"])
     add("  AP timestamp coverage     %s" % record["checks"]["timestamp_coverage"])
     add("  spike containment         %s" % record["checks"]["containment"])
@@ -454,13 +466,21 @@ def build_report(record):
     add("  the records file carries each value exactly as this command holds it, which is")
     add("  the file's value for a path read whole and a self-describing refusal or")
     add("  truncation marker for one the budgets declined. Only the required")
-    add("  general/source_script is necessarily complete on a verdict, because no verdict")
-    add("  is reached without it. The conversion provenance check above matches each")
-    add("  asset's whole value against the measured conversion statement and requires the")
-    add("  two assets to name the same converter version -- it does not confirm the")
-    add("  repository commit, because no asset in this dandiset carries one. The")
-    add("  session-time origin is pinned to that commit in the selection document, not")
-    add("  inferred here.")
+    add("  general/source_script and timestamps_reference_time are necessarily complete on")
+    add("  a verdict, because no verdict is reached without either. The conversion")
+    add("  provenance check above matches each asset's whole value against the measured")
+    add("  conversion statement; it does not confirm the repository commit, because no")
+    add("  asset in this dandiset carries one, and the session-time origin is pinned to")
+    add("  that commit in the selection document rather than inferred here. The two")
+    add("  converter versions are reported and gate nothing: requiring them to be equal")
+    add("  admitted 0 of the 71 sessions of this dandiset that were measured, because")
+    add("  every raw half was written by one version and every processed half by another.")
+    add("  The reference-time check is what replaced it. It is a necessary declared")
+    add("  condition and NOT an identification of the clock: two assets can declare the")
+    add("  same origin and still have been written under different internal conventions,")
+    add("  so it stands beside the pinned converter semantics and the containment check")
+    add("  rather than in place of them. On the same 71 sessions the two declared instants")
+    add("  agreed on 63 and differed by exactly one hour on 8.")
     add("  Containment is a consistency check: it cannot identify a clock offset or scale,")
     add("  and the two slack values below are what it leaves unchecked at the endpoints,")
     add("  not a bound on internal agreement.")
@@ -737,6 +757,8 @@ def main(argv=None):
             raw_prov["provenance"], "raw asset %s" % raw_asset["path"])
     except ValueError as exc:
         raise SystemExit("[fatal] input error: %s" % exc)
+    print("[drift] raw asset counts its times from %s"
+          % archive_units.ascii_safe(raw_auth["reference_value"], 60), flush=True)
     print("[drift] raw conversion provenance %s (version %s), read under a %d-byte "
           "request budget and a %d-byte transfer budget, spending %d and %d"
           % (archive_units.ascii_safe(raw_auth["value"], 120), raw_auth["version"],
@@ -883,15 +905,15 @@ def main(argv=None):
         "provenance": read["provenance"],
         "raw_provenance": raw_prov["provenance"],
         "provenance_authentication": {
-            "raw": {key: raw_auth[key] for key in
-                    ("path", "token", "form", "version", "version_is_measured",
-                     "source")},
-            "processed": {key: read["provenance_authentication"][key] for key in
-                          ("path", "token", "form", "version", "version_is_measured",
-                           "source")},
-            # Necessarily agreeing, because a disagreement stops the run before
-            # this record exists. It is recorded as a statement of what was
-            # enforced, not as a check this record could have failed.
+            "raw": archive_units.provenance_record(raw_auth),
+            "processed": archive_units.provenance_record(
+                read["provenance_authentication"]),
+            # The instants necessarily agree, because a disagreement stops the
+            # run before this record exists. That half is recorded as a
+            # statement of what was enforced, not as a check this record could
+            # have failed. ``versions_agree`` is the opposite: it is measured
+            # and reported, it gates nothing, and on every session of this
+            # dandiset read so far it is False.
             "pair": read["provenance_pair"],
         },
         "provenance_io": {"raw": raw_prov["provenance_io"],
@@ -921,18 +943,27 @@ def main(argv=None):
             "containment": ("all loaded spikes inside [t_first_s, t_last_s]"
                             if containment else "no spikes loaded"),
             "conversion_provenance": (
-                "both assets' %s match %r and name one version, %s (%s); raw %r, "
+                "both assets' %s match %r; raw names version %s, processed names %s "
+                "(%s, and version equality is reported rather than gated); raw %r, "
                 "processed %r"
                 % (archive_units.REQUIRED_PROVENANCE_PATH,
                    archive_units.CONVERSION_SOURCE_FORM_TEXT,
-                   read["provenance_pair"]["version"],
-                   "measured in Session 7"
-                   if read["provenance_pair"]["version_is_measured"]
-                   else "outside the two versions measured in Session 7, which is "
-                        "reported and not gated",
+                   read["provenance_pair"]["raw_version"],
+                   read["provenance_pair"]["processed_version"],
+                   "both among the versions measured across 71 sessions"
+                   if read["provenance_pair"]["versions_are_measured"]
+                   else "at least one outside the versions measured across 71 sessions",
                    archive_units.ascii_safe(raw_auth["value"], 60),
                    archive_units.ascii_safe(
                        read["provenance_authentication"]["value"], 60))),
+            "reference_time": (
+                "both assets state %s as the instant their time values are counted "
+                "from; raw declares %r, processed declares %r, and the two denote the "
+                "same instant to the microsecond"
+                % (read["provenance_pair"]["reference_instant_utc"],
+                   archive_units.ascii_safe(raw_auth["reference_value"], 60),
+                   archive_units.ascii_safe(
+                       read["provenance_authentication"]["reference_value"], 60))),
             "replay": replay_note,
         },
         "sets": {

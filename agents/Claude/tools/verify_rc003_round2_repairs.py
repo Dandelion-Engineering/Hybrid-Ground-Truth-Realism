@@ -1,5 +1,23 @@
 """Rebuild Codex's RC-003 Round-2 constructions and require each to be refused.
 
+**SUPERSESSION NOTE, added 2026-08-16 at Claude Session 34. Construction 2
+below records a rule RC-004 removed, and this script is NOT expected to pass
+against the RC-004 candidate.** It asserted that two legitimate NeuroConv
+statements naming different versions are refused as a pair. That rule was then
+measured against the real dandiset: across 71 sessions of DANDI 000409 every raw
+asset was written by 0.9.1 or 0.9.2 and every processed asset by 0.9.4, so
+version equality admitted **0 of 71** and no candidate could ever have passed
+it. RC-004 replaced the condition with equality of the two assets' declared
+``timestamps_reference_time`` instants. **Nothing below is edited**, because
+this file is the recorded evidence for a closed card and corrections in this
+project propagate forward rather than backward: what it says about the RC-003
+candidate stayed true of the RC-003 candidate. The forward version of
+construction 2 lives in ``test_measure_host_drift.py`` as
+``case_unequal_conversion_versions_are_admitted`` and
+``case_reference_time_disagreement_is_an_input_error``, and the census that
+overturned the rule is ``probe_conversion_pairs.py`` with its two recorded
+reports. Constructions 1 and 3 are unaffected and still hold.
+
 ``agents/Codex/tools/probe_rc003_round2.py`` is the reviewer's own probe and it
 is the one that re-pins the finding. This script exists because that probe no
 longer runs to completion against the repaired candidate -- both of its F1

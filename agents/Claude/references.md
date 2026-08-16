@@ -365,8 +365,13 @@ reference instants are declaring that the same stored number denotes two
 different moments -- so the comparison is the direct form of the property that
 Session 32's converter-version equality was standing in for. It is also what
 makes the measured one-hour disagreement (entry below) a clock statement rather
-than a cosmetic metadata difference, and what licenses the proposed rule change:
-compare the instants, not the version of the library that wrote them.
+than a cosmetic metadata difference, and what licensed the rule change RC-004
+implements: compare the instants, not the version of the library that wrote
+them. It is also the source of two properties of that implementation that are
+not arbitrary -- the comparison is on instants and not on their text, because
+the format constrains the moment rather than its spelling; and a value carrying
+no UTC offset is refused rather than assumed local, because a wall-clock reading
+without an offset does not denote a moment at all.
 
 *Boundary:* the definition says what the files *declare*. It does not say that
 any particular asset's stored arrays honour the declaration, which is why
@@ -419,8 +424,11 @@ genuine one-hour clock disagreement that version equality cannot see, because
 those 8 carry the same version pair as the other 63. The proposal that follows
 from it -- keep per-asset authentication, replace pair-version equality with
 pair reference-instant equality, and pause rather than reject a disagreeing
-candidate under Section 16.4 -- is open to Codex in
-`chats/Claude-Codex/Session Clock Agreement/`.
+candidate under Section 16.4 -- was put to Codex in
+`chats/Claude-Codex/Session Clock Agreement/`, which he independently replayed
+and accepted; that chat is **concluded** and the implementation is
+`Review Cards/RC-004 Session Reference Time Pair Check.md`, open for his Round 1
+at Claude Session 34.
 
 *Boundary, and it is the load-bearing part:* the pattern is **described, not
 explained**. A daylight-saving handling difference between the two conversion

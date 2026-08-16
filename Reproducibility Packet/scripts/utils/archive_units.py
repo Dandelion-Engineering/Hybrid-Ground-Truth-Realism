@@ -71,20 +71,36 @@ in :func:`provenance_transfer_budget`. **Both budgets refuse before delegating,
 and both are reported beside what they actually spent**, so ``--plan-only``
 states the bound before the run rather than the spend after it.
 
-**One provenance path is authenticated rather than recorded, and the pair has to
-agree.** The session-time origin the drift grid is anchored on is a property of
-the converter, so an asset that does not state what produced it cannot establish
-it. ``general/source_script`` must be present, must have been read whole, and
-must *be* the conversion statement the measured assets carry -- matched end to
-end, because a search for the tool's name alone said yes to a value reading
-"NOT created using NeuroConv", and a negated occurrence is not provenance. The
-raw and processed halves of one session must then name the same converter
-version, because the clock claim is that both halves share one coordinate and
-two converter versions is not evidence that they do. What those checks can and
-cannot establish is written at :data:`REQUIRED_PROVENANCE_PATH` and
-:func:`authenticate_provenance_pair`, and the honest half of it is that no asset
-in this dandiset carries the conversion repository's commit, so no check here
-confirms it.
+**Two provenance paths are authenticated rather than recorded, and one of them
+has to agree across the pair.** The session-time origin the drift grid is
+anchored on is a property of the converter and of the file's own declared
+reference instant, so an asset that states neither cannot establish it.
+``general/source_script`` must be present, must have been read whole, and must
+*be* the conversion statement the measured assets carry -- matched end to end,
+because a search for the tool's name alone said yes to a value reading "NOT
+created using NeuroConv", and a negated occurrence is not provenance. The root
+``timestamps_reference_time`` must be present, read whole, and parse as a
+timezone-aware ISO-8601 instant, and the two halves of one session must denote
+the **same** instant, because NWB defines every time value in a file as seconds
+counted from that instant and two different origins are two coordinates.
+
+**The pair used to be required to name the same converter version, and that
+rule admitted nothing.** It was measured across 71 sessions of DANDI 000409 --
+the 11 distinct sessions of the pinned candidate order and a deterministic
+60-session holdout drawn from the other 448 -- and every raw asset was written
+by NeuroConv 0.9.1 or 0.9.2 while every processed asset was written by 0.9.4.
+Agreement was 0 of 71. The property it stood in for is readable directly and
+behaves differently: the declared reference instants agree exactly on 63 of
+those 71 and differ by exactly one hour on 8, and those 8 carry the *same*
+version pair as the 63. A proxy that admits none of the real population, and
+that cannot see the defect it stands in for, is not a conservative check. The
+versions are still parsed, still reported, and no longer vote. What these checks
+can and cannot establish is written at :data:`REQUIRED_PROVENANCE_PATH`,
+:data:`REFERENCE_TIME_PATH` and :func:`authenticate_provenance_pair`, and the
+honest half of it is that no asset in this dandiset carries the conversion
+repository's commit, so no check here confirms it -- and that agreeing reference
+instants are a necessary declared condition rather than an identification of the
+clock.
 
 **What it validates, and why validation lives here rather than in the caller.**
 Four properties have to hold before a drift number computed from these arrays
@@ -131,6 +147,7 @@ reads and checks; ``utils.band_drift`` measures.
 """
 
 import contextlib
+import datetime
 import io
 import re
 import sys
@@ -155,10 +172,25 @@ DEPTH_UNIT_PHRASE = "micrometers"
 # The conversion provenance the selection document's clock claim rests on. The
 # session-time origin is a property of the converter, not of the recorded
 # arrays, so the asset's own statement of what produced it is the only
-# asset-level evidence that this file came off the documented conversion path.
+# asset-level evidence that this file came off the documented conversion path --
+# and the file's own declared reference instant is the only asset-level evidence
+# of where its time values are counted from.
+#
+# **The two authenticated paths are read first, in that order.** The budget is
+# cumulative over the whole call, so a path read after an expensive one may find
+# nothing left; putting both required paths ahead of the recorded ones is what
+# makes the budget unable to starve a verdict.
+#
+# **``general/session_start_time`` was here and is not any more.** It is absent
+# from all 142 assets read across the 71 sessions measured in Session 33, so it
+# contributed nothing but one block of stated transfer budget. The value NWB
+# actually defines sits at the file root, and the root ``session_start_time`` is
+# present on all 142 and equal to ``timestamps_reference_time`` on all 142 -- it
+# is recorded here for the reader, and nothing gates on it.
 PROVENANCE_PATHS = (
     "general/source_script",
-    "general/session_start_time",
+    "timestamps_reference_time",
+    "session_start_time",
     "general/institution",
     "general/lab",
 )
@@ -182,6 +214,38 @@ PROVENANCE_PATHS = (
 REQUIRED_PROVENANCE_PATH = "general/source_script"
 CONVERSION_SOURCE_TOKEN = "neuroconv"
 
+# The second required path: the instant the file's time values are counted from.
+#
+# **What the format says it is.** The NWB specification defines
+# ``timestamps_reference_time`` on ``NWBFile`` as the reference time for every
+# timestamp in the file -- each stored time value is seconds relative to it --
+# and defaults it to ``session_start_time``. It is therefore not a description
+# of the recording, it is the origin of the coordinate the bin grid is laid on,
+# and it is stated by the file rather than inferred from it.
+#
+# **What was measured, and why this path replaced a proxy.** Session 33 read
+# both halves of 71 sessions of DANDI 000409 -- the 11 distinct sessions of the
+# pinned candidate order plus a deterministic 60-session holdout drawn from the
+# other 448, so the holdout excludes the sessions the hypothesis was formed on.
+# Every asset carried this path and carried it as a timezone-aware ISO-8601
+# value; ``session_start_time`` equalled it on all 142. Processed minus raw was
+# exactly ``+0.0 s`` on 63 sessions and exactly ``+3600.0 s`` on 8, and never
+# anything else. The 8 are all one laboratory's sessions inside the US-Eastern
+# daylight window. **That is a described pattern and not a measured mechanism**:
+# a daylight-saving handling difference between the two conversion passes fits
+# every number, no mechanism was measured, and none is claimed here.
+#
+# **What agreement here does and does not establish.** It is a necessary
+# declared condition: two assets that name different origins are not stating one
+# coordinate, whatever their arrays contain. It is not an identification of the
+# clock, for the same reason endpoint containment is not one -- both halves could
+# agree on a declared origin and still have been written with different internal
+# conventions. The evidence set for the shared clock stays what the selection
+# document's section 16.4 says it is: the pinned converter commit's semantics,
+# each asset's own conversion statement, this agreement, and containment as a
+# consistency check with stated slack.
+REFERENCE_TIME_PATH = "timestamps_reference_time"
+
 # The positive form the measured values take, matched end to end rather than
 # searched for. Searching for the token above is not authentication: a value
 # reading "This asset was NOT created using NeuroConv; exported by LocalTool v3"
@@ -196,15 +260,22 @@ CONVERSION_SOURCE_FORM = re.compile(
 CONVERSION_SOURCE_FORM_TEXT = "Created using NeuroConv v<version>"
 
 # The versions that measurement found: reported, and deliberately NOT gated on.
-# Session 7's 21 assets carry two of them, and the one reading v0.9.1 belongs to
-# NYU-39, a host subject -- so this dandiset is not uniform in its converter
-# version and a third one is not by itself evidence of a different clock.
-# Gating on this tuple would be a threshold taken from a 21-asset sample of
-# *raw* assets and applied to processed assets this project has never read.
-# What is gated instead is the form above, which all 21 satisfy, and agreement
-# between the two halves of one session, which is the property the common-clock
-# claim actually needs -- see :func:`authenticate_provenance_pair`.
-MEASURED_CONVERSION_VERSIONS = ("0.9.1", "0.9.2")
+#
+# **The list grew because the measurement did, and the growth is the whole
+# story.** Session 7 read one *raw* asset per subject across 21 assets and found
+# 0.9.2 on twenty and 0.9.1 on one. Nothing had ever read a *processed* asset's
+# statement. Session 33 read both halves of 71 sessions: raw 0.9.1 once and
+# 0.9.2 seventy times, processed 0.9.4 on all seventy-one. So the dandiset is
+# not uniform in its converter version, the two halves of a session are never
+# converted by the same version, and a rule requiring them to agree admitted 0
+# of 71 -- see :func:`authenticate_provenance_pair` for what replaced it.
+#
+# Gating on this tuple would still be wrong for the reason it always was: it is
+# a list taken from the assets this project happens to have read, and a fourth
+# version is not by itself evidence of a different clock. What is gated is the
+# form above, which all 142 measured assets satisfy, and the declared reference
+# instant, which is the property the common-clock claim actually needs.
+MEASURED_CONVERSION_VERSIONS = ("0.9.1", "0.9.2", "0.9.4")
 
 # The budget on what reading conversion provenance may *ask for*, and so on what
 # it may materialize, cumulative across the whole call. Pinned here rather than
@@ -219,8 +290,8 @@ PROVENANCE_MAX_BYTES = 65536
 # the caller passed. That read is the one with no plan behind it -- it happens
 # before any ceiling exists and its cost is reported rather than bounded by one
 # -- so its transfer bound should not scale with a block size chosen for a bulk
-# payload read on a different file. At 64 KiB the bound is 327,680 bytes
-# instead of the 4,259,840 a 1 MiB block would make it.
+# payload read on a different file. At 64 KiB the bound is 393,216 bytes
+# instead of the 5,308,416 a 1 MiB block would make it.
 PROVENANCE_BLOCK_BYTES = 65536
 
 # Labels for the two nested read budgets, so a refusal says which one
@@ -711,9 +782,9 @@ def source_provenance(handle, reader, max_bytes=PROVENANCE_MAX_BYTES):
         a per-read bound says nothing about the total a scattered file can cost.
 
         **A refused read spends neither budget**, so an oversized or unreachable
-        value does not stop the paths after it from being read; and the required
-        path is read first, so the budget is never consumed before the one path
-        a verdict depends on has had it.
+        value does not stop the paths after it from being read; and the two
+        required paths are read first, so the budget is never consumed before
+        the paths a verdict depends on have had it.
     """
     out = {}
     with reader.budget(max_bytes, provenance_transfer_budget(reader.block_bytes),
@@ -816,8 +887,57 @@ def conversion_version(value):
     return match.group("version") if match else None
 
 
+def reference_instant(value):
+    """Return the timezone-aware instant a reference-time value denotes, or None.
+
+    Args:
+        value: one asset's :data:`REFERENCE_TIME_PATH`, as read.
+
+    Returns:
+        A :class:`datetime.datetime` carrying a UTC offset when the whole value
+        is an ISO-8601 timestamp that names one, ignoring surrounding
+        whitespace; None otherwise.
+
+    Note:
+        **A value without an offset is refused rather than assumed local.** An
+        instant is a point in time; a wall-clock reading without an offset is
+        not one, and choosing an offset for it -- UTC, or the machine's -- would
+        invent the very quantity the comparison is about. All 142 assets
+        measured in Session 33 carry an offset, so refusing is not refusing
+        something this dandiset contains.
+
+        **The comparison's resolution is one microsecond, and that is a
+        property of the parser rather than a choice made here.**
+        :meth:`datetime.datetime.fromisoformat` truncates fractional seconds
+        below a microsecond, so two values differing only in their nanosecond
+        digits parse equal and this check would call them the same instant. The
+        measured disagreement in this dandiset is 3,600 s, nine orders of
+        magnitude above that, so the resolution is stated rather than defended.
+    """
+    try:
+        parsed = datetime.datetime.fromisoformat(value.strip())
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed.utcoffset() is not None else None
+
+
+def instant_text(instant):
+    """Render an instant canonically, in UTC, for a record or a report.
+
+    Args:
+        instant: a timezone-aware :class:`datetime.datetime`.
+
+    Returns:
+        Its ISO-8601 form normalized to UTC, so two records of the same instant
+        written at different declared offsets read as the same string. The
+        declared value is recorded verbatim beside it and is not replaced by
+        this one.
+    """
+    return instant.astimezone(datetime.timezone.utc).isoformat()
+
+
 def authenticate_provenance(provenance, source):
-    """Confirm one asset states it came off the documented conversion toolchain.
+    """Confirm one asset states its conversion and the origin of its times.
 
     The selection document pins the session-time origin to a conversion
     repository at a named commit and says in terms that an asset whose
@@ -833,15 +953,25 @@ def authenticate_provenance(provenance, source):
 
     Returns:
         A dict with ``path``, ``value``, ``version``, ``form``, ``token``,
-        ``version_is_measured`` and ``source``, for the record and the report.
+        ``version_is_measured``, ``source``, ``reference_path``,
+        ``reference_value`` and ``reference_instant`` -- the last a
+        :class:`datetime.datetime`, which is why :func:`provenance_record` and
+        not this dict is what a JSON record carries.
 
     Raises:
-        ValueError: if the required path is absent, was not read whole, or is
-            not the measured conversion statement. All three are input errors:
-            they say the asset is not the one the clock claim is about, not that
-            the candidate drifted.
+        ValueError: if either required path is absent, was not read whole, is
+            not the measured conversion statement, or does not parse as a
+            timezone-aware instant. All of them are input errors: they say the
+            asset is not the one the clock claim is about, not that the
+            candidate drifted.
 
     Note:
+        **The conversion statement is checked before the reference time**, so a
+        file that is not from the documented toolchain at all is refused on that
+        rather than on a downstream property of a file this project is not
+        reading anyway. The order is load-bearing for the error a reader sees,
+        not for what is admitted.
+
         **A token search is not authentication, which is the repair here.** The
         first version required the case-insensitive substring ``neuroconv``
         anywhere in the value, and a value reading ``This asset was NOT created
@@ -853,6 +983,14 @@ def authenticate_provenance(provenance, source):
         arbitrary one. The version the sentence names is captured and reported;
         it is not matched against :data:`MEASURED_CONVERSION_VERSIONS`, for the
         reason recorded there.
+
+        **The reference time is authenticated per asset rather than only across
+        the pair**, so a value that is missing, refused, truncated, malformed or
+        timezone-naive is an input error naming *which* asset is at fault. The
+        alternative -- discovering it inside :func:`authenticate_provenance_pair`
+        -- would report a defect in one file as a disagreement between two, and
+        would let a raw asset's malformed value survive until the processed
+        asset had already been opened.
     """
     value = provenance.get(REQUIRED_PROVENANCE_PATH)
     if value is None:
@@ -877,58 +1015,139 @@ def authenticate_provenance(provenance, source):
             "conversion path the session clock is pinned to is not admitted by naming it"
             % (source, ascii_safe(value), REQUIRED_PROVENANCE_PATH,
                CONVERSION_SOURCE_FORM_TEXT, CONVERSION_SOURCE_TOKEN))
+    reference_value = provenance.get(REFERENCE_TIME_PATH)
+    if reference_value is None:
+        raise ValueError(
+            "%s carries no %s, so nothing in it states the instant its time values are "
+            "counted from; NWB defines every stored time as seconds relative to that "
+            "instant, and an asset that does not name one cannot be placed on a shared "
+            "session-time coordinate" % (source, REFERENCE_TIME_PATH))
+    if not provenance_is_complete(reference_value):
+        raise ValueError(
+            "%s carries a %s that was not read whole under the %d-byte provenance budget "
+            "(%s), and a value this command did not fully see is not evidence about where "
+            "the asset's times begin"
+            % (source, REFERENCE_TIME_PATH, PROVENANCE_MAX_BYTES,
+               ascii_safe(reference_value)))
+    instant = reference_instant(reference_value)
+    if instant is None:
+        raise ValueError(
+            "%s states %r as its %s, which is not an ISO-8601 timestamp naming a UTC "
+            "offset. A wall-clock reading with no offset is not an instant, and choosing "
+            "one for it would invent the quantity the two assets are compared on; all 142 "
+            "assets measured across 71 sessions of this dandiset carry an offset"
+            % (source, ascii_safe(reference_value), REFERENCE_TIME_PATH))
     return {"path": REQUIRED_PROVENANCE_PATH, "value": value, "version": version,
             "form": CONVERSION_SOURCE_FORM_TEXT, "token": CONVERSION_SOURCE_TOKEN,
             "version_is_measured": version in MEASURED_CONVERSION_VERSIONS,
-            "source": source}
+            "source": source, "reference_path": REFERENCE_TIME_PATH,
+            "reference_value": reference_value, "reference_instant": instant}
+
+
+def provenance_record(authentication):
+    """Return the JSON-safe half of an :func:`authenticate_provenance` result.
+
+    Args:
+        authentication: one asset's authentication result.
+
+    Returns:
+        A dict of strings and booleans: everything the record and the report
+        need, with the parsed instant rendered canonically in UTC by
+        :func:`instant_text` rather than carried as a
+        :class:`datetime.datetime`.
+
+    Note:
+        This exists so the caller does not restate the key list once per asset.
+        It did, and the two lists were identical -- which is the shape a later
+        edit updates on one side only.
+    """
+    record = {key: authentication[key] for key in
+              ("path", "token", "form", "version", "version_is_measured", "source",
+               "reference_path", "reference_value")}
+    record["reference_instant_utc"] = instant_text(authentication["reference_instant"])
+    return record
 
 
 def authenticate_provenance_pair(first, second):
-    """Confirm two assets of one session state the same conversion version.
+    """Confirm two assets of one session count their times from the same instant.
 
     Authenticating each asset separately establishes that each came off the
-    documented toolchain. It does not establish that they came off *one*
-    conversion, and the clock claim is about exactly that: the raw asset supplies
-    the grid's extent while the processed asset supplies the spikes, so a drift
-    number is only meaningful if the two share a session-time coordinate. Two
-    different converter versions on the two halves is not evidence that they do.
+    documented toolchain and that each states where its times begin. It does not
+    establish that the two halves are on *one* coordinate, and the clock claim
+    is about exactly that: the raw asset supplies the grid's extent while the
+    processed asset supplies the spikes, so a drift number is only meaningful if
+    both are counted from the same origin.
 
-    **This is the strict branch of a choice, and the alternative was to admit
-    the difference with a justification.** There is no such justification
-    available here: this project has no measurement of what differs between
-    NeuroConv versions, and Session 7's survey read one *raw* asset per subject,
-    so it says nothing about whether a session's two halves are converted
-    together. Requiring agreement is the position that does not rest on an
-    assumption, and its failure mode is the recoverable one: Section 16.4 of the
-    selection document makes an input error pause the pinned order rather than
-    reject the candidate, so a real disagreement stops the run, is reported with
-    both values, and is resolved by amendment against evidence this project
-    would then have.
+    **What is compared, and why it is not the converter version any more.** The
+    condition here used to be equality of the parsed NeuroConv version. That
+    version is a property of a library the conversion repository depends on, not
+    of the session-time convention, and Session 33 measured what it admits: on
+    71 sessions of DANDI 000409 -- 11 from the pinned candidate order and a
+    60-session holdout drawn from the other 448, excluding the sessions the
+    hypothesis came from -- the raw half was always 0.9.1 or 0.9.2 and the
+    processed half always 0.9.4. **Agreement was 0 of 71: no candidate in this
+    dandiset could ever have passed it.** On the same 71 sessions the declared
+    reference instants agree on 63 and differ by exactly 3,600 s on 8, and the 8
+    carry the same version pair as the 63 -- so the proxy was simultaneously too
+    strict to admit anything and blind to the defect it stood in for. The
+    versions are still parsed, still reported, and no longer decide anything.
+
+    **What agreement here is worth, stated so the report cannot overstate it.**
+    It is a *necessary declared* condition, not an identification of the clock.
+    Two assets can declare the same origin and still have been written under
+    different internal conventions; section 16.4 of the selection document
+    already says containment cannot identify a clock either, and this cannot
+    stand in for the converter semantics that argument rests on.
+
+    **The strict branch is still the one taken, and the failure mode is still
+    the recoverable one.** Nothing this project has measured says a one-hour
+    disagreement is harmless, so a disagreement stops the run rather than being
+    admitted with a justification the evidence does not support. Section 16.4
+    makes that an input error, which **pauses** the pinned order rather than
+    rejecting the candidate: the four candidates the measurement puts on the
+    wrong side of this keep their rank, and recovering them needs its own
+    evidence and its own recorded rule.
 
     Args:
         first: an :func:`authenticate_provenance` result, normally the raw one.
         second: the other asset's result.
 
     Returns:
-        A dict with ``version``, ``versions_agree`` (necessarily True, because
-        the run stops otherwise) and ``version_is_measured``.
+        A dict with ``reference_instant_utc``, ``reference_instants_agree``
+        (necessarily True, because the run stops otherwise),
+        ``reference_delta_s``, both assets' ``raw_version`` and
+        ``processed_version``, ``versions_agree`` -- which is **reported and
+        does not gate**, and which is False on every real session of this
+        dandiset -- and ``versions_are_measured``.
 
     Raises:
-        ValueError: if the two versions differ. It is an input error about the
-            asset pair, not a drift verdict.
+        ValueError: if the two declared instants differ. It is an input error
+            about the asset pair, not a drift verdict.
     """
-    if first["version"] != second["version"]:
+    if first["reference_instant"] != second["reference_instant"]:
+        delta_s = (second["reference_instant"] - first["reference_instant"]).total_seconds()
         raise ValueError(
-            "%s states conversion version %s and %s states %s. The session-time origin "
-            "the bin grid is anchored on is a property of the converter, and the two "
-            "halves of one session have to share it: the raw asset supplies the extent "
-            "and the processed asset supplies the spikes. Two converter versions is not "
-            "evidence that they share one coordinate, and nothing this command has "
-            "measured says the difference is harmless. Resolve it as an input error, "
-            "which pauses the pinned order rather than rejecting the candidate"
-            % (first["source"], first["version"], second["source"], second["version"]))
-    return {"version": first["version"], "versions_agree": True,
-            "version_is_measured": first["version"] in MEASURED_CONVERSION_VERSIONS}
+            "%s counts its times from %s and %s counts its times from %s, a difference of "
+            "%+.6f s. NWB defines every time value in a file as seconds relative to that "
+            "instant, so two assets naming different instants are not stating one "
+            "session-time coordinate -- and the raw asset supplies the grid's extent while "
+            "the processed asset supplies the spikes. Across 71 sessions of this dandiset "
+            "the two halves agree exactly on 63 and differ by exactly +3600 s on 8, and "
+            "nothing this command has measured says the difference is harmless. Resolve it "
+            "as an input error, which pauses the pinned order rather than rejecting the "
+            "candidate"
+            % (first["source"], ascii_safe(first["reference_value"]),
+               second["source"], ascii_safe(second["reference_value"]), delta_s))
+    return {"reference_instant_utc": instant_text(first["reference_instant"]),
+            "reference_instants_agree": True,
+            "reference_delta_s": 0.0,
+            "raw_version": first["version"],
+            "processed_version": second["version"],
+            # Reported, never gated. It is False on every session of DANDI
+            # 000409 measured so far, which is exactly why it does not gate.
+            "versions_agree": first["version"] == second["version"],
+            "versions_are_measured": (first["version"] in MEASURED_CONVERSION_VERSIONS
+                                      and second["version"] in MEASURED_CONVERSION_VERSIONS)}
 
 
 @contextlib.contextmanager
@@ -991,8 +1210,9 @@ def read_provenance(url, size, block_bytes):
         standing between a malformed asset and an unbounded spend. A bound
         denominated in blocks cannot be smaller than a block, so a 1 MiB block
         chosen for a bulk payload read on a *different* file would make this
-        read's bound 4,259,840 bytes for the sake of about thirty characters.
-        At :data:`PROVENANCE_BLOCK_BYTES` it is 327,680.
+        read's bound 5,308,416 bytes for the sake of about eighty characters
+        across two required paths. At :data:`PROVENANCE_BLOCK_BYTES` it is
+        393,216.
     """
     remote = RemoteFile(url, size, block=min(int(block_bytes), PROVENANCE_BLOCK_BYTES))
     reader = BoundedReader(remote)
@@ -1567,10 +1787,10 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
             return without reading any spike data.
         expect_conversion: the raw asset's :func:`authenticate_provenance`
             result, when the caller has one. Given it, this read also requires
-            the two assets to state the same converter version, and it does so
-            in preflight -- before the plan, and before a single spike is read
-            -- because a pair check run after the payload would cost the whole
-            read to reject the asset.
+            the two assets to declare the same session-time origin, and it does
+            so in preflight -- before the plan, and before a single spike is
+            read -- because a pair check run after the payload would cost the
+            whole read to reject the asset.
 
     Returns:
         A dict carrying ``probe``, ``band`` (the two bounds), ``plan`` (from

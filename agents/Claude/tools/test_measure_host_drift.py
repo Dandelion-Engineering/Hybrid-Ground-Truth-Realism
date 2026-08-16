@@ -38,6 +38,7 @@ Run from the project root with the project virtual environment:
 """
 
 import argparse
+import datetime
 import hashlib
 import importlib.util
 import io
@@ -327,13 +328,42 @@ DEFAULT_PROVENANCE = {
     "general/lab": "cortexlab",
 }
 
+# The instant the fixtures declare their time values are counted from. NWB
+# defines timestamps_reference_time as the origin every stored time in the file
+# is relative to, and all 142 assets read across 71 sessions of DANDI 000409
+# carry it as a timezone-aware ISO-8601 value with session_start_time equal to
+# it. This one is a real value from that measurement, NYU-39's raw half.
+#
+# **It is a separate argument from the provenance mapping because they are
+# separate axes.** Every fixture that varies the conversion statement still
+# needs a valid reference time, or it would be refused for a reason the case was
+# not written to exercise -- and every fixture that varies the reference time
+# still needs a valid conversion statement, for the same reason in the other
+# direction.
+DEFAULT_REFERENCE_TIME = "2021-05-10T14:33:49.023776-04:00"
 
-def _write_provenance(handle, provenance):
-    """Write a fixture's conversion-provenance datasets."""
+
+def _write_provenance(handle, provenance, reference_time=UNSET):
+    """Write a fixture's conversion-provenance datasets.
+
+    Args:
+        handle: the open fixture file.
+        provenance: mapping of NWB path to stored string.
+        reference_time: the root reference-time value, defaulting to
+            :data:`DEFAULT_REFERENCE_TIME`. ``None`` omits both root time
+            datasets, which is the fixture for an asset that states no origin.
+    """
     dt = h5py.string_dtype(encoding="utf-8")
     for nwb_path, value in (provenance or {}).items():
         dataset = handle.create_dataset(nwb_path, data=value, dtype=dt)
         dataset.attrs["file_name"] = "%s.py" % nwb_path.rsplit("/", 1)[-1]
+    stamp = DEFAULT_REFERENCE_TIME if reference_time is UNSET else reference_time
+    if stamp is not None:
+        handle.create_dataset(archive_units.REFERENCE_TIME_PATH, data=stamp, dtype=dt)
+        # Equal to the reference time, as it is on all 142 measured assets. It
+        # is recorded and gates nothing, so it follows the same value rather
+        # than becoming a second axis nothing reads.
+        handle.create_dataset("session_start_time", data=stamp, dtype=dt)
 
 
 def _write_electrode_table(handle, rows):
@@ -351,7 +381,7 @@ def _write_electrode_table(handle, rows):
 
 
 def write_raw(path, rows, t_first_s, t_last_s, timing_source="timestamps",
-              series_names=None, provenance=UNSET):
+              series_names=None, provenance=UNSET, reference_time=UNSET):
     """Write a raw-asset-shaped file: an electrode table and AP series timing.
 
     Args:
@@ -368,12 +398,15 @@ def write_raw(path, rows, t_first_s, t_last_s, timing_source="timestamps",
             command now authenticates it on the raw asset as well; pass an
             explicit mapping, or an empty one, to build the fixtures that must
             be refused.
+        reference_time: the declared session-time origin, defaulting to
+            :data:`DEFAULT_REFERENCE_TIME`. ``None`` writes none at all, which
+            the command must refuse as an input error.
     """
     names = series_names or ["ElectricalSeries%sAP" % probe for probe in PROBES]
     provenance = DEFAULT_PROVENANCE if provenance is UNSET else provenance
     with h5py.File(path, "w") as handle:
         _write_electrode_table(handle, rows)
-        _write_provenance(handle, provenance)
+        _write_provenance(handle, provenance, reference_time)
         acquisition = handle.create_group("acquisition")
         for name in names:
             node = acquisition.create_group(name)
@@ -462,7 +495,8 @@ def fragment_ragged_columns(path, chunk_elements=64, filler_elements=8192):
 
 def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
                     depth_dtype=np.float64, index_mutator=None, provenance=UNSET,
-                    time_dtype=np.float64, chunk_elements=None):
+                    time_dtype=np.float64, chunk_elements=None,
+                    reference_time=UNSET):
     """Write a processed-asset-shaped file: an electrode table and a units table.
 
     Args:
@@ -483,6 +517,10 @@ def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
         provenance: mapping of NWB path to stored string, defaulting to the
             measured shape. ``general/source_script`` is authenticated rather
             than recorded, so a fixture that omits it must do so deliberately.
+        reference_time: the declared session-time origin, defaulting to
+            :data:`DEFAULT_REFERENCE_TIME` -- the same value the raw writer
+            uses, so the pair agrees unless a case makes it disagree. ``None``
+            writes none at all.
     """
     provenance = DEFAULT_PROVENANCE if provenance is UNSET else provenance
     times = np.concatenate([u["times"] for u in units]) if units else np.zeros(0)
@@ -495,7 +533,7 @@ def write_processed(path, rows, units, depth_description=DEPTH_DESCRIPTION,
     dt = h5py.string_dtype(encoding="utf-8")
     with h5py.File(path, "w") as handle:
         _write_electrode_table(handle, rows)
-        _write_provenance(handle, provenance)
+        _write_provenance(handle, provenance, reference_time)
         node = handle.create_group("units")
         node.create_dataset("probe_name",
                             data=np.array([u["probe"] for u in units], dtype=object),
@@ -1461,11 +1499,32 @@ def case_provenance_is_reported_verbatim(h, tmp):
                 "general/lab", "general/institution"):
         h.check("provenance/report names %s whole" % key, key in text)
     pair = record["provenance_authentication"]["pair"]
-    h.equal("provenance/version parsed from the statement", pair["version"], "0.9.2")
-    h.check("provenance/version is one of the measured two",
-            pair["version_is_measured"] is True, pair)
-    h.check("provenance/pair agreement is what was enforced",
-            pair["versions_agree"] is True, pair)
+    h.equal("provenance/raw version parsed from the statement",
+            pair["raw_version"], "0.9.2")
+    h.equal("provenance/processed version parsed from the statement",
+            pair["processed_version"], "0.9.2")
+    h.check("provenance/versions are among the measured ones",
+            pair["versions_are_measured"] is True, pair)
+    h.check("provenance/instant agreement is what was enforced",
+            pair["reference_instants_agree"] is True, pair)
+    h.equal("provenance/instant delta is zero", pair["reference_delta_s"], 0.0)
+    # The reference time is read under the same two budgets as the rest of the
+    # provenance, which is what keeps its cost inside the plan rather than
+    # beside it. The whole-suite invariant already compares both spends against
+    # both budgets on every case that reaches a record; what this asserts is
+    # that the value really was read here rather than assumed.
+    for source in ("provenance", "raw_provenance"):
+        h.equal("provenance/%s carries the reference time" % source,
+                record[source].get(archive_units.REFERENCE_TIME_PATH),
+                DEFAULT_REFERENCE_TIME)
+    for half in ("raw", "processed"):
+        auth = record["provenance_authentication"][half]
+        h.equal("provenance/%s declared value recorded verbatim" % half,
+                auth["reference_value"], DEFAULT_REFERENCE_TIME)
+        h.equal("provenance/%s instant normalized to UTC" % half,
+                auth["reference_instant_utc"], "2021-05-10T18:33:49.023776+00:00")
+    h.check("provenance/report states the reference time",
+            "session reference time" in text and DEFAULT_REFERENCE_TIME in text)
     for label in ("raw", "processed"):
         spend = record["provenance_io"][label]
         h.check("provenance/%s budgets are published" % label,
@@ -1567,34 +1626,111 @@ def case_negated_conversion_statement_is_an_input_error(h, tmp):
     h.check("negated_conversion/no record", result["record"] is None)
 
 
-def case_conversion_version_mismatch_is_an_input_error(h, tmp):
-    """Two converter versions on one session's two halves stop the run.
+def case_unequal_conversion_versions_are_admitted(h, tmp):
+    """Two converter versions on one session's two halves no longer stop the run.
 
-    Each asset authenticating separately says each came off the documented
-    toolchain; it does not say they came off *one* conversion, which is what the
-    clock claim needs -- the raw asset supplies the grid's extent and the
-    processed asset supplies the spikes. Both values here are legitimate
-    NeuroConv statements and both appear in this dandiset; what is refused is
-    the pair. The refusal is an input error, so Section 16.4 pauses the pinned
-    order rather than recording a drift rejection.
+    RC-004's controlling measurement: across 71 sessions of DANDI 000409 -- the
+    11 distinct sessions of the pinned candidate order plus a deterministic
+    60-session holdout drawn from the other 448 -- every raw asset was written
+    by NeuroConv 0.9.1 or 0.9.2 and every processed asset by 0.9.4. Version
+    equality agreed on **0 of 71**, so the rule that required it could not admit
+    any candidate in this dandiset. This fixture is that real pair shape: two
+    legitimate conversion statements naming different versions, with the two
+    halves declaring the same session-time origin. It has to reach a verdict,
+    and both versions have to survive into the record.
     """
     rows = default_electrodes()
     units = band_units()
     result = run_case(
-        tmp, "version_mismatch",
+        tmp, "version_pair_real_shape",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S,
                             provenance={"general/source_script":
                                         "Created using NeuroConv v0.9.2"}),
         lambda p: write_processed(p, rows, units,
                                   provenance={"general/source_script":
-                                              "Created using NeuroConv v0.9.1"}))
+                                              "Created using NeuroConv v0.9.4"}))
+    h.equal("version_pair/verdict reached", result["status"], 0)
+    record = result["record"]
+    pair = record["provenance_authentication"]["pair"]
+    h.equal("version_pair/raw version recorded", pair["raw_version"], "0.9.2")
+    h.equal("version_pair/processed version recorded", pair["processed_version"], "0.9.4")
+    h.check("version_pair/disagreement is recorded, not enforced",
+            pair["versions_agree"] is False, pair)
+    h.check("version_pair/both versions are among the measured ones",
+            pair["versions_are_measured"] is True, pair)
+    h.check("version_pair/instants are what agreed",
+            pair["reference_instants_agree"] is True, pair)
+    text = result["text"] or ""
+    for version in ("0.9.2", "0.9.4"):
+        h.check("version_pair/report names version %s" % version, version in text)
+    h.check("version_pair/report does not claim one version",
+            "name one version" not in text, text[:0])
+
+
+def case_one_instant_written_at_two_offsets_is_admitted(h, tmp):
+    """The same instant declared at different UTC offsets passes the pair check.
+
+    The comparison is on instants and not on strings, and this is the fixture
+    that separates the two: ``2021-05-10T14:33:49.023776-04:00`` and
+    ``2021-05-10T18:33:49.023776+00:00`` are different text and one point in
+    time. A string comparison would call this a clock disagreement and pause a
+    candidate that has none, which is the pessimistic mirror of the defect
+    RC-004 exists to repair.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    same_instant_utc = "2021-05-10T18:33:49.023776+00:00"
+    h.check("offsets/fixture is two spellings of one instant",
+            DEFAULT_REFERENCE_TIME != same_instant_utc
+            and (archive_units.reference_instant(DEFAULT_REFERENCE_TIME)
+                 == archive_units.reference_instant(same_instant_utc)),
+            "%r against %r" % (DEFAULT_REFERENCE_TIME, same_instant_utc))
+    result = run_case(
+        tmp, "offset_spellings",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units, reference_time=same_instant_utc))
+    h.equal("offsets/verdict reached", result["status"], 0)
+    pair = result["record"]["provenance_authentication"]["pair"]
+    h.equal("offsets/delta is zero", pair["reference_delta_s"], 0.0)
+    h.equal("offsets/canonical instant is the UTC one",
+            pair["reference_instant_utc"], same_instant_utc)
+    auth = result["record"]["provenance_authentication"]
+    h.equal("offsets/raw declared value kept verbatim",
+            auth["raw"]["reference_value"], DEFAULT_REFERENCE_TIME)
+    h.equal("offsets/processed declared value kept verbatim",
+            auth["processed"]["reference_value"], same_instant_utc)
+
+
+def case_reference_time_disagreement_is_an_input_error(h, tmp):
+    """A one-hour difference in the declared origin stops the run.
+
+    This is the defect the version proxy could not see. All eight disagreeing
+    sessions in the 71-session measurement carry the *same* version pair as the
+    sixty-three sound ones, and their declared instants differ by exactly
+    +3,600 s. Every stored time in an NWB file is seconds counted from that
+    instant, so the two halves are not on one coordinate -- and the raw asset
+    supplies the grid's extent while the processed asset supplies the spikes.
+
+    The disposition is Section 16.4's: an input error, which **pauses** the
+    pinned order rather than rejecting the candidate.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    shifted = "2021-05-10T15:33:49.023776-04:00"
+    result = run_case(
+        tmp, "reference_shift",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units, reference_time=shifted))
     status = str(result["status"])
-    h.check("version_mismatch/refused", "states conversion version 0.9.2" in status,
-            status)
-    h.check("version_mismatch/names the other version", "states 0.9.1" in status, status)
-    h.check("version_mismatch/named as an input error", "input error" in status, status)
-    h.check("version_mismatch/no report", result["text"] is None)
-    h.check("version_mismatch/no record", result["record"] is None)
+    h.check("reference_shift/refused", "counts its times from" in status, status)
+    h.check("reference_shift/names the difference", "+3600.000000 s" in status, status)
+    h.check("reference_shift/quotes both values",
+            DEFAULT_REFERENCE_TIME in status and shifted in status, status)
+    h.check("reference_shift/named as an input error", "input error" in status, status)
+    h.check("reference_shift/says it pauses rather than rejects",
+            "pauses the pinned order" in status, status)
+    h.check("reference_shift/no report", result["text"] is None)
+    h.check("reference_shift/no record", result["record"] is None)
 
 
 def case_the_pair_check_runs_before_the_payload(h, tmp):
@@ -1616,8 +1752,7 @@ def case_the_pair_check_runs_before_the_payload(h, tmp):
         tmp, "pair_preflight_refused",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
         lambda p: write_processed(p, rows, units,
-                                  provenance={"general/source_script":
-                                              "Created using NeuroConv v0.9.1"}))
+                                  reference_time="2021-05-10T15:33:49.023776-04:00"))
     spent = distinct_bytes(refused["processed"])
     h.equal("pair_preflight/verdict reached when they agree", agreed["status"], 0)
     h.check("pair_preflight/refused when they do not", "input error" in str(refused["status"]),
@@ -1625,6 +1760,119 @@ def case_the_pair_check_runs_before_the_payload(h, tmp):
     h.check("pair_preflight/matched a reader", spent > 0, spent)
     h.check("pair_preflight/costs less than a full read", spent < full,
             "%d distinct bytes refusing against %d reading" % (spent, full))
+
+
+def case_missing_reference_time_is_an_input_error(h, tmp):
+    """An asset that states no session-time origin cannot be placed on one.
+
+    Both halves are checked, because both matter and for different reasons: the
+    raw asset supplies the grid's extent and the processed asset supplies the
+    spikes. Neither absence may become an agreement, a disagreement, or a drift
+    verdict -- all three would be a missing measurement reported as a value.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    processed = run_case(
+        tmp, "no_processed_reference",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units, reference_time=None))
+    status = str(processed["status"])
+    h.check("no_reference/processed refused",
+            "carries no timestamps_reference_time" in status, status)
+    h.check("no_reference/processed named as an input error",
+            "input error" in status, status)
+    h.check("no_reference/processed names the asset", "processed asset" in status, status)
+    h.check("no_reference/processed no report", processed["text"] is None)
+    h.check("no_reference/processed no record", processed["record"] is None)
+    raw = run_case(
+        tmp, "no_raw_reference",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S, reference_time=None),
+        lambda p: write_processed(p, rows, units))
+    status = str(raw["status"])
+    h.check("no_reference/raw refused",
+            "carries no timestamps_reference_time" in status, status)
+    h.check("no_reference/raw names the raw asset", "raw asset" in status, status)
+    h.check("no_reference/raw no report", raw["text"] is None)
+
+
+def case_timezone_naive_reference_time_is_an_input_error(h, tmp):
+    """A wall-clock reading with no offset is not an instant.
+
+    The eight disagreeing sessions in the 71-session measurement differ by
+    exactly one hour while both halves still label themselves ``-04:00``, so the
+    offset is the part of the value that carries the information. Admitting a
+    naive value would mean choosing an offset for it -- UTC, or the machine's --
+    which invents the very quantity the two assets are compared on. All 142
+    measured assets carry an offset, so refusing rejects nothing this dandiset
+    contains.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    naive = "2021-05-10T14:33:49.023776"
+    h.check("naive_reference/fixture parses as a datetime at all",
+            archive_units.reference_instant(naive) is None
+            and datetime.datetime.fromisoformat(naive) is not None,
+            "the fixture must be well-formed ISO-8601 and still be refused")
+    result = run_case(
+        tmp, "naive_reference",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units, reference_time=naive))
+    status = str(result["status"])
+    h.check("naive_reference/refused", "is not an ISO-8601 timestamp" in status, status)
+    h.check("naive_reference/names the offset as what is missing",
+            "UTC offset" in status, status)
+    h.check("naive_reference/named as an input error", "input error" in status, status)
+    h.check("naive_reference/no report", result["text"] is None)
+    h.check("naive_reference/no record", result["record"] is None)
+
+
+def case_malformed_reference_time_is_an_input_error(h, tmp):
+    """A value that is not a timestamp at all is refused before it is compared."""
+    rows = default_electrodes()
+    units = band_units()
+    result = run_case(
+        tmp, "malformed_reference",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units,
+                                  reference_time="session start, roughly noon"))
+    status = str(result["status"])
+    h.check("malformed_reference/refused", "is not an ISO-8601 timestamp" in status,
+            status)
+    h.check("malformed_reference/quotes the value", "roughly noon" in status, status)
+    h.check("malformed_reference/no report", result["text"] is None)
+
+
+def case_refused_reference_time_is_not_an_agreement(h, tmp):
+    """A reference time the budget declined is an input error, not a comparison.
+
+    The provenance read replaces a value it could not afford with a
+    self-describing marker, so the string is present and is not the file's
+    value. Comparing two markers would make two unread values agree, and
+    comparing a marker with a real value would make a budget refusal look like a
+    clock disagreement. Neither is admissible: an undetermined value is a
+    missing measurement.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    big = "2021-05-10T14:33:49.023776-04:00" + ("0" * (30 * archive_units.PROVENANCE_MAX_BYTES))
+    result = run_case(
+        tmp, "refused_reference",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units, reference_time=big))
+    status = str(result["status"])
+    h.check("refused_reference/refused", "not read whole" in status, status)
+    h.check("refused_reference/names the path", "timestamps_reference_time" in status,
+            status)
+    h.check("refused_reference/named as an input error", "input error" in status, status)
+    h.check("refused_reference/no report", result["text"] is None)
+    h.check("refused_reference/no record", result["record"] is None)
+    # And the marker itself must not be authenticatable, which is the property
+    # the input error rests on rather than a second statement of it.
+    marker = "%s a refusal>" % archive_units.PROVENANCE_UNREAD_PREFIX
+    h.check("refused_reference/a marker is not a complete value",
+            not archive_units.provenance_is_complete(marker), marker)
+    h.check("refused_reference/a marker does not parse as an instant",
+            archive_units.reference_instant(marker) is None, marker)
 
 
 def case_provenance_token_is_case_insensitive(h, tmp):
@@ -2930,12 +3178,26 @@ def case_report_names_the_new_confirmations(h, tmp):
     h.equal("confirmations/status", result["status"], 0)
     for required in ("structural columns", "asset pair identity",
                      "conversion provenance", "raw asset provenance",
+                     "session reference time",
                      "AP timestamp coverage", "stored payload", "block transfer",
                      "peak resident arrays", "live python structures",
                      "hdf5 chunk cache", "combined peak resident",
                      "pinned at 40 um"):
         h.check("confirmations/report carries %r" % required, required in text)
     h.check("confirmations/report is ascii", all(ord(char) < 128 for char in text))
+    # RC-004's wording obligations, checked here rather than left to a reader.
+    # The report must say what the reference-time check is worth, must not
+    # promote it into an identification of the clock, and must say that version
+    # equality is reported rather than gated -- an unchanged sentence that a
+    # code change has made false is the most productive finding class this
+    # project has, and these are the sentences the change put at risk.
+    h.check("confirmations/report bounds what agreement establishes",
+            "necessary declared" in text and "NOT an identification of the clock" in text,
+            text[:0])
+    h.check("confirmations/report says version equality does not gate",
+            "gate nothing" in text and "admitted 0 of the 71 sessions" in text, text[:0])
+    h.check("confirmations/report does not claim the pair names one version",
+            "name one version" not in text, text[:0])
 
 
 CASES = (
@@ -2979,8 +3241,14 @@ CASES = (
     case_missing_raw_provenance_is_an_input_error,
     case_foreign_conversion_is_an_input_error,
     case_negated_conversion_statement_is_an_input_error,
-    case_conversion_version_mismatch_is_an_input_error,
+    case_unequal_conversion_versions_are_admitted,
+    case_one_instant_written_at_two_offsets_is_admitted,
+    case_reference_time_disagreement_is_an_input_error,
     case_the_pair_check_runs_before_the_payload,
+    case_missing_reference_time_is_an_input_error,
+    case_timezone_naive_reference_time_is_an_input_error,
+    case_malformed_reference_time_is_an_input_error,
+    case_refused_reference_time_is_not_an_agreement,
     case_provenance_token_is_case_insensitive,
     case_vlen_provenance_is_refused_before_it_is_spent,
     case_budget_admits_a_value_it_can_afford,
