@@ -23,9 +23,10 @@ agents/Codex/
 │  ├── probe_rc004_round2.py
 │  ├── probe_nonfinite_depth_disposition.py
 │  ├── probe_missing_depth_actual_null.py
-│  └── probe_rc005_round1.py
+│  ├── probe_rc005_round1.py
+│  └── probe_rc005_round2.py
 ├── Session Summaries/
-│  └── HumanReport1.md … HumanReport39.md
+│  └── HumanReport1.md … HumanReport40.md
 └── Progress Reports/
    ├── Progress Report Phase 1 Close.md
    ├── Progress Report Amendment Compute Schedule.md
@@ -33,7 +34,8 @@ agents/Codex/
    ├── Progress Report Amendment Real Control Donor Exclusion.md
    ├── Progress Report Session 16.md
    ├── Progress Report Session 24.md
-   └── Progress Report Session 32.md
+   ├── Progress Report Session 32.md
+   └── Progress Report Session 40.md
 ```
 
 ## What each file owns
@@ -54,8 +56,9 @@ agents/Codex/
 - **`tools/probe_nonfinite_depth_disposition.py`** — synthetic evidence against relying on finite-sample support alone after dropping missing depths. Against the approved point estimator, five units retain 14,000 finite samples in every bin and pass every support floor, while one missing depth per unit/bin admits compatible `Delta_10min` values of 0 and 100 µm. Claude Session 37 correctly showed that this balanced construction is already rejected by the gate's second number, so it proves a point-estimate defect rather than a whole-gate pass; a stronger spread fixture supplies the whole-gate counterexample. It reads no archive, candidate asset or network data.
 - **`tools/probe_missing_depth_actual_null.py`** — independent pre-card evidence that the approved completed-data permutation null has an assumption-free, non-vacuous missing-depth interval: the completed vector length and missing source positions fix every seed-derived permutation before values are chosen. On the Session-37 state it passed 8/8, returned `[12.254, 18.618] µm`, contained three actual completions, and reproduced the zero-missing approved null element-for-element. The corrected Session-38 implementation preserves the first seven properties and deliberately removes the counterfactual API its eighth comparison called, so the old probe now raises only at that retired check. It uses synthetic arrays only and reads no archive, candidate asset or network data.
 - **`tools/probe_rc005_round1.py`** — independent RC-005 full-pass evidence using generated local HDF5 only. It reproduces the whole-command contradiction in which the reconciled disposition is `unmeasurable` but the terminal console line says `passed=True`; it also proves the reader's declared resident/peak formula omits the returned per-spike boolean masks and records the downstream finite-only copies separately from that read-scoped blocker. At rank-1 size the missing mask term is 3,160,311 bytes. It reads no archive, candidate asset or network data.
+- **`tools/probe_rc005_round2.py`** — independent RC-005 delta evidence using generated local HDF5 only. It positively matches the command's final line to the reconciled non-advancing record on a fixture whose point gate passes, verifies the point gate is labelled diagnostic, derives the mask-inclusive resident and peak terms outside the plan under test, refuses the exact old mask-omitting ceiling, admits the corrected peak, and checks the returned masks occupy exactly the charged bytes. It passes 10/10 and reads no archive, candidate asset or network data.
 - **`Session Summaries/HumanReport<N>.md`** — permanent detailed session reports for the director.
-- **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 32 count-based report; the next cadence report is Session 40.
+- **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 40 count-based report; the next cadence report is Session 48.
 
 ## Shared work outside this folder
 
@@ -66,12 +69,12 @@ agents/Codex/
 - `chats/Claude-Codex/Session Clock Agreement/` is concluded. The first real plan-only command showed that RC-003's converter-version equality admits none of the measured population. Claude and Codex independently reproduced 71 paired-session metadata reads: version equality is 0/71, while declared-reference-instant equality is 63/71 and isolates eight one-hour disagreements. Both agents agreed to a new Claude-owned, Codex-reviewed RC-004 that replaces the pair-version proxy with bounded reference-instant equality while preserving per-asset source authentication.
 - `chats/Claude-Codex/Session Reference Time Pair Check Review/` is concluded. RC-004 closed `Approved` at Round 2 after Claude explicitly approved the same five-file state Codex had approved; the reference-instant pair check therefore unblocked the separately governed rank-1 read.
 - `chats/Claude-Codex/Non-Finite Spike Depths/` is concluded. Its accepted design bounds both gate numbers over every completion, treats NaN alone as recoverable missing depth, keeps infinities fatal, and propagates all-missing destinations as defined but unbounded. Its successor is the RC-005 review below.
-- `chats/Claude-Codex/Missing Depth Recovery Review/` is active. RC-005 Round 1 is `Revisions Required` on two blockers: the command's final console line reports the raw passing point gate after reconciliation has made the candidate unmeasurable, and the reader's pre-read resident/peak formula omits the retained per-spike masks. Round 2 is delta-only against F1/F2 plus repair regressions. Ranks 1 and 2 remain paused and no candidate measurement is authorized.
+- `chats/Claude-Codex/Missing Depth Recovery Review/` is concluded. RC-005 closed `Approved with Follow-Ups` at Round 2 on the exact seven-file state both agents approved. The final console line now carries the reconciled decision, the point gate labels itself diagnostic, and the per-spike masks enter the resident/peak bound. Codex's independent delta probe passes 10/10; the owner suite passes 543/543 and the repair-reversion harness catches 4/4 with a green control. The implementation gate is cleared; rank-1 measurement remains a separate execution step.
 - `chats/Claude-Codex-Human/Review Method Change/` is active at Randy's request. The bounded agent-only Convergence Decision, successor-card lineage, and forced redesign after repeated non-approval are agreed and written into the superseding review method. The newest observation records that a synthetic review can prove dependence on a proxy without showing that the proxy admits or discriminates the real population; Claude's preserved-byte handoff correctly turned the new evidence into a new card rather than an unreviewed hotfix.
 - `Claim Sheet.md` and `Accessible Claim Sheet.md` are synchronized at SHA-256 `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365` / `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`. Amendments 1–6 are `In force`. The matching-rule prose, implementation/tests, host-dependent exact configuration, and manipulation gate remain separate approvals.
 - `Study Guide/Pass 1 - Conceptual Foundation.tex` and PDF are approved Phase 1 artifacts. Pass 2 remains a Phase 3 deliverable.
 - `director_requests.md` contains one open non-blocking Phase 1 contract-review item. No new director action is needed.
-- Root `README.md` is the append-only public live-run page. Its newest heartbeat records RC-005 Round 1's console-disposition and retained-mask accounting blockers and preserves the boundary that no candidate was read, no drift value exists, and no scientific result exists. The project remains in progress.
+- Root `README.md` is the append-only public live-run page. Its newest heartbeat records RC-005's same-state approval, the independently checked console and memory boundaries, the corrected §1–§16 physical byte count, and the boundary that approval clears implementation rather than producing a drift value. The project remains in progress.
 - The Reproducibility Packet is co-owned. Its design-stage runbook remains same-state approved at ten steps. Codex owns Rung 0, the sorter-panel decision, inference/negative-control harness, Tier A's independent balance/manipulation gate, and the two-part placement calibration.
 
 ## Current technical boundaries
@@ -82,8 +85,8 @@ agents/Codex/
 - Before T is measured or any host-specific manifest/pool is opened, an exact exposure-schedule/placement specification and synthetic tests must pin the nuisance seed, amplitude target, and commanded-placement construction. Matcher implementation/test review follows as another same-state gate.
 - The derived CCF label layer is opt-in; recognized white-matter/fibre-tract labels remain non-injectable. Any non-CA1 zone change must define the removal set across parent/descendant labels before matching.
 - RC-001 is closed `Approved` on Draft 24 `c35987fe…`, utility `eace4cd35…`, and harness `946df906…`. The gate uses eleven consecutive one-minute medians; the universal half-bin cutoff is withdrawn; within-bin transmission depends on depth ranks and episode placement; and neither missed nor transmitted sub-minute motion is treated as a one-way safety property. The owner harness passes 103 checks, Codex's probe passes thirteen checks including 93,184 exhaustive small cases, and the utility's executable AST is unchanged from Round 2.
-- RC-002 closed unapproved at its Convergence Decision, its one allowed successor RC-003 closed `Approved`, and RC-004 closed `Approved` at Round 2 on the exact five-file reference-instant state. Rank 1 then passed plan-only input authentication but the measurement stopped before a verdict on non-finite depth values. RC-005 now carries the wired recovery and is `Revisions Required` after Round 1; the strict finite-depth confirmation remains operative until a repaired exact state receives explicit same-state approval.
+- RC-002 closed unapproved at its Convergence Decision, its one allowed successor RC-003 closed `Approved`, RC-004 closed `Approved` at Round 2 on the exact five-file reference-instant state, and RC-005 closed `Approved with Follow-Ups` at Round 2 on the exact seven-file missing-depth state. The strict all-finite-depth confirmation is superseded only as §17 declares: NaN is bounded as missing, either infinity remains fatal, and a decision-unstable completion bound pauses the candidate. The rank-1 measurement is now the next separate resource-checked action.
 - `.gitattributes` makes repository-wide checkout bytes explicit and is same-state approved by both agents. All paths default to `-text`; 17 framework files and 11 legacy packet outputs intentionally reconstruct CRLF. A temporary `core.autocrlf=true` clone matched all 153 reviewed tracked files byte-for-byte.
-- No host is pinned and no candidate drift value exists. Rank 1's plan-only read completed and its real drift command stopped with no output because sparse NaN depths violate the still-binding input confirmation; a rank-2 diagnostic shows the same class. Support floors alone cannot authorize dropping them. The whole reader/command/§17 state now exists under RC-005, but Round 1 returned it for two repairs and did not approve execution. No Rung 0, generation or sorter run is authorized, and the rank-5/7/9/13 declared-clock disagreements remain separately paused.
+- No host is pinned and no candidate drift value exists. Rank 1's plan-only read completed and its first real drift command stopped with no output on sparse NaN depths; a rank-2 diagnostic shows the same class. Support floors alone cannot authorize dropping them, but RC-005's approved completion-bound layer now governs that condition. No Rung 0, generation or sorter run is authorized, and the rank-5/7/9/13 declared-clock disagreements remain separately paused.
 
 For resumption, read `Summary of Only Necessary Context.md`, then the latest human report. Use `references.md` rather than memory for citations.

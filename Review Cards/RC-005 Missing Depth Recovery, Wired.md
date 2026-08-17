@@ -4,7 +4,10 @@
 **Opened:** 2026-08-17 03:30 PDT, Claude Session 39
 **Chat:** `chats/Claude-Codex/Missing Depth Recovery Review/`. Its predecessor, `chats/Claude-Codex/Non-Finite Spike Depths/`, is **concluded** with a `Summary.md` and carries the four rulings this candidate implements; read that summary before Round 1.
 **Supersedes:** none. RC-004 is closed `Approved`; this card opens against that approved code on a defect class discovered *after* it closed — a real candidate's depth column carrying 231 NaN values — and it is not a successor card. Clause 5 does not apply.
-**Status:** Open — Round 2 handed back 2026-08-17; awaiting Codex's delta review
+**Status:** **Closed — `Approved with Follow-Ups` at Round 2, 2026-08-17.**
+Both agents explicitly approved the same seven-file state; no Convergence
+Decision fired. The missing-depth implementation gate is cleared, while the
+rank-1 measurement remains a separate execution step.
 
 ## Candidate state
 
@@ -22,7 +25,7 @@
 | `agents/Claude/tools/verify_rc005_round2_repairs.py` | `4f27b70c35f28f715d93ac214aebf0c01f4f4af2f958fb05b373132c8a013bee` | **new — the reversion harness for both repairs** |
 | `agents/Claude/Tier A Host and Injection Zone Selection.md` (Draft 26, **§17 only**) | `3e587874fdce355a4d605861f1ddfd0b1481a766385c2084e37d12db6d44100a` | **§17.9 and §17.10 amended, §17.12 added** |
 
-**§1–§16 are byte-identical to their approved state, proved rather than asserted.** The 143,890 bytes running from the `## 1.` heading to the `## 17.` heading hash to `700b3b9a4cd3a1b0f7342e2d4678fbe1cac87f68da6fbb2635ebc5b865cdad59` in both `HEAD` and this state; `git diff --numstat` reports 24 insertions and 5 deletions, all of them in §17 or in the status stack above `## 1.`.
+**§1–§16 are byte-identical to their approved state, proved rather than asserted.** The 144,664 physical bytes running from the `## 1.` heading to the `## 17.` heading hash to `700b3b9a4cd3a1b0f7342e2d4678fbe1cac87f68da6fbb2635ebc5b865cdad59` in both `219d395` and this state; `git diff --numstat` reports 24 insertions and 5 deletions, all of them in §17 or in the status stack above `## 1.`. The owner handoff and Draft-26 status line state 143,890 bytes; Codex's close-time direct byte read corrected the card's record while retaining that document wording as tracked follow-up 3.
 
 **The Round-1 table, superseded and kept for the trail:**
 
@@ -124,20 +127,21 @@ All executed on the exact bytes above, this session, rather than reasoned about.
 | — | 2026-08-17 03:33 PDT | Claude | card opened; the review chat `chats/Claude-Codex/Missing Depth Recovery Review/` created and the predecessor chat concluded; candidate handed off with the owner's explicit approval of this exact state | awaiting Round 1 |
 | 1 | 2026-08-17 04:18 PDT | Codex | **F1:** final console line reports the raw passing gate after reconciliation has made the candidate unmeasurable; **F2:** the pre-read resident/peak formula omits the returned per-spike boolean masks. Full numbered ledger and generated-fixture evidence are in the review chat; Round 2 is delta-only against F1/F2 plus repair regressions. Round-1 acceptance runs: `test_missing_depth.py` 86/0 (15.0 s and 4.4 s), `test_measure_host_drift.py` 518/0 (18.3 s), `test_band_drift.py` 103/0, mutation harness 32 of 32, runbook checker exit 0. | **Revisions Required** |
 | 2 | 2026-08-17 | Claude | Both blockers accepted, neither disputed; repaired on one state, with new coverage for each and a reversion harness proving that coverage can fail. Owner explicitly approves the Round-2 candidate table above. | handed back for delta review |
+| 2 | 2026-08-17 06:10 PDT | Codex | Authenticated all seven digests; F1 and F2 pass delta review. Independent generated-fixture probe 10/10; owner suite 543/0; reversion harness control green and 4/4 caught; compile, packet and diff checks green. Explicitly approved the Round-2 table. Two nonblocking record/label issues are tracked below rather than silently absorbed. | **Approved with Follow-Ups — closed** |
 
 ## Convergence Decision
 
-Not written. No convergence trigger has fired.
+Not written. No convergence trigger fired.
 
 ## Outcome
 
-**Round 1: Revisions Required.** The authenticated six-file candidate was not
-approved.
-
-**Round 2: repaired and handed back.** Ranks 1 and 2 remain paused and the strict
-finite-depth confirmation remains operative until this card closes with both
-agents explicitly approving the *same* state. Nothing was measured, no archive was
-read, and no host, drift, donor, generation or sorter decision was made.
+**Final outcome: `Approved with Follow-Ups` at Round 2.** Claude and Codex both
+explicitly approve the exact seven-file Round-2 table. F1's console decision and
+F2's mask-inclusive resident bound are repaired; the reconciliation rule is
+also explicitly approved rather than inferred from silence. This closure clears
+the missing-depth implementation gate for the separately governed rank-1
+measurement. Nothing was measured, no archive was read, and no host, drift,
+donor, generation or sorter decision was made by this review.
 
 
 ## Round 2 — what changed, and the evidence that it is a change
@@ -164,3 +168,13 @@ read, and no host, drift, donor, generation or sorter decision was made.
    `probe_missing_depth_crossover.py`, which raise the same question if their
    numbers reach an outward-facing artifact. All three are out of scope here and
    none is resolved by this card.
+3. Draft 26's status line calls the byte-identical §1–§16 span 143,890 bytes.
+   Direct physical-byte reads of both `219d395` and the approved state give
+   144,664 bytes at the stated identical SHA-256 `700b3b9a…`. The card record is
+   corrected above; correct the document's count when its status prose next
+   moves. The equality conclusion is unaffected.
+4. The report and refusal text label all of `resident_bytes` “converted arrays,”
+   although the exact safe formula also includes the largest slice at its stored
+   width. The aggregate, mask subterm, peak and admission decision are correct;
+   name that slice when the report layout or the broader memory-accounting
+   follow-up next moves.
