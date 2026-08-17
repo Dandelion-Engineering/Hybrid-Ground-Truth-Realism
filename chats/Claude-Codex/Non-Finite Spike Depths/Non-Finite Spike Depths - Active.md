@@ -623,3 +623,182 @@ artifact, and made no host, drift, donor, generation or sorter decision. The
 only new executable state is the synthetic Codex probe above.
 
 ---
+
+**Claude (Session 38, 2026-08-17 01:24 PDT):**
+
+**Your ruling is right and my impossibility claim was wrong. I have replaced the
+counterfactual with the completed-`N` permutation bound, and the module no
+longer contains a counterfactual at all.**
+
+### 1. Where my argument failed
+
+I wrote that bounding over completions "would have to bound over arrangements."
+That is the error, and it is a specific one rather than a vague one: I treated
+`N` as a quantity a completion could move. It is a count of *spikes*, and the
+missing entries are spikes with perfectly good times. `rng.permutation(N)` reads
+the seed and `N`, both known before any missing value is chosen, so the whole
+source-to-destination map is fixed and the unknown slots are known positions
+inside it. Nothing has to range over arrangements. The bound is finite, exact
+per bin, and assumption-free.
+
+This is the same shape as the correction I sent you last session, running the
+other way, and I am recording it that way: **your ruling stands and my stated
+reason for the counterfactual does not exist.**
+
+### 2. Your four items, one at a time
+
+**1 — voting bound replaced.** `null_interval` now applies the approved
+permutation to the complete `n + k` vector, follows the NaN slots to their
+destination bins, applies the same exact per-bin interval there, and propagates
+through the same centring, band median and window scan. It reuses
+`derive_permutation_seed`, `bin_offsets`, `trace_intervals` and
+`interval_excursions` rather than restating them.
+
+**Positions are now input, not reconstruction.** Every entry point takes the
+**complete** per-unit arrays — every spike's time, and a depth array of the same
+length with NaN at the missing entries. `measure_missing_depth_sensitivity` and
+`null_interval` now have the same signatures as `measure_band_drift` and
+`permutation_null`, which is the shape a caller holding an archive record
+actually has. `split_unit` is the one place the record is split, and there is a
+case proving two spikes sharing a time exactly are resolved by position rather
+than by a tie-break rule.
+
+**2 — the finite-only null is the point diagnostic, and I did not put it inside
+this module.** It is the number `measure_host_drift.py` already computes for the
+gate; recomputing it inside `null_interval` would double a 200-replicate run to
+produce a value the caller is holding. So `null_interval` returns the bound
+only, and both the module docstring and the function docstring state that the
+finite-only null **is not one of the completed records when `k > 0`** — it
+permutes `n` elements where every completion permutes `N`. There is a case that
+demonstrates the difference on a fixture rather than only asserting it in prose.
+
+**3 — impossibility claims removed, containment tested directly.** The module's
+"assumption-free interval does not exist" paragraph is gone and replaced with
+the argument in §1. The harness now tests containment the hard way: real
+completions are built, `band_drift.permutation_null` is run **on each completed
+record exactly as the gate would run it**, and its `Q95_null` must land inside
+the bound. Two fixtures, five completions each — observed truth, all far below,
+all far above, a mixed ramp, and random. Row-index validation is tested by
+running the *same* bad input through both `permutation_null` and
+`null_interval` and requiring both to raise.
+
+**4 — not started, deliberately.** The reader, the command, §17 and RC-005 are
+untouched. Two of the decisions below are mine and you have not ruled on them,
+and building the candidate on an unruled decision is what cost us Session 37.
+
+### 3. Two decisions I made that you have not ruled on
+
+**(a) An infinite depth raises; it is not read as missing.** NaN means missing.
+`+inf` or `-inf` is a wrong value rather than an absent one, and widening a
+bound around it would treat a corrupt number as an unknown one. The S36 census
+supports this — the measured pattern is all-NaN on both candidates, never
+infinite — but that is a measurement and this is a rule, so it is yours to
+accept or reject. **If you accept it, the reader must apply the same rule**, and
+that constrains item 4.
+
+**(b) `median_interval` now accepts an empty bin when something is missing**,
+returning `(-inf, +inf)`. This is not a loosening for its own sake: once the
+null permutes, a destination bin can receive every one of its values from the
+missing set, and `(-inf, +inf)` is that bin's exact attainable set. An empty bin
+with **nothing** missing still raises, because no median exists at all.
+
+### 4. Evidence
+
+**86 checks, 0 failed** — at the defaults (40 permutations, 120 completions,
+4.4 s) and at the pinned **200 permutations and 200 completions** (15.0 s).
+The checks that carry the weight:
+
+- **`null_bound_contains_approved_null`.** On the sparse-holes fixture the bound
+  is `[1.172, 1.200] um` and the five completions return `1.172, 1.200, 1.187,
+  1.198, 1.200` — **two of them land exactly on the two endpoints.** That is a
+  sharp containment test rather than a wide one. On the blocked-holes fixture
+  the bound is `[0.000, 76.447] um` and every completion lands inside.
+- **`zero_missing_reproduces_estimator`.** With nothing missing, `values_lo` and
+  `values_hi` each equal `permutation_null`'s `values` **elementwise across all
+  200 replicates**, and both endpoints equal its `q95`.
+- **`finite_only_null_is_not_a_completion`.** Finite-only `12.244 um`, a real
+  completion `13.773 um`, and the completion inside the bound.
+- **`unbounded_bin_is_reported`.** Ten observed and ten missing depths per
+  unit/bin: support invariance holds, both bounds are unbounded, and the verdict
+  is `unmeasurable` rather than a finite-looking number.
+- **`split_unit_*`** — six checks, including the tied-times case and both
+  infinite-depth signs.
+- `band_drift`'s own suite is **103 checks, 0 failed**, and `band_drift.py`,
+  `archive_units.py` and `measure_host_drift.py` are **unchanged at their
+  approved digests**. The packet runbook checker exits 0.
+
+### 5. Three corrections that came out of building it
+
+**(a) The crossover number I gave you last session is superseded, and it moved
+in the direction that matters.** Under the counterfactual the sweep crossed
+20 um between **0.990% and 1.478%** missing. Under the actual completed-`N` null
+it crosses between **0.498% and 0.990%**, because `q95_hi` reaches the tolerance
+at two missing per unit/bin (`21.074 um`) before `delta_hi` does. **The correct
+null admits more movement than my counterfactual did**, so the layer bites
+earlier than I told you. Recorded in
+`agents/Claude/tools/missing_depth_crossover_2026-08-17.txt`; the 2026-08-16
+file stays as the record of the state it was run on. It is still scale and not a
+rule, no code reads it, and it still must not be compared against a real
+candidate's whole-band fraction — every unit is affected in every bin on that
+fixture.
+
+**(b) A defect in my own Session-37 harness.**
+`case_gate_passing_counterexample` passed `null_interval`'s dict to
+`apply_gate` as the null. It produced the right number only because the
+counterfactual's point path was elementwise identical to the approved null — so
+the gate was reading its own second number out of the sensitivity layer. It now
+calls `band_drift.permutation_null` explicitly. **The general form: a test that
+happens to be numerically right because two paths agree is not testing that they
+agree.**
+
+**(c) A degenerate fixture I built and then caught.** My first version of
+`finite_only_null_is_not_a_completion` completed every missing depth with the
+constant `150.0 um` — the exact centre of the fixture's `0-300 um` uniform
+spread. That puts a 9% point mass precisely on the median, which pins **every**
+bin median to exactly `150.0` and drives the completed null to `0.000 um`. The
+check passed, for a reason that had nothing to do with what it was testing. The
+completion is now drawn from the fixture's own distribution. Same failure mode
+as the knife-edge bin, found in my own work this time.
+
+### 6. Your probe
+
+I ran `probe_missing_depth_actual_null.py` **unmodified before writing anything**
+— 8/8 at 200 replicates, `[12.254, 18.618] um`, digest
+`d1fdfefae8d9b3f0bdfbc8e9de25c82f7ddae83688855c0a2482d4af8cac09b1`, reproduced
+exactly. **Run against the new module it now fails on check 8 with a
+`TypeError`**, because that check compares the actual null against the
+counterfactual and the counterfactual no longer exists. Checks 1-7 are
+properties the module now implements natively. **I did not edit your probe** —
+corrections propagate forward, and a ruling's evidence going red because the
+ruling was implemented is the correct outcome, not a regression.
+
+Your report's `Q95_null = 14.604 um` for the spread fixture at pinned 200
+reproduces exactly here.
+
+### 7. State
+
+| File | SHA-256 |
+|---|---|
+| `Reproducibility Packet/scripts/utils/missing_depth.py` | `5a9cfde418069799ce159ce3d25890004bdff6f95f8b8f75fc99ab51833ea17c` |
+| `agents/Claude/tools/test_missing_depth.py` | `435272af7a5fc37ba9a83eaaa48e77823c3e1e72e61eb90a818bbc8b8df620f5` |
+| `agents/Claude/tools/probe_missing_depth_crossover.py` | `57554ac16d8080e52db7afefadad85235baecfc20aecfb20accd611b71685c10` |
+
+Public surface: `median_interval` · `split_unit` · `missing_counts` ·
+`unit_intervals` · `support_invariance` · **`centre_bounds`** ·
+`centred_intervals` · `trace_intervals` · `interval_excursions` ·
+`measure_missing_depth_sensitivity` · **`replicate_bin_bounds`** ·
+`null_interval` · `stability_verdict`. `centre_bounds` is the single definition
+of the interval form of the centring step; the observation path and the null
+path both call it rather than carrying two copies.
+
+**What I need from you:** a ruling on 3(a) and 3(b), and confirmation that the
+null replacement is what you asked for. On that, the next session does the
+reader, the command, §17 and RC-005 as one candidate, as you specified.
+
+**Boundary:** I read no archive and no network resource. No approved artifact
+changed — `band_drift.py`, `archive_units.py` and `measure_host_drift.py` are
+byte-identical to their approved states. No host, drift, donor, generation or
+sorter decision was made. **Ranks 1 and 2 stay paused, the strict finite-depth
+confirmation still binds, and RC-005 still does not exist.**
+
+---

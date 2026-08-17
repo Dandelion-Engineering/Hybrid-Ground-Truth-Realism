@@ -12,13 +12,30 @@ The shape of the evidence:
   so it is checked against brute-force enumeration of completions rather than
   against a looser bound: every completion's median lands inside it, both
   endpoints are attained by a real finite completion, and the zero-missing case
-  reproduces ``numpy.median`` exactly.
+  reproduces ``numpy.median`` exactly. A bin whose depths are all missing is
+  unbounded on both sides, which is that bin's exact attainable set.
+* ``split_unit_*`` -- the module takes the complete record with NaN at the
+  missing depths, so the missing samples' positions are input rather than
+  reconstruction. The cases check that the split preserves order, that it
+  survives spikes that share a time exactly, that an infinite depth raises
+  rather than being read as missing, and that a non-finite spike time raises.
 * ``pipeline_bound_contains_every_completion`` -- above the bin level the bound
   is an outer bound, and the property that matters is containment. Random bands
   are completed hundreds of times, each completion is run through the approved
   ``measure_band_drift``, and its ``Delta_10min`` must land inside the bound
   every time. Completion values are deliberately drawn far outside the observed
   depth range as well as inside it.
+* ``null_bound_contains_approved_null`` -- the same property for the gate's
+  second number, and the one this file exists to check hardest. The bound is
+  claimed to be assumption-free: the approved null's permutation depends only
+  on its seed and on the analysed spike *count*, which no completion changes,
+  so the unknown values can be followed to their destination bins. The test is
+  therefore direct rather than against a restatement of the definition: real
+  completions are built, ``band_drift.permutation_null`` is run on each
+  completed record exactly as the gate would run it, and its ``Q95_null`` must
+  land inside ``null_interval``'s bound every time.
+* ``null_rejects_bad_rows`` -- the row-index contract is the null's seed input,
+  so it is validated exactly as ``band_drift.permutation_null`` validates it.
 * ``codex_support_passing_counterexample`` -- the construction that defeated the
   first proposed disposition: 1,000 finite depths per bin split at 0 and 100 um
   with one missing depth, which passes every support floor at 0.0999%
@@ -44,18 +61,16 @@ The shape of the evidence:
 * ``small_missingness_still_passes`` -- the mirror. A bound that called every
   candidate unstable would be as useless as no bound, so the same fixture at a
   twentieth of the missingness must come back a stable pass.
-* ``zero_missing_reproduces_*`` -- a sensitivity layer that changes the answer
-  on data with no missingness is a defect in the layer. Both the observation
-  and the null must reproduce the approved estimator value for value.
-* ``null_point_path_matches_approved`` and ``null_bound_contains_completion`` --
-  the null's point path must equal ``band_drift.permutation_null`` replicate for
-  replicate, and its bound must contain the declared counterfactual computed
-  independently in this file from the same permutation.
+* ``zero_missing_reproduces_estimator`` -- a sensitivity layer that changes the
+  answer on data with no missingness is a defect in the layer. Both the
+  observation and the null must reproduce the approved estimator value for
+  value, elementwise across every replicate.
+* ``unbounded_bin_is_reported`` -- when half a bin is missing the interval is
+  genuinely unbounded, and the layer must say so and refuse a disposition
+  rather than produce a finite-looking number.
 * ``support_invariance_*`` -- the three floors, one case each, plus a unit whose
   depths are wholly missing. Each must make the candidate unmeasurable rather
   than quietly changing the included set.
-* ``nonfinite_time_still_stops`` -- the recovery is for depths only. A
-  non-finite spike time must still raise.
 
 Example
 -------
@@ -182,12 +197,17 @@ def case_median_interval_unbounded():
           lo10 == -np.inf and hi10 == np.inf, "[%r, %r]" % (lo10, hi10))
     check("k=2 against n=3 stays bounded",
           np.isfinite(lo2) and np.isfinite(hi2), "[%.3f, %.3f]" % (lo2, hi2))
+    # A destination bin can receive every one of its values from the missing
+    # set once the null permutes them, and then every real number is attainable.
+    lo_all, hi_all = md.median_interval(np.empty(0), 4)
+    check("a wholly missing bin is unbounded on both sides",
+          lo_all == -np.inf and hi_all == np.inf, "[%r, %r]" % (lo_all, hi_all))
 
 
 def case_median_interval_rejects_bad_input():
     """The interval takes the finite depths only and a non-negative count."""
     print("median_interval_rejects_bad_input")
-    for name, args in (("empty bin", ([], 1)),
+    for name, args in (("empty bin with nothing missing", ([], 0)),
                        ("non-finite value", ([1.0, np.nan], 1)),
                        ("negative count", ([1.0, 2.0], -1))):
         try:
@@ -267,6 +287,11 @@ def punch_holes(times, depths, per_unit, seed=FIXTURE_SEED + 7):
 def complete_record(finite_times, finite_depths, missing_times, fill):
     """Rebuild a complete record from the finite one and a completion.
 
+    The merge is a stable sort of the observed spikes followed by the missing
+    ones, which is the same order :func:`masked_record` produces, so a
+    completion and the NaN record the bound was computed from put every spike
+    at the same position.
+
     Args:
         finite_times: list of per-unit observed spike times.
         finite_depths: list of per-unit observed depths.
@@ -286,6 +311,83 @@ def complete_record(finite_times, finite_depths, missing_times, fill):
     return times, depths
 
 
+def masked_record(finite_times, finite_depths, missing_times):
+    """Build the complete record the module takes, NaN at the missing depths.
+
+    Args:
+        finite_times: list of per-unit observed spike times.
+        finite_depths: list of per-unit observed depths.
+        missing_times: list of per-unit missing-depth spike times.
+
+    Returns:
+        tuple: ``(times, depths)`` with NaN exactly at the missing positions.
+    """
+    fill = [np.full(np.asarray(mt).size, np.nan, dtype=np.float64)
+            for mt in missing_times]
+    return complete_record(finite_times, finite_depths, missing_times, fill)
+
+
+def case_split_unit_preserves_positions():
+    """The split reads positions from the record rather than guessing them."""
+    print("split_unit_preserves_positions")
+    times = np.array([1.0, 2.0, 2.0, 2.0, 3.0], dtype=np.float64)
+    depths = np.array([10.0, np.nan, 20.0, np.nan, 30.0], dtype=np.float64)
+    finite_t, finite_d, missing_t = md.split_unit(times, depths)
+    check("the observed spikes keep their order and values",
+          np.array_equal(finite_t, np.array([1.0, 2.0, 3.0]))
+          and np.array_equal(finite_d, np.array([10.0, 20.0, 30.0])))
+    check("tied missing spikes are located by position, not by time",
+          np.array_equal(missing_t, np.array([2.0, 2.0])),
+          "two of three spikes at t=2.0 s are missing")
+    check("the split accounts for every spike",
+          finite_t.size + missing_t.size == times.size)
+
+    empty = md.split_unit(np.empty(0), np.empty(0))
+    check("an empty unit splits into three empty arrays",
+          all(part.size == 0 for part in empty))
+
+
+def case_split_unit_rejects_bad_input():
+    """An infinite depth and a non-finite time both raise."""
+    print("split_unit_rejects_bad_input")
+    cases = [
+        ("mismatched lengths", np.array([1.0, 2.0]), np.array([1.0])),
+        ("a non-finite spike time", np.array([1.0, np.nan]),
+         np.array([1.0, 2.0])),
+        ("an infinite depth", np.array([1.0, 2.0]),
+         np.array([1.0, np.inf])),
+        ("a negative infinite depth", np.array([1.0, 2.0]),
+         np.array([1.0, -np.inf])),
+    ]
+    for name, times, depths in cases:
+        try:
+            md.split_unit(times, depths)
+            check("%s raises" % name, False, "no error")
+        except ValueError as error:
+            check("%s raises" % name, True, str(error)[:46])
+
+    times, depths, _ = make_band(n_units=4, seed=FIXTURE_SEED + 50)
+    depths[2] = depths[2].copy()
+    depths[2][11] = np.inf
+    try:
+        md.measure_missing_depth_sensitivity(times, depths, 740.0)
+        check("an infinite depth stops the whole measurement", False, "no error")
+    except ValueError as error:
+        check("an infinite depth stops the whole measurement", True,
+              str(error)[:46])
+
+    times[1] = times[1].copy()
+    depths[2][11] = 400.0
+    times[1][5] = np.nan
+    try:
+        md.measure_missing_depth_sensitivity(times, depths, 740.0)
+        check("a non-finite spike time stops the whole measurement", False,
+              "no error")
+    except ValueError as error:
+        check("a non-finite spike time stops the whole measurement", True,
+              str(error)[:46])
+
+
 def case_pipeline_bound_contains_every_completion(n_completions):
     """Every completion's Delta_10min lands inside the propagated bound."""
     print("pipeline_bound_contains_every_completion")
@@ -299,8 +401,8 @@ def case_pipeline_bound_contains_every_completion(n_completions):
         times, depths, _ = make_band(trajectory=ramp, seed=FIXTURE_SEED + fixture)
         finite_t, finite_d, missing_t, truth = punch_holes(
             times, depths, [3, 5, 2, 0, 4, 1], seed=FIXTURE_SEED + 20 + fixture)
-        result = md.measure_missing_depth_sensitivity(
-            finite_t, finite_d, missing_t, 740.0)
+        masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+        result = md.measure_missing_depth_sensitivity(masked_t, masked_d, 740.0)
         if not check("fixture %d is measurable" % fixture,
                      result["measurable"], result.get("reason", "")[:40]):
             return
@@ -339,9 +441,8 @@ def case_zero_missing_reproduces_estimator(n_permutations):
     """With no missing depths the layer changes neither number."""
     print("zero_missing_reproduces_estimator")
     times, depths, rows = make_band(seed=FIXTURE_SEED + 4)
-    empty = [np.empty(0, dtype=np.float64) for _ in times]
     observed = bd.measure_band_drift(times, depths, 740.0)
-    result = md.measure_missing_depth_sensitivity(times, depths, empty, 740.0)
+    result = md.measure_missing_depth_sensitivity(times, depths, 740.0)
     check("the point estimate is the approved estimator's own",
           result["observed"]["delta_window"] == observed["delta_window"],
           "%.6f um" % observed["delta_window"])
@@ -354,121 +455,158 @@ def case_zero_missing_reproduces_estimator(n_permutations):
     params = {"n_permutations": n_permutations}
     approved = bd.permutation_null(times, depths, 740.0, "asset", "Probe00",
                                    rows, params)
-    bounded = md.null_interval(times, depths, empty, 740.0, "asset", "Probe00",
-                               rows, params)
-    check("the null's point path reproduces the approved null",
-          bounded["values"] == approved["values"],
+    bounded = md.null_interval(times, depths, 740.0, "asset", "Probe00", rows,
+                               params)
+    check("the null's lower path reproduces the approved null elementwise",
+          bounded["values_lo"] == approved["values"],
           "%d replicates identical" % n_permutations)
-    check("the null bound collapses onto it",
+    check("the null's upper path reproduces the approved null elementwise",
+          bounded["values_hi"] == approved["values"],
+          "%d replicates identical" % n_permutations)
+    check("the null bound collapses onto the approved percentile",
           bounded["q95_lo"] == approved["q95"] and bounded["q95_hi"] == approved["q95"],
           "q95 %.6f um" % approved["q95"])
 
 
-def case_null_point_path_matches_approved(n_permutations):
-    """The null's point path is unchanged by the presence of missing depths."""
-    print("null_point_path_matches_approved")
-    times, depths, rows = make_band(seed=FIXTURE_SEED + 5)
-    finite_t, finite_d, missing_t, _ = punch_holes(
-        times, depths, [4, 2, 6, 0, 3], seed=FIXTURE_SEED + 25)
-    params = {"n_permutations": n_permutations}
-    approved = bd.permutation_null(finite_t, finite_d, 740.0, "asset", "Probe00",
-                                   rows, params)
-    bounded = md.null_interval(finite_t, finite_d, missing_t, 740.0, "asset",
-                               "Probe00", rows, params)
-    check("point replicates match the approved null exactly",
-          bounded["values"] == approved["values"],
-          "%d replicates" % n_permutations)
-    check("the bound brackets its own point value",
-          bounded["q95_lo"] <= approved["q95"] <= bounded["q95_hi"],
-          "[%.4f, %.4f] around %.4f um"
-          % (bounded["q95_lo"], approved["q95"], bounded["q95_hi"]))
+def case_null_bound_contains_approved_null(n_permutations):
+    """The approved null of every completed record lands inside the bound.
 
-
-def counterfactual_null_q95(finite_t, finite_d, missing_t, fill, extent_s,
-                            asset_id, probe, rows, params):
-    """Compute one completion's null under the declared counterfactual.
-
-    The counterfactual holds the arrangement fixed: the observed depths are
-    permuted among the observed-depth spikes with the same seeds the approved
-    null uses, and each completed value stays at its own spike's time. This is
-    an independent path to the same definition ``null_interval`` bounds, built
-    from the approved primitives rather than from that function.
-
-    Args:
-        finite_t: list of per-unit observed spike times.
-        finite_d: list of per-unit observed depths.
-        missing_t: list of per-unit missing-depth spike times.
-        fill: list of per-unit completion values.
-        extent_s: the recording extent in seconds.
-        asset_id: the asset identifier the seeds are derived from.
-        probe: the probe name the seeds are derived from.
-        rows: per-unit table row indices.
-        params: parameter overrides.
-
-    Returns:
-        float: the nearest-rank 95th percentile of the replicate values.
+    This is the assumption-free claim, tested directly. Each completion is
+    turned into a real complete record and handed to
+    ``band_drift.permutation_null`` exactly as the gate would hand it the
+    archive's own record; the resulting ``Q95_null`` must sit inside the
+    interval computed from the NaN record alone.
     """
-    p = dict(bd.PARAMS)
-    p.update(params)
-    n_bins, _ = bd.complete_bins(extent_s, p["bin_seconds"])
-    offsets = [bd.bin_offsets(t, n_bins, p["bin_seconds"]) for t in finite_t]
-    medians = [bd.bin_medians(d, off, p["min_spikes_per_bin"])
-               for d, off in zip(finite_d, offsets)]
-    defined = np.array([np.isfinite(m).sum() for m in medians], dtype=np.float64)
-    included = defined >= p["min_bin_fraction"] * n_bins
-    values = np.empty(p["n_permutations"], dtype=np.float64)
-    for k in range(p["n_permutations"]):
-        replicate = []
-        for u in range(len(finite_t)):
-            shuffled = np.asarray(finite_d[u], dtype=np.float64).copy()
-            if included[u]:
-                seed = bd.derive_permutation_seed(asset_id, probe, rows[u], k,
-                                                  p["master_seed"])
-                rng = np.random.Generator(np.random.PCG64(seed))
-                first, stop = int(offsets[u][0]), int(offsets[u][-1])
-                analysed = shuffled[first:stop].copy()
-                shuffled[first:stop] = analysed[rng.permutation(analysed.size)]
-            merged_t, merged_d = complete_record(
-                [finite_t[u]], [shuffled], [missing_t[u]], [fill[u]])
-            off = bd.bin_offsets(merged_t[0], n_bins, p["bin_seconds"])
-            replicate.append(bd.bin_medians(merged_d[0], off,
-                                            p["min_spikes_per_bin"]))
-        stack = bd.unit_traces(replicate, included)
-        trace = np.nanmedian(stack, axis=0)
-        _, delta_window, _ = bd.excursions(trace, p["window_bins"])
-        values[k] = delta_window
-    values.sort()
-    rank = int(np.ceil(p["null_percentile"] / 100.0 * p["n_permutations"]))
-    return float(values[rank - 1])
+    print("null_bound_contains_approved_null")
+    params = {"n_permutations": n_permutations}
+    rng = np.random.default_rng(FIXTURE_SEED + 70)
+    escapes, checked = [], 0
+    fixtures = []
 
-
-def case_null_bound_contains_completion(n_permutations):
-    """The null bound contains the counterfactual null of real completions."""
-    print("null_bound_contains_completion")
     times, depths, rows = make_band(seed=FIXTURE_SEED + 6)
     finite_t, finite_d, missing_t, truth = punch_holes(
         times, depths, [5, 3, 4], seed=FIXTURE_SEED + 30)
+    fixtures.append(("sparse holes", finite_t, finite_d, missing_t, truth, rows,
+                     740.0))
+
+    finite_t, finite_d, missing_t, rows2, extent2 = spread_fixture(
+        missing_per_bin=20)
+    truth2 = [rng.uniform(0.0, 300.0, size=mt.size) for mt in missing_t]
+    fixtures.append(("blocked holes", finite_t, finite_d, missing_t, truth2,
+                     rows2, extent2))
+
+    for label, f_t, f_d, m_t, truth_values, unit_rows, extent in fixtures:
+        masked_t, masked_d = masked_record(f_t, f_d, m_t)
+        bounded = md.null_interval(masked_t, masked_d, extent, "asset",
+                                   "Probe00", unit_rows, params)
+        fills = [
+            ("observed truth", truth_values),
+            ("all far below", [np.full(mt.size, -3000.0) for mt in m_t]),
+            ("all far above", [np.full(mt.size, 3000.0) for mt in m_t]),
+            ("mixed ramp", [np.linspace(-500.0, 500.0, mt.size) for mt in m_t]),
+            ("random", [rng.uniform(-1000.0, 1000.0, size=mt.size)
+                        for mt in m_t]),
+        ]
+        for name, fill in fills:
+            full_t, full_d = complete_record(f_t, f_d, m_t, fill)
+            q95 = bd.permutation_null(full_t, full_d, extent, "asset",
+                                      "Probe00", unit_rows, params)["q95"]
+            inside = bounded["q95_lo"] - 1e-9 <= q95 <= bounded["q95_hi"] + 1e-9
+            checked += 1
+            if not inside:
+                escapes.append("%s/%s" % (label, name))
+            check("%-13s %-14s inside [%.3f, %.3f]"
+                  % (label, name, bounded["q95_lo"], bounded["q95_hi"]), inside,
+                  "q95 %.3f um" % q95)
+        check("%s: the bound is finite and not vacuous" % label,
+              bounded["bounded"] and bounded["q95_hi"] - bounded["q95_lo"] < 120.0,
+              "width %.3f um" % (bounded["q95_hi"] - bounded["q95_lo"]))
+    check("no completed record's null escapes the bound", not escapes,
+          "%d completions checked, escapes: %s" % (checked, escapes or "none"))
+
+
+def case_finite_only_null_is_not_a_completion(n_permutations):
+    """The finite-only null is a diagnostic, not one of the completed records.
+
+    Running the approved null on the observed depths alone permutes ``n``
+    elements where every completion permutes ``N = n + k``. The module says so
+    rather than claiming containment, and this case is the evidence that the
+    distinction is real on a fixture rather than only in the argument.
+    """
+    print("finite_only_null_is_not_a_completion")
     params = {"n_permutations": n_permutations}
-    bounded = md.null_interval(finite_t, finite_d, missing_t, 740.0, "asset",
-                               "Probe00", rows, params)
-    fills = [
-        ("observed truth", truth),
-        ("all far below", [np.full(mt.size, -3000.0) for mt in missing_t]),
-        ("all far above", [np.full(mt.size, 3000.0) for mt in missing_t]),
-        ("mixed", [np.linspace(-500.0, 500.0, mt.size) for mt in missing_t]),
+    finite_t, finite_d, missing_t, rows, extent = spread_fixture(
+        missing_per_bin=20)
+    masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+    bounded = md.null_interval(masked_t, masked_d, extent, "asset", "Probe00",
+                               rows, params)
+    finite_only = bd.permutation_null(finite_t, finite_d, extent, "asset",
+                                      "Probe00", rows, params)
+    # Draw the completion from the fixture's own depth distribution. A constant
+    # completion at the distribution's centre would put a point mass exactly on
+    # the median and pin every bin median to it, which makes the two nulls
+    # differ for a degenerate reason rather than the one under test.
+    fill_rng = np.random.default_rng(FIXTURE_SEED + 80)
+    truth = [fill_rng.uniform(0.0, 300.0, size=mt.size) for mt in missing_t]
+    full_t, full_d = complete_record(finite_t, finite_d, missing_t, truth)
+    completed = bd.permutation_null(full_t, full_d, extent, "asset", "Probe00",
+                                    rows, params)
+    check("a completed record's null differs from the finite-only null",
+          finite_only["q95"] != completed["q95"],
+          "finite-only %.4f um, completed %.4f um"
+          % (finite_only["q95"], completed["q95"]))
+    check("the completed record's null is inside the bound",
+          bounded["q95_lo"] - 1e-9 <= completed["q95"] <= bounded["q95_hi"] + 1e-9,
+          "[%.3f, %.3f] um" % (bounded["q95_lo"], bounded["q95_hi"]))
+
+
+def case_null_rejects_bad_rows(n_permutations):
+    """Row indices are validated exactly as the approved null validates them."""
+    print("null_rejects_bad_rows")
+    params = {"n_permutations": min(4, n_permutations)}
+    times, depths, rows = make_band(n_units=7, seed=FIXTURE_SEED + 15)
+    bad = [
+        ("too few row indices", rows[:-1]),
+        ("a duplicate row index", [0, 1, 2, 3, 4, 5, 5]),
+        ("a negative row index", [0, 1, 2, 3, 4, 5, -1]),
+        ("a non-integer row index", [0, 1, 2, 3, 4, 5, 6.5]),
     ]
-    escapes = []
-    for name, fill in fills:
-        q95 = counterfactual_null_q95(finite_t, finite_d, missing_t, fill, 740.0,
-                                      "asset", "Probe00", rows, params)
-        inside = bounded["q95_lo"] - 1e-9 <= q95 <= bounded["q95_hi"] + 1e-9
-        if not inside:
-            escapes.append(name)
-        check("completion %-14s inside [%.3f, %.3f]"
-              % (name, bounded["q95_lo"], bounded["q95_hi"]), inside,
-              "q95 %.3f um" % q95)
-    check("no completion's null escapes the bound", not escapes,
-          "escapes: %s" % (escapes or "none"))
+    for name, unit_rows in bad:
+        errors = []
+        for fn in (bd.permutation_null, md.null_interval):
+            try:
+                fn(times, depths, 740.0, "asset", "Probe00", unit_rows, params)
+                errors.append(None)
+            except ValueError as error:
+                errors.append(str(error))
+        check("%s raises in both nulls" % name,
+              errors[0] is not None and errors[1] is not None,
+              "approved: %s" % (errors[0] or "no error")[:34])
+
+
+def case_unbounded_bin_is_reported(n_permutations):
+    """Half a bin missing is unbounded, and the layer refuses a disposition."""
+    print("unbounded_bin_is_reported")
+    params = {"n_permutations": n_permutations}
+    finite_t, finite_d, missing_t, rows, extent = spread_fixture(
+        per_bin=10, missing_per_bin=10)
+    masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, extent)
+    check("support invariance still holds", result["support"]["invariant"],
+          result.get("reason", "")[:40])
+    check("the observation bound is unbounded", result["measurable"]
+          and not result["bounded"],
+          "[%.1f, %.1f] um" % (result["delta_window_lo"],
+                               result["delta_window_hi"]))
+    bounded = md.null_interval(masked_t, masked_d, extent, "asset", "Probe00",
+                               rows, params)
+    check("the null bound is unbounded too", not bounded["bounded"],
+          "[%.1f, %.1f] um" % (bounded["q95_lo"], bounded["q95_hi"]))
+    verdict = md.stability_verdict(result, bounded,
+                                   bd.PARAMS["threshold_strict_um"])
+    check("the disposition is unmeasurable rather than a number",
+          verdict["disposition"] == "unmeasurable" and not verdict["stable"],
+          verdict["reason"][:44])
 
 
 def codex_construction(finite_per_bin, missing_per_bin=1, n_units=5, n_bins=12,
@@ -511,8 +649,8 @@ def case_codex_support_passing_counterexample(n_permutations):
     print("codex_support_passing_counterexample")
     finite_t, finite_d, missing_t, rows, extent = codex_construction(1000)
     fraction = 1.0 / (1000.0 + 1.0)
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  extent)
+    masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, extent)
     check("every support floor still passes", result["support"]["invariant"],
           "%.6f%% missing" % (100.0 * fraction))
     check("the complete-case point estimate is flat",
@@ -524,8 +662,8 @@ def case_codex_support_passing_counterexample(n_permutations):
                                result["delta_window_hi"]))
 
     params = {"n_permutations": n_permutations}
-    bounded = md.null_interval(finite_t, finite_d, missing_t, extent, "asset",
-                               "Probe00", rows, params)
+    bounded = md.null_interval(masked_t, masked_d, extent, "asset", "Probe00",
+                               rows, params)
     verdict = md.stability_verdict(result, bounded,
                                    bd.PARAMS["threshold_strict_um"])
     check("the candidate does not reach a stable pass",
@@ -607,19 +745,21 @@ def case_gate_passing_counterexample(n_permutations):
     params = {"n_permutations": n_permutations}
     threshold = bd.PARAMS["threshold_strict_um"]
     finite_t, finite_d, missing_t, rows, extent = spread_fixture()
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  extent)
-    bounded = md.null_interval(finite_t, finite_d, missing_t, extent, "asset",
-                               "Probe00", rows, params)
-    gate = bd.apply_gate(result["observed"], bounded, threshold)
+    masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, extent)
+    approved_null = bd.permutation_null(finite_t, finite_d, extent, "asset",
+                                        "Probe00", rows, params)
+    gate = bd.apply_gate(result["observed"], approved_null, threshold)
     check("the approved gate passes the observed record", gate["passed"],
           "delta %.3f um, q95 %.3f um against %.1f um"
-          % (result["observed"]["delta_window"], bounded["q95"], threshold))
+          % (result["observed"]["delta_window"], approved_null["q95"], threshold))
     check("support invariance holds", result["support"]["invariant"],
           "%.3f%% of samples missing"
           % (100.0 * result["exclusions"]["total"]
              / (result["exclusions"]["total"]
                 + sum(t.size for t in finite_t))))
+    bounded = md.null_interval(masked_t, masked_d, extent, "asset", "Probe00",
+                               rows, params)
     verdict = md.stability_verdict(result, bounded, threshold)
     check("the missing depths leave it decision-unstable",
           verdict["disposition"] == "decision-unstable",
@@ -639,10 +779,10 @@ def case_small_missingness_still_passes(n_permutations):
     threshold = bd.PARAMS["threshold_strict_um"]
     finite_t, finite_d, missing_t, rows, extent = spread_fixture(
         missing_per_bin=1)
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  extent)
-    bounded = md.null_interval(finite_t, finite_d, missing_t, extent, "asset",
-                               "Probe00", rows, params)
+    masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, extent)
+    bounded = md.null_interval(masked_t, masked_d, extent, "asset", "Probe00",
+                               rows, params)
     verdict = md.stability_verdict(result, bounded, threshold)
     check("the disposition is a stable pass",
           verdict["disposition"] == "passes" and verdict["stable"],
@@ -669,8 +809,8 @@ def case_support_invariance_bin_floor():
     order = np.concatenate([keep, outside])
     finite_t[0], finite_d[0] = t[order], d[order]
     missing_t[0] = np.sort(t[dropped])
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  740.0)
+    masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, 740.0)
     check("the candidate is unmeasurable", not result["measurable"],
           result.get("reason", "")[:52])
     check("the reason names the unit/bin pair",
@@ -695,8 +835,8 @@ def case_support_invariance_unit_floor():
         missing.append(t[idx[9]])
     finite_t[0], finite_d[0] = t[keep_mask], d[keep_mask]
     missing_t[0] = np.asarray(sorted(missing), dtype=np.float64)
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  740.0)
+    masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, 740.0)
     check("the candidate is unmeasurable", not result["measurable"],
           result.get("reason", "")[:52])
 
@@ -705,14 +845,10 @@ def case_all_depths_missing_unit():
     """A unit whose depths are wholly missing makes the candidate unmeasurable."""
     print("all_depths_missing_unit")
     times, depths, _ = make_band(n_units=7, seed=FIXTURE_SEED + 10)
-    finite_t = [t.copy() for t in times]
-    finite_d = [d.copy() for d in depths]
-    missing_t = [np.empty(0, dtype=np.float64) for _ in times]
-    missing_t[2] = finite_t[2].copy()
-    finite_t[2] = np.empty(0, dtype=np.float64)
-    finite_d[2] = np.empty(0, dtype=np.float64)
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  740.0)
+    masked_t = [t.copy() for t in times]
+    masked_d = [d.copy() for d in depths]
+    masked_d[2] = np.full(masked_t[2].size, np.nan, dtype=np.float64)
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, 740.0)
     check("the candidate is unmeasurable", not result["measurable"],
           result.get("reason", "")[:52])
     check("the wholly missing unit is the one reported",
@@ -720,7 +856,7 @@ def case_all_depths_missing_unit():
           "%d bin mismatches, all on unit 2"
           % len(result["support"]["bin_mismatches"]))
     check("its exclusions are counted",
-          result["exclusions"]["per_unit"][2] == missing_t[2].size,
+          result["exclusions"]["per_unit"][2] == masked_t[2].size,
           "%d spikes" % result["exclusions"]["per_unit"][2])
 
 
@@ -728,55 +864,27 @@ def case_dropping_takes_a_bin_below_the_unit_floor():
     """Dropping must not silently rescue a bin the floors would have rejected."""
     print("dropping_takes_a_bin_below_the_unit_floor")
     times, depths, _ = make_band(n_units=6, seed=FIXTURE_SEED + 11)
-    finite_t, finite_d, missing_t, _ = punch_holes(times, depths, [0] * 6)
-    # Remove every observed spike from one bin of five units at once, so the
+    masked_t = [t.copy() for t in times]
+    masked_d = [d.copy() for d in depths]
+    # Remove every observed depth from one bin of five units at once, so the
     # bin falls below the five-included-unit floor on the observed record.
     for u in range(5):
-        t, d = finite_t[u], finite_d[u]
-        idx = np.flatnonzero((t >= 180.0) & (t < 240.0))
-        mask = np.ones(t.size, dtype=bool)
-        mask[idx] = False
-        finite_t[u], finite_d[u] = t[mask], d[mask]
-        missing_t[u] = np.sort(t[idx])
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  740.0)
+        idx = np.flatnonzero((masked_t[u] >= 180.0) & (masked_t[u] < 240.0))
+        masked_d[u][idx] = np.nan
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, 740.0)
     check("the candidate is unmeasurable", not result["measurable"],
           result.get("reason", "")[:52])
-
-
-def case_nonfinite_time_still_stops():
-    """A non-finite spike time raises rather than being excluded."""
-    print("nonfinite_time_still_stops")
-    times, depths, _ = make_band(n_units=6, seed=FIXTURE_SEED + 12)
-    finite_t = [t.copy() for t in times]
-    finite_d = [d.copy() for d in depths]
-    missing_t = [np.empty(0, dtype=np.float64) for _ in times]
-    missing_t[1] = np.array([np.nan], dtype=np.float64)
-    try:
-        md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t, 740.0)
-        check("a non-finite missing-depth time raises", False, "no error")
-    except ValueError as error:
-        check("a non-finite missing-depth time raises", True, str(error)[:44])
-
-    finite_d[3][17] = np.nan
-    missing_t[1] = np.empty(0, dtype=np.float64)
-    try:
-        md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t, 740.0)
-        check("a non-finite depth left in the finite record raises", False,
-              "no error")
-    except ValueError as error:
-        check("a non-finite depth left in the finite record raises", True,
-              str(error)[:44])
 
 
 def case_missing_outside_the_grid():
     """A missing spike past the last complete bin is counted, not binned."""
     print("missing_outside_the_grid")
     times, depths, _ = make_band(n_units=7, seed=FIXTURE_SEED + 13)
-    finite_t, finite_d, missing_t, _ = punch_holes(times, depths, [0] * 7)
-    missing_t[0] = np.array([735.0], dtype=np.float64)
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  740.0)
+    masked_t = [t.copy() for t in times]
+    masked_d = [d.copy() for d in depths]
+    masked_t[0] = np.concatenate([masked_t[0], np.array([735.0])])
+    masked_d[0] = np.concatenate([masked_d[0], np.array([np.nan])])
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, 740.0)
     check("the candidate stays measurable", result["measurable"],
           result.get("reason", "")[:40])
     check("the outside-grid spike is counted",
@@ -794,8 +902,8 @@ def case_exclusions_are_published():
     per_unit = [6, 0, 3, 11, 0, 2]
     finite_t, finite_d, missing_t, _ = punch_holes(times, depths, per_unit,
                                                    seed=FIXTURE_SEED + 40)
-    result = md.measure_missing_depth_sensitivity(finite_t, finite_d, missing_t,
-                                                  740.0)
+    masked_t, masked_d = masked_record(finite_t, finite_d, missing_t)
+    result = md.measure_missing_depth_sensitivity(masked_t, masked_d, 740.0)
     exclusions = result["exclusions"]
     expected = per_unit + [0, 0]
     check("per-unit counts match the construction",
@@ -839,6 +947,13 @@ def case_stability_verdict_quadrants():
     check("a null floor above the tolerance fails on its own",
           fails_on_null["disposition"] == "fails",
           fails_on_null["reason"][:44])
+    unbounded_null = md.stability_verdict(
+        {"measurable": True, "bounded": True, "delta_window_lo": 1.0,
+         "delta_window_hi": 2.0},
+        {"q95_lo": 1.0, "q95_hi": float("inf")}, 20.0)
+    check("an unbounded null alone makes it unmeasurable",
+          unbounded_null["disposition"] == "unmeasurable",
+          unbounded_null["reason"][:44])
 
 
 def main():
@@ -862,10 +977,14 @@ def main():
     case_median_interval_zero_missing()
     case_median_interval_unbounded()
     case_median_interval_rejects_bad_input()
+    case_split_unit_preserves_positions()
+    case_split_unit_rejects_bad_input()
     case_pipeline_bound_contains_every_completion(args.completions)
     case_zero_missing_reproduces_estimator(args.permutations)
-    case_null_point_path_matches_approved(args.permutations)
-    case_null_bound_contains_completion(args.permutations)
+    case_null_bound_contains_approved_null(args.permutations)
+    case_finite_only_null_is_not_a_completion(args.permutations)
+    case_null_rejects_bad_rows(args.permutations)
+    case_unbounded_bin_is_reported(args.permutations)
     case_codex_support_passing_counterexample(args.permutations)
     case_gate_passing_counterexample(args.permutations)
     case_small_missingness_still_passes(args.permutations)
@@ -873,7 +992,6 @@ def main():
     case_support_invariance_unit_floor()
     case_all_depths_missing_unit()
     case_dropping_takes_a_bin_below_the_unit_floor()
-    case_nonfinite_time_still_stops()
     case_missing_outside_the_grid()
     case_exclusions_are_published()
     case_stability_verdict_quadrants()

@@ -134,7 +134,7 @@ def main(argv=None):
     print("the crossover below is a property of this fixture and is not a rule")
     print("")
     header = ("%6s %8s %10s %10s %10s %10s %10s  %-18s %s"
-              % ("k/bin", "missing%", "delta", "delta_lo", "delta_hi", "q95",
+              % ("k/bin", "missing%", "delta", "delta_lo", "delta_hi", "q95_fin",
                  "q95_hi", "disposition", "approved gate"))
     print(header)
     print("-" * len(header))
@@ -145,20 +145,36 @@ def main(argv=None):
         times, depths, missing, rows, extent = build_band(
             args.units, args.bins, args.per_bin, missing_per_bin,
             args.width_um, args.seed)
-        result = md.measure_missing_depth_sensitivity(times, depths, missing,
-                                                      extent)
+        # The module takes the complete record with NaN at the missing depths,
+        # so the missing samples' positions are input rather than reconstruction.
+        masked_t, masked_d = [], []
+        for unit_times, unit_depths, unit_missing in zip(times, depths, missing):
+            merged_t = np.concatenate([unit_times, unit_missing])
+            merged_d = np.concatenate([
+                unit_depths,
+                np.full(unit_missing.size, np.nan, dtype=np.float64),
+            ])
+            order = np.argsort(merged_t, kind="stable")
+            masked_t.append(merged_t[order])
+            masked_d.append(merged_d[order])
+        result = md.measure_missing_depth_sensitivity(masked_t, masked_d, extent)
         if not result["measurable"]:
             print("%6d %8s  %s" % (missing_per_bin, "-", result["reason"][:70]))
             continue
-        bounded = md.null_interval(times, depths, missing, extent, "asset",
+        bounded = md.null_interval(masked_t, masked_d, extent, "asset",
                                    "Probe00", rows, params)
         verdict = md.stability_verdict(result, bounded, args.threshold_um)
-        gate = bd.apply_gate(result["observed"], bounded, args.threshold_um)
+        # The approved gate reads the finite-only null, which is the number the
+        # command reports; the bound above is over the completed-record null.
+        approved_null = bd.permutation_null(times, depths, extent, "asset",
+                                            "Probe00", rows, params)
+        gate = bd.apply_gate(result["observed"], approved_null,
+                             args.threshold_um)
         fraction = 100.0 * missing_per_bin / float(args.per_bin + missing_per_bin)
         print("%6d %8.3f %10.3f %10.3f %10.3f %10.3f %10.3f  %-18s %s"
               % (missing_per_bin, fraction, result["observed"]["delta_window"],
                  result["delta_window_lo"], result["delta_window_hi"],
-                 bounded["q95"], bounded["q95_hi"], verdict["disposition"],
+                 approved_null["q95"], bounded["q95_hi"], verdict["disposition"],
                  "pass" if gate["passed"] else gate["label"]))
         if verdict["disposition"] == "passes":
             last_stable = (missing_per_bin, fraction)

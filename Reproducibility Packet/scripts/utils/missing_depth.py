@@ -8,6 +8,21 @@ candidates is all-NaN, never infinite, and never in the times. Dropping those
 samples and reporting the count is not sufficient, and this module exists
 because of exactly why it is not.
 
+The record this module takes
+----------------------------
+Every entry point here takes the **complete** per-unit arrays -- every spike's
+time, and a depth array of the same length whose missing entries are NaN. That
+is deliberate. The missing samples' *positions in the original spike order* are
+part of the input, not something to be reconstructed from their times, because
+two spikes can share a time and a reconstruction would then have to guess which
+of them lost its depth. The null bound below reads those positions, so the
+guess would be a silent decision inside a bound.
+
+NaN means missing. An infinite depth raises: an infinite value is a wrong
+measurement rather than an absent one, and quietly widening a bound around it
+would treat a corrupt number as an unknown one. The reader that produces these
+arrays has to apply the same rule.
+
 Why a count is not enough
 -------------------------
 The pre-declared support floors -- at least ``min_spikes_per_bin`` depths in a
@@ -69,27 +84,37 @@ not, all three floors, both ways. A violation makes the candidate unmeasurable.
 This is an equality, not a fitted tolerance, and both measured host candidates
 satisfy it.
 
-The counterfactual null
------------------------
+Bounding the gate's own null
+----------------------------
 The gate is two numbers, so a completion could flip it through ``Q95_null`` as
-well as through ``Delta_10min``. **An assumption-free interval on ``Q95_null``
-does not exist in a non-vacuous form.** Under a completion a unit's analysed
-pool holds ``n + k`` values and the null's seed-determined permutation is an
-arrangement of that many elements -- a different arrangement, not a
-perturbation of the computed one -- so bounding over completions would have to
-bound over arrangements, under which any bin can receive any subset of the
-pool. The bound would degenerate to the unit's whole observed depth range and
-would be reporting the permutation's freedom rather than the missing data's.
+well as through ``Delta_10min``, and :func:`null_interval` bounds the second
+one over every completion **without assuming anything about the missing
+values**.
 
-:func:`null_interval` therefore evaluates a **declared counterfactual**, and
-declares it: the counterfactual null permutes the observed depths among the
-observed-depth spikes exactly as the actual null does -- same seeds, same
-arrangement -- and leaves each completed value at its own spike's time. That
-isolates the effect of the missing values from a nuisance that has nothing to
-do with them, since two seeds already give two different nulls on data with no
-missingness at all. The nearest-rank percentile is nondecreasing in every
-sample value, so taking it separately over the replicates' lower and upper
-bounds is sound.
+The reason that is possible -- and an earlier draft of this module claimed it
+was not -- is that the approved null's arrangement is fixed before any missing
+value is chosen. ``band_drift.permutation_null`` draws
+``rng.permutation(N)`` from a seed derived from the asset, the probe, the unit
+row and the replicate index; the only other input is ``N``, the number of
+analysed-bin spikes, and that is a count of *spikes*, which a completion does
+not change. So the whole source-to-destination map is known, and so is which
+source slots hold the unknown values. Follow those slots through the map, count
+how many land in each destination bin, apply the exact per-bin interval above
+there, and propagate through the same centring, band median and window scan the
+observation uses. Nothing ranges over arrangements, and the result is finite
+whenever the per-bin intervals are.
+
+Two consequences worth stating where they cannot be missed:
+
+* **The finite-only null is not one of the completions when ``k > 0``.** The
+  approved null run on the ``n`` observed depths permutes ``n`` elements; every
+  completed record permutes ``N = n + k``. Those are different draws from the
+  same seed. The finite-only ``Q95_null`` is reported as the point diagnostic
+  the gate itself computes, and it is *not* claimed to lie inside
+  :func:`null_interval`'s bound.
+* **The bound is exact per bin and an outer bound above it**, for the same
+  dependence reason as the observation's, and with the error in the same
+  direction.
 
 What this module does not do
 ----------------------------
@@ -118,20 +143,24 @@ def median_interval(values, n_missing):
     Returns:
         tuple: ``(lo, hi)`` in micrometres. ``-inf`` or ``+inf`` marks an
         unbounded side, which happens only when the missing count reaches
-        roughly half the bin.
+        roughly half the bin. A bin whose depths are *all* missing is unbounded
+        on both sides, which is the exact attainable set for it.
 
     Raises:
-        ValueError: if ``values`` is empty, holds a non-finite value, or
-            ``n_missing`` is negative.
+        ValueError: if ``values`` is empty with nothing missing, holds a
+            non-finite value, or ``n_missing`` is negative.
     """
     x = np.asarray(values, dtype=np.float64)
-    if x.size == 0:
-        raise ValueError("a bin median interval needs at least one finite depth")
-    if not np.all(np.isfinite(x)):
-        raise ValueError("median_interval takes the finite depths only")
     k = int(n_missing)
     if k < 0:
         raise ValueError("n_missing must be non-negative, got %r" % (n_missing,))
+    if x.size == 0:
+        if k == 0:
+            raise ValueError("a bin median interval needs at least one finite depth")
+        # Every value in the bin is missing, so every real number is attainable.
+        return float("-inf"), float("inf")
+    if not np.all(np.isfinite(x)):
+        raise ValueError("median_interval takes the finite depths only")
     x = np.sort(x)
     n = x.size
     total = n + k
@@ -140,6 +169,47 @@ def median_interval(values, n_missing):
     lo = -np.inf if r1 - k < 1 else 0.5 * (x[r1 - k - 1] + x[r2 - k - 1])
     hi = np.inf if r2 > n else 0.5 * (x[r1 - 1] + x[r2 - 1])
     return float(lo), float(hi)
+
+
+def split_unit(spike_times, depths):
+    """Split one unit's complete record into its observed and missing parts.
+
+    NaN marks a missing depth. An infinite depth is a wrong value rather than
+    an absent one and raises here, so that no bound is ever widened around a
+    corrupt number as though it were an unknown one.
+
+    Args:
+        spike_times: the unit's ascending spike times, in seconds, every spike.
+        depths: depths aligned with ``spike_times``, NaN where missing.
+
+    Returns:
+        tuple: ``(finite_times, finite_depths, missing_times)``, each a
+        ``numpy.ndarray``; the first two aligned with each other and the third
+        ascending, all three preserving the input order.
+
+    Raises:
+        ValueError: if the arrays disagree in length, a spike time is
+            non-finite, or a depth is infinite.
+    """
+    times = np.asarray(spike_times, dtype=np.float64)
+    values = np.asarray(depths, dtype=np.float64)
+    if times.size != values.size:
+        raise ValueError(
+            "%d spike times and %d depths" % (times.size, values.size)
+        )
+    if times.size and not np.all(np.isfinite(times)):
+        raise ValueError(
+            "spike times must be finite; a spike with no usable time cannot be "
+            "placed in a bin and is an input error, not a missing depth"
+        )
+    infinite = np.isinf(values)
+    if infinite.any():
+        raise ValueError(
+            "%d depths are infinite; an infinite depth is a wrong value, not a "
+            "missing one, and is an input error" % int(infinite.sum())
+        )
+    missing = np.isnan(values)
+    return times[~missing], values[~missing], times[missing]
 
 
 def missing_counts(missing_times, n_bins, bin_seconds=None):
@@ -170,6 +240,11 @@ def unit_intervals(spike_times, depths, missing_times, n_bins, params=None):
     The point medians come from :func:`band_drift.bin_medians` so that this
     module never carries a second definition of the estimator's own quantity.
     Only bins that actually hold a missing spike get a non-degenerate interval.
+
+    This takes the *split* record -- the observed spikes and the missing
+    spikes' times -- because the observation's binning depends on times alone
+    and never on which of two tied spikes lost its depth. The null bound is
+    the part that needs positions, and it reads them from the complete arrays.
 
     Args:
         spike_times: the unit's ascending finite-depth spike times, in seconds.
@@ -317,16 +392,56 @@ def support_invariance(tables, params=None):
     return result
 
 
-def centred_intervals(tables, included):
-    """Centre each included unit's interval on its own across-bin median.
+def centre_bounds(lo, hi):
+    """Centre one unit's bin-median interval on its own across-bin median.
 
-    This mirrors :func:`band_drift.unit_traces` -- the centring rule itself is
-    that function's and is not restated here -- and adds the interval the
-    missing depths open around it. The centring constant is itself
-    interval-valued, and subtracting an interval widens: the lower centred
-    bound takes the unit's highest admissible centre and the upper bound takes
-    its lowest. That is an outer bound, and the module docstring says which way
-    its error runs.
+    This is the single definition of the interval form of the centring step
+    ``delta_u(b) = d_u(b) - median_b' d_u(b')``. The centring constant is
+    itself interval-valued, and subtracting an interval widens: the lower
+    centred bound takes the unit's highest admissible centre and the upper
+    bound takes its lowest. That is an outer bound, and the module docstring
+    says which way its error runs.
+
+    Args:
+        lo: per-bin lower bounds, NaN in bins the unit does not define.
+        hi: per-bin upper bounds, same shape and same NaN pattern.
+
+    Returns:
+        tuple: ``(centred_lo, centred_hi, valid)`` where ``valid`` is the
+        boolean mask of bins the unit defines and the two arrays hold NaN
+        outside it.
+
+    Raises:
+        ValueError: if the arrays disagree in shape, their defined bins
+            disagree, or the unit defines no bin at all.
+    """
+    lo = np.asarray(lo, dtype=np.float64)
+    hi = np.asarray(hi, dtype=np.float64)
+    if lo.shape != hi.shape:
+        raise ValueError("bound arrays disagree in shape: %s and %s"
+                         % (lo.shape, hi.shape))
+    # NaN marks a bin the unit does not define; an infinite bound is a defined
+    # bin whose interval is unbounded, so isnan and not isfinite is the test.
+    valid = ~np.isnan(lo)
+    if not np.array_equal(valid, ~np.isnan(hi)):
+        raise ValueError("the lower and upper bounds define different bins")
+    if not valid.any():
+        raise ValueError("the unit defines no bin median to centre on")
+    centre_lo = float(np.median(lo[valid]))
+    centre_hi = float(np.median(hi[valid]))
+    centred_lo = np.full(lo.shape, np.nan, dtype=np.float64)
+    centred_hi = np.full(hi.shape, np.nan, dtype=np.float64)
+    centred_lo[valid] = lo[valid] - centre_hi
+    centred_hi[valid] = hi[valid] - centre_lo
+    return centred_lo, centred_hi, valid
+
+
+def centred_intervals(tables, included):
+    """Centre every included unit's interval, and stack the results.
+
+    The centring rule itself is :func:`centre_bounds`; the point stack is
+    :func:`band_drift.unit_traces` output, unchanged, so the point path and the
+    interval path never carry two definitions of the same step.
 
     Args:
         tables: list of per-unit dicts from :func:`unit_intervals`.
@@ -334,8 +449,7 @@ def centred_intervals(tables, included):
 
     Returns:
         tuple: ``(point_stack, lo_stack, hi_stack)``, each an
-        ``(n_included, n_bins)`` array with NaN in undefined bins. The point
-        stack is :func:`band_drift.unit_traces` output, unchanged.
+        ``(n_included, n_bins)`` array with NaN in undefined bins.
 
     Raises:
         ValueError: if an included unit has no defined bin median.
@@ -350,13 +464,10 @@ def centred_intervals(tables, included):
         if not keep:
             continue
         table = tables[u]
-        valid = np.isfinite(table["point"])
-        if not valid.any():
-            raise ValueError("included unit %d has no defined bin median" % u)
-        centre_lo = float(np.median(table["lo"][valid]))
-        centre_hi = float(np.median(table["hi"][valid]))
-        lo_stack[row, valid] = table["lo"][valid] - centre_hi
-        hi_stack[row, valid] = table["hi"][valid] - centre_lo
+        try:
+            lo_stack[row], hi_stack[row], _ = centre_bounds(table["lo"], table["hi"])
+        except ValueError as error:
+            raise ValueError("included unit %d: %s" % (u, error))
         row += 1
     if n_bins and point_stack.shape[1] != n_bins:
         raise ValueError("centred stack has %d bins, expected %d"
@@ -389,7 +500,7 @@ def trace_intervals(lo_stack, hi_stack, min_units_per_bin=None):
         raise ValueError("bound stacks disagree in shape: %s and %s"
                          % (lo_stack.shape, hi_stack.shape))
     n_bins = lo_stack.shape[1]
-    # NaN marks a bin the unit does not define; an infinite bound is a defined
+    # NaN marks a bin a unit does not define; an infinite bound is a defined
     # bin whose interval is unbounded, and counting it as absent would report
     # an invalid bin where the honest answer is an unbounded one.
     units_per_bin = (~np.isnan(lo_stack)).sum(axis=0)
@@ -462,53 +573,81 @@ def interval_excursions(lo_trace, hi_trace, window_bins=None):
     return result
 
 
-def measure_missing_depth_sensitivity(spike_times, depths, missing_times,
-                                      extent_s, params=None):
+def _split_band(spike_times, depths):
+    """Split a whole band's complete record, one unit at a time.
+
+    Args:
+        spike_times: list of per-unit complete spike-time arrays.
+        depths: list of per-unit depth arrays, NaN where missing.
+
+    Returns:
+        tuple: three lists -- observed times, observed depths, missing times.
+
+    Raises:
+        ValueError: if the two lists disagree in length, or any unit fails
+            :func:`split_unit`.
+    """
+    if len(spike_times) != len(depths):
+        raise ValueError(
+            "%d unit time arrays and %d unit depth arrays"
+            % (len(spike_times), len(depths))
+        )
+    finite_times, finite_depths, missing_times = [], [], []
+    for u in range(len(spike_times)):
+        try:
+            times, values, missing = split_unit(spike_times[u], depths[u])
+        except ValueError as error:
+            raise ValueError("unit %d: %s" % (u, error))
+        finite_times.append(times)
+        finite_depths.append(values)
+        missing_times.append(missing)
+    return finite_times, finite_depths, missing_times
+
+
+def measure_missing_depth_sensitivity(spike_times, depths, extent_s, params=None):
     """Measure the band drift and bound what the missing depths could do to it.
 
-    The point estimate is :func:`band_drift.measure_band_drift` on the finite
+    The point estimate is :func:`band_drift.measure_band_drift` on the observed
     record, called rather than reimplemented, so this function never disagrees
     with the approved estimator about what the observation is. Around it, the
     function reports the interval every completion of the missing depths could
     have produced, and the exclusions that have to be published with it.
 
     Args:
-        spike_times: list of per-unit ascending finite-depth spike times.
-        depths: list of per-unit finite depths, aligned with ``spike_times``.
-        missing_times: list of per-unit ascending missing-depth spike times,
-            one entry per band unit; an empty array where a unit has none.
+        spike_times: list of per-unit ascending complete spike-time arrays.
+        depths: list of per-unit depth arrays aligned with ``spike_times``,
+            NaN at every spike whose depth the archive could not supply.
         extent_s: the raw AP stream's final aligned timestamp, in seconds.
         params: parameter overrides; defaults to ``band_drift.PARAMS``.
 
     Returns:
-        dict: ``observed``, the point result from ``measure_band_drift``;
-        ``measurable`` and, when False, ``reason``; ``support`` from
-        :func:`support_invariance`; ``exclusions`` with ``total``,
-        ``per_unit``, ``per_unit_bin`` (non-zero entries only) and
+        dict: ``observed``, the point result from ``measure_band_drift`` on the
+        observed record; ``measurable`` and, when False, ``reason``;
+        ``support`` from :func:`support_invariance`; ``exclusions`` with
+        ``total``, ``per_unit``, ``per_unit_bin`` (non-zero entries only) and
         ``outside_grid``; and, when measurable, ``delta_window_lo`` /
         ``delta_window_hi``, ``delta_full_lo`` / ``delta_full_hi``,
         ``window_start_hi``, ``bounded``, ``lo_trace`` and ``hi_trace``.
 
     Raises:
-        ValueError: if the three lists disagree in length, or if the point
-            estimate falls outside its own bound, which would mean the interval
-            is wrong rather than merely wide.
+        ValueError: if the two lists disagree in length, a unit's record is
+            malformed, or the point estimate falls outside its own bound, which
+            would mean the interval is wrong rather than merely wide.
     """
     p = dict(band_drift.PARAMS)
     if params:
         p.update(params)
-    if not (len(spike_times) == len(depths) == len(missing_times)):
-        raise ValueError(
-            "%d unit time arrays, %d depth arrays and %d missing-time arrays"
-            % (len(spike_times), len(depths), len(missing_times))
-        )
-    observed = band_drift.measure_band_drift(spike_times, depths, extent_s, p)
+    finite_times, finite_depths, missing_times = _split_band(spike_times, depths)
+    observed = band_drift.measure_band_drift(
+        finite_times, finite_depths, extent_s, p
+    )
     result = {"observed": observed}
     n_bins, _ = band_drift.complete_bins(extent_s, p["bin_seconds"])
 
     tables = [
-        unit_intervals(spike_times[u], depths[u], missing_times[u], n_bins, p)
-        for u in range(len(spike_times))
+        unit_intervals(finite_times[u], finite_depths[u], missing_times[u],
+                       n_bins, p)
+        for u in range(len(finite_times))
     ]
     per_unit = [int(t["n_missing"].sum() + t["missing_outside"]) for t in tables]
     per_unit_bin = []
@@ -566,126 +705,173 @@ def measure_missing_depth_sensitivity(spike_times, depths, missing_times,
     return result
 
 
-def null_interval(spike_times, depths, missing_times, extent_s, asset_id, probe,
-                  unit_row_indices, params=None):
-    """Bound ``Q95_null`` under the declared missing-depth counterfactual.
+def replicate_bin_bounds(permuted, offsets, min_spikes_per_bin=None):
+    """Per-bin median intervals after one replicate's permutation.
 
-    The counterfactual is stated in the module docstring and is not an
-    assumption-free bound: it holds the null's arrangement fixed -- same seeds,
-    same permutation of the observed depths among the observed-depth spikes --
-    and lets each completed value sit at its own spike's time. The point path
-    reproduces :func:`band_drift.permutation_null` replicate for replicate,
-    which is the property to test this function on.
+    ``permuted`` holds one unit's complete depth vector after the approved
+    null's permutation has been applied to its analysed slice, with NaN still
+    marking the values a completion would have supplied. Each destination bin
+    therefore shows exactly how many unknown values landed in it, which is what
+    makes the bound assumption-free.
 
     Args:
-        spike_times: list of per-unit ascending finite-depth spike times.
-        depths: list of per-unit finite depths, aligned with ``spike_times``.
-        missing_times: list of per-unit ascending missing-depth spike times.
+        permuted: the unit's permuted complete depth vector, NaN where missing.
+        offsets: boundary indices into it from :func:`band_drift.bin_offsets`,
+            computed on the complete spike times.
+        min_spikes_per_bin: minimum complete spikes for a defined bin median;
+            defaults to ``band_drift.PARAMS``.
+
+    Returns:
+        tuple: ``(lo, hi)`` arrays with one entry per complete bin and NaN in
+        every bin below the floor.
+    """
+    if min_spikes_per_bin is None:
+        min_spikes_per_bin = band_drift.PARAMS["min_spikes_per_bin"]
+    permuted = np.asarray(permuted, dtype=np.float64)
+    offsets = np.asarray(offsets)
+    n_bins = offsets.size - 1
+    lo = np.full(n_bins, np.nan, dtype=np.float64)
+    hi = np.full(n_bins, np.nan, dtype=np.float64)
+    for b in range(n_bins):
+        first, stop = int(offsets[b]), int(offsets[b + 1])
+        if stop - first < min_spikes_per_bin:
+            continue
+        destination = permuted[first:stop]
+        known = destination[~np.isnan(destination)]
+        lo[b], hi[b] = median_interval(known, destination.size - known.size)
+    return lo, hi
+
+
+def null_interval(spike_times, depths, extent_s, asset_id, probe,
+                  unit_row_indices, params=None):
+    """Bound ``Q95_null`` over every completion of the missing depths.
+
+    This is an assumption-free bound on the gate's own second number, not a
+    counterfactual. The approved null's permutation depends only on its seed
+    and on the analysed-bin **spike count**, both of which a completion leaves
+    unchanged, so the source-to-destination map is known before any missing
+    value is chosen. This function follows the unknown source slots through
+    that map and applies the exact per-bin interval where they land.
+
+    The finite-only null -- ``band_drift.permutation_null`` on the observed
+    depths alone -- is *not* computed here and is *not* one of the completions
+    when anything is missing: it permutes ``n`` elements where every completion
+    permutes ``N = n + k``. The caller already computes it for the gate and
+    reports it as the point diagnostic.
+
+    Args:
+        spike_times: list of per-unit ascending complete spike-time arrays.
+        depths: list of per-unit depth arrays aligned with ``spike_times``,
+            NaN at every missing depth.
         extent_s: the raw AP stream's final aligned timestamp, in seconds.
         asset_id: the processed asset's exact stored identifier string.
         probe: the probe's exact stored name string.
-        unit_row_indices: each unit's row index in the units table.
+        unit_row_indices: each unit's row index in the units table, in the same
+            order as ``spike_times``.
         params: parameter overrides; defaults to ``band_drift.PARAMS``.
 
     Returns:
-        dict: ``q95`` (the point value, identical to the approved null's),
-        ``q95_lo`` and ``q95_hi``, ``rank``, ``n_permutations``, and the three
-        sorted replicate arrays as ``values``, ``values_lo`` and ``values_hi``.
+        dict: ``q95_lo`` and ``q95_hi``, the nearest-rank percentile of the
+        replicate lower and upper bounds; ``values_lo`` and ``values_hi``, both
+        sorted ascending; ``rank``; ``n_permutations``; and ``bounded``, False
+        when either endpoint is infinite.
 
     Raises:
-        ValueError: if a replicate is unmeasurable, which fixed bin counts make
-            impossible unless the observation was too.
+        ValueError: if the per-unit lists disagree in length, the row indices
+            are not distinct non-negative integers, the record is not
+            support-invariant, or a replicate is unmeasurable -- which the
+            fixed bin counts make impossible unless the observation was too.
     """
     p = dict(band_drift.PARAMS)
     if params:
         p.update(params)
-    if not (len(spike_times) == len(depths) == len(missing_times)
-            == len(unit_row_indices)):
-        raise ValueError("the four per-unit lists disagree in length")
-    rows = [int(row) for row in unit_row_indices]
-    n_bins, _ = band_drift.complete_bins(extent_s, p["bin_seconds"])
+    if len(unit_row_indices) != len(spike_times):
+        raise ValueError(
+            "%d row indices for %d units" % (len(unit_row_indices), len(spike_times))
+        )
+    normalized_rows = [int(row) for row in unit_row_indices]
+    if any(row != normalized or normalized < 0
+           for row, normalized in zip(unit_row_indices, normalized_rows)):
+        raise ValueError("unit_row_indices must be distinct non-negative integers")
+    if len(set(normalized_rows)) != len(normalized_rows):
+        raise ValueError("unit_row_indices must be distinct non-negative integers")
 
+    finite_times, finite_depths, missing_times = _split_band(spike_times, depths)
+    n_bins, _ = band_drift.complete_bins(extent_s, p["bin_seconds"])
     tables = [
-        unit_intervals(spike_times[u], depths[u], missing_times[u], n_bins, p)
-        for u in range(len(spike_times))
+        unit_intervals(finite_times[u], finite_depths[u], missing_times[u],
+                       n_bins, p)
+        for u in range(len(finite_times))
     ]
     support = support_invariance(tables, p)
     if not support["invariant"]:
         raise ValueError("the observation is not support-invariant: %s"
                          % support["reason"])
-    included = support["included"]
+    # Support invariance makes these two masks equal by construction; the
+    # complete one is the mask the approved null computes on any completion.
+    included = support["included_complete"]
     if included.sum() < p["min_units_per_bin"]:
         raise ValueError(
             "the observation is unmeasurable: only %d included units, need at least %d"
             % (int(included.sum()), p["min_units_per_bin"])
         )
 
+    complete = [np.asarray(d, dtype=np.float64) for d in depths]
     offsets = [
-        band_drift.bin_offsets(np.asarray(spike_times[u], dtype=np.float64),
-                               n_bins, p["bin_seconds"])
-        for u in range(len(spike_times))
+        band_drift.bin_offsets(np.asarray(t, dtype=np.float64), n_bins,
+                               p["bin_seconds"])
+        for t in spike_times
     ]
-    pools = [np.asarray(d, dtype=np.float64) for d in depths]
-    values = np.empty(p["n_permutations"], dtype=np.float64)
+    n_included = int(included.sum())
     values_lo = np.empty(p["n_permutations"], dtype=np.float64)
     values_hi = np.empty(p["n_permutations"], dtype=np.float64)
 
     for k in range(p["n_permutations"]):
-        replicate = []
-        for u in range(len(spike_times)):
-            if not included[u]:
-                replicate.append(tables[u])
+        lo_stack = np.full((n_included, n_bins), np.nan, dtype=np.float64)
+        hi_stack = np.full((n_included, n_bins), np.nan, dtype=np.float64)
+        row = 0
+        for u, keep in enumerate(included):
+            if not keep:
                 continue
             seed = band_drift.derive_permutation_seed(
-                asset_id, probe, rows[u], k, p["master_seed"]
+                asset_id, probe, normalized_rows[u], k, p["master_seed"]
             )
             rng = np.random.Generator(np.random.PCG64(seed))
-            shuffled = pools[u].copy()
+            permuted = complete[u].copy()
             first, stop = int(offsets[u][0]), int(offsets[u][-1])
-            analysed = pools[u][first:stop]
-            shuffled[first:stop] = analysed[rng.permutation(analysed.size)]
-            point = band_drift.bin_medians(shuffled, offsets[u], p["min_spikes_per_bin"])
-            lo, hi = point.copy(), point.copy()
-            for b in np.flatnonzero(tables[u]["n_missing"] > 0):
-                if not tables[u]["defined_finite"][b]:
-                    continue
-                low, high = median_interval(
-                    shuffled[offsets[u][b]:offsets[u][b + 1]],
-                    tables[u]["n_missing"][b],
-                )
-                lo[b], hi[b] = low, high
-            replicate.append({
-                "point": point, "lo": lo, "hi": hi,
-                "defined_finite": tables[u]["defined_finite"],
-                "n_missing": tables[u]["n_missing"],
-            })
-        point_stack, lo_stack, hi_stack = centred_intervals(replicate, included)
-        units_per_bin = np.isfinite(point_stack).sum(axis=0)
-        if np.any(units_per_bin < p["min_units_per_bin"]):
+            analysed = complete[u][first:stop]
+            permuted[first:stop] = analysed[rng.permutation(analysed.size)]
+            lo, hi = replicate_bin_bounds(permuted, offsets[u],
+                                          p["min_spikes_per_bin"])
+            try:
+                lo_stack[row], hi_stack[row], _ = centre_bounds(lo, hi)
+            except ValueError as error:
+                raise ValueError("permutation %d, unit %d: %s" % (k, u, error))
+            row += 1
+        lo_trace, hi_trace, invalid = trace_intervals(
+            lo_stack, hi_stack, p["min_units_per_bin"]
+        )
+        if invalid.size:
             raise ValueError(
-                "permutation %d produced an invalid bin; the null preserves bin counts, "
-                "so this means the observation was already unmeasurable" % k
+                "permutation %d produced %d invalid bins; the null preserves bin counts, "
+                "so this means the observation was already unmeasurable"
+                % (k, invalid.size)
             )
-        point_trace = np.nanmedian(point_stack, axis=0)
-        lo_trace, hi_trace, _ = trace_intervals(lo_stack, hi_stack,
-                                                p["min_units_per_bin"])
-        _, delta_window, _ = band_drift.excursions(point_trace, p["window_bins"])
         bounds = interval_excursions(lo_trace, hi_trace, p["window_bins"])
-        values[k] = delta_window
         values_lo[k] = bounds["delta_window_lo"]
         values_hi[k] = bounds["delta_window_hi"]
 
-    values.sort()
     values_lo.sort()
     values_hi.sort()
     rank = int(np.ceil(p["null_percentile"] / 100.0 * p["n_permutations"]))
+    q95_lo = float(values_lo[rank - 1])
+    q95_hi = float(values_hi[rank - 1])
     return {
-        "values": values.tolist(),
         "values_lo": values_lo.tolist(),
         "values_hi": values_hi.tolist(),
-        "q95": float(values[rank - 1]),
-        "q95_lo": float(values_lo[rank - 1]),
-        "q95_hi": float(values_hi[rank - 1]),
+        "q95_lo": q95_lo,
+        "q95_hi": q95_hi,
+        "bounded": bool(np.isfinite(q95_lo) and np.isfinite(q95_hi)),
         "rank": rank,
         "n_permutations": int(p["n_permutations"]),
     }
@@ -701,6 +887,9 @@ def stability_verdict(sensitivity, null_bounds, threshold_um):
     violated support invariance -- leaves the candidate unmeasurable and
     paused. No tolerance is fitted anywhere in this rule; ``L`` is the gate's
     own pre-declared threshold.
+
+    Both inputs bound the quantities the approved gate actually reads on a
+    completed record, so "every completion" in the reasons below is literal.
 
     Args:
         sensitivity: the dict from :func:`measure_missing_depth_sensitivity`.
