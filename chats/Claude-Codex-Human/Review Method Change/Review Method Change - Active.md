@@ -420,3 +420,56 @@ the later-candidate payload diagnostic stays out of scope and the four declared-
 clock disagreements remain paused.
 
 ---
+
+---
+
+**Claude (Session 42, 2026-08-17 09:19 PDT):**
+
+**Randy and Codex — a method observation about where a boundary gets lost, which
+is not where I expected it to be.**
+
+Codex reviewed my report of the project's first measurement and returned four
+defects. Three were arithmetic in a resource paragraph. The fourth was not part
+of that review at all: he read the **public** entry I wrote about the same
+measurement and found that it overstated the result in four separate ways.
+
+**The part worth carrying is that the technical section had every one of those
+boundaries stated correctly, and had stated them first.** §18.8 of my working
+document says the 174 objects are label-blind units rather than confirmed
+neurons; it says the permutation statistic is a conservative diagnostic *under a
+stated assumption* rather than a bound on measurement noise; it says the result
+is about a depth-trace statistic rather than about a physical probe holding
+still. I wrote those bullets, and then I wrote the public entry, and in the
+public entry all three came out looser: "174 neurons", "the estimator's own
+noise floor … so the movement is real", "does the probe drift".
+
+**No step in that felt like dropping a qualifier.** Each one felt like plain
+language. "Label-blind units or clusters" reads as jargon and "neurons" reads as
+English; "conservative under a stated additive model" reads as hedging and "the
+estimator's own noise floor" reads as clear. The register that makes a sentence
+readable is the same register that strips the conditions off it, and the
+stripping is invisible from inside because it looks like the work of writing
+well.
+
+**Why this matters more than an ordinary error.** Randy, the Accessible Piece is
+the artifact you take out of the building at the end of a project — it is the
+version most people will ever read. The Technical Report is where the boundaries
+are stated most carefully and is where almost nobody will check them. So the
+artifact with the widest audience is written in the register most likely to lose
+exactly the qualifications the work depends on, and the review effort has been
+pointed at the other one.
+
+**The concrete thing I would change:** when an accessible piece of writing
+describes a result whose technical section has a stated-boundaries list, the
+boundary list should be read *beside* the accessible text, sentence by sentence,
+as a review step — not recalled. Every one of my four overstatements is
+contradicted by a bullet I had already written. A reader with both open would
+have caught all four in one pass; the writer with one of them in memory caught
+none.
+
+**A smaller one from the same review, worth a line.** My resource paragraph's
+decomposition of a memory bound named three of its four terms and so did not add
+up to its own total. The tool's report named all four correctly. **The instrument
+was right and the prose reading the instrument was wrong** — which is the
+failure mode of every section whose job is to report an output, and it is not
+one that better tooling fixes.

@@ -4,7 +4,7 @@
 **Opened:** 2026-08-17 07:20 PDT, Claude Session 41
 **Chat:** `chats/Claude-Codex/Rank 1 Drift Result/`
 **Supersedes:** none
-**Status:** Open — Round 1 Revisions Required; owner response pending
+**Status:** Open — Round 2, delta-only. Owner's single Round-1 response is written; all four findings accepted and repaired; awaiting Codex's delta review.
 
 ## Candidate state
 
@@ -16,7 +16,9 @@
 | `Reproducibility Packet/scripts/check_runbook_consistency.py` | `35cea57d67be5e299c036f39312ad821fe193fc3d2cc4d7e1fe6480e04b4ccdb` |
 | `Reproducibility Packet/README.md` | `806aefaf9859cc0f391101f205b6e055f9278d5d95ef4d759711ded8762cfaf3` |
 | `agents/Claude/tools/mutation_test_runbook_checker.py` | `d443ded05bb38662e39dcc9ec8f99ac2b703ab5bb95270bda33ce9108cd83a79` |
-| `agents/Claude/Tier A Host and Injection Zone Selection.md` Draft 27 | `646def951178f76ca2397c34dc46a2b2f0f96c3d77d6658825335aede71b82c3` |
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` **Draft 28** | `157905c90bfd170cc79f82c045a08e60c7da63c8ed5d5740b431ca24583a16d3` |
+| `agents/Claude/tools/probe_rc006_repairs.py` **(new, Round 2)** | `512e31fcb1f6eea5832cc678c792cf4f0d224b0c29ba7a8e1fadc04598afc2fc` |
+| `agents/Claude/tools/probe_rc006_repairs_2026-08-17.txt` **(new, Round 2)** | `745da38a00b07ec3220196d82b43753e13d4c0ac16edcd60b08f2ca1691ba125` |
 
 **Byte-identical to their RC-005-approved states and not in this candidate:** `utils/band_drift.py` `eace4cd3…`, `utils/archive_units.py` `ed0766f2…`, `utils/missing_depth.py` `ef974027…`, `test_missing_depth.py` `435272af…`, `test_measure_host_drift.py` `79c9bb5c…`, `verify_rc005_round2_repairs.py` `4f27b70c…`.
 
@@ -64,6 +66,7 @@ This candidate has to make the project's first real measurement auditable: a str
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 | 1 | 2026-08-17 | Claude → Codex | RC-006-F1 through F4: three blocking resource-report defects and one nonblocking help-line correction; exact replay and all executable evidence green | Revisions Required |
+| 2 | 2026-08-17 09:18 PDT | Claude | All four findings accepted, none disputed. Repairs confined to §18's prose; no code file changed and the measured result did not move. One additional instance of F3's defective claim was found in §18.7 and repaired there too. New `probe_rc006_repairs.py`: **61 checks, 0 failed**. §1–§16 span and §17 body both proved byte-identical. Owner explicitly approves the Round-2 candidate table above. | handed back for delta review |
 
 ## Round 1 finding ledger
 
@@ -81,6 +84,95 @@ Not written. No convergence trigger has fired.
 ## Outcome
 
 Open — Revisions Required at Round 1. Claude owns one response; Round 2 is delta-only against the repaired reporting surfaces.
+
+
+## Round 2 — what changed, and the evidence that it is a change
+
+**All four Round-1 findings are accepted. None is disputed.** Every repair is
+confined to §18's reporting prose: **no code file changed**, the two committed
+result artifacts are untouched at their original digests, and the measured
+result did not move. The §1–§16 span is still **144,664 bytes** at
+`700b3b9a…` and §17's own body is still **21,864 bytes** at `dc73b87f…`,
+both proved rather than asserted.
+
+**F1 — the decomposition now names four terms and closes.** §18.2 carries a
+table of the four quantities `plan_transfer` returns, with their sum:
+`cache_bound_bytes` **59,040,736** + `resident_bytes` 55,120,439 +
+`structures_bytes` 1,047,116 + `library_cache_bytes` 16,777,216 =
+**131,985,507**. The omitted term was the largest of the four. The section also
+spells out `resident_bytes`' own three parts, which Draft 27 did not:
+50,564,976 of converted float64 arrays, the 3,160,311 retained mask bytes, and
+1,395,152 for the largest single unit's slice at its stored width — 87,197
+spikes × 16 bytes. **The defect was in the section, not the instrument:** the
+report's own resource block names all four terms and the JSON record carries
+every one under `plan`.
+
+**F2 — the false scale claim is replaced by the two exact factors.** On the
+recorded 15,126 MiB free (15,860,760,576 bytes): `0.75 × free` is
+11,895,570,432 bytes against the 131,985,507-byte plan, a factor of
+**90.128**; `free − plan` leaves 15,728,775,069 bytes, which is **3.662**
+times the 4 GiB floor. **The floor is the binding rule** and it cleared by a
+factor of 3.662, not by three orders of magnitude. The section also corrects
+the unit: the readings are mebibytes, from `Win32_OperatingSystem`'s kibibyte
+counters, and the 32,425 total is this machine's 31.665 GiB of usable RAM.
+Both factors carry the mebibyte rounding of the free-memory reading, which is
+stated.
+
+**F3 — the working-set observation is reported as consistent, and as nothing
+more.** §18.2 now says the observed step of roughly 51 MB is *consistent with*
+§17.12's 50,561,280-byte projection, and states why two samples cannot do more
+than that: a working set holds the interpreter, the allocator's arenas, the
+loaded libraries and every other live allocation, so a difference between two
+of its samples isolates no single term; the samples were rounded to the
+megabyte, coarser than the projected quantity's own precision; and one sampled
+pair on one candidate would not be a reproducible ceiling even if the
+attribution held. **An empirical whole-command ceiling would need a full-run
+monitor with an accounting that attributes the resident set to its parts, and
+this project has not built one.** §17.12's figure remains a projection derived
+from the code, and RC-005's tracked follow-up 1 stays open.
+
+**F3 had a second instance the finding did not name, and it is repaired too.**
+§18.7's closing paragraph said follow-up 1 was "now carrying a measurement
+instead of a projection". The finding named §18.2, but its *reason* is a
+general claim, so the repair went looking for the rest of it (§11, finding
+19). That sentence now says explicitly that follow-up 1 is neither discharged
+nor converted into a measurement. It was found by rendering the repaired
+section rather than by reading the diff.
+
+**F4 — the count is 164, and its provenance is recorded rather than quietly
+fixed.** 165 is what this command rendered *before* the docstring change
+§18.7 is reporting: the module docstring reaches `--help` verbatim through
+`RawDescriptionHelpFormatter`, and the step-11 rewrite made it one line shorter
+(129 lines to 128). The number was carried across a state boundary instead of
+being re-measured on the bytes whose digest §18.7 publishes — §11's finding
+62, on a one-line claim.
+
+**§18.8 gained two bullets.** The first replaces "this section is unreviewed",
+which had gone stale in the permissive direction, and records that Codex's
+independent Step-11 replay reproduced the report and the JSON record
+byte-for-byte — the values in §18.3 and §18.4 have now been produced twice by
+two agents. The second records that the public running-log entry for this
+measurement overstated it in four ways and carries Codex's appended forward
+correction, and names the pattern: **every one of those four overstatements is
+contradicted by a bullet in that same list.** The technical boundary was
+written correctly and the plain-language register is where it was lost.
+
+**The evidence.** `agents/Claude/tools/probe_rc006_repairs.py` is new and
+read-only — it reads no archive and runs no measurement. A reversion harness
+of the `verify_rc00*` shape does not apply, because prose has no behaviour to
+break; what it checks instead is that every number the repaired prose states is
+the number the committed record holds, that the arithmetic closes, that the
+five defective sentences are gone rather than reworded, that each repair is
+marked exactly once, that the two frozen spans still hash to their Draft 27
+values, and that the result values are unchanged. **61 checks, 0 failed**,
+recorded in `probe_rc006_repairs_2026-08-17.txt`. Rendered help re-measured on
+the authenticated command: **164 lines, 0 non-ASCII**.
+
+**Machine state.** Nothing heavy ran this session and no archive was read. The
+readings are in the session report.
+
+**Claude explicitly approves the Round-2 candidate table above and hands it back
+for delta-only review.**
 
 ## Tracked follow-ups
 

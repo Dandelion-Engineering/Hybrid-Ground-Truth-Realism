@@ -1,0 +1,76 @@
+F1 -- the plan decomposition names all four terms and closes
+  ok    section 18.2 states cache_bound_bytes                      59,040,736
+  ok    section 18.2 states resident_bytes                         55,120,439
+  ok    section 18.2 states structures_bytes                       1,047,116
+  ok    section 18.2 states library_cache_bytes                    16,777,216
+  ok    four terms sum to peak_resident_bytes                      131985507
+  ok    peak_resident_bytes                                        131985507
+  ok    cache_bound_bytes is the largest term                      59040736
+  ok    the report also names all four                             true
+  ok    resident: converted arrays                                 50564976
+  ok    resident: retained masks                                   3160311
+  ok    resident: largest slice at stored width                    1395152
+  ok    largest slice is a whole number of spikes                  0
+  ok    largest unit spike count                                   87197
+  ok    resident parts sum                                         55120439
+  ok    spent-before-band bytes                                    9073136
+  ok    hdf5 cache is two 8 MiB halves                             16777216
+
+F2 -- the admission factors are the stated ones
+  ok    free bytes at the recorded reading                         15860760576
+  ok    75 percent of free                                         11895570432
+  ok    remaining after the plan                                   15728775069
+  ok    75%-of-free factor                                         90.128
+  ok    4 GiB floor factor                                         3.662
+  ok    both rules admit                                           true
+  ok    the floor is the binding rule                              true
+  ok    no factor reaches three orders of magnitude                true
+  ok    section 18.2 states **90.128**                             true
+  ok    section 18.2 states **3.662**                              true
+  ok    section 18.2 states 15,860,760,576                         true
+  ok    section 18.2 states 11,895,570,432                         true
+  ok    section 18.2 states 15,728,775,069                         true
+  ok    section 18.2 states 4,294,967,296                          true
+
+F3 -- the working-set observation is reported as consistent, not measured
+  ok    section 17.12's projection is still called a projection    true
+  ok    the step is called consistent with the projection          true
+  ok    no whole-command empirical ceiling is claimed              true
+  ok    follow-up 1 is stated as still open                        true
+  ok    the projection's value appears once in section 18          1
+
+F4 -- the rendered help count
+  ok    rendered help lines                                        164
+  ok    non-ASCII characters in help                               0
+  ok    section 18.7 states 164 lines                              true
+
+The defective sentences are gone and the repairs are marked
+  ok    gone: which clears the 75%-of-free rule and the 4 GiB      true
+  ok    gone: `--help` **165 lines, 0 non-ASCII**                  true
+  ok    gone: - **This section is unreviewed.**                    true
+  ok    gone: **The projection is now a measurement, and any l     true
+  ok    gone: follow-up 1 now carrying a measurement instead o     true
+  ok    marked once: RC-006-F1 is repaired                         1
+  ok    marked once: RC-006-F2 is repaired                         1
+  ok    marked once: RC-006-F3 is repaired                         1
+  ok    marked once: RC-006-F4 is repaired                         1
+
+Nothing outside section 18 and the status stack moved
+  ok    section 17 bytes                                           21864
+  ok    section 17 sha256                                          dc73b87f64550d941ca99c9889668e45da688428cc791d8a8fe8d9c60303f72a
+  ok    sections 1-16 bytes                                        144664
+  ok    sections 1-16 sha256                                       700b3b9a4cd3a1b0f7342e2d4678fbe1cac87f68da6fbb2635ebc5b865cdad59
+  ok    Draft 28 status line present                               1
+  ok    Draft 27 status line retained                              1
+
+The measured result did not move
+  ok    Delta_10min in the record                                  1.821
+  ok    Q95_null in the record                                     0.526
+  ok    the gate still passes                                      True
+  ok    the label is unchanged                                     resolved, within tolerance
+  ok    inside_null is unchanged                                   False
+  ok    disposition                                                passes
+  ok    advances                                                   True
+  ok    conflict                                                   False
+
+61 checks, 0 failed
