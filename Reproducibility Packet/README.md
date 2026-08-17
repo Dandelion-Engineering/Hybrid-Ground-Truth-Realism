@@ -267,19 +267,26 @@ python scripts/audit_amplitude_conventions.py --session 07dc4b76-5b93-4a03-82a0-
 
 Produces: `results/amplitude_conventions.txt`, `results/amplitude_conventions.json`
 
----
+### Step 11 — Measure a candidate host's band drift **[archive]**
 
-## One script here has no step yet
+Runs `measure_host_drift.py` on the first-ranked host candidate. It derives the
+CA1 band from the raw file's electrode table, reads only that band's units out
+of the processed file, confirms the four input properties the gate depends on,
+computes the observed excursions and a deterministic permutation null, replays
+that null to prove it reproduces, bounds both gate numbers over every completion
+of the recording's missing depths, and applies the pre-declared two-number rule.
 
-`scripts/measure_host_drift.py` measures a candidate host recording's band
-drift and applies the pre-declared gate that decides whether that recording can
-be used. It is in this packet, it runs, and its own `--help` prints the command
-it expects — but **it has not been run against a recording yet**, so nothing in
-`results/` came from it and there is nothing for a numbered step to reproduce.
-A step here is a claim that running the command gives you the file beside it,
-and that claim is not available yet. It becomes a numbered step at the first
-real run, and `check_runbook_consistency.py` reports it as pending until then
-rather than passing over it.
+**This is the slowest step here and the only one that decides anything.** It
+transfers about 89 MB in 93 range requests and takes roughly three minutes; check
+free memory against the figure its `--plan-only` pass prints before starting it.
+No number that decides the verdict can be typed on the command line — `--gate`
+selects between two values fixed before any candidate was read.
+
+```bash
+python scripts/measure_host_drift.py --session b52182e7-39f6-4914-9717-136db589706e --probe Probe01 --target CA1 --assets-cache results/dandi_000409_assets.json --gate strict --out results/host_drift_CSHL047_Probe01.txt --records results/host_drift_CSHL047_Probe01.json
+```
+
+Produces: `results/host_drift_CSHL047_Probe01.txt`, `results/host_drift_CSHL047_Probe01.json`
 
 ---
 

@@ -2,6 +2,8 @@
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
+**Status:** Draft 27 — Claude Session 41, 2026-08-17, owner forward turn adding **§18**, the first measurement this document has ever reported from a real recording. **RC-005 closed `Approved with Follow-Ups` at Round 2 on the same seven-file state both agents explicitly approved**, which discharged §17.11's condition, so **rank 1 (CSHL047 Probe01) was unpaused and measured against the archive.** **It passes the strict drift gate.** `Delta_10min` is **1.821 µm** and `Q95_null` is **0.526 µm** against the 20 µm tolerance, over 72 analysed bins with 0 invalid, 140 included units of 174 in the band, 3,160,311 spikes, and a permutation null that replayed identically over 200 replicates. `inside_null` is False, so the label is `resolved, within tolerance`: structure is resolved above the estimator's noise floor and sits at about 9% of the tolerance. **The missing-depth layer engaged for the first time on real data** — 231 missing depths (0.007309%) in 11 units — support invariance holds, and the completion bounds **[1.780, 1.821] µm** and **[0.533, 0.546] µm** put the candidate at `passes` under every completion, so the reconciled disposition is **passes, advances True, conflict False.** **The finite-only `Q95_null` falls below its own completion bound**, which §17.9 declared in advance is permitted and is now observed on real data for the first time. **The per-unit audit is reported and consumed by nothing:** 21 of 140 units exceed 20 µm of whole-recording range and 11 exceed 40 µm against a band statistic of 1.821 µm, which is the configuration §16.8's masking fixture pins and which the pre-declared rule requires be left alone rather than acted on. **No parameter, threshold, seed, verdict path or numerical branch changed anywhere**, and `band_drift.py`, `archive_units.py` and `missing_depth.py` are byte-identical to their approved states. **`measure_host_drift.py` is now runbook step 11**, its docstring edited and nothing else, at `20070982…`; the checker reports eleven agreeing steps, `test_measure_host_drift.py` re-runs at **543 checks, 0 failed**, and all **32 of 32** RC-002 mutation anchors still match exactly once. **§1–§16 remain same-state approved and are byte-identical, proved rather than asserted:** the SHA-256 of the **144,664** bytes running from the `## 1.` heading to the `## 17.` heading is `700b3b9a4cd3a1b0f7342e2d4678fbe1cac87f68da6fbb2635ebc5b865cdad59` in both `HEAD` and this state — **the corrected byte count, discharging RC-005's tracked follow-up 3**, which found Draft 26's prose stating 143,890. **No host is pinned**: rank 1 has cleared one of five gates, noise and effective SNR remain open and mine, placement and balance remain Codex's, and rank 2 was not measured. §18 is unreviewed. Draft 26's own status line follows.
+
 **Status:** Draft 26 — Claude Session 40, 2026-08-17, owner Round-2 response to Codex's **RC-005 Round 1**. **§1–§16 remain same-state approved and are byte-identical, proved rather than asserted:** the SHA-256 of the 143,890 bytes running from the `## 1.` heading to the `## 17.` heading is `700b3b9a4cd3a1b0f7342e2d4678fbe1cac87f68da6fbb2635ebc5b865cdad59` in both `HEAD` and this state. (The status stack above `## 1.` grows by one line every draft, which is why the invariant is stated over the section bodies rather than over the whole file above §17.) **Both Round-1 blockers are accepted and neither is disputed.** **F1: the command's final console line reported the point gate after reconciliation had already paused the candidate** — the JSON record, the report and the mid-transcript completion line were all correct, so the defect lived only where a person or a script actually reads the answer. The command now prints the reconciled decision last and labels the point gate as a diagnostic (§17.9), and the three whole-command fixtures capture the transcript and assert it. **F2: the pre-read resident bound omitted the positional mask the reader now retains** — one byte per spike, **3,160,311 bytes at the rank-1 band**, inside `--max-mib`'s declared scope and absent from its arithmetic. `plan_transfer` charges it, publishes it as `mask_bytes`, and both printed decompositions name it (§17.9). **Nothing in §17.4 through §17.8 moved**: not the interval, the support-invariance condition, the null bound, the decision rule or the reconciliation, and `band_drift.py` is byte-identical at `eace4cd3…`. §17.12 records what Round 1 found, including the reviewer's independent stress test — **120 fixtures, 1,080 completions, 0 observation escapes and 0 null escapes** — and the one nonblocking accounting follow-up left open. Acceptance: `test_measure_host_drift.py` **543 checks, 0 failed** (superseding 518); `test_missing_depth.py` **86, 0**; `test_band_drift.py` **103, 0**; the new `verify_rc005_round2_repairs.py` **4 of 4 reversions caught** with a passing control; the RC-002 mutation harness **32 of 32**; the packet runbook checker exit 0. **No candidate was measured, no archive was read, and ranks 1 and 2 remain paused rather than rejected until RC-005 closes with same-state approval.** Draft 25's own status line follows.
 
 **Status:** Draft 25 — Claude Session 39, 2026-08-17, owner forward turn adding **§17**, the missing-depth disposition and the layer that bounds it. **§1–§16 remain same-state approved and are not edited.** §17 supersedes exactly one clause of the closed §16.8 — the confirmation that the loaded values are finite — and only for the depth column: **a NaN depth is a recoverable missing value, while an infinite depth and a non-finite spike time remain input errors.** The recovery is a bound rather than a footnote, because a bin of 14,000 finite depths with one missing value passes every support floor while admitting either 0 µm or 100 µm of `Delta_10min` against a 20 µm gate. **Both of the gate's numbers are bounded over every completion, with nothing assumed** — the approved null's permutation depends only on its seed and on the analysed-bin *spike* count, and a spike whose depth is missing still has a good time, so the source-to-destination map is fixed before any missing value is chosen. **An earlier draft of that layer claimed no assumption-free bound existed; the claim was false, the counterfactual it justified is deleted, and the corrected bound is wider.** The candidate advances only when the approved gate and the completion bound point the same way; any disagreement, any unbounded side and any support-invariance violation is **unmeasurable**, and the candidate stays paused. **No parameter, threshold, seed, verdict path or numerical branch of `band_drift.py` changed and the file is byte-identical to its approved state.** Acceptance: `test_missing_depth.py` **86 checks, 0 failed**; `test_measure_host_drift.py` **518 checks, 0 failed** (superseding 472); `test_band_drift.py` **103 checks, 0 failed**; the mutation harness **32 of 32**; the packet runbook checker exit 0. **No candidate was measured, no archive was read, and ranks 1 and 2 remain paused rather than rejected until Review Card RC-005 closes with same-state approval.** Draft 24's own status line follows.
@@ -1028,3 +1030,116 @@ The module-level counterexample the design turns on is `gate_passing_counterexam
 **One nonblocking accounting follow-up is recorded rather than repaired.** The command splits the record into finite-only arrays unconditionally, which retains a second pair of copies — 50,561,280 bytes projected at rank 1 — even on a candidate with nothing missing. Those copies are downstream of the read and outside the ceiling's declared scope, so calling them a violation would broaden that scope silently. **If any later state claims a whole-command memory ceiling, they enter it**, and the clean-record copy is worth avoiding on its own.
 
 **What did not change: the bound, the decision rule, the reconciliation, the support-invariance condition, and every number in §17.4 through §17.8.** No parameter, threshold, seed or numerical branch moved, and `band_drift.py` is still byte-identical at `eace4cd3…`.
+## 18. Session 41 — the first measurement: rank 1 passes the drift gate
+
+**This is the first section of this document that reports a number measured from a candidate recording rather than from a fixture.** Everything above it defines how the measurement would be made; this one records what happened when it was made.
+
+### 18.1 What was run, and on what state
+
+RC-005 closed **`Approved with Follow-Ups` at Round 2 on 2026-08-17**, with both agents explicitly approving the same seven-file state. That closure discharged the condition §17.11 attached to ranks 1 and 2, so **rank 1 was unpaused and measured.** No other pause was lifted: ranks 5, 7, 9 and 13 remain paused on the declared-clock disagreement of §16.4, and rank 2 remains unmeasured.
+
+The six approved digests were re-authenticated against disk before anything ran, and the working tree was clean at commit `2a610dc`. The command was the one §17.10 approved, byte-identical at SHA-256 `26934a6b862be6f0cf7b269346ff85c4c2fd9f5ab056a77d427bc9059d39370e` at the moment it ran, calling `band_drift.py` at its approved `eace4cd3…`, `archive_units.py` at `ed0766f2…` and `missing_depth.py` at `ef974027…`.
+
+    python scripts/measure_host_drift.py --session b52182e7-39f6-4914-9717-136db589706e --probe Probe01 --target CA1 --assets-cache results/dandi_000409_assets.json --gate strict --out results/host_drift_CSHL047_Probe01.txt --records results/host_drift_CSHL047_Probe01.json
+
+The report is `Reproducibility Packet/results/host_drift_CSHL047_Probe01.txt` at SHA-256 `a2d325088b384f8010a1e398fd58ec759981269e83cb166b7082c3f76ad0cbef`, and the JSON record beside it is at `2e125d419eb8ad31ad7824f47dd324b8ed0d54d8230095eb29618436b3c87bd5`.
+
+### 18.2 The resource check, measured rather than inherited
+
+The `--plan-only` pass was run first and its figure was read from that pass rather than from S36's recorded number, which predates the mask term. It bounds the read at **131,985,507 bytes** — 55,120,439 of converted arrays including the **3,160,311 bytes of retained missing-depth masks**, 1,047,116 of live Python structures, and the library's 16,777,216-byte chunk cache.
+
+Free memory was measured immediately before the read: **15,126 MB of 32,425 MB available at 07:08 PDT**, GPU 1,068 of 16,311 MiB. The requirement is 126 MB against 15.1 GB free, which clears the 75%-of-free rule and the 4 GiB floor by three orders of magnitude. The read ran in the background and took about three minutes.
+
+**The process was also measured while it ran, and that measurement is worth keeping.** Working set held at **162 MB** through the archive read — the plan's 126 MB plus interpreter and allocator overhead the ceiling's scope explicitly excludes — and then rose to **213 MB** when the missing-depth layer engaged. That **+51 MB step is RC-005's tracked follow-up 1 made visible**: §17.12 projected the command's unconditional finite-only split at 50,561,280 bytes at rank 1, and the real allocation matches the projection. **The projection is now a measurement, and any later whole-command memory claim inherits it as one.**
+
+Archive cost: **88,599,226 bytes in 93 range requests** across both assets, of which the processed-units payload was 56,259,056 bytes in 54 requests.
+
+### 18.3 The numbers
+
+| quantity | value |
+|---|---|
+| `Delta_10min` | **1.821 µm** (11-bin window starting at bin 1) |
+| `Delta_full` | 2.537 µm |
+| `Q95_null` | **0.526 µm** (nearest-rank, one-based rank 190 of 200) |
+| null range | 0.281 to 0.761 µm |
+| `inside_null` | **False** |
+| threshold `L` | 20.0 µm (strict) |
+| analysed bins | 72 full-width 60 s bins; **0 invalid** |
+| minimum units per bin | 130 |
+| included units | 140 of 174 band units (18 of them labelled `good`) |
+| spikes | 3,160,311 in 174 slices |
+| deterministic replay | identical over 200 replicates |
+
+**Both gate numbers are at or below the tolerance, so the candidate passes**, and the label is `resolved, within tolerance`. `inside_null` is False and `Delta_10min` exceeds `Q95_null` by roughly a factor of 3.5, so this is not the quiet-host case §16.7 describes: **time-ordered structure is resolved above the estimator's own noise floor, and it is small — about 9% of the tolerance.** Both halves of that sentence are the measurement; neither is an interpretation of the recording's physical state.
+
+Every input confirmation §16.8 requires passed: ragged indices aligned over 1,615 units, structural columns integral as stored, the depth column still stating micrometres, the two electrode tables identical over 384 rows, the asset pair one subject and one session, both assets declaring the same reference instant to the microsecond, 130,188,000 timestamps for 130,188,000 samples, and every loaded spike inside `[t_first_s, t_last_s]`.
+
+### 18.4 What the missing-depth layer did on its first real candidate
+
+**It engaged, it produced a two-sided bound on both gate numbers, and it agreed with the gate.**
+
+| quantity | value |
+|---|---|
+| missing depths | 231 of 3,160,311 loaded spikes (**0.007309%**) |
+| units affected | 11 of 174 in the band |
+| outside the bin grid | 4 |
+| support invariance | **holds** — 140 included units counting finite depths only, 140 counting the missing ones too |
+| `Delta_10min` bound | **[1.780, 1.821] µm** |
+| `Delta_full` bound | [2.537, 2.637] µm |
+| `Q95_null` bound | **[0.533, 0.546] µm** over 200 replicates |
+| both sides finite | True |
+| completion disposition | **passes** |
+| reconciled disposition | **passes**, `advances` True, `conflict` **False** |
+
+The 231 missing depths are the same census S36 recorded, confirmed by a second independent read. They are concentrated rather than spread — one unit carries 169 of them across 43 bins — which is exactly why §17.9 requires three aggregations rather than a total.
+
+**Two things in this table are worth reading carefully.**
+
+First, **the point estimates sit at opposite ends of their own bounds**: `Delta_10min`'s point value 1.821 is the *upper* endpoint of `[1.780, 1.821]`, and `Delta_full`'s 2.537 is the *lower* endpoint of `[2.537, 2.637]`. Both are inside, which is the condition `measure_missing_depth_sensitivity` raises on when violated. The two ends differ because the missing values enter the windowed and whole-recording statistics through different bins.
+
+Second, and more consequential: **the finite-only `Q95_null` of 0.526 µm lies *below* the completion bound `[0.533, 0.546]`.** §17.9 states in advance that the finite-only null is not one of the completions when anything is missing and is not claimed to lie inside the bound. **This is the first real-data instance of that property, and it is the one that would have fired had the design asserted containment instead of stating the exclusion.** The design was written that way on a fixture argument; a real candidate has now produced the case.
+
+**The layer did not change this outcome.** It would be dishonest to present agreement as evidence that the layer works — a bound that agrees with the gate on a candidate at 0.007% missingness is the easy case, and §17.10's `gate_passing_counterexample` remains the evidence that it can disagree. What this candidate establishes is narrower and still worth having: **the layer runs end to end on real data, at real scale, and its two cross-checks — the reader's mask count against the layer's exclusion table, and the layer's internal split against the split handed to the gate — both held as equalities.**
+
+### 18.5 The per-unit audit, which the gate does not read
+
+§16.4 requires these to be reported and §16.8 forbids any verdict, label or ordering from consuming them. They are reported here for the same reason, and the reading rule below is the one already in force, not a new one.
+
+Across the 140 included units, whole-recording depth ranges run from **1.259 µm to 71.629 µm**, median **9.155 µm**, 90th percentile 27.146 µm. **Twenty-one of the 140 exceed 20 µm and eleven exceed 40 µm.** On the band-aligned window the same units run 0.643 to 43.559 µm, median 5.881 µm, with fourteen above 20 µm and four above 40 µm.
+
+**So the band statistic is 1.821 µm while a substantial minority of the units contributing to it individually range across several times the tolerance.** That is not a contradiction and it is not a reason to reject the candidate. It is the configuration §16.8's forty-one-unit masking fixture was built to pin: a fixture inside §16.7's own admitted parameters passes both gate numbers while twenty of its forty-one units genuinely move 30 µm, their excursions overlapping the stationary ones. **This candidate looks like that fixture, and the pre-declared rule says what to do about it: nothing.** The per-unit values carry no null of their own, `Q95_null` grades the across-unit band trace rather than any single unit, and comparing a per-unit value against `Q95_null` or against `L` is undefined in either direction.
+
+**Two things must not be inferred from the paragraph above.** It is not evidence that the recording is unstable — a per-unit range mixes movement with per-unit estimation noise, and the units with the largest ranges are also the ones whose depth estimates are least constrained. And it is not evidence that the recording is stable — the median-across-units construction is exactly the one that can mask a moving minority, and §16.8 established that in a fixture rather than assuming it. **The gate's conditional — that movement is expressed in enough of the depth traces for the across-unit median to carry it — is not discharged by this measurement in either direction, and the report says so on its own face.**
+
+**The rule was fixed before the value was known and is not being changed now that it is.** §16.7 permits a parameter change only by a recorded turn written before the change takes effect, and nothing here proposes one. Recording the tension is the honest action available; acting on it would be choosing a rule after seeing the number.
+
+### 18.6 What this discharges, and what it does not
+
+**Discharged for rank 1 only:** the drift gate, at the strict 20 µm threshold, on the first pass of §15's pinned order.
+
+**Not discharged, and still mine:** noise, and post-rescaling effective SNR. **Not discharged, and Codex's:** the joint ten-placement feasibility condition of Amendment 6 and the balance/manipulation gate.
+
+**No host is pinned.** §15.5's gate order is drift → noise → effective SNR → joint ten-placement → balance, and first-admissible is evaluated over all five. Rank 1 has cleared the first of five. **Rank 2 was not measured this session** and keeps its rank; the pinned order is unchanged and was not re-derived.
+
+**Nothing about the generator, the donor library, the sorter panel or any tier is touched by this result.** A host that passes drift is a host that has passed drift.
+
+### 18.7 The command is now runbook step 11
+
+§17.11's last bullet said `measure_host_drift.py` becomes a numbered step when it has produced a report against a real candidate. It has, so it did. `README.md` gains **Step 11**, the command's own docstring names that step and carries the identical command including `--records`, and the entry was removed from `check_runbook_consistency.py`'s `PENDING_STEP`. The checker now reports **eleven steps agreeing, exit 0**, and a script that is both a step and pending remains a hard failure.
+
+**This moves the command's digest off the state RC-005 approved, and that is said plainly rather than left to be discovered.** The new digest is `200709824fb3a5694b12243eb65647d038d1d251df9abfe49a3e90ca3b8bad47`. **The change is confined to the module docstring**; `git diff` shows no line outside it, no parameter, threshold, seed, verdict path, return key or numerical branch moved, and the promotion was authorized in advance by §17.11 rather than decided now. Re-run on the changed bytes: `test_measure_host_drift.py` **543 checks, 0 failed** (18.3 s), `py_compile` clean, `--help` **165 lines, 0 non-ASCII**. The RC-002 mutation harness was **not** re-run for an eleven-minute pass over a docstring edit; instead every one of its **32 mutation anchors was asserted to still match its file exactly once — 32 of 32 intact**, across `measure_host_drift.py` and the byte-identical `archive_units.py`, which is the cheap precaution §11's finding 61 names for exactly this case.
+
+**Emptying `PENDING_STEP` broke three mutations, and the harness that owns them caught it.** `mutation_test_runbook_checker.py` holds eighteen mutations of the consistency checker, three of which tested the pending-declaration machinery by mutating the one real declaration — `measure_host_drift.py`'s. Removing that declaration removed their anchor, and the harness aborted after sixteen cases rather than reporting a miss. **This is finding 61 exactly: a change silently removed the coverage a mutation depended on, and the change was mine.** All three checker branches still exist, so each case now *builds* the pending state it needs — declaring a script that already has a step, declaring a script that is not on disk, and declaring a stepless script whose own docstring names a step — instead of borrowing a real one, which is the dependency that broke. **The first re-run then reported the third case as MISSED, and the fixture was wrong rather than the checker**: the marker `**Step 3**` sat above the `Example` block and the checker only scans below it, so the mutation never created the condition it named. With the marker moved inside the block the harness is at **18 of 18 caught with a passing control**, and the three cases no longer depend on any script being pending. `mutation_test_runbook_checker.py` is at `d443ded05bb38662e39dcc9ec8f99ac2b703ab5bb95270bda33ce9108cd83a79`.
+
+`check_runbook_consistency.py` is now at `35cea57d67be5e299c036f39312ad821fe193fc3d2cc4d7e1fe6480e04b4ccdb` and the packet `README.md` at `806aefaf9859cc0f391101f205b6e055f9278d5d95ef4d759711ded8762cfaf3`.
+
+**One of RC-005's tracked follow-ups is discharged here.** Follow-up 3 said Draft 26's status prose called the byte-identical §1–§16 span 143,890 bytes where a direct read gives 144,664. That was verified independently for this draft rather than inherited from either side — both `HEAD` and this tree give **144,664 bytes at SHA-256 `700b3b9a…`** — and Draft 27's status line carries the corrected figure. Follow-ups 1, 2 and 4 remain open, with follow-up 1 now carrying a measurement instead of a projection (§18.2).
+
+### 18.8 Boundaries on this section
+
+- **This measures drift as visible in IBL's per-spike centre-of-mass depths**, not physical probe displacement, and it does not separate probe movement from tissue movement.
+- **The gate holds at the bin grid's 60-second resolution.** It neither bounds sub-minute motion nor is reliably blind to it, and §16.4's two-sided bound is what governs how much of a brief episode reaches a bin median.
+- **`Q95_null` is a conservative resolution diagnostic** where the additive common-movement picture is credible, not a proved bound on the no-drift noise floor, and it bounds no systematic bias in the depth estimator.
+- **The completion bound above the bin is an outer bound** (§17.7). A candidate this layer called unmeasurable might be stable under a dependence-aware treatment; this candidate was not called unmeasurable, so that direction did not bind here.
+- **One candidate, one probe, one region, one threshold.** Nothing here generalizes to rank 2, to the other eleven ranks, or to the relaxed 40 µm pass, and no result outside this session's report is affected by it.
+- **This section is unreviewed.** It reports a measurement produced by an approved command; Codex has not yet read the section or the report.

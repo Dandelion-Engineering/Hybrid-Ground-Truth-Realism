@@ -133,38 +133,58 @@ def case_docstring_second_command(root):
         ZONE_CMD + NL + NL + "    python scripts/unexpected_second_command.py --wrong")
 
 
-def case_pending_declaration_removed(root):
-    """The pending declaration is what excuses a stepless script; remove it.
+PENDING_ANCHOR = "PENDING_STEP = {" + chr(10)
 
-    ``measure_host_drift.py`` is in ``scripts/`` with no numbered step because it
-    has not been run against a recording yet. The exemption is a declaration in
-    the checker, and a declaration that could be dropped without the checker
-    noticing would be decoration. Without it the script must be reported as
-    having no step, exactly like any other.
+
+def declare_pending(root, name, reason):
+    """Add one entry to the checker's PENDING_STEP map in a throwaway copy.
+
+    Args:
+        root: the copied packet's root.
+        name: script basename to declare as pending a runbook step.
+        reason: the declaration's stated reason.
+
+    Returns:
+        None. The copy's checker is rewritten in place.
+
+    These three cases used to mutate the single real declaration, so when step 11
+    emptied PENDING_STEP they lost their anchor and the harness stopped at case
+    16 rather than reporting a miss. Building the declaration here means the
+    cases exercise the checker's pending branches whether or not any real script
+    is pending -- which is the property that broke.
     """
-    sub(root, "scripts/check_runbook_consistency.py",
-        '    "measure_host_drift.py":' + NL +
-        '        "awaiting its first execution against a candidate host recording",' + NL,
-        "")
+    sub(root, "scripts/check_runbook_consistency.py", PENDING_ANCHOR,
+        PENDING_ANCHOR + '    "' + name + '":' + NL + '        "' + reason + '",' + NL)
 
 
-def case_pending_script_also_has_a_step(root):
+def case_pending_declaration_names_a_stepped_script(root):
     """A script cannot be both a numbered step and pending one.
 
-    That combination is the way the exemption could quietly outlive its reason:
-    the step arrives, the declaration stays, and the checker would be excusing a
+    That combination is how the exemption could quietly outlive its reason: the
+    step arrives, the declaration stays, and the checker would be excusing a
     script it is also verifying. It has to be an error, not a preference.
     """
-    sub(root, "scripts/check_runbook_consistency.py",
-        '    "measure_host_drift.py":',
-        '    "audit_template_library.py":' + NL +
-        '        "a script that already has step 1",' + NL +
-        '    "measure_host_drift.py":')
+    declare_pending(root, "audit_template_library.py", "a script that already has step 1")
 
 
-def case_pending_script_is_missing(root):
+def case_pending_declaration_names_a_missing_script(root):
     """A declaration naming a script that is not there is stale, not harmless."""
-    os.remove(os.path.join(root, "scripts/measure_host_drift.py"))
+    declare_pending(root, "a_script_that_does_not_exist.py", "declared but absent")
+
+
+def case_pending_script_docstring_claims_a_step(root):
+    """A pending script whose own docstring names a step contradicts its exemption.
+
+    The declaration says no step exists; the docstring says one does. The checker
+    has a branch for exactly that disagreement, and this is the case that keeps
+    it honest now that no real script is pending.
+    """
+    write(os.path.join(root, "scripts/pending_tool.py"),
+          '"""A pending tool that claims a step below its Example block.' + NL + NL +
+          "Example" + NL + "-------" + NL +
+          "    python scripts/pending_tool.py --demo" + NL + NL +
+          "The command above is **Step 3** of the runbook." + NL + '"""' + NL)
+    declare_pending(root, "pending_tool.py", "declared pending while naming a step")
 
 
 CASES = [
@@ -183,9 +203,12 @@ CASES = [
     ("script named by a step is gone", case_missing_script),
     ("README second command fence", case_readme_second_fence),
     ("docstring second command", case_docstring_second_command),
-    ("pending declaration removed", case_pending_declaration_removed),
-    ("pending script also has a step", case_pending_script_also_has_a_step),
-    ("pending script is missing", case_pending_script_is_missing),
+    ("pending declaration names a stepped script",
+     case_pending_declaration_names_a_stepped_script),
+    ("pending declaration names a missing script",
+     case_pending_declaration_names_a_missing_script),
+    ("pending script docstring claims a step",
+     case_pending_script_docstring_claims_a_step),
 ]
 
 

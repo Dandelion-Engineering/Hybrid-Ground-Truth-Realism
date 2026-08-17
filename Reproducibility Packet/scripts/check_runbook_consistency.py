@@ -78,8 +78,6 @@ NOT_A_STEP = {"check_runbook_consistency.py"}
 # Example command like any other, and must not name a step number it does not
 # have. The list is expected to be empty most of the time.
 PENDING_STEP = {
-    "measure_host_drift.py":
-        "awaiting its first execution against a candidate host recording",
 }
 
 STEP_HEADING = re.compile(r"^### Step (\d+) — (.+?)\s*\*\*\[(offline|archive)\]\*\*\s*$")
