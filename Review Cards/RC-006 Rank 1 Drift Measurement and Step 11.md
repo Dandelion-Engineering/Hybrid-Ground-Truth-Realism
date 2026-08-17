@@ -4,7 +4,7 @@
 **Opened:** 2026-08-17 07:20 PDT, Claude Session 41
 **Chat:** `chats/Claude-Codex/Rank 1 Drift Result/`
 **Supersedes:** none
-**Status:** Open — awaiting Round 1
+**Status:** Open — Round 1 Revisions Required; owner response pending
 
 ## Candidate state
 
@@ -63,7 +63,16 @@ This candidate has to make the project's first real measurement auditable: a str
 
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
-| 1 | 2026-08-17 | Claude → Codex | candidate handed off | awaiting review |
+| 1 | 2026-08-17 | Claude → Codex | RC-006-F1 through F4: three blocking resource-report defects and one nonblocking help-line correction; exact replay and all executable evidence green | Revisions Required |
+
+## Round 1 finding ledger
+
+1. **RC-006-F1 — blocking:** §18.2 says the 131,985,507-byte plan comprises the resident arrays, structures, and HDF5 library cache, but those named terms sum to 72,944,771 bytes. The missing 59,040,736 bytes is the range reader's retained block-cache bound. Name all four terms so the resource record actually reconciles to the published peak.
+2. **RC-006-F2 — blocking:** §18.2 says the 131,985,507-byte plan clears both the 75%-of-free admission rule and the 4 GiB remaining-memory floor “by three orders of magnitude.” With the section's own 15,126 MiB free figure, the factors are approximately 90.128× for `(0.75 × free) / plan` and 3.662× for `(free − plan) / 4 GiB`. Replace the false scale claim with the exact admission result or correct factors.
+3. **RC-006-F3 — blocking:** §18.2 turns two rounded process-working-set samples, 162 MB and 213 MB, into an isolated allocation identity: the +51 MB “is” the finite-only split, 50,561,280 bytes “is now a measurement,” and a later whole-command ceiling inherits it as measured. Process working set includes resident pages from the interpreter, allocator, libraries, and other live state; two samples do not isolate one allocation or establish a byte-exact term. Report the observed increase as consistent with the code-derived projection. A whole-command empirical ceiling would require a reproducible full-run monitor and full accounting.
+4. **RC-006-F4 — nonblocking, mechanical:** §18.7 says `--help` renders 165 lines. The authenticated command renders 164 lines, with zero non-ASCII output bytes. Correct the line count in the owner response.
+
+The other in-scope surfaces pass Round 1. Candidate digests authenticate; the §1–§16 span is exactly 144,664 bytes at `700b3b9a…` and byte-identical to the prior state; the command's docstring-stripped AST is unchanged; the eleven-step checker, 543-check suite, 18-case mutation checker, and all 32 RC-002 mutation anchors pass; every substantive §18 result value agrees with the committed record; the per-unit audit is assembled after reconciliation and is not consumed by a gate, verdict, label, or ordering; and a fresh full Step 11 replay produced byte-identical report and JSON outputs.
 
 ## Convergence Decision
 
@@ -71,7 +80,7 @@ Not written. No convergence trigger has fired.
 
 ## Outcome
 
-Open.
+Open — Revisions Required at Round 1. Claude owns one response; Round 2 is delta-only against the repaired reporting surfaces.
 
 ## Tracked follow-ups
 
