@@ -27,9 +27,10 @@ converted to float64 on the way in, so what is held is not what is stored
 either. :func:`plan_transfer` therefore reports ``logical_bytes`` (the stored
 payload, exact), ``cache_bound_bytes`` (an upper bound on the distinct block
 bytes the read can fetch, including what has already been spent on metadata),
-``resident_bytes`` (the converted arrays plus the largest slice at its stored
-width) and ``structures_bytes`` (a measured bound on the Python containers the
-read holds while it runs). ``peak_resident_bytes`` is the sum of the last
+``resident_bytes`` (the converted arrays, the boolean missing-depth mask
+retained beside each of them, and the largest slice at its stored width) and
+``structures_bytes`` (a measured bound on the Python containers the read holds
+while it runs). ``peak_resident_bytes`` is the sum of the last
 three, and it is the single quantity :func:`read_band_units` enforces its
 ceiling against, because those three are live together rather than in turn.
 
@@ -170,6 +171,14 @@ UNITS_PATH = "units"
 ELECTRODES_PATH = "general/extracellular_ephys/electrodes"
 TIME_COLUMN = "spike_times"
 DEPTH_COLUMN = "spike_distances_from_probe_tip_um"
+
+# One byte per spike, and it is charged to the read rather than assumed free.
+# ``read_band_units`` returns a boolean positional mask beside every unit's
+# depths and that mask is retained for as long as the arrays are, so it belongs
+# in the pre-read bound the ceiling is enforced against. Taken from numpy rather
+# than written as 1 so a platform where a bool is wider cannot make the bound
+# silently too small.
+MASK_ITEMSIZE = int(np.dtype(np.bool_).itemsize)
 
 # The depth column's own first-party description is the only statement in the
 # file about what unit its values carry. Requiring this substring keeps the
@@ -1763,8 +1772,11 @@ def plan_transfer(band_units, scalars, time_layout, depth_layout,
         A dict with ``n_units``, ``n_spikes``, ``per_unit`` (``(row, n_spikes)``
         pairs), ``logical_bytes`` (exact stored payload), ``cache_bound_bytes``
         (an upper bound on distinct block bytes, ``spent_bytes`` included),
-        ``resident_bytes`` (the converted arrays plus the largest slice at its
-        stored width), ``structures_bytes`` (the live Python containers),
+        ``resident_bytes`` (the converted arrays, the retained missing-depth
+        masks, and the largest slice at its stored width), ``mask_bytes`` (the
+        mask term alone, which is a *component* of ``resident_bytes`` and not a
+        further term to add to it), ``structures_bytes`` (the live Python
+        containers),
         ``library_cache_bytes`` (what HDF5's own raw-data chunk cache is allowed
         to reach for the two columns), ``peak_resident_bytes`` (the sum of the
         previous four), ``bound_basis`` naming how the block bound was derived,
@@ -1782,7 +1794,8 @@ def plan_transfer(band_units, scalars, time_layout, depth_layout,
         arrays are resident while every block that fed the first unit is still
         resident too. Its declared scope is the block cache, the converted
         per-unit arrays with the largest stored-width slice, the Python
-        containers this call is given, and the ceiling HDF5's own raw-data chunk
+        containers this call is given, the boolean missing-depth mask retained
+        beside each unit's arrays, and the ceiling HDF5's own raw-data chunk
         cache is allowed to reach for the two columns. What it does **not**
         cover is named rather than left to be discovered: the interpreter's
         baseline, the allocator's fragmentation overhead, and any transient
@@ -1830,8 +1843,14 @@ def plan_transfer(band_units, scalars, time_layout, depth_layout,
         bounded_bytes += block_bytes
 
     cache_bound = min(int(file_size), spent_bytes + bounded_bytes)
-    resident = total_spikes * 16 + largest * (time_layout["itemsize"]
-                                              + depth_layout["itemsize"])
+    # The reader returns one boolean mask element per spike beside the two
+    # float64 arrays and keeps it for as long as it keeps them, so the mask is
+    # part of what this read holds rather than allocator overhead or a
+    # transient. Charging it here is what keeps ``peak_resident_bytes`` a
+    # quantity a free-memory measurement can be compared against.
+    mask_bytes = total_spikes * MASK_ITEMSIZE
+    resident = (total_spikes * 16 + mask_bytes
+                + largest * (time_layout["itemsize"] + depth_layout["itemsize"]))
     structures = python_structure_bytes(band_units, scalars, time_layout,
                                         depth_layout, *held)
     library_cache = (time_layout.get("library_cache_bytes", 0)
@@ -1844,6 +1863,7 @@ def plan_transfer(band_units, scalars, time_layout, depth_layout,
                                          + depth_layout["itemsize"]),
         "cache_bound_bytes": cache_bound,
         "resident_bytes": resident,
+        "mask_bytes": mask_bytes,
         "structures_bytes": structures,
         "library_cache_bytes": library_cache,
         "peak_resident_bytes": cache_bound + resident + structures + library_cache,
@@ -1965,13 +1985,14 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
             raise ValueError(
                 "reading %d band units (%d spikes, %d bytes of stored payload) would hold "
                 "%d bytes at once -- %d bytes of retained block cache (%s), %d bytes of "
-                "converted arrays, %d bytes of Python structures and %d bytes of HDF5 "
-                "chunk cache, all live together -- and peak_resident_bytes is above the "
-                "declared ceiling of %d. Raise the ceiling deliberately against a "
-                "measurement of free memory, or read a smaller band."
+                "converted arrays (of which %d bytes are the retained missing-depth "
+                "masks), %d bytes of Python structures and %d bytes of HDF5 chunk cache, "
+                "all live together -- and peak_resident_bytes is above the declared "
+                "ceiling of %d. Raise the ceiling deliberately against a measurement of "
+                "free memory, or read a smaller band."
                 % (plan["n_units"], plan["n_spikes"], plan["logical_bytes"],
                    plan["peak_resident_bytes"], plan["cache_bound_bytes"],
-                   plan["bound_basis"], plan["resident_bytes"],
+                   plan["bound_basis"], plan["resident_bytes"], plan["mask_bytes"],
                    plan["structures_bytes"], plan["library_cache_bytes"], max_bytes))
 
         result = {

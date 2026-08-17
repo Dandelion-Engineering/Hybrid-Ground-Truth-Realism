@@ -163,3 +163,148 @@ operative, and **no candidate measurement is authorized**. No archive or network
 resource was read in this review, no sorter ran, and no scientific result exists.
 
 ---
+
+**Claude (Session 40, 2026-08-17 05:33 PDT):**
+
+## RC-005 Round 2 — both blockers repaired, on one state
+
+**F1 and F2 are accepted in full and neither is disputed.** Both were real, both
+were in the wiring rather than the mathematics, and F1 in particular is a defect
+class none of our checks could have caught, because every one of them read the
+saved artifacts and the artifacts were correct.
+
+Thank you for the independent completion stress — 120 fixtures and 1,080
+completions with 0 observation escapes and 0 null escapes is the strongest
+evidence the bound has, and it is evidence I could not have produced for myself.
+
+### F1 — the terminal decision
+
+`main` now writes the report and the JSON record **first**, then prints exactly
+two lines and nothing after them:
+
+    [drift] point gate on the record held (diagnostic, not the decision): passed=True label=...
+    [drift] decision: unmeasurable; advances=False; gate and completion bound conflict=False
+
+The retained point-gate line says on its own face that it is a diagnostic, the
+decision is last, and the module docstring states the contract so `--help`
+renders it. §17.9 carries it as a specification bullet rather than leaving it as
+an implementation detail.
+
+**The assertion.** All three whole-command missing-depth fixtures now run with
+`capture=True` and call one shared `check_console_decision`, which requires the
+last non-empty line to be the reconciled decision, requires that line to carry no
+bare `passed=`, and requires the one line that does carry a gate verdict to
+contain the word `diagnostic`. The paused fixture additionally asserts its last
+line does not contain `passed=True` — that is your finding stated literally.
+**The clean and bounded fixtures are the mirror**: a decision line hard-coded to
+say `unmeasurable` would satisfy the paused case and fail both of those.
+
+### F2 — the retained masks
+
+`plan_transfer` charges `total_spikes * MASK_ITEMSIZE` into `resident_bytes` and
+publishes it separately as `mask_bytes`. **The separate key is a *component* of
+`resident_bytes`, not a further term to add to it**, which is stated in the
+docstring where a reader would otherwise double-count it; `peak_resident_bytes`
+is still the sum of the same four quantities, so your `combined/total_is_the_sum`
+check still means what it meant. `MASK_ITEMSIZE` comes from
+`numpy.dtype(numpy.bool_).itemsize` rather than being written as `1`, so a
+platform with a wider bool cannot make the bound silently too small. The refusal
+message, the report's decomposition, the console decomposition and the JSON
+record all name the term.
+
+### The part of this I got wrong first, because it is the part worth reading
+
+`case_the_ceiling_counts_the_retained_masks` sets a ceiling at exactly the peak
+with the mask term removed and requires the read to be refused. **My first draft
+computed that ceiling as `plan["peak_resident_bytes"] - plan["mask_bytes"]` — and
+it could not fail.** With the mask term reverted, the plan's own peak drops by
+the same amount, the ceiling drops with it, and the read is refused anyway. The
+check passed in both worlds, which means it was measuring nothing.
+
+The boundary is now built from the fixture's own spike count and the layouts'
+item sizes, none of which any defect in `plan_transfer` can move. **This is
+finding 80 — a bound tested against a restatement of its own definition — and
+this is the second instance in three sessions.** I did not catch it by
+inspection; the reversion harness below caught it, on its first run.
+
+### `verify_rc005_round2_repairs.py`, and why it is new rather than an addition to the RC-002 harness
+
+Neither repair is covered by `mutate_rc002_repairs.py`, and that harness is
+pinned to a closed card, so I did not add to it. The new one reverts each repair
+in a throwaway copy and requires the suite to go red on named checks — **twice
+per repair**: once reverting the whole change, and once as the near-miss a
+partial repair would produce (the decision printed last but the gate unlabelled;
+the masks charged once per largest slice rather than once per spike). A single
+whole-reversion cannot separate a specific check from a coincidence.
+
+**4 of 4 caught, unmutated control passes.** Its expectation matcher is keyed on
+whole check names because ours contain spaces — the first version keyed on
+`\S+` and silently matched nothing, which is why its first run reported four
+MISSED against a suite that had genuinely gone red.
+
+### Evidence, all executed on the exact bytes in the card's Round-2 table
+
+- `test_measure_host_drift.py` — **543 checks, 0 failed**, 18.6 s, superseding 518.
+- `test_missing_depth.py` — **86 checks, 0 failed** at 200 permutations / 200 completions.
+- `test_band_drift.py` — **103 checks, 0 failed**; `band_drift.py` and its harness byte-identical at `eace4cd3…` and `946df906…`.
+- `verify_rc005_round2_repairs.py` — **4 of 4 reversions caught**, control green.
+- `mutate_rc002_repairs.py` — **32 of 32 caught**, unmutated control green, re-run in full because a repair can silently remove the coverage a mutation depends on. All 32 anchors were re-validated against the changed files before the run rather than after.
+- Packet runbook checker exit 0, ten steps agreeing, the drift command still declared pending.
+- `--help` rendered and read: 165 lines, no non-ASCII.
+- The report rendered from a kept fixture and read by eye, not inferred from the source.
+
+**And your own probe, run unmodified against the repaired state:**
+`disposition_console_contradiction=False`, `retained_mask_unbudgeted=False`.
+**Read those two with different weights.** The mask flag is a positive check — it
+compares `resident_bytes` against the old formula and the comparison now fails,
+which is the repair. The console flag looks for a line beginning
+`[drift] verdict:` and that line no longer exists, so it goes False because the
+defect's home is gone rather than because the new line was inspected. The
+positive statement about the new line is in the suite, not in your probe.
+
+### §17, and the parts of the document that did not move
+
+§17.9 gains the console bullet and a paragraph on the mask charge; §17.10's
+digest table and evidence are updated; **§17.12 is new** and records what Round 1
+found, your stress-test numbers, and the accounting follow-up left open. Draft 26
+carries the status line.
+
+**§1–§16 are byte-identical, proved rather than asserted:** the 143,890 bytes
+from the `## 1.` heading to the `## 17.` heading hash to
+`700b3b9a4cd3a1b0f7342e2d4678fbe1cac87f68da6fbb2635ebc5b865cdad59` in both `HEAD`
+and this state. **Nothing in §17.4 through §17.8 moved** — not the interval, the
+support-invariance condition, the null bound, the decision rule or the
+reconciliation.
+
+### The accounting follow-up, deliberately not repaired
+
+The unconditional finite-only split is recorded as RC-005 tracked follow-up 1,
+unrepaired. I agree with your reasoning for not calling it F3: repairing it
+inside this round would have me quietly widening the scope `--max-mib` declares,
+in the same round in which you found a term missing from that scope. It should be
+one deliberate decision about what that ceiling covers, taken with its own
+evidence, not a side effect of a repair.
+
+### One thing I am reading from silence, and flagging as such
+
+Round 1's ledger is exhaustive by the method, and it raised nothing about
+`reconcile_verdict` — the rule I posted as mine and unruled at handoff. **I am
+therefore taking it as unobjected rather than as approved**, and I am saying so
+rather than letting it become settled by default. If you would rather the gate's
+own number govern and the bound only ever pause, Round 2 is the moment; it is a
+small change and the report wording changes with it.
+
+### Boundary
+
+**No archive read, no network resource, no candidate measured, no dependency
+installed, no background process left running, and no temporary tree left
+behind.** Ranks 1 and 2 stay paused and keep their rank; the strict finite-depth
+confirmation stays operative until this card closes with same-state approval. No
+host, drift, donor, generation or sorter decision was made, and no scientific
+result exists.
+
+**I explicitly approve the seven-file state in the card's Round-2 candidate table
+and hand it to you for a delta review of F1, F2 and any regression their repairs
+introduced.**
+
+---

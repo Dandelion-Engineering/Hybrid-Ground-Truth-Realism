@@ -4,11 +4,27 @@
 **Opened:** 2026-08-17 03:30 PDT, Claude Session 39
 **Chat:** `chats/Claude-Codex/Missing Depth Recovery Review/`. Its predecessor, `chats/Claude-Codex/Non-Finite Spike Depths/`, is **concluded** with a `Summary.md` and carries the four rulings this candidate implements; read that summary before Round 1.
 **Supersedes:** none. RC-004 is closed `Approved`; this card opens against that approved code on a defect class discovered *after* it closed — a real candidate's depth column carrying 231 NaN values — and it is not a successor card. Clause 5 does not apply.
-**Status:** Open — Round 1 Revisions Required; awaiting owner repair
+**Status:** Open — Round 2 handed back 2026-08-17; awaiting Codex's delta review
 
 ## Candidate state
 
 **One state, six files.** The whole wired path is the candidate, not the sensitivity module alone; Codex asked for that explicitly on 2026-08-17 02:11 PDT.
+
+**Round 2, handed back 2026-08-17 by Claude (Session 40).** Three files changed under F1 and F2, one is new, and three are unchanged from Round 1 and listed so the delta is visible. **Round 2 is delta-only** against F1, F2 and any regression their repairs introduced.
+
+| file | SHA-256 | round 2 |
+|---|---|---|
+| `Reproducibility Packet/scripts/utils/missing_depth.py` | `ef9740279f018e0b663e5d407f5297331fa17fe9042b18f2b477dc6c2233b988` | unchanged |
+| `Reproducibility Packet/scripts/utils/archive_units.py` | `ed0766f2d3e6399a4a28f5289159b948cc907ed8ee72055314b0f363d515ec3a` | **F2** |
+| `Reproducibility Packet/scripts/measure_host_drift.py` | `26934a6b862be6f0cf7b269346ff85c4c2fd9f5ab056a77d427bc9059d39370e` | **F1, plus F2's two printed decompositions and the docstring** |
+| `agents/Claude/tools/test_missing_depth.py` | `435272af7a5fc37ba9a83eaaa48e77823c3e1e72e61eb90a818bbc8b8df620f5` | unchanged |
+| `agents/Claude/tools/test_measure_host_drift.py` | `79c9bb5c3c04bdba66dcbcca9cf092d0b611d19b9ff526edcfeb8ed596c04335` | **the coverage for both** |
+| `agents/Claude/tools/verify_rc005_round2_repairs.py` | `4f27b70c35f28f715d93ac214aebf0c01f4f4af2f958fb05b373132c8a013bee` | **new — the reversion harness for both repairs** |
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` (Draft 26, **§17 only**) | `3e587874fdce355a4d605861f1ddfd0b1481a766385c2084e37d12db6d44100a` | **§17.9 and §17.10 amended, §17.12 added** |
+
+**§1–§16 are byte-identical to their approved state, proved rather than asserted.** The 143,890 bytes running from the `## 1.` heading to the `## 17.` heading hash to `700b3b9a4cd3a1b0f7342e2d4678fbe1cac87f68da6fbb2635ebc5b865cdad59` in both `HEAD` and this state; `git diff --numstat` reports 24 insertions and 5 deletions, all of them in §17 or in the status stack above `## 1.`.
+
+**The Round-1 table, superseded and kept for the trail:**
 
 | file | SHA-256 |
 |---|---|
@@ -54,11 +70,14 @@ The rank-1 candidate's read stopped on a confirmation that every loaded depth is
 
 All executed on the exact bytes above, this session, rather than reasoned about.
 
+**Round 2's runs are the ones below; Round 1's are in the Round log.**
+
 | test | result |
 |---|---|
-| `./venv/Scripts/python.exe "agents/Claude/tools/test_missing_depth.py" --permutations 200 --completions 200` | **86 checks, 0 failed**, 15.0 s |
-| `./venv/Scripts/python.exe "agents/Claude/tools/test_missing_depth.py"` (defaults) | **86 checks, 0 failed**, 4.4 s |
-| `./venv/Scripts/python.exe "agents/Claude/tools/test_measure_host_drift.py"` | **518 checks, 0 failed**, 18.3 s — superseding RC-004's 472 |
+| `./venv/Scripts/python.exe "agents/Claude/tools/test_missing_depth.py" --permutations 200 --completions 200` | **86 checks, 0 failed** |
+| `./venv/Scripts/python.exe "agents/Claude/tools/test_measure_host_drift.py"` | **543 checks, 0 failed**, 18.6 s — superseding Round 1's 518 and RC-004's 472 |
+| `./venv/Scripts/python.exe "agents/Claude/tools/verify_rc005_round2_repairs.py" --repo-root .` | **4 of 4 reversions caught, control passes** |
+| `./venv/Scripts/python.exe agents/Codex/tools/probe_rc005_round1.py --repo-root .` — the reviewer's own probe, unmodified | `disposition_console_contradiction=False`, `retained_mask_unbudgeted=False` |
 | `./venv/Scripts/python.exe "agents/Claude/tools/test_band_drift.py" --permutations 200` | **103 checks, 0 failed** — unchanged suite, unchanged module |
 | `./venv/Scripts/python.exe "agents/Claude/tools/mutate_rc002_repairs.py" --repo-root .` | **32 of 32 caught** (see Round log for the run's own report) |
 | `python scripts/check_runbook_consistency.py --readme README.md --scripts scripts`, from inside the packet | **exit 0**, ten steps agreeing, `measure_host_drift.py` still declared pending |
@@ -103,7 +122,8 @@ All executed on the exact bytes above, this session, rather than reasoned about.
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 | — | 2026-08-17 03:33 PDT | Claude | card opened; the review chat `chats/Claude-Codex/Missing Depth Recovery Review/` created and the predecessor chat concluded; candidate handed off with the owner's explicit approval of this exact state | awaiting Round 1 |
-| 1 | 2026-08-17 04:18 PDT | Codex | **F1:** final console line reports the raw passing gate after reconciliation has made the candidate unmeasurable; **F2:** the pre-read resident/peak formula omits the returned per-spike boolean masks. Full numbered ledger and generated-fixture evidence are in the review chat; Round 2 is delta-only against F1/F2 plus repair regressions. | **Revisions Required** |
+| 1 | 2026-08-17 04:18 PDT | Codex | **F1:** final console line reports the raw passing gate after reconciliation has made the candidate unmeasurable; **F2:** the pre-read resident/peak formula omits the returned per-spike boolean masks. Full numbered ledger and generated-fixture evidence are in the review chat; Round 2 is delta-only against F1/F2 plus repair regressions. Round-1 acceptance runs: `test_missing_depth.py` 86/0 (15.0 s and 4.4 s), `test_measure_host_drift.py` 518/0 (18.3 s), `test_band_drift.py` 103/0, mutation harness 32 of 32, runbook checker exit 0. | **Revisions Required** |
+| 2 | 2026-08-17 | Claude | Both blockers accepted, neither disputed; repaired on one state, with new coverage for each and a reversion harness proving that coverage can fail. Owner explicitly approves the Round-2 candidate table above. | handed back for delta review |
 
 ## Convergence Decision
 
@@ -111,9 +131,26 @@ Not written. No convergence trigger has fired.
 
 ## Outcome
 
-**Round 1: Revisions Required.** The authenticated six-file candidate is not
-approved. Ranks 1 and 2 remain paused and the strict finite-depth confirmation
-remains operative pending a repaired exact state and explicit same-state approval.
+**Round 1: Revisions Required.** The authenticated six-file candidate was not
+approved.
+
+**Round 2: repaired and handed back.** Ranks 1 and 2 remain paused and the strict
+finite-depth confirmation remains operative until this card closes with both
+agents explicitly approving the *same* state. Nothing was measured, no archive was
+read, and no host, drift, donor, generation or sorter decision was made.
+
+
+## Round 2 — what changed, and the evidence that it is a change
+
+**F1.** `main` now writes the report and the JSON record first and then prints two lines: the point gate, labelled `point gate on the record held (diagnostic, not the decision)`, and last, `[drift] decision: <disposition>; advances=<bool>; gate and completion bound conflict=<bool>`. Nothing is printed after the decision. The module docstring states the contract, so `--help` renders it. §17.9 carries it as a specification bullet.
+
+**F2.** `plan_transfer` charges `total_spikes * MASK_ITEMSIZE` into `resident_bytes` and publishes it separately as `mask_bytes` — a *component* of `resident_bytes`, not a further term, so `peak_resident_bytes` is still the sum of the same four quantities and the existing sum check still holds. `MASK_ITEMSIZE` is taken from `numpy.dtype(numpy.bool_).itemsize` rather than written as 1. The refusal message, the report's decomposition and the console decomposition all name the term, and the JSON record carries it.
+
+**Coverage, and why the first version of it was not coverage.** The three whole-command missing-depth fixtures now capture stdout and run `check_console_decision`, which requires the last non-empty line to be the reconciled decision, requires it to carry no bare `passed=`, and requires the single line that does carry one to say `diagnostic`. `case_the_ceiling_counts_the_retained_masks` pins the mask term and sets a ceiling at exactly the peak with the masks removed, which must be refused.
+
+**That case's first draft computed that ceiling from `plan["peak_resident_bytes"] - plan["mask_bytes"]`, and it could not fail**: with the mask term reverted, the plan's own peak dropped by the same amount, so the ceiling dropped with it and the read was refused anyway. The boundary is now built from the fixture's own spike count, which no defect in `plan_transfer` can move. **This is finding 80 — testing a bound against a restatement of its own definition — and it was caught by the reversion harness rather than by inspection.**
+
+**`verify_rc005_round2_repairs.py` exists because neither repair is covered by the RC-002 mutation harness**, which is pinned to a closed card. It reverts each repair in a throwaway copy — twice each, once wholly and once as the near-miss a partial repair would produce — and requires named checks to go red. All four are caught and the unmutated control passes.
 
 ## Tracked follow-ups
 

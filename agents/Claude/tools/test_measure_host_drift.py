@@ -1424,6 +1424,48 @@ def case_infinite_depth_is_refused(h, tmp):
         h.check("infinite/%s no report" % name, result["text"] is None)
 
 
+def check_console_decision(h, prefix, transcript, disposition, advances):
+    """Require the command's last printed line to be the reconciled decision.
+
+    RC-005 F1: the command printed the completion disposition in the middle of
+    its transcript and then ended with the point gate's own ``passed=`` line, so
+    a reader or a script that acts on the last line could advance a candidate
+    reconciliation had already paused. Asserting the JSON record and the report
+    did not catch it, because both were correct; only the console was wrong.
+
+    Args:
+        h: the harness.
+        prefix: the case's check-name prefix.
+        transcript: ``result["stdout"]`` -- None when the case did not capture.
+        disposition: the reconciled disposition the record carries.
+        advances: the reconciled ``advances`` flag the record carries.
+
+    Returns:
+        None. Failures are recorded on the harness.
+    """
+    if transcript is None:
+        h.check(prefix + "/console captured", False,
+                "the case has to run with capture=True to assert on stdout")
+        return
+    lines = [line for line in transcript.splitlines() if line.strip()]
+    if not lines:
+        h.check(prefix + "/console is not empty", False)
+        return
+    last = lines[-1]
+    h.check(prefix + "/last line is the decision",
+            last.startswith("[drift] decision:"), repr(last))
+    h.check(prefix + "/decision names the reconciled disposition",
+            ("decision: %s;" % disposition) in last, repr(last))
+    h.check(prefix + "/decision states whether the candidate advances",
+            ("advances=%s" % advances) in last, repr(last))
+    h.check(prefix + "/the last line carries no bare gate verdict",
+            "passed=" not in last, repr(last))
+    gate_lines = [line for line in lines if "passed=" in line]
+    h.check(prefix + "/the point gate is printed and labelled a diagnostic",
+            len(gate_lines) == 1 and "diagnostic" in gate_lines[0],
+            repr(gate_lines))
+
+
 def case_missing_depth_is_bounded_rather_than_refused(h, tmp):
     """A NaN depth is measured with a bound around it, not refused.
 
@@ -1439,7 +1481,7 @@ def case_missing_depth_is_bounded_rather_than_refused(h, tmp):
     result = run_case(
         tmp, "missing_depth_bounded",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
-        lambda p: write_processed(p, rows, units))
+        lambda p: write_processed(p, rows, units), capture=True)
     h.equal("missing/status", result["status"], 0)
     h.check("missing/report written", result["text"] is not None)
     if result["text"] is None or result["record"] is None:
@@ -1506,6 +1548,10 @@ def case_missing_depth_is_bounded_rather_than_refused(h, tmp):
             disposition["disposition"] == "passes")
     h.check("missing/report carries the final disposition",
             "final disposition" in text)
+    # The mirror of the paused case below: a decision line that always said
+    # "unmeasurable" would satisfy that case and be useless here.
+    check_console_decision(h, "missing", result["stdout"],
+                           disposition["disposition"], disposition["advances"])
 
 
 def case_missing_depths_can_pause_a_passing_gate(h, tmp):
@@ -1530,7 +1576,7 @@ def case_missing_depths_can_pause_a_passing_gate(h, tmp):
     result = run_case(
         tmp, "missing_depth_pauses",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
-        lambda p: write_processed(p, rows, units))
+        lambda p: write_processed(p, rows, units), capture=True)
     h.equal("pause/status", result["status"], 0)
     if result["record"] is None:
         h.check("pause/record written", False)
@@ -1552,6 +1598,15 @@ def case_missing_depths_can_pause_a_passing_gate(h, tmp):
             "the fixture no longer isolates the layer's effect: the gate failed too")
     h.check("pause/report names the violation",
             "VIOLATED" in (result["text"] or ""))
+    # RC-005 F1. This transcript ends on a candidate the record pauses while the
+    # point gate passes it, so it is the one place the two can contradict each
+    # other; before the repair the last line here read "passed=True".
+    check_console_decision(h, "pause", result["stdout"],
+                           record["disposition"]["disposition"],
+                           record["disposition"]["advances"])
+    h.check("pause/console does not end in a passing verdict",
+            "passed=True" not in (result["stdout"] or "").splitlines()[-1],
+            repr((result["stdout"] or "").splitlines()[-1:]))
 
 
 def case_no_missing_depth_skips_the_layer(h, tmp):
@@ -1568,7 +1623,7 @@ def case_no_missing_depth_skips_the_layer(h, tmp):
     result = run_case(
         tmp, "no_missing_depth",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
-        lambda p: write_processed(p, rows, units))
+        lambda p: write_processed(p, rows, units), capture=True)
     h.equal("clean/status", result["status"], 0)
     if result["record"] is None:
         h.check("clean/record written", False)
@@ -1588,6 +1643,11 @@ def case_no_missing_depth_skips_the_layer(h, tmp):
     h.check("clean/disposition says why it is completion-independent",
             "no depth was missing" in record["disposition"]["reason"])
     h.equal("clean/no conflict is possible", record["disposition"]["conflict"], False)
+    # Derived from the gate rather than from the reconciled record, because on
+    # this path the gate is what the decision has to reproduce.
+    check_console_decision(h, "clean", result["stdout"],
+                           "passes" if record["verdict"]["passed"] else "fails",
+                           record["verdict"]["passed"])
 
 
 def case_unsorted_times_are_refused(h, tmp):
@@ -3234,6 +3294,80 @@ def case_ceiling_can_bind_on_resident_memory(h, tmp):
         archive_units.RemoteFile = LocalFile
 
 
+def case_the_ceiling_counts_the_retained_masks(h, tmp):
+    """The mask the reader keeps beside every unit is inside the declared ceiling.
+
+    RC-005 F2. ``read_band_units`` returns a boolean positional mask of one
+    element per spike and holds it for exactly as long as it holds the two
+    float64 arrays, but the pre-read bound counted only the arrays. That is not
+    allocator overhead and it is not a transient outside the read: it is a
+    returned array, inside the scope ``--max-mib`` declares, and at the rank-1
+    band it is 3,160,311 bytes admitted without being named.
+
+    The fixture has no missing depth at all, which is the point -- the mask is
+    allocated per spike rather than per missing value, so the charge does not
+    depend on the candidate carrying any.
+
+    The decisive check is the ceiling set to exactly the peak with the mask term
+    removed: that is the number the pre-repair formula returned as the peak, so
+    it was admitted then and has to be refused now.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    lo, hi = band_bounds()
+    spikes = sum(len(unit["times"]) for unit in units)
+    largest = max(len(unit["times"]) for unit in units)
+    case_dir = os.path.join(tmp, "mask_ceiling")
+    os.makedirs(case_dir, exist_ok=True)
+    processed = os.path.join(case_dir, "processed.nwb")
+    write_processed(processed, rows, units)
+    size = os.path.getsize(processed)
+    block = 16 * 1024
+    archive_units.RemoteFile = BlockLocalFile
+    try:
+        plan = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                             plan_only=True)["plan"]
+        # Every quantity the two admission ceilings are built from comes from the
+        # fixture rather than from the plan under test. Taking them from the plan
+        # would move the boundary with the defect: with the mask term dropped,
+        # ``peak_resident_bytes - mask_bytes`` is below the mutated peak and the
+        # ceiling refuses it, which would have tested only that two halves of one
+        # formula agree.
+        expected_masks = spikes * archive_units.MASK_ITEMSIZE
+        expected_resident = spikes * 16 + expected_masks + largest * 16
+        h.equal("masks/one byte per spike", plan["mask_bytes"], expected_masks)
+        h.check("masks/the term is not zero", expected_masks > 0, str(expected_masks))
+        h.equal("masks/resident carries the arrays, the masks and one slice",
+                plan["resident_bytes"], expected_resident)
+        expected_peak = (plan["cache_bound_bytes"] + expected_resident
+                         + plan["structures_bytes"] + plan["library_cache_bytes"])
+        h.equal("masks/peak is still the sum of the four terms",
+                plan["peak_resident_bytes"], expected_peak)
+        omitted = expected_peak - expected_masks
+        refused = None
+        try:
+            archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                          max_bytes=omitted)
+        except ValueError as exc:
+            refused = str(exc)
+        h.check("masks/the ceiling the omission admitted is refused",
+                refused is not None and "peak_resident_bytes is above" in refused,
+                repr(refused))
+        h.check("masks/the refusal names the mask term",
+                refused is not None
+                and ("of which %d bytes are the retained missing-depth masks"
+                     % plan["mask_bytes"]) in refused,
+                repr(refused))
+        read = archive_units.read_band_units(processed, size, block, PROBES[0], lo, hi,
+                                             max_bytes=expected_peak)
+        h.equal("masks/the true peak is admitted",
+                read["plan"]["peak_resident_bytes"], expected_peak)
+        held = sum(unit["missing_depths"].nbytes for unit in read["band_units"])
+        h.equal("masks/what is held is what was charged", held, plan["mask_bytes"])
+    finally:
+        archive_units.RemoteFile = LocalFile
+
+
 def case_ceiling_covers_cache_and_arrays_together(h, tmp):
     """The cache and the converted arrays are live at once, so the ceiling sums them.
 
@@ -3475,8 +3609,11 @@ def case_plan_separates_the_costs(h, tmp):
                                          1024 * 1024, PROBES[0], lo, hi, plan_only=True)
     plan = read["plan"]
     h.equal("three_costs/payload is the stored size", plan["logical_bytes"], spikes * 12)
-    h.equal("three_costs/resident is float64 plus one slice",
-            plan["resident_bytes"], spikes * 16 + largest * 12)
+    h.equal("three_costs/resident is float64 plus the masks plus one slice",
+            plan["resident_bytes"],
+            spikes * 16 + spikes * archive_units.MASK_ITEMSIZE + largest * 12)
+    h.equal("three_costs/mask term is one byte per spike", plan["mask_bytes"],
+            spikes * archive_units.MASK_ITEMSIZE)
     h.equal("three_costs/peak_is_the_sum",
             plan["peak_resident_bytes"],
             plan["cache_bound_bytes"] + plan["resident_bytes"]
@@ -3754,6 +3891,7 @@ CASES = (
     case_band_gap_is_pinned,
     case_ceiling_bounds_the_block_transfer,
     case_ceiling_can_bind_on_resident_memory,
+    case_the_ceiling_counts_the_retained_masks,
     case_ceiling_covers_cache_and_arrays_together,
     case_chunked_columns_are_placed_from_the_chunk_index,
     case_fragmented_chunks_are_still_bounded,

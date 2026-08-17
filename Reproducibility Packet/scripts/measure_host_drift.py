@@ -44,7 +44,11 @@ permutation null. And it refuses to let the observed verdict stand when that
 bound straddles the threshold: the candidate is reported unmeasurable and stays
 paused rather than being passed on the strength of a point estimate. An
 *infinite* depth remains an input error, because widening a bound around a
-corrupt number would turn corruption into uncertainty. **The layer engages only
+corrupt number would turn corruption into uncertainty. **The last line this
+command prints is that reconciled decision**, and the gate's own pass/fail is
+printed above it marked as a diagnostic: the two can disagree, and a reader or a
+script that acts on the final line must not be able to advance a candidate the
+reconciliation has paused. **The layer engages only
 when something is actually missing**, since with nothing missing its bounds
 collapse onto the gate's own two numbers and computing them again would double
 the most expensive step of the run to reproduce values already in hand.
@@ -52,7 +56,8 @@ the most expensive step of the run to reproduce values already in hand.
 **Cost is sized before it is spent, in the units it is actually paid in.**
 The ragged columns' index arrays are one integer per unit, so the band's slices
 are known before a single spike is read. ``--plan-only`` prints the stored
-payload, an upper bound on the block transfer, the converted arrays and one
+payload, an upper bound on the block transfer, the converted arrays -- including
+the one-byte-per-spike positional mask the reader retains beside them -- and one
 combined peak-resident bound, then stops; ``--max-mib`` refuses the read when
 that combined bound exceeds it. The combined one is the number to compare
 against free RAM, because the range reader's block cache is not released while
@@ -694,8 +699,9 @@ def build_report(record):
     add("  stored payload            %d bytes (exact)" % plan["logical_bytes"])
     add("  block transfer            at most %d bytes over %d KiB blocks, by %s"
         % (plan["cache_bound_bytes"], plan["block_bytes"] // 1024, plan["bound_basis"]))
-    add("  peak resident arrays      %d bytes (the converted arrays alone)"
-        % plan["resident_bytes"])
+    add("  peak resident arrays      %d bytes (the converted arrays and the %d bytes"
+        % (plan["resident_bytes"], plan["mask_bytes"]))
+    add("                            of missing-depth masks retained beside them)")
     add("  live python structures    %d bytes (measured)" % plan["structures_bytes"])
     add("  hdf5 chunk cache          %d bytes (the library's own ceiling; 0 when neither"
         % plan["library_cache_bytes"])
@@ -1083,9 +1089,10 @@ def main(argv=None):
     print("[drift] %d band units of %d on the probe; %d spikes"
           % (plan["n_units"], read["n_units_on_probe"], plan["n_spikes"]), flush=True)
     print("[drift] payload %d bytes; transfer bounded at %d bytes (%s); combined peak "
-          "resident at most %d bytes (%d arrays + %d structures + %d hdf5 cache + the block cache)"
+          "resident at most %d bytes (%d arrays, of which %d are the retained missing-depth "
+          "masks, + %d structures + %d hdf5 cache + the block cache)"
           % (plan["logical_bytes"], plan["cache_bound_bytes"], plan["bound_basis"],
-             plan["peak_resident_bytes"], plan["resident_bytes"],
+             plan["peak_resident_bytes"], plan["resident_bytes"], plan["mask_bytes"],
              plan["structures_bytes"], plan["library_cache_bytes"]), flush=True)
     if args.plan_only:
         print("[drift] --plan-only: nothing else was read and no verdict was computed",
@@ -1228,8 +1235,8 @@ def main(argv=None):
         "io": io_total,
         "plan": {key: plan[key] for key in
                  ("n_units", "n_spikes", "logical_bytes", "cache_bound_bytes",
-                  "resident_bytes", "structures_bytes", "library_cache_bytes",
-                  "peak_resident_bytes",
+                  "resident_bytes", "mask_bytes", "structures_bytes",
+                  "library_cache_bytes", "peak_resident_bytes",
                   "bound_basis", "block_bytes", "spent_bytes",
                   "time_layout", "depth_layout")},
         "descriptions": read["descriptions"],
@@ -1317,13 +1324,24 @@ def main(argv=None):
     with open(args.out, "w", encoding="utf-8", newline="\n") as handle:
         handle.write("\n".join(lines) + "\n")
     print("[drift] wrote %s" % args.out, flush=True)
-    print("[drift] verdict: passed=%s label=%s" % (verdict["passed"], verdict["label"]),
-          flush=True)
 
     if args.records:
         with open(args.records, "w", encoding="utf-8", newline="\n") as handle:
             json.dump(record, handle, indent=1, sort_keys=True)
         print("[drift] wrote %s" % args.records, flush=True)
+
+    # The point gate reads the record the archive supplied; the disposition
+    # below reads it together with what every completion of the missing depths
+    # could have done to it, and only the second decides whether this candidate
+    # advances. The two can disagree, so the diagnostic says on its own line
+    # that it is one, and the decision is the last thing printed -- an operator
+    # or a script that reads only the final line must not be able to act on the
+    # gate's number after reconciliation has paused the candidate.
+    print("[drift] point gate on the record held (diagnostic, not the decision): "
+          "passed=%s label=%s" % (verdict["passed"], verdict["label"]), flush=True)
+    print("[drift] decision: %s; advances=%s; gate and completion bound conflict=%s"
+          % (reconciled["disposition"], reconciled["advances"], reconciled["conflict"]),
+          flush=True)
     return 0
 
 
