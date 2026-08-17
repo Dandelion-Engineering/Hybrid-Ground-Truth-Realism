@@ -1378,19 +1378,216 @@ def case_ragged_index_must_end_at_column_length(h, tmp):
     h.check("truncated/no report", result["text"] is None)
 
 
-def case_non_finite_depth_is_refused(h, tmp):
-    """A NaN depth stops the command instead of reaching the median."""
+def _nan_at(units, positions):
+    """Copy a unit list and set NaN depths at explicit (unit, index) positions.
+
+    Positions are stated rather than drawn, because a fixture that hopes a random
+    draw lands where the check needs it is a fixture that can silently stop
+    testing what it was written for.
+
+    Args:
+        units: unit dicts from :func:`band_units`.
+        positions: iterable of ``(unit_index, spike_index)`` pairs.
+
+    Returns:
+        The same list, with the touched units' depth arrays replaced by copies.
+    """
+    touched = set(unit_index for unit_index, _ in positions)
+    for unit_index in touched:
+        units[unit_index]["depths"] = units[unit_index]["depths"].copy()
+    for unit_index, spike_index in positions:
+        units[unit_index]["depths"][spike_index] = np.nan
+    return units
+
+
+def case_infinite_depth_is_refused(h, tmp):
+    """An infinite depth stops the command, on either sign.
+
+    NaN and infinity are different failures of the same column. An infinity is a
+    wrong value rather than an absent one, so widening a bound around it would
+    turn corruption into uncertainty; it stays an input error.
+    """
     rows = default_electrodes()
-    units = band_units()
-    units[1]["depths"] = units[1]["depths"].copy()
-    units[1]["depths"][7] = np.nan
+    for name, value in (("plus", np.inf), ("minus", -np.inf)):
+        units = band_units()
+        units[1]["depths"] = units[1]["depths"].copy()
+        units[1]["depths"][7] = value
+        result = run_case(
+            tmp, "infinite_depth_%s" % name,
+            lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+            lambda p: write_processed(p, rows, units))
+        h.check("infinite/%s refused" % name,
+                "infinite spike depths" in str(result["status"]),
+                str(result["status"]))
+        h.check("infinite/%s named as input error" % name,
+                "input error" in str(result["status"]), str(result["status"]))
+        h.check("infinite/%s no report" % name, result["text"] is None)
+
+
+def case_missing_depth_is_bounded_rather_than_refused(h, tmp):
+    """A NaN depth is measured with a bound around it, not refused.
+
+    This is the whole-command half of the recovery: the record reaches a verdict,
+    the exclusions are published three ways, and both of the gate's numbers carry
+    an interval over every completion of the missing values.
+    """
+    rows = default_electrodes()
+    # Three per unit across all eight, at spread positions, so the bound is
+    # non-degenerate on both of the gate's numbers rather than only present.
+    positions = [(unit, index) for unit in range(8) for index in (17, 190, 401)]
+    units = _nan_at(band_units(), positions)
     result = run_case(
-        tmp, "nonfinite_depth",
+        tmp, "missing_depth_bounded",
         lambda p: write_raw(p, rows, 0.0, EXTENT_S),
         lambda p: write_processed(p, rows, units))
-    h.check("nonfinite/refused", "non-finite spike depths" in str(result["status"]),
-            str(result["status"]))
-    h.check("nonfinite/no report", result["text"] is None)
+    h.equal("missing/status", result["status"], 0)
+    h.check("missing/report written", result["text"] is not None)
+    if result["text"] is None or result["record"] is None:
+        return
+    text = result["text"]
+    record = result["record"]
+    missing = record["missing_depth"]
+    h.check("missing/report has the section",
+            "## Missing depths and the completion bound" in text)
+    h.equal("missing/total counted", missing["n_missing"], len(positions))
+    h.equal("missing/units affected", missing["n_units_affected"], 8)
+    h.equal("missing/per-unit sums to the total",
+            sum(entry["n_missing"] for entry in missing["per_unit"]),
+            missing["n_missing"])
+    h.equal("missing/per-bin sums to the gridded total",
+            sum(entry["n_missing"] for entry in missing["per_bin"]),
+            missing["n_missing"] - missing["outside_grid"])
+    h.equal("missing/triples sum to the gridded total",
+            sum(triple[2] for triple in missing["per_unit_bin"]),
+            missing["n_missing"] - missing["outside_grid"])
+    h.check("missing/support invariance holds", missing["support"]["invariant"],
+            str(missing["support"].get("reason")))
+    bounds = missing["bounds"]
+    h.check("missing/bounds measurable", bounds.get("measurable"),
+            str(bounds.get("reason")))
+    if not bounds.get("measurable"):
+        return
+    point = record["observed"]["delta_window"]
+    h.check("missing/point inside its own bound",
+            bounds["delta_window_lo"] <= point <= bounds["delta_window_hi"],
+            "%r not in [%r, %r]" % (point, bounds["delta_window_lo"],
+                                    bounds["delta_window_hi"]))
+    # Strictly wider on both sides, because a bound that collapses onto the
+    # point would make every check above pass without the layer doing anything.
+    h.check("missing/bound is strictly two-sided",
+            bounds["delta_window_lo"] < point < bounds["delta_window_hi"],
+            "%r against [%r, %r]" % (point, bounds["delta_window_lo"],
+                                     bounds["delta_window_hi"]))
+    null_bounds = missing["null_bounds"]
+    h.check("missing/null bound present", null_bounds is not None)
+    if null_bounds is not None:
+        h.check("missing/null bound is strictly two-sided",
+                null_bounds["q95_lo"] < null_bounds["q95_hi"],
+                "[%r, %r]" % (null_bounds["q95_lo"], null_bounds["q95_hi"]))
+        h.equal("missing/null bound replicate count",
+                null_bounds["n_permutations"], record["null"]["n_permutations"])
+        h.check("missing/report states the null bound",
+                "Q95_null bound" in text)
+    h.check("missing/disposition is one of the four",
+            missing["stability"]["disposition"]
+            in ("passes", "fails", "decision-unstable", "unmeasurable"),
+            missing["stability"]["disposition"])
+    h.check("missing/report carries the per-unit table",
+            "per-unit exclusions" in text and "per-bin exclusions" in text)
+    h.check("missing/report says where the bound is exact",
+            "Above the bin it is an OUTER bound" in text)
+    h.check("missing/report says the finite-only null is not a completion",
+            "is NOT one of those completions" in text)
+    disposition = record["disposition"]
+    h.check("missing/final disposition recorded",
+            disposition["disposition"] in ("passes", "fails", "unmeasurable"),
+            disposition["disposition"])
+    h.equal("missing/advances only on passes", disposition["advances"],
+            disposition["disposition"] == "passes")
+    h.check("missing/report carries the final disposition",
+            "final disposition" in text)
+
+
+def case_missing_depths_can_pause_a_passing_gate(h, tmp):
+    """The layer can flip a passing gate to unmeasurable, and does here.
+
+    Without a case in this direction every command-level check above would pass
+    on a fixture where the layer changed nothing, which is the failure mode of a
+    check that cannot fail. Twenty-five of one bin's thirty depths are dropped,
+    which leaves that bin below the ten-spike floor on the finite record and
+    above it on every completion -- a support-invariance violation, which is
+    unmeasurable by declaration rather than by a fitted number.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    times = units[2]["times"]
+    in_bin = np.flatnonzero((times >= 300.0) & (times < 360.0))
+    if in_bin.size < 26:
+        h.check("pause/fixture has a full bin", False,
+                "bin 5 of unit 2 holds only %d spikes" % in_bin.size)
+        return
+    units = _nan_at(units, [(2, int(index)) for index in in_bin[:in_bin.size - 5]])
+    result = run_case(
+        tmp, "missing_depth_pauses",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units))
+    h.equal("pause/status", result["status"], 0)
+    if result["record"] is None:
+        h.check("pause/record written", False)
+        return
+    record = result["record"]
+    missing = record["missing_depth"]
+    h.check("pause/support invariance violated",
+            not missing["support"]["invariant"])
+    h.check("pause/violation is reported by unit and bin",
+            missing["support"]["n_bin_mismatches"] > 0,
+            str(missing["support"]["n_bin_mismatches"]))
+    h.equal("pause/completion disposition", missing["stability"]["disposition"],
+            "unmeasurable")
+    h.check("pause/no null bound was built", missing["null_bounds"] is None)
+    h.equal("pause/final disposition", record["disposition"]["disposition"],
+            "unmeasurable")
+    h.equal("pause/does not advance", record["disposition"]["advances"], False)
+    h.check("pause/the gate itself had passed", record["verdict"]["passed"],
+            "the fixture no longer isolates the layer's effect: the gate failed too")
+    h.check("pause/report names the violation",
+            "VIOLATED" in (result["text"] or ""))
+
+
+def case_no_missing_depth_skips_the_layer(h, tmp):
+    """With nothing missing the layer is not run, and the report says so.
+
+    Its bounds collapse onto the gate's own two numbers when no depth is missing,
+    so running it would double the most expensive step of the run to reproduce
+    values already in hand. The collapse itself is proved elementwise in
+    ``test_missing_depth.py``; what this case checks is that the command skips
+    the work and states that it did.
+    """
+    rows = default_electrodes()
+    units = band_units()
+    result = run_case(
+        tmp, "no_missing_depth",
+        lambda p: write_raw(p, rows, 0.0, EXTENT_S),
+        lambda p: write_processed(p, rows, units))
+    h.equal("clean/status", result["status"], 0)
+    if result["record"] is None:
+        h.check("clean/record written", False)
+        return
+    record = result["record"]
+    missing = record["missing_depth"]
+    h.equal("clean/nothing missing", missing["n_missing"], 0)
+    h.equal("clean/no unit affected", missing["n_units_affected"], 0)
+    h.check("clean/no bounds computed", missing["bounds"] is None)
+    h.check("clean/no null bound computed", missing["null_bounds"] is None)
+    h.check("clean/no stability verdict", missing["stability"] is None)
+    h.check("clean/report says the layer did not run",
+            "the sensitivity layer was not run" in (result["text"] or ""))
+    h.equal("clean/disposition follows the gate",
+            record["disposition"]["disposition"],
+            "passes" if record["verdict"]["passed"] else "fails")
+    h.check("clean/disposition says why it is completion-independent",
+            "no depth was missing" in record["disposition"]["reason"])
+    h.equal("clean/no conflict is possible", record["disposition"]["conflict"], False)
 
 
 def case_unsorted_times_are_refused(h, tmp):
@@ -3501,7 +3698,10 @@ CASES = (
     case_repeat_run_is_identical,
     case_ragged_indices_must_agree,
     case_ragged_index_must_end_at_column_length,
-    case_non_finite_depth_is_refused,
+    case_infinite_depth_is_refused,
+    case_missing_depth_is_bounded_rather_than_refused,
+    case_missing_depths_can_pause_a_passing_gate,
+    case_no_missing_depth_skips_the_layer,
     case_unsorted_times_are_refused,
     case_depth_unit_must_be_stated,
     case_out_of_range_electrode_is_refused,

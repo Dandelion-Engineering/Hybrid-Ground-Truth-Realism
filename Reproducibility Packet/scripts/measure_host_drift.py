@@ -31,6 +31,24 @@ recorded as having failed the gate, because the selection rule is
 first-admissible in a fixed order and a rejection recorded for the wrong reason
 hands the host to the next rank irrecoverably.
 
+**A missing depth is neither an input error nor a silent exclusion.** The
+archive's depth column is a waveform centre of mass, and a degenerate weight sum
+leaves NaN in it; on the two candidates censused so far the pattern is all-NaN,
+never infinite, and never in the times. Such a spike still carries a perfectly
+good time, so the reader returns the record complete with a positional mask, and
+this command does three things with it rather than one. It publishes the
+exclusions **per unit, per bin and in total**. It bounds, through
+``utils.missing_depth``, what every completion of those missing values could have
+done to **both** of the gate's numbers -- the observed excursion and the
+permutation null. And it refuses to let the observed verdict stand when that
+bound straddles the threshold: the candidate is reported unmeasurable and stays
+paused rather than being passed on the strength of a point estimate. An
+*infinite* depth remains an input error, because widening a bound around a
+corrupt number would turn corruption into uncertainty. **The layer engages only
+when something is actually missing**, since with nothing missing its bounds
+collapse onto the gate's own two numbers and computing them again would double
+the most expensive step of the run to reproduce values already in hand.
+
 **Cost is sized before it is spent, in the units it is actually paid in.**
 The ragged columns' index arrays are one integer per unit, so the band's slices
 are known before a single spike is read. ``--plan-only`` prints the stored
@@ -117,7 +135,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np  # noqa: E402
 
 from screen_host_timing import read_series_timing  # noqa: E402
-from utils import archive_units, band_drift, dandi  # noqa: E402
+from utils import archive_units, band_drift, dandi, missing_depth  # noqa: E402
 from utils.host_anatomy import contiguous_band, read_electrode_table  # noqa: E402
 
 GATES = {"strict": "threshold_strict_um", "relaxed": "threshold_relaxed_um"}
@@ -354,6 +372,90 @@ def summarize_set(units):
     }
 
 
+def summarize_missing(band_units, sensitivity, null_bounds, stability, n_spikes):
+    """Assemble the missing-depth record, JSON-safe and aggregated three ways.
+
+    The exclusions are published per unit, per bin and in total, because a total
+    alone hides whether 200 missing depths are one unit's whole recording or two
+    hundred units' single spikes, and those two admit very different bounds. The
+    per-unit and per-bin tables are aggregates of the same ``(unit, bin, count)``
+    triples the layer produces, and those triples are carried through whole so
+    the aggregation can be audited against what it aggregated.
+
+    Args:
+        band_units: the band units, each carrying ``row``, ``label`` and
+            ``n_missing_depths``.
+        sensitivity: the dict from
+            ``utils.missing_depth.measure_missing_depth_sensitivity``, or None
+            when nothing was missing and the layer was not run.
+        null_bounds: the dict from ``utils.missing_depth.null_interval``, or None.
+        stability: the dict from ``utils.missing_depth.stability_verdict``, or None.
+        n_spikes: the number of spikes loaded, for the fraction.
+
+    Returns:
+        A dict carrying the counts, the three aggregations, the support-invariance
+        summary, the bounds and the completion disposition. Numpy values are
+        converted, because this record is written as JSON.
+    """
+    n_missing = int(sum(unit["n_missing_depths"] for unit in band_units))
+    record = {
+        "n_missing": n_missing,
+        "n_spikes": int(n_spikes),
+        "fraction_percent": (100.0 * n_missing / n_spikes) if n_spikes else 0.0,
+        "n_units_in_band": len(band_units),
+        "n_units_affected": sum(1 for unit in band_units if unit["n_missing_depths"]),
+        "outside_grid": 0,
+        "per_unit": [],
+        "per_bin": [],
+        "per_unit_bin": [],
+        "support": None,
+        "bounds": None,
+        "null_bounds": None,
+        "stability": None,
+    }
+    if sensitivity is None:
+        return record
+
+    exclusions = sensitivity["exclusions"]
+    record["outside_grid"] = int(exclusions["outside_grid"])
+    record["per_unit_bin"] = [[int(band_units[u]["row"]), int(b), int(n)]
+                              for u, b, n in exclusions["per_unit_bin"]]
+    bins_per_unit = {}
+    per_bin = {}
+    for u, b, n in exclusions["per_unit_bin"]:
+        bins_per_unit[u] = bins_per_unit.get(u, 0) + 1
+        counts, units = per_bin.get(b, (0, 0))
+        per_bin[b] = (counts + n, units + 1)
+    record["per_unit"] = [
+        {"row": int(unit["row"]), "label": unit["label"],
+         "n_missing": int(unit["n_missing_depths"]),
+         "n_bins": int(bins_per_unit.get(u, 0))}
+        for u, unit in enumerate(band_units) if unit["n_missing_depths"]]
+    record["per_bin"] = [{"bin": int(b), "n_missing": int(per_bin[b][0]),
+                          "n_units": int(per_bin[b][1])}
+                         for b in sorted(per_bin)]
+
+    support = sensitivity["support"]
+    record["support"] = {
+        "invariant": bool(support["invariant"]),
+        "reason": support.get("reason"),
+        "n_included": int(support["included"].sum()),
+        "n_included_complete": int(support["included_complete"].sum()),
+        "n_bin_mismatches": len(support["bin_mismatches"]),
+        "bin_mismatches": [[int(u), int(b)] for u, b in support["bin_mismatches"]],
+        "min_units_per_bin": int(support["units_per_bin"].min()),
+        "min_units_per_bin_complete": int(support["units_per_bin_complete"].min()),
+    }
+    record["bounds"] = {key: sensitivity[key] for key in
+                        ("measurable", "reason", "bounded", "delta_full_lo",
+                         "delta_full_hi", "delta_window_lo", "delta_window_hi",
+                         "window_start_hi", "lo_trace", "hi_trace")
+                        if key in sensitivity}
+    record["null_bounds"] = null_bounds
+    record["stability"] = stability
+    return record
+
+
 def replay_matches(first, second):
     """Compare two permutation nulls for exact reproduction.
 
@@ -369,6 +471,73 @@ def replay_matches(first, second):
     return (first["values"] == second["values"]
             and first["q95"] == second["q95"]
             and first["rank"] == second["rank"])
+
+
+def reconcile_verdict(verdict, stability):
+    """Reconcile the gate's verdict on the record held with the completion bound.
+
+    The approved gate reads the record the archive supplied. When depths were
+    missing, ``utils.missing_depth`` bounds what every completion of them could
+    have made those same two numbers do, and both statements have to point the
+    same way before a candidate advances or is rejected.
+
+    They can point opposite ways, and the reason is worth stating where the rule
+    is: the finite-only null permutes the observed spikes while every completion
+    permutes all of them, so the finite-only ``Q95_null`` is not one of the
+    completions and can sit on the other side of the threshold from the whole
+    bound. A disagreement is not resolved in favour of either side. It is
+    precisely the state in which the record held does not determine the verdict,
+    which is what unmeasurable means here, and the candidate keeps its rank.
+
+    No tolerance is fitted anywhere in this rule and nothing in it is typeable.
+
+    Args:
+        verdict: the dict from ``band_drift.apply_gate``.
+        stability: the dict from ``utils.missing_depth.stability_verdict``, or
+            None when no depth was missing.
+
+    Returns:
+        A dict with ``disposition`` (``"passes"``, ``"fails"`` or
+        ``"unmeasurable"``), ``advances`` (True only on ``"passes"``),
+        ``conflict`` (True only when the two statements point opposite ways) and
+        ``reason``.
+    """
+    passed = bool(verdict["passed"])
+    if stability is None:
+        return {
+            "disposition": "passes" if passed else "fails",
+            "advances": passed,
+            "conflict": False,
+            "reason": "no depth was missing, so the gate's two numbers are the only ones "
+                      "any completion of this record could have produced",
+        }
+    disposition = stability["disposition"]
+    if disposition in ("passes", "fails"):
+        if (disposition == "passes") == passed:
+            return {
+                "disposition": disposition,
+                "advances": passed,
+                "conflict": False,
+                "reason": stability["reason"],
+            }
+        return {
+            "disposition": "unmeasurable",
+            "advances": False,
+            "conflict": True,
+            "reason": "the gate %s on the record held while every completion of the "
+                      "missing depths %s it; the finite-only null is not one of those "
+                      "completions, so the record held does not determine the verdict "
+                      "(%s)"
+                      % ("passed" if passed else "failed",
+                         "passes" if disposition == "passes" else "fails",
+                         stability["reason"]),
+        }
+    return {
+        "disposition": "unmeasurable",
+        "advances": False,
+        "conflict": False,
+        "reason": stability["reason"],
+    }
 
 
 def nearest_rank(values, percentile):
@@ -593,12 +762,108 @@ def build_report(record):
         add("  deterministic replay      %s" % record["checks"]["replay"])
         add("")
 
+    missing = record["missing_depth"]
+    add("## Missing depths and the completion bound")
+    add("")
+    add("  missing depths            %d of %d loaded spikes (%.6f%%)"
+        % (missing["n_missing"], missing["n_spikes"], missing["fraction_percent"]))
+    add("  units affected            %d of %d in the band"
+        % (missing["n_units_affected"], missing["n_units_in_band"]))
+    add("  outside the bin grid      %d (before session zero, or past the last complete bin)"
+        % missing["outside_grid"])
+    if not missing["n_missing"]:
+        add("")
+        add("  Nothing was missing, so the sensitivity layer was not run. Every bound it")
+        add("  would have produced collapses onto the gate's own two numbers when no depth")
+        add("  is missing, and the harness proves that collapse is elementwise exact.")
+        add("")
+    else:
+        support = missing["support"]
+        add("  support invariance        %s"
+            % ("holds: every unit and every bin has the same inclusion status whether the "
+               "missing samples are counted or not" if support["invariant"]
+               else "VIOLATED - %s" % support["reason"]))
+        add("  included units            %d counting finite depths only, %d counting the "
+            "missing ones too"
+            % (support["n_included"], support["n_included_complete"]))
+        bounds = missing["bounds"]
+        if not bounds.get("measurable"):
+            add("  bounds                    not computed: %s" % bounds.get("reason"))
+        else:
+            observed = record["observed"]
+            add("  Delta_10min bound         %.3f to %.3f um (the point estimate is %.3f)"
+                % (bounds["delta_window_lo"], bounds["delta_window_hi"],
+                   observed["delta_window"]))
+            add("  Delta_full bound          %.3f to %.3f um (the point estimate is %.3f)"
+                % (bounds["delta_full_lo"], bounds["delta_full_hi"],
+                   observed["delta_full"]))
+            if missing["null_bounds"]:
+                null_bounds = missing["null_bounds"]
+                add("  Q95_null bound            %.3f to %.3f um over %d replicates "
+                    "(nearest-rank, one-based rank %d)"
+                    % (null_bounds["q95_lo"], null_bounds["q95_hi"],
+                       null_bounds["n_permutations"], null_bounds["rank"]))
+                add("  both bounds finite        %s"
+                    % (bounds["bounded"] and null_bounds["bounded"]))
+        stability = missing["stability"]
+        add("  completion disposition    %s" % stability["disposition"])
+        add("  reason                    %s" % stability["reason"])
+        add("")
+        add("  per-unit exclusions (only units with a missing depth appear):")
+        add("    %6s %8s %10s %8s" % ("row", "label", "n_missing", "bins"))
+        for entry in missing["per_unit"]:
+            add("    %6d %8s %10d %8d"
+                % (entry["row"], entry["label"] or "<none>", entry["n_missing"],
+                   entry["n_bins"]))
+        add("")
+        add("  per-bin exclusions (only bins holding a missing depth appear):")
+        add("    %6s %10s %8s" % ("bin", "n_missing", "units"))
+        for entry in missing["per_bin"]:
+            add("    %6d %10d %8d" % (entry["bin"], entry["n_missing"], entry["n_units"]))
+        add("")
+        add("  The (unit, bin, count) triples these two tables aggregate are in the JSON")
+        add("  record when --records was given; %s."
+            % ("it was" if record["records_written"] else "it was not"))
+        add("")
+        add("  How to read the bound, including where it is not exact:")
+        add("  - Per bin it is the attainable set, not an approximation of one: a median is")
+        add("    nondecreasing in every argument, so driving the missing values below every")
+        add("    observed depth minimises it and above every observed depth maximises it.")
+        add("  - Above the bin it is an OUTER bound. The same missing values enter a bin")
+        add("    median and the per-unit centring constant subtracted from it, and interval")
+        add("    arithmetic ignores that dependence. The error runs one way: too wide,")
+        add("    never too narrow. This layer can call a candidate unmeasurable that a")
+        add("    dependence-aware treatment would have called stable; it cannot pass one")
+        add("    that some completion would have failed.")
+        add("  - The Q95_null bound is assumption-free. The approved null's permutation is")
+        add("    drawn from a seed and from the analysed-bin SPIKE count, and a spike whose")
+        add("    depth is missing still has a good time, so both are fixed before any")
+        add("    missing value is chosen and the unknown values sit in known positions.")
+        add("  - The finite-only Q95_null printed above is NOT one of those completions when")
+        add("    anything is missing: it permutes the observed spikes where every")
+        add("    completion permutes all of them. It is the number the gate itself reads,")
+        add("    and it is not claimed to lie inside the bound.")
+        add("  - An unbounded side is reported as unbounded and makes the candidate")
+        add("    unmeasurable. No completion places a value at infinity; what an unbounded")
+        add("    side asserts is that every finite value on it is attainable.")
+        add("")
+
     verdict = record["verdict"]
+    reconciled = record["disposition"]
     add("## Verdict")
     add("")
     add("  passed                    %s" % verdict["passed"])
     add("  label                     %s" % verdict["label"])
     add("  reason                    %s" % verdict["reason"])
+    add("")
+    add("  The three lines above are the approved gate applied to the record the archive")
+    add("  supplied. The lines below reconcile that with what the missing depths could")
+    add("  have changed; on a candidate with no missing depth they say the same thing.")
+    add("")
+    add("  final disposition         %s" % reconciled["disposition"])
+    add("  advances                  %s" % reconciled["advances"])
+    add("  gate and bound conflict   %s" % reconciled["conflict"])
+    add("  reason                    %s" % reconciled["reason"])
     add("")
 
     audit = record["audit"]
@@ -840,22 +1105,35 @@ def main(argv=None):
     n_bins, discarded_s = band_drift.complete_bins(t_last_s)
     n_before_origin = int(sum(int((unit["times"] < 0.0).sum()) for unit in band_units))
 
-    observed = band_drift.measure_band_drift(
-        [unit["times"] for unit in band_units],
-        [unit["depths"] for unit in band_units],
-        t_last_s)
+    rows = [unit["row"] for unit in band_units]
+    complete_times = [unit["times"] for unit in band_units]
+    complete_depths = [unit["depths"] for unit in band_units]
+    n_missing_total = int(sum(unit["n_missing_depths"] for unit in band_units))
+
+    # The record is split exactly once, here, by the one function that owns the
+    # split. The approved estimator and the approved null take the observed
+    # depths and raise on a non-finite value; the sensitivity layer takes the
+    # complete record, because its null bound reads the missing samples'
+    # positions and two spikes can share a time. A ValueError from split_unit is
+    # left to raise rather than converted: the reader has already refused every
+    # infinite depth and every non-finite time, so reaching one here would be a
+    # bug in this project's code and a traceback is the right report.
+    observed_times, observed_depths = [], []
+    for unit in band_units:
+        unit_times, unit_depths, _ = missing_depth.split_unit(unit["times"], unit["depths"])
+        observed_times.append(unit_times)
+        observed_depths.append(unit_depths)
+
+    observed = band_drift.measure_band_drift(observed_times, observed_depths, t_last_s)
 
     null = None
     replay_note = "not reached"
     if observed.get("measurable"):
-        rows = [unit["row"] for unit in band_units]
         null = band_drift.permutation_null(
-            [unit["times"] for unit in band_units],
-            [unit["depths"] for unit in band_units],
+            observed_times, observed_depths,
             t_last_s, processed_asset["asset_id"], args.probe, rows)
         second = band_drift.permutation_null(
-            [unit["times"] for unit in band_units],
-            [unit["depths"] for unit in band_units],
+            observed_times, observed_depths,
             t_last_s, processed_asset["asset_id"], args.probe, rows)
         if replay_matches(null, second):
             replay_note = "identical over %d replicates" % null["n_permutations"]
@@ -868,6 +1146,44 @@ def main(argv=None):
             null = None
 
     verdict = band_drift.apply_gate(observed, null, threshold_um)
+
+    sensitivity, null_bounds, stability = None, None, None
+    if n_missing_total:
+        print("[drift] %d of %d loaded depths are missing; bounding both gate numbers "
+              "over every completion" % (n_missing_total, plan["n_spikes"]), flush=True)
+        sensitivity = missing_depth.measure_missing_depth_sensitivity(
+            complete_times, complete_depths, t_last_s)
+        # Two cross-checks, because this layer holds its own copy of the record
+        # and its own accounting of what is missing. The first ties the reader's
+        # positional mask to the layer's exclusion table; the second ties the
+        # layer's internal split to the split this command handed the gate. Both
+        # are equalities and neither is a tolerance.
+        counted = sensitivity["exclusions"]["total"]
+        if counted != n_missing_total:
+            raise SystemExit(
+                "[fatal] the reader masked %d missing depths and the sensitivity layer "
+                "accounted for %d; one of the two is not reading the record this command "
+                "holds" % (n_missing_total, counted))
+        layer_observed = sensitivity["observed"]
+        for key in ("measurable", "delta_full", "delta_window", "window_start"):
+            if layer_observed.get(key) != observed.get(key):
+                raise SystemExit(
+                    "[fatal] the sensitivity layer's observation disagrees with the gate's "
+                    "on %r: %r against %r" % (key, layer_observed.get(key),
+                                              observed.get(key)))
+        if list(layer_observed.get("included", [])) != list(observed.get("included", [])):
+            raise SystemExit(
+                "[fatal] the sensitivity layer included a different unit set than the gate")
+        if sensitivity.get("measurable"):
+            null_bounds = missing_depth.null_interval(
+                complete_times, complete_depths, t_last_s,
+                processed_asset["asset_id"], args.probe, rows)
+        stability = missing_depth.stability_verdict(sensitivity, null_bounds, threshold_um)
+        print("[drift] completion disposition: %s" % stability["disposition"], flush=True)
+
+    reconciled = reconcile_verdict(verdict, stability)
+    missing_record = summarize_missing(band_units, sensitivity, null_bounds, stability,
+                                       plan["n_spikes"])
 
     included_rows = [band_units[i] for i in observed.get("included", [])]
     audit = []
@@ -989,6 +1305,8 @@ def main(argv=None):
         "observed": observed,
         "null": null,
         "verdict": verdict,
+        "missing_depth": missing_record,
+        "disposition": reconciled,
         "audit": audit,
     }
 

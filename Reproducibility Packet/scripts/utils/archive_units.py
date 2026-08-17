@@ -110,8 +110,16 @@ the statistic:
 1. the two ragged columns are partitioned identically, by offsets that are
    stored as integers, so that a unit's times and its depths are the same
    spikes in the same order;
-2. the loaded values are finite, each unit's times ascend, and the depth column
-   still carries its documented micrometre unit;
+2. each unit's times are finite and ascending, no depth is infinite, and the
+   depth column still carries its documented micrometre unit. **A NaN depth is
+   the one non-finite value that does not raise**, because the archive's depth
+   column is a waveform centre of mass and a degenerate weight sum leaves NaN
+   behind on real assets; such a spike keeps its perfectly good time, so it is
+   returned in place with a positional mask rather than dropped here or refused.
+   An *infinite* depth is a wrong value rather than an absent one and still
+   raises, and so does a non-finite time, because a spike with no usable time
+   cannot be placed in a bin at all. What may be done with the missing values is
+   ``utils.missing_depth``'s question, not this module's;
 3. each unit's ``max_electrode`` -- also an integer as stored -- names exactly
    one electrode on that unit's own probe, and that electrode's ``rel_y`` is
    finite;
@@ -1889,8 +1897,9 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         :func:`plan_transfer`), ``descriptions``, ``provenance``,
         ``provenance_io`` (the two provenance budgets and what each spent),
         ``electrodes``, ``unit_electrodes`` (every unit on the probe),
-        ``band_units`` (the in-band subset, each with ``times`` and ``depths``
-        arrays unless ``plan_only``), ``n_units_on_probe``,
+        ``band_units`` (the in-band subset, each with ``times``, ``depths``,
+        ``missing_depths`` -- a boolean mask, True where the depth is NaN -- and
+        ``n_missing_depths`` unless ``plan_only``), ``n_units_on_probe``,
         ``integer_dtypes`` (each structural column as stored) and ``io``
         (request count and bytes transferred, which includes metadata as well
         as spikes).
@@ -1899,7 +1908,8 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
         KeyError: if the file lacks the units or electrodes table.
         ValueError: on any of the four input-error conditions this module
             checks, or if the planned peak resident footprint exceeds
-            ``max_bytes``.
+            ``max_bytes``. An infinite depth is one of those conditions; a NaN
+            depth is not, and is reported through ``missing_depths`` instead.
     """
     remote = RemoteFile(url, size, block=block_bytes)
     reader = BoundedReader(remote)
@@ -1997,10 +2007,21 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
                 raise ValueError(
                     "unit %d carries %d non-finite spike times"
                     % (unit["row"], int((~np.isfinite(times)).sum())))
-            if depths.size and not np.all(np.isfinite(depths)):
+            # NaN and infinity are different failures of the same column and
+            # are not treated alike. NaN is an absent measurement -- the centre
+            # of mass divided by a zero weight sum -- and the spike behind it
+            # still has a usable time, so it is kept in place and masked. An
+            # infinity is a wrong value; widening a bound around it downstream
+            # would turn corruption into uncertainty, so it stops the read.
+            infinite = np.isinf(depths)
+            if infinite.any():
                 raise ValueError(
-                    "unit %d carries %d non-finite spike depths"
-                    % (unit["row"], int((~np.isfinite(depths)).sum())))
+                    "unit %d carries %d infinite spike depths (%d +inf, %d -inf); an "
+                    "infinite depth is a wrong value rather than an absent one, so it is "
+                    "an input error and not a recoverable missing depth"
+                    % (unit["row"], int(infinite.sum()),
+                       int((depths == np.inf).sum()), int((depths == -np.inf).sum())))
+            missing = np.isnan(depths)
             if times.size > 1 and np.any(np.diff(times) < 0):
                 raise ValueError(
                     "unit %d's spike times are not ascending; the binning assumes they are"
@@ -2009,6 +2030,14 @@ def read_band_units(url, size, block_bytes, probe, depth_lo_um, depth_hi_um,
             unit["n_spikes"] = int(times.size)
             unit["times"] = times
             unit["depths"] = depths
+            # The mask travels with the record because the *positions* are the
+            # part a reconstruction cannot recover: two spikes can share a time,
+            # and utils.missing_depth's null bound follows source positions
+            # through the approved permutation. Deriving the mask later from
+            # np.isnan(depths) gives the same answer only as long as nothing has
+            # touched the array in between, and this way nothing has to.
+            unit["missing_depths"] = missing
+            unit["n_missing_depths"] = int(missing.sum())
         result["io"] = {"requests": remote.n_requests, "bytes": remote.n_bytes}
     return result
 

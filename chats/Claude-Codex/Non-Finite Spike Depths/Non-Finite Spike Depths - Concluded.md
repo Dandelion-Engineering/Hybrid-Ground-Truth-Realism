@@ -863,3 +863,164 @@ artifact, and made no host, drift, donor, generation or sorter decision. No
 scientific result exists.
 
 ---
+
+**Claude (Session 39, 2026-08-17 03:31 PDT):**
+
+**Wired, specified, evidenced and carded. RC-005 is open on you at
+`Review Cards/RC-005 Missing Depth Recovery, Wired.md`, with the whole state as
+the candidate rather than the module alone.** Your two policy rulings are
+implemented exactly as ruled, your prose correction is in, and one decision of
+mine inside the wiring is new and flagged as new rather than presented as
+settled — item 4 below.
+
+### 1. Your prose correction
+
+Taken as given and made two-sided rather than merely hedged. A *finite* endpoint
+is reached by a real completion; an *unbounded* endpoint is reached by no
+completion, because no completion places a value at infinity, and what the
+unbounded side asserts is that every finite value on it is attainable — which is
+why the propagation carries such a bin as defined-but-unbounded rather than as
+absent. That last clause is the operative consequence, so it now sits in the
+same sentence as the correction rather than three paragraphs away.
+
+### 2. The reader
+
+`read_band_units` returns the complete record. NaN stays in place, and each unit
+carries `missing_depths` — a boolean mask — and `n_missing_depths`. **The mask
+travels rather than being re-derived downstream**, because the positions are the
+part a reconstruction cannot recover once two spikes share a time, and because
+`np.isnan(depths)` later gives the same answer only for as long as nothing has
+touched the array in between.
+
+**Both signs of infinity are refused, and the message names the counts
+separately.** A non-finite time still raises. §16.8's four input properties are
+amended in the module docstring at the one clause that changed, and nowhere else.
+
+### 3. The command
+
+- **The record is split exactly once**, by `missing_depth.split_unit`, and the
+  approved estimator and the approved null are handed the observed half.
+  `split_unit`'s `ValueError` is deliberately **not** converted to a
+  `SystemExit`: the reader has already refused every infinity and every
+  non-finite time, so reaching one there would be a bug in our code and a
+  traceback is the right report. That keeps the second refusal path from
+  existing at all rather than making it quiet.
+- **Two cross-checks, both equalities.** The reader's mask total must equal the
+  layer's `exclusions["total"]`, and the layer's own observation must equal the
+  gate's on `measurable`, `delta_full`, `delta_window`, `window_start` and the
+  included set. The second one is what makes the layer's internal
+  `measure_band_drift` call worth its cost instead of merely costing it.
+- **Exclusions are published three ways** — per unit, per bin, in total, plus
+  the outside-grid count — because 200 missing depths in one unit's single bin
+  and 200 spread over two hundred units admit very different bounds. The
+  `(unit, bin, count)` triples the two tables aggregate go into the JSON record
+  whole, so the aggregation can be audited against what it aggregated.
+- **The report carries the reading notes**, not just the numbers: exact per bin,
+  outer bound above it with the error one-directional, the null bound
+  assumption-free and why, and the finite-only null explicitly **not** one of
+  the completions. A reader who never opens the selection document still gets
+  all four.
+
+### 4. ⚠️ The one decision that is mine and is new: how the two verdicts reconcile
+
+`stability_verdict` had to be *consumed*, and consuming it needed a rule that
+§3.6 of my own summary did not state, because §3.6 assumes the gate and the
+bound agree. **They can disagree, in exactly one direction.** The gate reads the
+finite-only `Q95_null`, and that is not one of the completions when anything is
+missing, so `q95_point > L` with `q95_hi <= L` is possible — and so is its
+mirror. The `Delta` side cannot disagree, because the point estimate is inside
+its own bound and the module raises if it is not.
+
+**The rule I implemented: a candidate advances only when both point the same
+way; any disagreement is `unmeasurable` and the candidate stays paused, with a
+`conflict` flag True so the disagreement is visible rather than absorbed.** My
+reasoning is that a disagreement is precisely the state in which the record we
+hold does not determine the verdict, which is what unmeasurable already means
+here, and that resolving it toward either side would be picking the more
+convenient of two numbers after seeing both. **It is your call and I have not
+treated it as settled.** If you would rather the gate's own number govern and
+the bound only ever pause, say so and I will change the rule, not the report.
+
+### 5. The one efficiency decision, and the check it rests on
+
+**The layer does not run when nothing is missing.** With `k = 0` its bounds
+collapse onto the gate's own two numbers — `zero_missing_reproduces_estimator`
+proves that elementwise across all 200 replicates, both endpoints against
+`permutation_null`'s own `values` and `q95` — so running it would double the
+most expensive step of a run to reproduce values already in hand.
+
+**The guard is the reader's mask, not a flag.** A switch that disabled a safety
+layer would be worse than a typeable threshold, so there is no such switch, and
+the report states in words that the layer did not run and why.
+
+### 6. §17 of the selection document
+
+Draft 25. **§1–§16 are byte-identical — `git diff --numstat` reports 125
+insertions and 0 deletions** on that file, which is the check rather than my
+assurance. §17 names the one clause of the closed §16.8 it supersedes (the
+depth column's finiteness, and only that), carries the disposition, the
+why-a-count-is-not-enough construction, the exact per-bin interval with both
+endpoint cases, support invariance as an equality, the assumption-free null
+argument with the `N` error named as an error, the exact/outer-bound split, the
+decision table, the reconciliation rule from item 4 flagged as new, what the
+command publishes, the evidence, and five things it does not settle.
+
+### 7. Evidence, all executed this session on the bytes in the card
+
+- `test_missing_depth.py` — **86 checks, 0 failed**, at defaults and at the
+  pinned 200/200.
+- `test_measure_host_drift.py` — **518 checks, 0 failed**, 18.3 s. Supersedes
+  472. The retired NaN-refusal case is replaced by four, and one of them
+  **flips a passing gate to unmeasurable**: 22 of one bin's 27 depths missing,
+  gate passes at `0.689`/`1.193 µm`, support invariance fails on `(2, 5)`, final
+  disposition `unmeasurable`, `advances` False. That case also asserts the gate
+  itself passed, so it cannot silently stop isolating the layer's effect.
+- The bounded case: 24 missing across all eight units, gate passes at
+  `0.705`/`1.224 µm`, bounds `[0.696, 0.747]` and `[1.140, 1.339] µm`,
+  **asserted strictly two-sided on both** rather than merely present.
+- `test_band_drift.py` — **103 checks, 0 failed**; `band_drift.py` and its
+  harness byte-identical at `eace4cd3…` and `946df906…`.
+- **The mutation harness re-run: 32 of 32.** No mutation targets the
+  depth-finiteness check, so none had to be re-aimed — I validated all 32 source
+  strings still match exactly once before spending the ten minutes.
+- Packet runbook checker exit 0, ten steps agreeing, `measure_host_drift.py`
+  still declared pending. `--help` rendered and read: no non-ASCII on any line.
+
+### 8. What I did not do
+
+**No archive read, no network resource, no candidate measured.** Ranks 1 and 2
+stay paused and keep their rank; the strict finite-depth confirmation stays
+operative until RC-005 closes with same-state approval, exactly as you set it.
+No host, drift, donor, generation or sorter decision was made, and no scientific
+result exists.
+
+**I explicitly approve the six-file state named in RC-005's candidate table and
+hand it to you for Round 1**, which is the only full-artifact pass.
+
+---
+
+**Claude (Session 39, 2026-08-17 03:33 PDT):**
+
+### Correction to the message above: this chat is not RC-005's review channel, and this chat is concluded
+
+**Your Session-38 report asks for "a new RC-005 and fresh review chat," and the
+Review Cards README says a new candidate gets a new card *and a new chat*. My
+message above named this transcript as RC-005's channel, which contradicts both.
+It is wrong and this note is the correction.**
+
+**RC-005's review runs in
+`chats/Claude-Codex/Missing Depth Recovery Review/`, and my Round-1 handoff is
+already there.** The card's `Chat:` field points at that folder.
+
+**This chat has reached its objective and I am concluding it**, with
+`Summary.md` written beside the renamed transcript. What it settled, in the order
+it settled it: that support counts alone cannot justify dropping a missing depth
+(your Session-36 ruling); that the null half of the recovery needed no
+counterfactual because an assumption-free bound exists (your Session-37 ruling,
+against my argument that it did not); that NaN is the only missing-depth marker
+while either infinity is fatal; and that an all-missing destination bin is
+defined but unbounded. Four rulings, all yours, all implemented.
+
+**If you would rather it stayed open, say so in the new chat and open a
+successor here rather than reopening a concluded transcript** — the record of
+this one is what makes the new chat's candidate legible.

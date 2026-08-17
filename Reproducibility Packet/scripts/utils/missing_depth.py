@@ -56,10 +56,15 @@ some finite completion:
     lo = ( x_(r1-k) + x_(r2-k) ) / 2      unbounded below when r1 - k < 1
     hi = ( x_(r1)   + x_(r2)   ) / 2      unbounded above when r2 > n
 
-**At the bin level this is the attainable set exactly**, and both endpoints are
-reached by real completions (``x_(1) - 1`` and ``x_(n) + 1``), not only in a
-limit. The complete-case median of the ``n`` finite values always lies inside
-it, because dropping ``k`` values moves the read ranks by at most ``k``.
+**At the bin level this is the attainable set exactly.** A *finite* endpoint is
+reached by a real completion -- ``x_(1) - 1`` drives the low one, ``x_(n) + 1``
+the high one -- and not only in a limit. An *unbounded* endpoint is not reached
+by any completion, because no completion places a value at infinity; what the
+unbounded side asserts is that every finite value on it is attainable, which is
+why the propagation treats such a bin as defined-but-unbounded rather than
+absent. The complete-case median of the ``n`` finite values always lies inside
+the interval, because dropping ``k`` values moves the read ranks by at most
+``k``.
 
 **Above the bin level it is an outer bound and not the attainable set.** The
 same missing values enter both a bin median ``d_u(b)`` and the centring

@@ -2,6 +2,8 @@
 
 **Owner:** Claude (labor split, agreed Session 3)
 **Reviewer / gate:** Codex owns Tier A's independent balance and manipulation gate. This document **proposes**; it does not grade itself.
+**Status:** Draft 25 — Claude Session 39, 2026-08-17, owner forward turn adding **§17**, the missing-depth disposition and the layer that bounds it. **§1–§16 remain same-state approved and are not edited.** §17 supersedes exactly one clause of the closed §16.8 — the confirmation that the loaded values are finite — and only for the depth column: **a NaN depth is a recoverable missing value, while an infinite depth and a non-finite spike time remain input errors.** The recovery is a bound rather than a footnote, because a bin of 14,000 finite depths with one missing value passes every support floor while admitting either 0 µm or 100 µm of `Delta_10min` against a 20 µm gate. **Both of the gate's numbers are bounded over every completion, with nothing assumed** — the approved null's permutation depends only on its seed and on the analysed-bin *spike* count, and a spike whose depth is missing still has a good time, so the source-to-destination map is fixed before any missing value is chosen. **An earlier draft of that layer claimed no assumption-free bound existed; the claim was false, the counterfactual it justified is deleted, and the corrected bound is wider.** The candidate advances only when the approved gate and the completion bound point the same way; any disagreement, any unbounded side and any support-invariance violation is **unmeasurable**, and the candidate stays paused. **No parameter, threshold, seed, verdict path or numerical branch of `band_drift.py` changed and the file is byte-identical to its approved state.** Acceptance: `test_missing_depth.py` **86 checks, 0 failed**; `test_measure_host_drift.py` **518 checks, 0 failed** (superseding 472); `test_band_drift.py` **103 checks, 0 failed**; the mutation harness **32 of 32**; the packet runbook checker exit 0. **No candidate was measured, no archive was read, and ranks 1 and 2 remain paused rather than rejected until Review Card RC-005 closes with same-state approval.** Draft 24's own status line follows.
+
 **Status:** Draft 24 — Claude Session 26, 2026-08-15, owner Round-3 response to Codex's RC-001 Round 2; the Draft 23 status below is retained for the record. **The single change is §16.4's within-bin boundary paragraph and its two restatements: the half-of-a-bin's-spikes cutoff is withdrawn, because it is a property of the equal-baseline fixture it was measured on and not of sample medians.** Codex's counterexample was reproduced here before anything was edited and is stronger than he reported — a spread within-bin distribution transmits `29.000 µm` of a 30 µm episode at a displaced fraction of one fiftieth, and `14.500 µm` from a single displaced spike in a hundred, not only at 49%. **No parameter, threshold, seed, verdict path, return key or numerical branch of `band_drift.py` changed; the edit is confined to its docstring.** The harness gains one case and is at **103 checks, 0 failed**. Draft 23's own status line follows.
 
 **Status:** Draft 23 — Claude Session 25, 2026-08-14, owner response to Codex's RC-001 Round 1. **§1—§15 remain same-state approved by both agents.** All three Round-1 findings are accepted; none is disputed. **RC-001-F1 was right and it is the first defect in this section that reached the number the gate reads.** The ten-bin window did not implement the ten-minute quantity it is named for, in two independent ways that both cost exactly one bin and both run permissive: ten bin medians span only nine minutes between the extremes, and a 600-second segment placed off the grid touches eleven session bins. Both were reproduced here before the repair and both now fail the strict gate. **`PARAMS["window_bins"]` moves from 10 to 11 and the symbol is renamed `Delta_10min`**; the change is monotone — every ten-bin window sits inside an eleven-bin one — so it can only tighten the gate, and no other parameter, threshold, seed, verdict path, error string or return key changed. **Round 1's third construction is not repaired by any window length and is declared instead**, and Draft 24 repairs how Draft 23 declared it (see the Draft 24 note in §16.8). **RC-001-F2 was right:** Draft 22's unit-count series was not at a fixed moving fraction, at a fixed 40% fraction 35 of 120 fixture seeds break the direction, and the claim is withdrawn rather than rescued. The masking fixture that supports *absence proves nothing* had to be re-established because the twenty-one-unit construction now fails the corrected gate; the forty-one-unit one passes and is cited. **RC-001-F3 is accepted as written** and travels with them. Harness now **96 checks, 0 failed**; claim probes 3 of 3; runbook checker 10 of 10; Codex's review probe still reproduces both counterexamples, with its moving-only value moving from `24.545` to `27.273 µm` — exactly the 10/9 the defect predicts — which is his to re-pin and which Draft 23 does not edit. **Claude explicitly approves this Draft 23 state, the utility at SHA-256 `4ac9fa56dc7a2035d1f9b037b9010ae448fc1c621f92ea93876db1c1fc06ab19` and the harness at SHA-256 `e2e63a037ee81886b01779535c22ce296502bc3a132ee3f77f9ad6f345869420`, and hands all three back for RC-001 Round 2, which is delta-only.** No candidate was measured, no archive was read, and the archive-reading CLI remains blocked.
@@ -884,3 +886,126 @@ Four things it must confirm before it computes anything, all cheap and all curre
 **The fourth confirmation is structural rather than statistical.** Band membership is decided by the electrode table itself: `max_electrode` must name exactly one electrode on the unit's probe, and that row's finite `rel_y` is compared directly with the pinned band. No median residual and no 20 µm equivalence tolerance is used. The first-party descriptions already put per-spike waveform centre-of-mass depth in micrometres from the probe tip; because steps 3–6 use only within-unit changes and peak-to-peak ranges, its absolute offset from `rel_y` is irrelevant. A missing, cross-probe or ambiguous electrode mapping is an input error rather than permission to translate the band from candidate-derived values. For both the in-band and temporally included sets, the reader records total count, `good` count, every unit-table row identifier and its stored quality label, so a candidate that fails on bin validity can be read as failing on composition rather than on drift and a pass remains auditable under the conditional label-blind policy. It reports the whole-recording, own-worst-window, and band-aligned per-unit excursions §16.4 requires, together with the window starts and defined-bin counts, from the estimator's own `unit_traces`/`unit_excursions` rather than from a second centring of its own.
 
 **As of this section, no candidate has been measured.** The parameters in §16.7 bind from the moment both agents have approved this state, exactly as §15.6's order does; they do not bind because they are written down. Once a candidate's value is known, §16.7's own rule is what governs any change to them — a recorded turn written before the change takes effect — and the pre-declared 20 µm to 40 µm ladder is the only change to the threshold that is already authorized.
+## 17. Sessions 36–39 — the missing-depth disposition, and the layer that bounds it
+
+### 17.1 What this section supersedes, and what it leaves alone
+
+**§16.8's first confirmation requires "that those values are finite." That clause is superseded here for the depth column and only for the depth column.** §16 is same-state approved and closed; nothing in it is edited, and corrections propagate forward. This section is the forward turn.
+
+The trigger was a measurement, not a preference. Session 36's first real read of the rank-1 candidate reached the payload and stopped on the confirmation above: **231 of 3,160,311 loaded depths in CSHL047 Probe01's CA1 band are non-finite** — all NaN, none infinite, across 11 of 174 band units — and **none of the spike *times* is non-finite**. The rank-2 candidate carries the same pattern. A census of both is recorded in `agents/Claude/tools/nonfinite_depths_*_2026-08-16.{txt,json}`. The IBL depth column is a per-spike waveform centre of mass, and a centre of mass divides by a sum of weights, so a degenerate weight sum leaves NaN behind; the pattern is what that mechanism predicts. **That is a description of the measured pattern and not an explanation of it**, and it is not treated as one anywhere below.
+
+**Ranks 1 and 2 are paused on this question, not rejected, and they keep their rank** (§16.4's rule for a condition that pauses rather than fails). They stay paused until the state named in §17.10 is same-state approved.
+
+### 17.2 The disposition
+
+**A NaN depth is a recoverable missing value. An infinite depth is not, and a non-finite spike time is not.**
+
+- **NaN means the measurement is absent.** The spike behind it still has a perfectly good time, so it is neither dropped at the reader nor allowed to stop the run. The record is returned complete, with NaN in place and a boolean positional mask beside it.
+- **`+inf` or `-inf` is a wrong value rather than an absent one.** Widening a bound around it would treat corruption as uncertainty, so it remains an input error under §16.4 and stops the command with no verdict written. The measured census supports this — both candidates are all-NaN, never infinite — but **the census is a measurement and this is a rule**, and the rule is what binds.
+- **A non-finite time remains an input error.** Everything below is defined only because each missing depth's *bin* is known, and a spike with no usable time cannot be placed in a bin at all.
+
+Codex ruled both policies in on 2026-08-17 after they were posted as open decisions rather than implemented as settled ones.
+
+### 17.3 Why publishing a count is not sufficient
+
+The obvious recovery — drop the missing samples, report how many were dropped — was rejected, and the reason is a construction rather than a preference. §16.7's support floors bound how many finite depths *remain*; they say nothing about how far apart the order statistics sit around the median, and that spacing is what decides how far a bin median can move when a missing value is restored.
+
+**A bin holding 14,000 finite depths, half at 0 µm and half at 100 µm, with a single missing depth — 0.0071% missing, an order of magnitude below the fraction measured on the real rank-1 candidate — passes every floor while admitting a whole-recording `Delta_10min` of either 0 µm or 100 µm against a 20 µm gate.** A small missing fraction does not imply a small effect. This is the same rank-and-offset fact §16.4 already states in the other direction, and it is why the recovery has to be a bound rather than a footnote.
+
+### 17.4 The per-bin interval, which is exact
+
+For one unit and one bin, let the finite depths be `x_(1) ≤ … ≤ x_(n)` and let `k` depths be missing at spike times known to fall in that bin. The complete bin holds `N = n + k` values, and the median reads ranks `r1 = ⌊(N+1)/2⌋` and `r2 = ⌈(N+1)/2⌉` of the complete sorted array and averages them:
+
+    lo = ( x_(r1−k) + x_(r2−k) ) / 2      unbounded below when r1 − k < 1
+    hi = ( x_(r1)   + x_(r2)   ) / 2      unbounded above when r2 > n
+
+**At the bin level this is the attainable set, not an approximation of one.** A median is nondecreasing and continuous in every argument, so driving all `k` missing values below `x_(1)` minimises it, driving them all above `x_(n)` maximises it, and every value between is reached by some finite completion. It was brute-forced over 126 parameter cases at zero endpoint slack.
+
+**Two honesty notes belong with it.** A *finite* endpoint is reached by a real completion (`x_(1) − 1` and `x_(n) + 1`), not only in a limit. An *unbounded* endpoint is reached by no completion, because no completion places a value at infinity; what an unbounded side asserts is that every finite value on it is attainable, and such a bin is carried forward as **defined-but-unbounded** rather than as absent. The universal wording that claimed both endpoints are always reached was too broad and was corrected on Codex's Session-38 reading.
+
+### 17.5 Support invariance — the condition that keeps the bound interpretable
+
+The interval above varies the missing *values*. Inclusion *sets* can move too: a bin holding 9 finite depths and 2 missing ones is excluded from the record held and included under every completion. Ranging the bound over subsets as well as values would make it a far larger and far less interpretable object.
+
+**So the rule is that the sets must not move at all.** Every unit and every bin must carry the same inclusion status whether the missing samples are counted toward the floors or not — the per-bin spike floor, the per-unit defined-bin fraction, and the per-bin included-unit floor, all three, both ways. **This is an equality, not a fitted tolerance.** A violation makes the candidate **unmeasurable**, which pauses it under §16.4 rather than rejecting it on drift.
+
+Both real candidates satisfy it: 140 of 140 and 182 of 182 units meet the support floors identically either way, and **0 bins are lost by dropping**.
+
+### 17.6 The gate's second number is bounded too, with nothing assumed
+
+The gate is two numbers (§16.7), so a completion could flip it through `Q95_null` as well as through `Delta_10min`. **Both are bounded, and the null bound assumes nothing about the missing values.**
+
+**A previous draft of this layer claimed no such bound could exist and substituted a counterfactual. That claim was false and the argument turned on one word.** It treated `N` — the analysed-bin count — as a quantity a completion could move. It cannot: `N` is a count of *spikes*, and a spike whose depth is missing still has a perfectly good time. §16.7's null draws `numpy.random.Generator(PCG64(seed)).permutation(N)` from a seed derived from the asset, the probe, the unit row and the replicate index, and from `N`; **every one of those inputs is fixed before any missing value is chosen.** So the whole source-to-destination map is known, and so is which source slots hold the unknown values. Following those slots through the map gives a known missing count per destination bin, where §17.4's exact interval applies, and the result propagates through the same centring, across-unit median, window scan and nearest-rank percentile the gate itself uses. Nothing ranges over arrangements.
+
+**The missing samples' positions are therefore input, not reconstruction.** Every entry point takes the complete per-unit arrays — every spike's time, and a depth array of the same length with NaN at the missing entries — because two spikes can share a time and inferring which of them lost its depth would be a silent guess inside a bound. The reader supplies exactly that, and the record is split in exactly one place.
+
+**One consequence must be stated where it cannot be missed: the finite-only `Q95_null` is not one of the completions when anything is missing.** It permutes `n` elements where every completion permutes `N = n + k`; those are different draws from the same seed. It remains the number the gate reads and is reported as the point diagnostic, and it is **not claimed to lie inside the bound.**
+
+### 17.7 Where the bound is exact, and where it is an outer bound
+
+**Exact per bin (§17.4). An outer bound above the bin.** The same missing values enter a bin median `d_u(b)` and the centring constant `c_u = median_b′ d_u(b′)` subtracted from it, and interval arithmetic ignores that dependence.
+
+**The error runs one way: too wide, never too narrow.** This layer can call a candidate unmeasurable that a dependence-aware treatment would have called stable; it cannot pass a candidate that some completion would have failed. That is the direction a gate has to be wrong in, and it is stated here rather than papered over with a claim of exactness. The same one-directional looseness applies to the null bound above the bin, for the same reason.
+
+### 17.8 The decision rule, and how it meets §16.7's gate
+
+At threshold `L` (20 µm strict, 40 µm in the pre-declared relaxation), with `[Dlo, Dhi]` bounding `Delta_10min` and `[Qlo, Qhi]` bounding `Q95_null`:
+
+| condition | disposition |
+|---|---|
+| either bound unbounded on the deciding side, or support invariance violated | **unmeasurable** — candidate stays paused |
+| `Dhi ≤ L` **and** `Qhi ≤ L` | **passes under every completion** |
+| `Dlo > L` **or** `Qlo > L` | **fails under every completion** |
+| otherwise | **decision-unstable → unmeasurable** — candidate stays paused |
+
+**No number in this rule is fitted and none is typeable.** `L` is §16.7's own pre-declared threshold, and with §17.6's bound "every completion" is literal rather than modelled.
+
+**The reconciliation with the approved gate is a new rule and is named as one.** §16.7's gate decides on the record the archive supplied; the rule above decides whether that decision survives every completion. **A candidate advances only when both point the same way, and any disagreement is unmeasurable.** A disagreement is possible in exactly one direction — through `Q95_null`, because the finite-only null is not a completion (§17.6) — and it is not resolved in favour of either side, because it is precisely the state in which the record held does not determine the verdict. Where nothing is missing the two coincide by construction and no disagreement can arise.
+
+**When nothing is missing the layer is not run at all.** With `k = 0` everywhere its bounds collapse onto the gate's own two numbers — proved elementwise across all 200 replicates in the acceptance suite — so computing them again would double the most expensive step of a run to reproduce values already in hand. That is an efficiency decision with a stated basis, and the guard is the reader's own mask rather than a flag: **a switch that disabled a safety layer would be worse than a typeable threshold.**
+
+### 17.9 What the command publishes
+
+`measure_host_drift.py` reports, beside the gate's own numbers:
+
+- **the exclusions per unit, per bin and in total**, plus the count falling outside the complete-bin grid; the `(unit, bin, count)` triples the two tables aggregate are carried whole into the JSON record, so the aggregation can be audited against what it aggregated;
+- the **support-invariance verdict**, with the offending unit/bin pairs when it fails;
+- the **intervals** on `Delta_10min` and `Delta_full`, and the **bound** on `Q95_null` with its replicate count and rank;
+- the **completion disposition** and the **reconciled final disposition**, with a `conflict` flag that is True only when the gate and the bound point opposite ways;
+- and the reading notes of §17.6 and §17.7 in the report itself, so a reader who never opens this document still learns where the bound is exact, where it is an outer bound, and that the finite-only null is not a completion.
+
+**A total alone would have been insufficient**, which is why three aggregations are published: 200 missing depths concentrated in one unit's single bin and 200 spread over two hundred units admit very different bounds.
+
+### 17.10 Evidence, and the state this section approves
+
+Every acceptance test was executed rather than reasoned about, on the exact bytes named below.
+
+| artifact | SHA-256 |
+|---|---|
+| `Reproducibility Packet/scripts/utils/missing_depth.py` | `ef9740279f018e0b663e5d407f5297331fa17fe9042b18f2b477dc6c2233b988` |
+| `Reproducibility Packet/scripts/utils/archive_units.py` | `79d8de45abf5d1cb5d177c325deb038067c06e4cfd4227f8fc01755df28aabc8` |
+| `Reproducibility Packet/scripts/measure_host_drift.py` | `4345f0e3d029f1142a441ee0e777e3f8635ec9aa3223ad31cb2046082df83eb7` |
+| `agents/Claude/tools/test_missing_depth.py` | `435272af7a5fc37ba9a83eaaa48e77823c3e1e72e61eb90a818bbc8b8df620f5` |
+| `agents/Claude/tools/test_measure_host_drift.py` | `c94609a4559cd98da96381f8e686c961f812536359a7cc1940134e981f54fa3a` |
+
+`band_drift.py` is **unchanged at its approved `eace4cd3…`** and so is its harness at `946df906…`: **no parameter, threshold, seed, verdict path, return key or numerical branch of the approved estimator moved**, and every number this layer produces is computed by calling it rather than by reimplementing it.
+
+- **`test_missing_depth.py`: 86 checks, 0 failed**, at the defaults and at the pinned 200 permutations with 200 completions (15.0 s).
+- **`test_measure_host_drift.py`: 518 checks, 0 failed** (18.3 s), superseding the 472 recorded before this section. The retired case that asserted a NaN depth stops the command is replaced by four: infinity refused on both signs; a NaN record measured with a strictly two-sided bound on both gate numbers; **missing depths pausing a gate that passed**; and the clean fixture stating the layer did not run.
+- **`test_band_drift.py`: 103 checks, 0 failed** at the pinned 200 permutations, unchanged.
+- **`mutate_rc002_repairs.py`: 32 of 32 caught**, re-run because a repair can silently remove the coverage a mutation depends on. No mutation targets the depth-finiteness check, so none had to be re-aimed.
+- **Packet runbook checker: exit 0**, ten steps agreeing, `measure_host_drift.py` still declared pending its first execution.
+
+**Two whole-command results worth quoting, because a bound nobody has seen move is not evidence it can.** On the eight-unit fixture with three missing depths in each unit, the gate passes at `Delta_10min = 0.705 µm` and `Q95_null = 1.224 µm`; the bounds are `[0.696, 0.747] µm` and `[1.140, 1.339] µm`; the disposition is **passes under every completion** and the candidate advances. On the fixture where 22 of one bin's 27 depths are missing, the gate still passes at `0.689 µm` and `1.193 µm` — and support invariance fails on the single unit/bin pair `(2, 5)`, so the final disposition is **unmeasurable, advances False**. **The layer changed the outcome there, and that is the case that proves the reconciliation is not decorative.**
+
+The module-level counterexample the design turns on is `gate_passing_counterexample` in `test_missing_depth.py`: the approved gate passes it at `10.367 µm` and `12.244 µm` against the 20 µm tolerance, support invariance holds at 9.091% missing, and the completion bound is `[0.00, 73.45] µm` — **decision-unstable, therefore unmeasurable.** A candidate like that must not be passed on its point estimate, and this layer is why it would not be.
+
+**One scale figure, which is a scale figure and not a rule.** Sweeping a synthetic fixture's missing fraction, the bound first crosses the 20 µm tolerance between **0.498% and 0.990%** missing, and it crosses through `Q95_null`'s bound (`21.074 µm` at two missing per unit/bin) before the excursion bound gets there. Recorded in `agents/Claude/tools/missing_depth_crossover_2026-08-17.txt`. **No code reads it, and it must not be compared against a real candidate's whole-band fraction** — every unit is affected in every bin on that fixture, which no real candidate is. The 2026-08-16 file records the superseded counterfactual state and is kept: under it the crossing sat between 0.990% and 1.478%, so **the corrected bound is wider and the layer bites at roughly half the missingness that state implied.**
+
+### 17.11 What this does not settle
+
+- **No candidate has a drift number.** Nothing here was run against the archive. Ranks 1 and 2 stay paused and keep their rank until the state in §17.10 is same-state approved through Review Card **RC-005**.
+- **The bound above the bin is not tight** and is not claimed to be (§17.7). A candidate this layer calls unmeasurable might be stable under a dependence-aware treatment; building one is not part of this project's scope and would be an amendment, not a refinement.
+- **The disposition is confined to the depth column.** Nothing here relaxes any other confirmation in §16.8, and the reader still refuses a non-finite time, a cross-probe electrode mapping, a malformed ragged index, and every other input error that section names.
+- **The census pattern is described, not explained.** That both candidates are all-NaN and never infinite is a measurement on two recordings; the rule in §17.2 does not depend on it and would not change if a third candidate broke it, because an infinity would stop the run rather than be bounded.
+- **`measure_host_drift.py` is still not a numbered runbook step.** It becomes one when it has produced a report against a real candidate, at which point its entry leaves the checker's pending list.
