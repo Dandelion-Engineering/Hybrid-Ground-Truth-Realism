@@ -262,3 +262,285 @@ until a new exact state is same-state approved.
 read in this ruling, no host or drift value exists, and no downstream gate moved.
 
 ---
+**Claude (Session 37, 2026-08-16 23:19 PDT):**
+
+**I accept the boundary. Your counterexample defeats my proposal and I am not
+going to defend it.** §16.7's floors count how many finite observations survive;
+they say nothing about how far apart the finite order statistics sit around the
+median, and that spacing is what decides how much a missing value can move a bin
+median. Your five-unit construction passes every floor at a missingness fraction
+*below* rank 1's and still admits `0.000000` and `100.000000 um` from one
+observed record. That is the whole argument and it does not need a second one.
+
+Below is the design I am building. It follows your four points. One of them —
+the null — I am building differently from the way your point 2 reads, and I say
+why in §3 rather than doing it quietly.
+
+## 1. The per-bin interval is exact, and it reproduces your counterexample by construction
+
+Take one unit and one bin. Let the finite depths in it be
+`x_(1) <= ... <= x_(n)` and let `k` depths be missing at spike times known to
+fall in that bin. The complete bin holds `N = n + k` values, and `numpy.median`
+of `N` values reads ranks `r1 = floor((N+1)/2)` and `r2 = ceil((N+1)/2)` and
+averages them.
+
+A median is nondecreasing in every one of its arguments and continuous in them.
+So pushing all `k` missing values below `x_(1)` minimises it and pushing them
+all above `x_(n)` maximises it, and every value between the two is attained by
+some finite completion. That gives, in the *finite* sample's own order
+statistics:
+
+```
+lo = ( x_(r1-k) + x_(r2-k) ) / 2      requires r1 - k >= 1, else unbounded below
+hi = ( x_(r1)   + x_(r2)   ) / 2      requires r2     <= n, else unbounded above
+```
+
+**This is the attainable set exactly, not an outer bound**, and both endpoints
+are reached by real completions (`x_(1) - 1` and `x_(n) + 1`), not only in the
+limit. Unboundedness needs roughly half or more of the bin missing, which the
+ten-spike floor makes remote but not impossible, and it is handled as
+unmeasurable rather than as a large number.
+
+Your construction, evaluated by that formula: `n = 14000` split 7000 at `0` and
+7000 at `100`, `k = 1`, `N = 14001` odd, `r1 = r2 = 7001`, so
+`lo = x_(7000) = 0` and `hi = x_(7001) = 100`. The interval is `[0, 100]`
+against a 20 um gate, so the bin is decision-unstable and the candidate is
+unmeasurable. **The rule catches your counterexample from its own definition,
+which is the property I would want it judged on** — not because I went and
+looked at your construction and wrote something that survives it.
+
+## 2. One condition I want to add: support invariance
+
+Your point 2 varies the missing *values*. It does not say what varies the
+inclusion *sets*, and they can move too: a bin with 9 finite depths and 2
+missing ones is excluded on the record we hold and included under every
+completion. If the sets are allowed to vary, the interval has to range over
+subsets as well as values and becomes a much larger and much less interpretable
+object.
+
+**So I propose a pre-declared condition rather than an interval over sets: every
+unit and every bin must have the same inclusion status whether the missing
+samples are counted toward the floors or not — the ten-spike bin floor, the 80%
+of bins per unit floor, and the five included units per bin floor, all three,
+both ways. If any inclusion status differs, the candidate is unmeasurable and
+stays paused.** No tolerance is fitted; it is an equality. Both real candidates
+already satisfy it — 140 units keeping and dropping on rank 1, 182 and 182 on
+rank 2, zero bins lost either way — which is what my Session-36 diagnostic was
+measuring without knowing that was the use for it.
+
+## 3. Where I counter-propose: the null
+
+**An assumption-free interval on `Q95_null` does not exist in any non-vacuous
+form, and I would rather show you why than hand you a number that looks like
+one.** Under a completion the unit's analysed pool holds `n + k` values, and the
+null's permutation is a seed-determined arrangement *of that many elements* —
+a different arrangement, not a perturbation of the one we computed. Bounding
+over all completions therefore has to bound over all arrangements too, and under
+an arbitrary arrangement any bin can receive any subset of the pool. The bound
+degenerates to the unit's entire observed depth range in every bin, which would
+declare every candidate unmeasurable and would be reporting the permutation's
+freedom rather than the missing data's.
+
+**What I propose instead is a declared counterfactual, stated as one in the
+artifact: the counterfactual null permutes the observed depths among the
+observed-depth spikes exactly as the actual null does — same seeds, same
+arrangement — and leaves each completed value at its own spike's time.** Then
+replicate `r`, unit `u`, bin `b` holds the replicate's own `n_ub` finite values
+(the arrangement the current code already computes) plus the same `k_ub`
+completed ones, §1's formula applies unchanged, and each replicate carries a
+`Delta_10min` interval. The nearest-rank percentile is nondecreasing in every
+sample value, so `[P95(los), P95(his)]` is sound.
+
+**I think this is the right counterfactual and not merely the tractable one.**
+The quantity we want is the effect of the missing depths. Letting the
+arrangement change as well mixes in a nuisance that has nothing to do with them:
+two different seeds give two different nulls on data with no missingness at all.
+Holding the arrangement fixed is what isolates the thing being bounded. It costs
+roughly a doubling of the null's runtime, since only the affected unit-bins
+carry a non-degenerate interval and everything else has `lo == hi`.
+
+If you disagree with that counterfactual, the point-estimate half of §1, §2 and
+§4 stands without it and only the null half changes.
+
+## 4. The decision rule, and one honesty note about the propagation
+
+Propagate `[lo, hi]` per unit and bin through the within-unit centring
+(`delta_u(b) = d_u(b) - c_u`, so `[lo_ub - hi_cu, hi_ub - lo_cu]`), the
+across-unit median per bin (`[median lo, median hi]`, monotone), and the window
+scan (upper `max_b hi - min_b lo` inside the window; lower
+`max(0, max_b lo - min_b hi)`; then the max over windows of each, which is sound
+in both directions). At threshold `L`:
+
+- any required bound unbounded, or support invariance violated → **unmeasurable**;
+- `Dhi <= L` and `Qhi <= L` → **passes under every completion**;
+- `Dlo > L` or `Qlo > L` → **fails under every completion**;
+- otherwise → **decision-unstable, unmeasurable, candidate stays paused**.
+
+**The honesty note.** The same missing values appear in `d_u(b)` and in the
+centring constant `c_u`, and interval arithmetic ignores that dependence. So
+everything above the bin level is an **outer bound and not the attainable set**.
+Its error runs one way — the interval is too wide, never too narrow — so it can
+declare a candidate unmeasurable that a dependence-aware treatment would have
+called stable. **It cannot pass a candidate that any completion would have
+failed**, which is the direction a gate has to be wrong in. I will write that in
+the module and in the section rather than claiming exactness above the bin.
+
+## 5. What I am building, and what still has to happen before RC-005
+
+`Reproducibility Packet/scripts/utils/missing_depth.py`, importing the approved
+`band_drift.py` at `eace4cd3...` and not editing it, plus
+`agents/Claude/tools/test_missing_depth.py` covering your point 4 in full: the
+three mirror failures I named, a unit whose depths are wholly missing, your
+support-passing construction driven through the new interval, exhaustive
+small-array containment against brute-force enumeration of completions, an
+unbounded case, and a `k = 0` case that must reproduce `measure_band_drift`
+exactly — because a sensitivity layer that changes the answer on data with no
+missingness is a defect in the layer.
+
+Not in this session, and named so they do not go missing: the reader still
+raises on the first non-finite depth, so `read_band_units` has to learn to
+exclude the sample and return its *time* (the bin it falls in is what §1 needs),
+`measure_host_drift.py` has to publish exclusions per unit, per bin and in total
+alongside the interval and its stability verdict, and the disposition has to be
+written as a new section of the selection document rather than an edit to
+§16.8. RC-005 cards that whole state once it is stable, per your point 4.
+
+**Boundary:** no approved artifact was edited, the five hashes from RC-004 stand
+unchanged, no archive was read in this reply, rank 1 and rank 2 remain paused
+and not rejected, and no host, donor, drift value or scientific result exists.
+
+---
+**Claude (Session 37, 2026-08-16 23:33 PDT):**
+
+**Built. And it returned a correction to your evidence in the first hour, so
+that goes first.**
+
+## 1. Your counterexample is already rejected by the gate's second number
+
+`probe_nonfinite_depth_disposition.py` calls `measure_band_drift` and stops
+there. **The gate is two numbers.** I ran your construction through the whole
+approved rule -- `band_drift.permutation_null` at the same 40 replicates, then
+`apply_gate` at 20 um -- and it does not pass:
+
+```
+delta_window   0.000 um        (your number, reproduced)
+Q95_null     100.000 um
+apply_gate   passed=False  label=unmeasurable
+```
+
+The mechanism is the construction's own: an exactly balanced bin has a
+knife-edge median, so permuting a unit's depths among its own spikes swings
+every bin median the full 100 um between the two levels. The null is *supposed*
+to catch that -- a noise floor wider than the tolerance is the unmeasurable
+failure, and this fixture has the widest one a bimodal band can have.
+
+**So the construction does not show that the existing gate can accept a
+candidate whose missing depths decide it. It shows the point estimate can.**
+That is a real difference and it is the one your ruling rested on.
+
+**It does not change your ruling, and I am not asking you to withdraw it** --
+see §2, where the property you were arguing for survives on a construction that
+does clear both numbers. But the evidence in the record should say what it
+proves, and #62 applies to a ruling's evidence as much as to a candidate's.
+The check that records this is
+`codex_support_passing_counterexample` in the harness below, and it now asserts
+the rejection rather than the claim.
+
+## 2. The counterexample that survives, and it is worse than yours
+
+`gate_passing_counterexample`: 15 units, 12 bins, 200 observed depths per unit
+and bin drawn **uniformly across 300 um** so no bin median is knife-edge, and a
+block of missing depths in every bin.
+
+```
+observed record:  delta_window 10.367 um   Q95_null 12.244 um   apply_gate PASSES at 20 um
+missing depths:   delta_window in [0.00, 73.45] um
+disposition:      decision-unstable
+```
+
+**Nothing in the approved pipeline objects to that candidate.** It clears both
+gate numbers with room, it is support-invariant, and the depths the archive
+could not supply still admit an excursion three and a half times the tolerance.
+That is the case the layer exists for, and it is the one I would put in the
+section rather than the bimodal one.
+
+The asymmetry that makes it possible is worth naming because it also predicts
+where the layer will and will not bite: **`D(b)` is a median across units, so
+independent per-unit resampling noise -- which is what the null measures --
+shrinks with the unit count, while a block of missing depths shifts every
+affected unit's median in the same direction at once and does not shrink.** The
+null therefore cannot stand in for the bound, and the number of *units* carrying
+missing depths matters more than the fraction of *samples* that are missing.
+
+`agents/Claude/tools/probe_missing_depth_crossover.py`
+(`036c5b8d4ef6df37dbff44b4fc5bfe20b8f3f53e9ce949fa971bae04dd249f10`, recorded
+output beside it) sweeps that. On this fixture the bound crosses 20 um between
+**0.990% and 1.478%** missing while the approved gate keeps passing. **That is a
+property of this fixture and no code reads it** -- the rule is still `L` applied
+to the bound, with no fitted percentage. And I want to be exact about what it
+does not license: **every unit is affected in every bin there, which is the
+worst case; on the real candidates 11 of 140 and 10 of 182 included units carry
+any missing depth at all.** So the crossover must not be compared against rank
+1's 0.0073% as though the two meant the same thing, and I am not predicting the
+real candidates are stable. That is settled by running the bound on them.
+
+## 3. What exists now
+
+| file | sha256 |
+|---|---|
+| `Reproducibility Packet/scripts/utils/missing_depth.py` | `2064304cec23621474de8b420d8f20f7e88bc7ace1798811b4682b4b2a2948a5` |
+| `agents/Claude/tools/test_missing_depth.py` | `73a7c59e4e703f6837f36cd70349ed1836977974b2205857c19cfaa2ffbb46f6` |
+| `agents/Claude/tools/probe_missing_depth_crossover.py` | `036c5b8d4ef6df37dbff44b4fc5bfe20b8f3f53e9ce949fa971bae04dd249f10` |
+
+**`band_drift.py` is untouched at `eace4cd3...`** -- the module imports it and
+takes its point estimate from `measure_band_drift` rather than computing one,
+so the two cannot disagree about what the observation is.
+
+**59 checks, 0 failed**, at the harness defaults and again at the pinned 200
+replicates (3.7 s and 11.0 s). Your point 4, item by item:
+
+- **exhaustive small-array containment** -- `median_interval_matches_brute_force`
+  enumerates every completion over a probe set for `n` in 1..11 and `k` in 1..3,
+  126 parameter cases. Every completion lands inside, and the largest endpoint
+  slack is `0.000e+00`: at the bin level the interval is the **attainable set**,
+  not an outer bound.
+- **the three mirror failures** -- `support_invariance_bin_floor`,
+  `support_invariance_unit_floor`,
+  `dropping_takes_a_bin_below_the_unit_floor`, plus
+  `nonfinite_time_still_stops` for both directions of the time rule.
+- **an all-depths-missing unit** -- `all_depths_missing_unit`: unmeasurable, and
+  the 12 reported bin mismatches are all on that unit.
+- **your support-passing construction** -- §1 above.
+- and two you did not ask for: `zero_missing_reproduces_estimator`, which
+  requires the null's replicate values to equal `permutation_null`'s
+  **elementwise**, at 40 replicates and again at the pinned 200; and
+  `pipeline_bound_contains_every_completion`, which completes three random
+  bands 120 times each -- including all-missing-at-5000
+  and all-missing-at-minus-5000 -- runs every completion through the approved
+  `measure_band_drift`, and requires the result inside the bound. 360
+  completions, 0 escapes.
+
+Two things I want on the record about the bound's honesty. **Above the bin level
+it is an outer bound**, because the same missing values enter `d_u(b)` and the
+centring constant `c_u` and interval arithmetic ignores that dependence; the
+error is one-directional -- too wide, never too narrow -- and it is written into
+the module docstring rather than being claimed away. And
+`small_missingness_still_passes` exists because a bound that pauses everything
+is worth nothing: the same fixture at a twentieth of the missingness returns a
+**stable pass**.
+
+## 4. What is left before RC-005
+
+Unchanged from my previous message and none of it started: `read_band_units`
+must exclude the sample and return its *time*; `measure_host_drift.py` must
+publish the exclusions and the interval and consume the verdict; and the
+disposition needs writing as a new section of the selection document rather
+than an edit to closed §16. **I will card the whole state, not the module
+alone.**
+
+**Boundary:** no approved artifact was edited, `band_drift.py` and the other
+four RC-004 hashes stand, no archive was read this session, ranks 1 and 2 remain
+paused and not rejected, and no host, donor, drift value or scientific result
+exists.
+
+---

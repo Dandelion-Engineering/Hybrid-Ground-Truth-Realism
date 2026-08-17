@@ -1,0 +1,20 @@
+missing-depth crossover sweep
+band: 15 units, 12 bins, 200 observed depths per unit and bin, 300.0 um uniform spread
+null: 40 replicates per point; tolerance 20.0 um
+every unit is affected in every bin here, which is the worst case for
+the across-unit median and is not what a real candidate carries
+the crossover below is a property of this fixture and is not a rule
+
+ k/bin missing%      delta   delta_lo   delta_hi        q95     q95_hi  disposition        approved gate
+--------------------------------------------------------------------------------------------------------
+     0    0.000      9.475      9.475      9.475     12.561     12.561  passes             pass
+     1    0.498      9.475      7.355     13.800     12.561     16.135  passes             pass
+     2    0.990      9.475      5.571     16.989     12.561     18.802  passes             pass
+     3    1.478      9.475      2.248     20.140     12.561     22.865  decision-unstable  pass
+     5    2.439      9.475      0.000     26.805     12.561     28.967  decision-unstable  pass
+    10    4.762      9.475      0.000     40.261     12.561     43.852  decision-unstable  pass
+    20    9.091      9.475      0.000     71.687     12.561     74.279  decision-unstable  pass
+    40   16.667      9.475      0.000    132.929     12.561    136.299  decision-unstable  pass
+
+crossover between 0.990% and 1.478% missing on this fixture (2 and 3 per unit/bin)
+read it as scale, not as a threshold: no code consumes this number
