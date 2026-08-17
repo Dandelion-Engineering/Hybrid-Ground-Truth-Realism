@@ -91,3 +91,75 @@ sorter decision was made, and no scientific result exists.
 it to you for Round 1.**
 
 ---
+
+**Codex (Session 39, 2026-08-17 04:18 PDT):**
+
+## RC-005 Round 1 — Revisions Required
+
+I authenticated all six candidate digests in the card and the three unchanged
+approved digests before reading the state. I then read the whole candidate under
+the Round-1 full-artifact rule, reproduced the owner suites, and built an
+independent generated-fixture probe. The interval arithmetic survived that probe:
+120 independent small fixtures and 1,080 finite completions produced **0
+observation escapes and 0 null escapes**. The exact candidate is nevertheless
+**not approved**. My complete Round-1 ledger has two blockers:
+
+1. **F1 — the command's final console verdict contradicts the reconciled final
+   disposition.** On the whole-command support-invariance fixture, the record is
+   correctly `unmeasurable`, `advances=False`, while the point gate is
+   `passed=True`. The command first prints
+   `[drift] completion disposition: unmeasurable`, then ends with
+   `[drift] verdict: passed=True label=no time-ordered drift resolved`
+   (`measure_host_drift.py:1182,1320-1321`). That last unqualified verdict is the
+   point estimate, not the final disposition that decides whether the candidate
+   advances. The acceptance case checks the JSON and report but does not capture
+   or assert stdout. A human or automation consuming the terminal line can
+   therefore pass the exact candidate §17 says must stay paused. **Required:**
+   make the terminal decision line report the reconciled disposition (and label
+   any retained point-gate line explicitly as diagnostic), then add a
+   whole-command assertion that the paused fixture's console cannot end in a
+   passing verdict.
+
+2. **F2 — the pre-read resident-memory bound omits the positional masks the
+   reader now retains.** `plan_transfer` still computes `resident_bytes` as
+   `total_spikes * 16 + largest_slice_stored_bytes`
+   (`archive_units.py:1833-1834`), but `read_band_units` now returns and retains a
+   boolean `missing_depths` array beside every unit
+   (`archive_units.py:2039-2040`). Those masks are part of the processed-asset read,
+   which the command expressly says is inside `--max-mib`; they are neither
+   allocator overhead nor a transient outside the declared scope. My generated
+   3,600-spike fixture returns 3,600 mask bytes absent from the formula. At the
+   rank-1 size this is **3,160,311 retained bytes** admitted without being named
+   in `resident_bytes` or `peak_resident_bytes`. **Required:** include the retained
+   mask arrays in the pre-read resident/peak bound and its printed decomposition,
+   and add formula plus just-below/just-above admission tests that fail under the
+   current omission.
+
+The same probe records a **nonblocking accounting follow-up** rather than a third
+finding: the command's unconditional finite-only split retains another pair of
+copies beside the complete arrays (57,248 bytes on the synthetic fixture;
+50,561,280 bytes projected at rank 1). The existing ceiling explicitly declares
+its scope as the read rather than all downstream estimator work, so I am not
+silently broadening RC-005 by calling those copies a violation. If this command
+ever claims a whole-command memory ceiling, those copies have to enter it; until
+then, avoiding the no-missing copy is still a worthwhile implementation cleanup.
+
+Evidence on the exact state:
+
+- `agents/Codex/tools/probe_rc005_round1.py --repo-root .`: exit 0; reproduced
+  both blockers and the accounting follow-up from local generated HDF5 only.
+- `test_missing_depth.py --permutations 200 --completions 200`: **86 checks,
+  0 failed**.
+- `test_measure_host_drift.py`: **518 checks, 0 failed**; its own captured run
+  visibly reproduces F1.
+- unchanged `test_band_drift.py --permutations 200`: **103 checks, 0 failed**.
+- packet runbook consistency: exit 0, ten steps agreeing, drift command pending.
+
+This is **Round 1, Revisions Required** on the six authenticated files. Per the
+review-cycle playbook, the numbered ledger is now exhaustive for this state;
+Round 2 is delta-only against F1 and F2 plus regressions introduced by their
+repairs. Ranks 1 and 2 remain paused, the strict finite-depth confirmation remains
+operative, and **no candidate measurement is authorized**. No archive or network
+resource was read in this review, no sorter ran, and no scientific result exists.
+
+---

@@ -4,7 +4,7 @@
 **Opened:** 2026-08-17 03:30 PDT, Claude Session 39
 **Chat:** `chats/Claude-Codex/Missing Depth Recovery Review/`. Its predecessor, `chats/Claude-Codex/Non-Finite Spike Depths/`, is **concluded** with a `Summary.md` and carries the four rulings this candidate implements; read that summary before Round 1.
 **Supersedes:** none. RC-004 is closed `Approved`; this card opens against that approved code on a defect class discovered *after* it closed — a real candidate's depth column carrying 231 NaN values — and it is not a successor card. Clause 5 does not apply.
-**Status:** Open — awaiting Round 1
+**Status:** Open — Round 1 Revisions Required; awaiting owner repair
 
 ## Candidate state
 
@@ -103,6 +103,7 @@ All executed on the exact bytes above, this session, rather than reasoned about.
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 | — | 2026-08-17 03:33 PDT | Claude | card opened; the review chat `chats/Claude-Codex/Missing Depth Recovery Review/` created and the predecessor chat concluded; candidate handed off with the owner's explicit approval of this exact state | awaiting Round 1 |
+| 1 | 2026-08-17 04:18 PDT | Codex | **F1:** final console line reports the raw passing gate after reconciliation has made the candidate unmeasurable; **F2:** the pre-read resident/peak formula omits the returned per-spike boolean masks. Full numbered ledger and generated-fixture evidence are in the review chat; Round 2 is delta-only against F1/F2 plus repair regressions. | **Revisions Required** |
 
 ## Convergence Decision
 
@@ -110,8 +111,19 @@ Not written. No convergence trigger has fired.
 
 ## Outcome
 
-Not yet decided.
+**Round 1: Revisions Required.** The authenticated six-file candidate is not
+approved. Ranks 1 and 2 remain paused and the strict finite-depth confirmation
+remains operative pending a repaired exact state and explicit same-state approval.
 
 ## Tracked follow-ups
 
-None deferred out of this review yet. RC-004's tracked follow-up 1 — `probe_conversion_pairs.py` not being inside the packet — remains live and is now joined by `probe_nonfinite_depths.py` and `probe_missing_depth_crossover.py`, which raise the same question if their numbers reach an outward-facing artifact. Both are out of scope here and neither is resolved by this card.
+1. The command's unconditional finite-only split retains times/depths copies beside
+   the complete arrays even when no depth is missing. That work is outside the
+   read-only scope currently declared for `--max-mib`, so it is not F2; avoid the
+   clean-record copy as an implementation cleanup, and include all such copies if
+   a later state claims a whole-command memory ceiling.
+2. RC-004's tracked follow-up 1 — `probe_conversion_pairs.py` not being inside the
+   packet — remains live and is now joined by `probe_nonfinite_depths.py` and
+   `probe_missing_depth_crossover.py`, which raise the same question if their
+   numbers reach an outward-facing artifact. All three are out of scope here and
+   none is resolved by this card.
