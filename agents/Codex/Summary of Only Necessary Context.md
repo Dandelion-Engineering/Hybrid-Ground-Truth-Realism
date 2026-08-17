@@ -1,88 +1,99 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 37 · 2026-08-17.**
+**Rewritten at the end of Codex Session 38 · 2026-08-17.**
 
-**Next Codex session will be Session 38. The next count-based progress report is due in Session 40.**
+**Next Codex session will be Session 39. The next count-based progress report is due in Session 40.**
 
 ## Current phase and controlling boundary
 
 **Phase 2 — Execution is open. No scientific result exists.** RC-004 remains
-closed `Approved`, but the first rank-1 measurement stopped before a drift
-verdict because sparse NaN depths violate the still-binding finite-depth input
-confirmation. Rank 1 and the rank-2 holdout remain paused, not rejected. No
-host is pinned and no candidate has a drift, noise, effective-SNR, donor,
-placement, generation or sorter value.
+closed `Approved`, but the first rank-1 drift command stopped before a verdict
+because sparse NaN depths violate the still-binding finite-depth confirmation.
+Rank 1 and the rank-2 holdout remain paused, not rejected. No host is pinned and
+no candidate has a drift, noise, effective-SNR, donor, placement, generation or
+sorter value.
 
-Do not modify the approved reader/command, resume the pinned order, or open
-RC-005 until the missing-depth recovery is a complete stable pre-card state and
-then receives same-state approval.
+The missing-depth recovery now has an accepted pre-card design, but no whole
+reader/command/§17 candidate and no RC-005 exist. Do not resume the pinned order,
+read another candidate payload, or treat the recovery as approved execution
+code until RC-005 closes with explicit same-state approval.
 
-## Claude Session 37: accepted work and correction
+## Claude Session 38 and the accepted correction
 
-Claude accepted Codex Session 36's rejection of count-only exclusion and built
-`Reproducibility Packet/scripts/utils/missing_depth.py` (`2064304e…`) plus a
-59-check harness (`73a7c59…`). Codex reproduced **59/59** at the pinned 200
-permutations.
+Claude accepted Codex Session 37's ruling that the fixed-arrangement
+counterfactual did not bound the gate's actual null. The corrected
+`Reproducibility Packet/scripts/utils/missing_depth.py` is
+`5a9cfde418069799ce159ce3d25890004bdff6f95f8b8f75fc99ab51833ea17c`.
 
-Accepted design pieces:
+The corrected completed-`N` construction is the accepted pre-card design:
 
-- exact unit/bin median attainable intervals from finite order statistics and
-  missing counts;
-- support invariance across all three existing inclusion floors;
-- conservative propagation through centring, the across-unit median and the
-  excursion statistic;
-- exclusion publication per unit, per bin and in total; and
-- the existing 20/40 µm tolerance as the decision boundary, with no fitted
-  missingness percentage.
+- every entry point takes the complete aligned spike-time/depth arrays, with
+  NaN at missing positions, so tied times never require reconstruction;
+- the complete analysed spike count, original missing source positions and
+  replicate seed fix each approved permutation before missing values are
+  chosen;
+- missing slots are followed to their destination bins and the exact bin-
+  median interval is propagated through centring, the across-unit median,
+  `Delta_10min` and the nearest-rank null percentile;
+- the interval is exact per bin and conservative above it, with error only
+  toward pausing a candidate that a dependence-aware treatment might admit;
+- the finite-only null remains a point diagnostic and is not described as a
+  completed record when `k > 0`; and
+- no fitted missingness threshold is introduced; the existing 20/40 µm gate
+  judges decision stability.
 
-Claude also correctly narrowed Codex's first counterexample. The balanced
-0/100 µm construction proves the **point estimate** can change from 0 to 100 µm
-while support remains green, but the existing two-number gate already rejects
-that fixture because `Q95_null = 100 µm`. Claude's stronger spread fixture
-supplies the whole-gate example: the observed record passes at `Delta_10min =
-10.367 µm` and pinned-200 `Q95_null = 14.604 µm`, while missing completions admit
-an excursion bound to `73.45 µm`.
+## Codex Session 38 rulings
 
-## Codex Session 37 null ruling
+The full ruling is appended to the active Non-Finite Spike Depths chat. It is a
+design disposition before formal review, not approval of an executable
+candidate.
 
-**The proposed fixed-arrangement null is not accepted as the voting
-sensitivity quantity.** Claude argued that the actual completed-data null is
-necessarily vacuous because restoring values changes the permutation length.
-But the completed length `N`, original missing source positions and replicate
-seed are all known before missing values are chosen. Therefore
-`rng.permutation(N)` is fixed across every completion. Follow the unknown source
-slots to their destination bins and propagate their exact median intervals
-through the actual approved null.
+1. **Completed-`N` null accepted.** It is the actual completed-data quantity the
+   gate consumes, not a substitute counterfactual.
+2. **NaN is the only missing-depth marker.** `+inf` and `-inf` remain fatal input
+   errors. Both measured candidates carry NaN only; relaxing infinities would
+   extend the recovery to an unmeasured wrong-value class.
+3. **An all-missing null destination is defined but unbounded.** If its complete
+   count meets the floor, `(-inf, +inf)` is the exact attainable median set and
+   must propagate to an unmeasurable disposition. An empty bin with no missing
+   values still raises.
+4. **Pre-card prose correction:** qualify the universal statement that both
+   interval endpoints are attained. Finite bounded endpoints are attained; an
+   unbounded side has no finite completion at infinity, although every finite
+   value on that side is attainable.
 
-Independent evidence is
-`agents/Codex/tools/probe_missing_depth_actual_null.py`, SHA-256
-`d1fdfefae8d9b3f0bdfbc8e9de25c82f7ddae83688855c0a2482d4af8cac09b1`.
-At 200 permutations it passes 8/8: finite actual-null interval
-`[12.254, 18.618] µm`, width `6.365 µm`; low/high/mixed actual completions all
-inside; zero-missing lower/upper paths each reproduce all 200 approved-null
-replicates; actual and counterfactual intervals are distinct.
+## Evidence reproduced
 
-The reader must preserve original all-spike order or a missing-position mask,
-not merely missing times, because tied times cannot reconstruct source order.
-The current counterfactual may remain only as a clearly nonvoting diagnostic
-with a separate purpose.
+- Owner harness `435272af…`: **86/86** at 200 permutations and 200 completion
+  draws.
+- Approved `test_band_drift.py`: **103/103** at 200 permutations.
+- Codex's Session-37 probe `d1fdfefa…` preserves seven completed-data checks —
+  `[12.254, 18.618] µm`, three completions contained, and zero-missing identity —
+  then raises only when its retired eighth check calls the removed
+  counterfactual signature. Do not edit it to make the old comparison green.
+- The corrected crossover fixture reaches the 20 µm gate between 0.498% and
+  0.990% missing under its deliberately systematic construction. This is
+  scale on that fixture, not a threshold or a comparison to either real
+  candidate's whole-band missing fraction.
 
 ## Immediate owner and next step
 
-**Immediate owner: Claude, still before formal review.** The active chat contains
-the full ruling. Claude should:
+**Immediate owner: Claude.** Build one stable whole state before RC-005:
 
-1. implement the completed-`N` actual-null interval;
-2. add actual full-null completion containment, zero-missing identity,
-   unbounded and row-index validation tests;
-3. wire the reader so it excludes non-finite depths for the point path while
-   preserving missing positions and keeping non-finite times fatal;
-4. publish exclusions and both sensitivity intervals in the command output;
-5. write the forward §17 disposition without editing closed §16; and
-6. create RC-005 and a fresh review chat only when that whole state is stable.
+1. change the archive reader to preserve the complete aligned record and
+   missing positions;
+2. enforce the accepted NaN/infinity split;
+3. have `measure_host_drift.py` publish exclusions per unit, per bin and total,
+   the finite-only point diagnostics, both completed-data bounds and the
+   stability disposition;
+4. append forward §17 to the selection document without editing closed §16;
+5. rerun the reader acceptance suite and both mutation harnesses after wiring;
+6. fix the one unbounded-endpoint prose sentence; and
+7. open RC-005 and a fresh review chat only after that whole state is stable.
 
-This is open-ended co-design, not a review round. The strict finite-depth rule
-continues to bind until a later exact state is same-state approved.
+The strict finite-depth rule continues to bind until the later exact state is
+same-state approved. Ranks 5, 7, 9 and 13 remain separately paused on declared-
+clock disagreement, and their payload diagnostic remains out of order.
 
 ## Approved foundation still in force
 
@@ -101,8 +112,7 @@ continues to bind until a later exact state is same-state approved.
 
 ## Downstream gates remain separate
 
-1. converge on and same-state approve the non-finite-depth recovery under
-   RC-005;
+1. stabilize and same-state approve the non-finite-depth recovery under RC-005;
 2. resume rank-1 plan/measurement in the pinned order;
 3. exposure-schedule/placement specification and approval;
 4. matcher implementation, exhaustive/mutation tests and approval;
@@ -112,9 +122,8 @@ continues to bind until a later exact state is same-state approved.
 8. independent Tier A balance/manipulation approval;
 9. separate generation authorization and later Rung 0/sorter authorization.
 
-Ranks 5, 7, 9 and 13 remain paused on declared-clock disagreement. Their
-payload diagnostic remains out of order. The three-way Review Method Change
-chat stays active by Randy's instruction; no new director decision is needed.
+The three-way Review Method Change chat stays active by Randy's instruction; no
+new director decision is needed.
 
-`agents/Codex/Session Summaries/HumanReport37.md` is the detailed record of the
-cross-review, actual-null construction, tests, append verification and boundary.
+`agents/Codex/Session Summaries/HumanReport38.md` is the detailed record of the
+design authentication, tests, rulings, append verification and boundary.
