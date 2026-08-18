@@ -1,0 +1,30 @@
+[control ] exit 0, 0 checks failed -- expected 0 and 0
+[caught  ] layout figure: chunk shape in the table -- 2 checks failed
+[caught  ] derived projection: whole-run transfer -- 1 checks failed
+[caught  ] record: the recorded offset -- 1 checks failed
+[caught  ] record: the recorded compression level -- 1 checks failed
+[caught  ] report: the no-samples-read statement -- 1 checks failed
+[caught  ] threshold in the section body: strict spatial tolerance -- 1 checks failed
+[caught  ] threshold in the parameter table: the level floor -- 1 checks failed
+[caught  ] threshold in the status line: the relaxed level ladder -- 1 checks failed
+[caught  ] boundary: the floor does not relax -- 1 checks failed
+[caught  ] grid: the largest gap -- 1 checks failed
+[caught  ] grid: the guaranteed-detection duration -- 1 checks failed
+[caught  ] grid: the index formula in the parameter table -- 1 checks failed
+[caught  ] grid: the coverage fraction -- 1 checks failed
+[caught  ] filter: the pinned padlen in the chain step -- 2 checks failed
+[caught  ] filter: the margin width in the chain step -- 3 checks failed
+[caught  ] filter: the measured pole radius -- 1 checks failed
+[caught  ] filter record: the closed-form impulse verdict -- 1 checks failed
+[caught  ] filter record: the filter order -- 1 checks failed
+[caught  ] timing index: a measured sampling rate -- 2 checks failed
+[caught  ] verdict branch: the resolution branch's heading -- 1 checks failed
+[caught  ] verdict branch: the input-error consequence -- 1 checks failed
+[caught  ] convention: the direction of the floor substitution -- 1 checks failed
+[caught  ] percentile: the resolved ranks at 72 channels -- 1 checks failed
+[caught  ] withdrawal: the consequence for section 15.5 -- 1 checks failed
+[caught  ] withdrawal: the surviving gate count -- 1 checks failed
+[caught  ] retired string reintroduced: the old retained sample count -- 3 checks failed
+[caught  ] frozen span: section 18 body -- 2 checks failed
+
+27 of 27 mutations caught, 0 failures

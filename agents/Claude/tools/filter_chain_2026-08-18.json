@@ -1,0 +1,107 @@
+{
+ "butterworth": {
+  "max_pole_radius": 0.9807813066977904,
+  "order": 5,
+  "sections": 3,
+  "tau_ms": 1.7177018896893674,
+  "tau_samples": 51.53105669068102
+ },
+ "context_chunks": 9,
+ "cutoff_hz": 300.0,
+ "impulse": {
+  "closed_form_minus_one_over_n": -7.680491551459293e-05,
+  "h_centre": -7.680491551459327e-05,
+  "matches_closed_form": true,
+  "max_abs_h_outside_150_sample_edges": 0.0018311674095787091,
+  "n": 13020,
+  "sum_abs_h_outside_150_sample_edges": 1.6260854135303973
+ },
+ "margin_study": [
+  {
+   "construction": "dft_brickwall",
+   "excursion_uv": 0.0,
+   "margin_ms": 5.0,
+   "margin_samples": 150,
+   "sigma_reference_uv_at_worst": 6.671329746921091,
+   "trials": 12,
+   "worst_max_abs_sample_error_uv": 6.427118360636014,
+   "worst_relative_sigma_error": 0.01136599495441315
+  },
+  {
+   "construction": "dft_brickwall",
+   "excursion_uv": 200.0,
+   "margin_ms": 5.0,
+   "margin_samples": 150,
+   "sigma_reference_uv_at_worst": 6.671315032078752,
+   "trials": 12,
+   "worst_max_abs_sample_error_uv": 6.426970380969027,
+   "worst_relative_sigma_error": 0.011357890793970205
+  },
+  {
+   "construction": "dft_brickwall",
+   "excursion_uv": 0.0,
+   "margin_ms": 16.666666666666668,
+   "margin_samples": 500,
+   "sigma_reference_uv_at_worst": 6.681600581726186,
+   "trials": 12,
+   "worst_max_abs_sample_error_uv": 2.997807698794439,
+   "worst_relative_sigma_error": 0.01122578645878769
+  },
+  {
+   "construction": "dft_brickwall",
+   "excursion_uv": 200.0,
+   "margin_ms": 16.666666666666668,
+   "margin_samples": 500,
+   "sigma_reference_uv_at_worst": 6.681602308408079,
+   "trials": 12,
+   "worst_max_abs_sample_error_uv": 2.9976918782508433,
+   "worst_relative_sigma_error": 0.011221993069068015
+  },
+  {
+   "construction": "butterworth_sosfiltfilt",
+   "excursion_uv": 0.0,
+   "margin_ms": 5.0,
+   "margin_samples": 150,
+   "sigma_reference_uv_at_worst": 6.219160926529057,
+   "trials": 12,
+   "worst_max_abs_sample_error_uv": 0.6069297216426224,
+   "worst_relative_sigma_error": -0.000745404313909126
+  },
+  {
+   "construction": "butterworth_sosfiltfilt",
+   "excursion_uv": 200.0,
+   "margin_ms": 5.0,
+   "margin_samples": 150,
+   "sigma_reference_uv_at_worst": 6.219160926529035,
+   "trials": 12,
+   "worst_max_abs_sample_error_uv": 0.60696401283063,
+   "worst_relative_sigma_error": -0.0007454291408613978
+  },
+  {
+   "construction": "butterworth_sosfiltfilt",
+   "excursion_uv": 0.0,
+   "margin_ms": 16.666666666666668,
+   "margin_samples": 500,
+   "sigma_reference_uv_at_worst": 6.171216592940866,
+   "trials": 12,
+   "worst_max_abs_sample_error_uv": 0.000575447805595708,
+   "worst_relative_sigma_error": 5.70819002732037e-07
+  },
+  {
+   "construction": "butterworth_sosfiltfilt",
+   "excursion_uv": 200.0,
+   "margin_ms": 16.666666666666668,
+   "margin_samples": 500,
+   "sigma_reference_uv_at_worst": 6.171216592940977,
+   "trials": 12,
+   "worst_max_abs_sample_error_uv": 0.0005754480562538689,
+   "worst_relative_sigma_error": 5.708258141723377e-07
+  }
+ ],
+ "nominal_rate_hz": 30000.0,
+ "numpy": "2.5.2",
+ "pinned_seed": 20260818,
+ "scipy": "1.18.0",
+ "trials": 12,
+ "window_samples": 13020
+}

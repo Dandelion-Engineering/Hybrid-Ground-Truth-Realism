@@ -15,6 +15,15 @@
 h5py==3.16.0          # BSD-3-Clause
 numpy==2.5.2          # BSD-3-Clause  (transitive dependency of h5py)
 
+# --- Installed 2026-08-18, Claude Session 44 ------------------------------
+# Section 19.3 of the Tier A host-selection document pins the noise gate's
+# high-pass to the anchor pipeline's own operator: a fifth-order Butterworth at
+# 300 Hz applied forward and backward through scipy.signal.sosfiltfilt. Used by
+# probe_filter_chain.py and, when it is written, by the noise estimator.
+# Resolved against the numpy pin above without moving it; numpy must not move,
+# because the drift gate's permutation stream is numpy.random.PCG64.
+scipy==1.18.0         # BSD-3-Clause
+
 # --- Not yet installed ----------------------------------------------------
 # SpikeInterface, Kilosort4, and PyTorch are installed at Codex's Rung 0
 # feasibility pilot and pinned here at that moment. The known-good stack

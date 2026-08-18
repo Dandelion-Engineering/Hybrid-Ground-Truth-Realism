@@ -677,6 +677,74 @@ rather than an inherited fact.
 
 *Citation:* this project's own measurement, Claude Session 43, 2026-08-18.
 
+
+### SpikeInterface — `FilterRecording` and `highpass_filter`, read as source rather than as documentation
+
+*What it covers.* The implementation of the preprocessing step the anchor
+pipeline uses by default. `FilterRecording.__init__` defaults to
+`filter_order=5`, `ftype="butter"`, `filter_mode="sos"` and
+`direction="forward-backward"`, and that direction resolves to
+`scipy.signal.sosfiltfilt` — so the filter is **zero phase**, not causal, and
+the docstring says so in terms ("resulting in zero-phase filtering. Note this
+doubles the effective filter order"). `highpass_filter` defaults
+`margin_ms="auto"`, which resolves through `adjust_margin_ms_for_highpass` to
+`5 × (1000 / freq_min)` milliseconds — **16.667 ms at a 300 Hz corner, exactly
+500 samples at 30 kHz.** The margin is taken from real neighbouring samples and
+stripped after filtering.
+
+*How it informed the project.* It settled RC-007 finding F4 and changed §19.3's
+pinned chain. Draft 29 contrasted its own rectangular DFT high-pass against "a
+causal recursive filter with a 300 Hz corner" — a filter the anchor does not
+use — and justified a 150-sample edge discard on a locality claim that is false
+for the DFT operator. Reading the source made the better repair available:
+adopt the anchor's operator and the anchor's own margin rule, which removes the
+deviation entirely rather than hedging it. **Neither the filter design nor the
+margin width is now this project's choice**, which is the same posture §19.6
+takes toward the two SpikeForest multipliers.
+
+*Boundary.* This is `main` at the time of reading, not a pinned release, and
+`highpass_filter`'s margin default has changed at least once — the signature
+still carries a `_skip_margin_warning_for_old_version` argument. §19.3
+therefore pins its own margin **by value** (500 samples) and its own
+`padlen` **by value** (18), rather than by reference to whatever a future
+SpikeInterface or scipy resolves them to.
+
+*Link:*
+[`src/spikeinterface/preprocessing/filter.py`](https://github.com/SpikeInterface/spikeinterface/blob/main/src/spikeinterface/preprocessing/filter.py)
+
+*Citation:* SpikeInterface contributors, `spikeinterface.preprocessing.filter`,
+SpikeInterface, MIT licence. Source read 2026-08-18.
+
+---
+
+### This project's own measurement — the two filter constructions compared, Session 44
+
+*What it covers.* `agents/Claude/tools/probe_filter_chain.py` and its records
+`filter_chain_2026-08-18.txt` / `.json`. Three measurements on synthetic data,
+no archive access: the rectangular DFT high-pass's impulse response at the
+centre of a 13,020-sample window is exactly `−1/13020`, reproducing the
+reviewer's figure to the last bit; the fifth-order Butterworth's slowest pole
+sits at radius `0.980781307`, a time constant of **51.531 samples (1.718 ms)**,
+so a 500-sample margin is 9.703 time constants; and, comparing one window
+filtered in isolation against that same window filtered inside nine chunks of
+continuous signal, the brick wall's scale estimate is off by **+1.14% and does
+not improve with a wider margin**, while the Butterworth at a 500-sample margin
+is off by **+1e-06**.
+
+*How it informed the project.* It is the evidence behind §19.3's replacement of
+the filter and behind the claim that the surviving margin deviation is bounded
+rather than merely small. The middle result is the one that decided the design:
+a global operator's error cannot be reduced by discarding more edge, which is
+what makes the locality claim structural rather than a matter of picking a
+bigger number.
+
+*Boundary.* Synthetic signals from one pinned seed, twelve realizations, worst
+case reported. It bounds the *isolation* deviation and nothing else; it says
+nothing about the two remaining deviations, and it is not a measurement of any
+candidate recording.
+
+*Citation:* this project's own measurement, Claude Session 44, 2026-08-18.
+
 ---
 
 ## Pending — sources identified but not yet verified

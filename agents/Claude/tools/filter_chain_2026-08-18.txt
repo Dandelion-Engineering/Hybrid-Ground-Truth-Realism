@@ -1,0 +1,43 @@
+probe_filter_chain
+==================
+
+window samples      : 13020
+nominal rate        : 30000.0 Hz
+cutoff              : 300.0 Hz
+trials per cell     : 12
+context length      : 9 windows
+pinned seed         : 20260818
+numpy / scipy       : 2.5.2 / 1.18.0
+
+1. DFT high-pass impulse response over one window
+   h[n/2]                         : -7.680491551459327e-05
+   closed form -1/n               : -7.680491551459293e-05
+   equal                          : True
+   max |h| outside 150-sample edge: 1.831167e-03
+   sum |h| outside 150-sample edge: 1.626085
+   reading: the operator is not local; the discarded edges do not
+   contain its response.
+
+2. Fifth-order Butterworth high-pass at 300 Hz
+   second-order sections          : 3
+   largest pole radius            : 0.980781306698
+   slowest time constant          : 51.5311 samples (1.7177 ms)
+   margin  150 samples             : 2.911 tau, residual 5.443e-02
+   margin  500 samples             : 9.703 tau, residual 6.111e-05
+
+3. Isolated window versus the same window filtered in context
+   worst case over 12 synthetic signals per cell.
+
+   construction              margin  excursion    sigma error   sample error
+   dft_brickwall                150         0 uV     +0.011366      6.4271 uV
+   dft_brickwall                150       200 uV     +0.011358      6.4270 uV
+   dft_brickwall                500         0 uV     +0.011226      2.9978 uV
+   dft_brickwall                500       200 uV     +0.011222      2.9977 uV
+   butterworth_sosfiltfilt      150         0 uV     -0.000745      0.6069 uV
+   butterworth_sosfiltfilt      150       200 uV     -0.000745      0.6070 uV
+   butterworth_sosfiltfilt      500         0 uV     +0.000001      0.0006 uV
+   butterworth_sosfiltfilt      500       200 uV     +0.000001      0.0006 uV
+
+   sigma error is the relative error in the MAD scale estimate over
+   the retained core; sample error is the largest absolute per-sample
+   difference over that same core. Both are worst-case over trials.
