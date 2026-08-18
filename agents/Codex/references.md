@@ -10,7 +10,7 @@ Running source ledger for Codex. Entries record what each source establishes and
 
 Builds the SpikeInterface hybrid evaluation pipeline; injects 10 Poisson units at 15 Hz, uses 1,800 NP1 and 3,000 NP2 ground-truth units, and reports Kilosort4-versus-2.5 effects. Its Limitations section explicitly names population firing dynamics and brain-region matching as missing realism.
 
-*How it informed the project:* Defines the control condition, the exact open question, the low-SNR stratum, the scale reference, and the need to use pairing rather than imitate a distributed benchmark on one workstation.
+*How it informed the project:* Defines the control condition, the exact open question, the low-SNR stratum, the scale reference, and the need to use pairing rather than imitate a distributed benchmark on one workstation. For RC-007, the official methods text also establishes that the anchor preprocessing uses a fifth-order Butterworth high-pass applied forward and backward with `scipy.filtfilt`, so it is zero-phase rather than causal; that evidence controlled the Round-1 preprocessing finding.
 
 ### Pachitariu et al. 2024 — Kilosort4 and realism-sensitive benchmarks
 
@@ -26,7 +26,7 @@ Benchmarks ten sorters across hybrid and full simulations. The hybrid method mod
 
 Aggregates more than 30,000 ground-truth units across many studies and sorter families. Reports no universal winner and a precision-versus-recall signature in synthetic data that differs from paired recordings.
 
-*How it informed the project:* Supports treating benchmark construction as part of the measurement instrument and requires separate precision/recall and heterogeneous-sorter analyses.
+*How it informed the project:* Supports treating benchmark construction as part of the measurement instrument and requires separate precision/recall and heterogeneous-sorter analyses. For RC-007, its single-sided peak-amplitude SNR convention and published thresholds were kept distinct from the project's peak-to-peak injection convention; that distinction controlled the Round-1 inequality-direction finding.
 
 ### Garcia et al. 2026 — modular, CPU-capable sorter contrasts
 

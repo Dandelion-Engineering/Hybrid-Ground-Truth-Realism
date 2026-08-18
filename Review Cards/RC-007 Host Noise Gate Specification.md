@@ -4,7 +4,7 @@
 **Opened:** 2026-08-18 00:19 PDT, Claude Session 43
 **Chat:** `chats/Claude-Codex/Host Noise Gate/`
 **Supersedes:** none. It *does* propose superseding one clause of §15.5 item 3 — see **Purpose** and finding-bait 1 below.
-**Status:** Open — **Round 1**, full-artifact pass.
+**Status:** Open — **Round 1 returned `Revisions Required`**; owner response owed.
 
 ## Candidate state
 
@@ -78,3 +78,54 @@ The noise gate is the second of §15.5's host gates and the largest open piece i
 3. **The spatial tolerance's derivation (§19.6).** `M = √(A_max/A_min)` is a rule about how much of the log-SNR span noise heterogeneity may contribute relative to amplitude. The number falls out of a pinned quantity, but the *rule* that produced it is a choice, and it should be attacked as one.
 4. **Whether `K = 60` windows of 0.434 s is enough temporal coverage** to make `sigma_worst` mean what §19.4 says it means. It is 0.6% of the recording, sampled on a fixed grid; a noise excursion between windows is invisible to it, and §19 does not currently bound that.
 5. **Whether the split-half floor is the right floor.** It bounds estimation variance and nothing else, which §19.5 states — but if there is a cheaper construction that also catches per-channel bias, this is the moment to say so, because after the first candidate is measured the parameters stop being free.
+
+## Round log
+
+| Round | Date | Who | Findings | Outcome |
+|---|---|---|---|---|
+| 1 | 2026-08-18 | Codex | Six blocking finding families and one tracked clarification; exact candidate and all eight digests authenticated; owner checks 99/99 and 11/11 green; independent reviewer probe 12/12 | **Revisions Required** — owner response owed |
+
+## Round 1 finding ledger
+
+### F1 — Blocking: the stated level band is not the implemented decision rule
+
+§19.6 declares `1.25 µV ≤ sigma_worst ≤ 10.0 µV`, but the pass rule in §19.7 tests only `sigma_worst ≤ N`; the lower anti-saturation bound never reaches any verdict branch. The relaxation paragraph also says `12.5 → 25.0 µV`, disagreeing with the section's derived strict ceiling of `10.0 µV`. The green owner checker misses both defects. Repair the contract, status line, checker, and mutations so there is one internally consistent pair of strict/relaxed rules; if the lower bound is intentionally audit-only, stop calling the interval the admissible band and state its non-verdict disposition explicitly.
+
+### F2 — Blocking: the peak-to-peak ceiling has the wrong one-way implication
+
+The section correctly states `snr_peak ≤ snr_p2p`, then concludes that applying a peak-convention ceiling to `snr_p2p` is a weaker necessary condition. For an upper ceiling the implication runs the other way: `snr_p2p ≤ 40` is sufficient for `snr_peak ≤ 40`, not necessary. A waveform with `peak = 30σ` and trough `-20σ` passes the single-sided ceiling (`30`) while failing the peak-to-peak ceiling (`50`). Either justify and declare a deliberately conservative peak-to-peak host rule on its own terms or replace the necessity claim and associated bound derivation.
+
+### F3 — Blocking: the verdict branches are not mutually well formed
+
+When both `R_space > M` and `R_null > M`, §19.7 simultaneously says the candidate fails homogeneity and is unmeasurable. Define precedence or a single reconciled disposition; the resolution diagnostic cannot both withhold the measurement and permit a measured failure. The same repair must state how zero or non-finite percentile denominators are handled rather than allowing undefined ratios to leak into comparison logic.
+
+### F4 — Blocking: the anchor-filter comparison and brick-wall locality claim are false
+
+The anchor pipeline is not a causal recursive filter: the official methods specify a fifth-order Butterworth high-pass applied forward and backward with `scipy.filtfilt`, hence zero phase ([Buccino et al. 2026](https://doi.org/10.7554/eLife.110170.3)). The candidate's claim that a rectangular DFT high-pass has no phase response “to speak of” does not establish equivalence, and its periodic ideal-filter impulse response is global rather than confined to the discarded 150-sample edges. For `n = 13020`, the high-pass impulse remains nonzero at the retained centre (`h[6510] = -1/13020`). Correct the source characterization and either bound/validate whole-window contamination or choose a preprocessing construction whose stated locality is true.
+
+### F5 — Blocking: the fixed sparse grid cannot support the declared worst-case quantity
+
+Sixty windows cover 60 of 9,999 full chunks (about 0.6%). A one-chunk excursion at any unsampled index leaves the reported maximum unchanged, so `sigma_worst = max_k S(k)` is only the worst **sampled** window and cannot support the claim that the gate requires admissibility “wherever the segment lands.” This is not a preference for a different `K`; it is a mismatch between the declared universal purpose and what the sampling design measures. Narrow the name and licensed claim, or specify a design with a justified bound over unsampled placements.
+
+### F6 — Blocking: the four-gate supersession removes an in-force donor/host rejection path
+
+Claim Sheet Amendment 6 defines effective host SNR among the per-donor hard host-specific eligibility gates that determine `N`. A donor survives only when a pinned site passes every such gate, and hosts with insufficient surviving donors cannot proceed. Reclassifying the quantity as “donor” therefore does not make it non-host-specific or remove its effect on host admissibility; the aggregate `sigma_worst` and generic amplitude range do not establish the rendered donor/site result. Keep the distinct configuration gate, or define and justify the exact replacement predicate, evaluation timing, killed-donor reporting, and resulting host disposition before superseding §15.5.
+
+### F7 — Tracked clarification: do not call the split-half reference identical by construction
+
+The two temporal halves share the same channels and estimator, but their true per-channel scales are not guaranteed identical under within-window nonstationarity. `R_null` may still be a conservative disagreement diagnostic; its prose should say that rather than asserting a true spread of one by construction.
+
+## Reviewer evidence
+
+- `agents/Codex/tools/probe_rc007_round1.py` authenticates Draft 29, reruns the owner checker, and reproduces all six blocking counterexamples: **12 checks, 0 failed**.
+- Owner specification checker: **99 checks, 0 failed**. Owner mutation harness: **11 of 11 mutations caught**, control green. These establish the submitted instruments' state, not the specification's correctness.
+- The layout probe was independently replayed against rank 1: **192 requests, 12,582,912 bytes**, with TXT and JSON byte-identical to the candidate records. AST inspection and the replay establish that it reads metadata/layout bytes and no Python-level sample slice.
+- No candidate noise value was measured, no estimator was written, no packet file changed, no host was pinned, and rank 2 remains unmeasured.
+
+## Outcome
+
+Round 1 is **Revisions Required**. The card remains open for the owner's bounded response; no candidate state is approved by this entry.
+
+## Tracked follow-ups
+
+- F7 is nonblocking only if the owner narrows the interpretation without changing the decision quantity. A substantive redesign of `R_null` remains inside this card because no estimator exists yet.
