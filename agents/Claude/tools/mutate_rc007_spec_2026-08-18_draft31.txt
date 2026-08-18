@@ -1,0 +1,55 @@
+[control ] exit 0, 0 checks failed -- expected 0 and 0
+[caught  ] layout figure: chunk shape in the table -- 2 checks failed
+[caught  ] derived projection: whole-run transfer -- 1 checks failed
+[caught  ] derived projection: the chunks a run transfers -- 1 checks failed
+[caught  ] record: the recorded offset -- 1 checks failed
+[caught  ] record: the recorded compression level -- 1 checks failed
+[caught  ] report: the no-samples-read statement -- 1 checks failed
+[caught  ] threshold in the section body: strict spatial tolerance -- 1 checks failed
+[caught  ] threshold in the parameter table: the level floor -- 1 checks failed
+[caught  ] status line: the guaranteed-detection duration -- 1 checks failed
+[caught  ] status line: the isolation errors -- 1 checks failed
+[caught  ] status line: the refusal to bound the chunk-size difference -- 1 checks failed
+[caught  ] boundary: the floor does not relax -- 1 checks failed
+[caught  ] grid: the largest gap -- 1 checks failed
+[caught  ] grid: the guaranteed-detection duration -- 1 checks failed
+[caught  ] grid: the tight bound stated in chunks -- 1 checks failed
+[caught  ] grid: the tightness claim itself -- 1 checks failed
+[caught  ] grid: the eligibility rule for a window centre -- 1 checks failed
+[caught  ] grid: the index formula in the parameter table -- 1 checks failed
+[caught  ] grid: the coverage fraction -- 1 checks failed
+[caught  ] filter: the pinned padlen in the chain step -- 2 checks failed
+[caught  ] filter: the margin width in the chain step -- 2 checks failed
+[caught  ] filter: the retained core after the margin -- 3 checks failed
+[caught  ] filter: where the margin samples come from -- 1 checks failed
+[caught  ] filter: the identity the chain now claims -- 2 checks failed
+[caught  ] filter record: the closed-form impulse verdict -- 1 checks failed
+[caught  ] filter record: the filter order -- 1 checks failed
+[caught  ] timing index: a measured sampling rate -- 2 checks failed
+[caught  ] verdict branch: the resolution branch's heading -- 1 checks failed
+[caught  ] verdict branch: the input-error consequence -- 1 checks failed
+[caught  ] convention: the direction of the floor substitution -- 1 checks failed
+[caught  ] percentile: the resolved ranks at 72 channels -- 1 checks failed
+[caught  ] withdrawal: the consequence for section 15.5 -- 1 checks failed
+[caught  ] withdrawal: the surviving gate count -- 1 checks failed
+[caught  ] superseded string reintroduced outside the withdrawal record -- 1 checks failed
+[caught  ] superseded value reintroduced outside the withdrawal record -- 4 checks failed
+[caught  ] isolation: the negative counterexample in the chain paragraph -- 1 checks failed
+[caught  ] isolation: the counterexample in the round-2 record -- 1 checks failed
+[caught  ] isolation: the refusal to promote the residual into a bound -- 1 checks failed
+[caught  ] isolation: the independent re-derivation figures -- 1 checks failed
+[caught  ] split half: the one-sided statement -- 1 checks failed
+[caught  ] split half: the cancelled spread -- 1 checks failed
+[caught  ] split half: what a passing candidate passes on -- 1 checks failed
+[caught  ] split half: the ideal ratio at the new half length -- 1 checks failed
+[caught  ] gate 3: the withdrawal of the discharge claim -- 1 checks failed
+[caught  ] cost: the three-chunk read -- 1 checks failed
+[caught  ] cost: the filtered block in float64 -- 1 checks failed
+[caught  ] cost: the refused cheaper arrangement -- 1 checks failed
+[caught  ] dropped step: the measured size of the mean removal -- 1 checks failed
+[caught  ] standing: the number of review rounds -- 2 checks failed
+[caught  ] round 3 record: the isolated scale error at one seed -- 2 checks failed
+[caught  ] round 3 record: the cancelled split-half spread -- 2 checks failed
+[caught  ] frozen span: section 18 body -- 2 checks failed
+
+52 of 52 mutations caught, 0 failures

@@ -1,0 +1,67 @@
+RC-007 Round 3 -- owner re-derivation of the Round 2 blockers
+==================================================================
+
+[0] pinned filter constants
+    sos sections            : 3
+    scipy default padlen    : 18
+    padlen is a property of the sos array and not of the block length,
+    so the 14,020-sample block uses the same pinned 18.
+
+[1] F4-R1 re-derived: Draft 30's isolated window on the reviewer's
+    stored-lattice fixture (plateaus at +/-29,866 counts)
+    seed  24: relative sigma error -0.002284   worst retained sample 0.547247 uV
+    seed  28: relative sigma error +0.002834   worst retained sample 0.547407 uV
+    -> Draft 30's `+1e-06` was a property of its twelve fixtures.
+    -> The reviewer's finding is reproduced independently.
+
+[2] Draft 31: the margin comes from real neighbouring samples
+    seed  24    plateau: residual vs nine-chunk filtering -0.000000000
+                        worst retained sample 0.000039 uV
+    seed  24 continuous: residual vs nine-chunk filtering +0.000000000
+                        worst retained sample 0.000125 uV
+    seed  28    plateau: residual vs nine-chunk filtering +0.000000000
+                        worst retained sample 0.000039 uV
+    seed  28 continuous: residual vs nine-chunk filtering -0.000000000
+                        worst retained sample 0.000184 uV
+    -> The 500-sample margin drawn from REAL neighbours absorbs the
+       plateau transient too: the scale residual is at machine
+       precision and the worst retained sample moves by ~1e-04 uV.
+    -> This is a FIXTURE DIAGNOSTIC AND NOT A BOUND.  What carries
+       the repair is structural: there is no isolated-window
+       construction left to bound, because every sample the filter
+       sees is a real recorded sample and the margin rule is the
+       anchor's own.
+
+[3] the per-window mean removal Draft 30 applied and Draft 31 drops
+    seed  24    plateau: mean removal moves a retained sample by 0.000000000 uV
+    seed  24 continuous: mean removal moves a retained sample by 0.000000000 uV
+    seed  28    plateau: mean removal moves a retained sample by 0.000000000 uV
+    seed  28 continuous: mean removal moves a retained sample by 0.000000000 uV
+    -> The anchor pipeline has no mean-removal step.  Keeping one
+       would break the identity Draft 31 claims, for a step whose
+       effect is this small.  It is removed.
+
+[4] F7-R1 re-derived: the split-half spread can be deflated
+    estimation disagreement alone      : R_null = 4.000000
+    times reciprocal temporal factors  : R_null = 1.000000
+    a non-reciprocal temporal change    : R_null = 4.000000
+    -> Non-stationarity has two directions.  A HIGH value still
+       withholds the measurement; a LOW value certifies nothing.
+
+[5] Draft 31's grid, its guarantee and its transfer projection
+    C = 9999, K = 60
+    centres run 1 .. 9997 (both neighbours are full chunks)
+    largest gap g           : 170 chunks
+    guaranteed detection    : 73.780 s (170 consecutive chunks)
+    Draft 30 published      : 74.214 s (171 chunks) -- true but one chunk loose
+    realized coverage       : 26.04 s of 4339.57 s = 0.600%
+    longest unsampled run   : 169 chunks (= g - 1)
+    compression ratio       : 0.531718
+    projected stored bytes per chunk : 5,316,841
+    chunks transferred      : 180 (three per window: the window and both neighbours)
+    projected transfer      : 957,031,364 bytes
+    Draft 30's one-chunk read would have been 319,010,455 bytes
+    one filtered block as float64 : 43,069,440 bytes (14,020 x 384)
+
+checks run: 27
+checks failed: 0

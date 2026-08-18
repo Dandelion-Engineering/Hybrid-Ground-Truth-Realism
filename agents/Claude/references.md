@@ -739,11 +739,53 @@ what makes the locality claim structural rather than a matter of picking a
 bigger number.
 
 *Boundary.* Synthetic signals from one pinned seed, twelve realizations, worst
-case reported. It bounds the *isolation* deviation and nothing else; it says
-nothing about the two remaining deviations, and it is not a measurement of any
-candidate recording.
+case reported. **Superseded in one claim by the Session 45 entry below: this
+measurement does NOT bound the isolation deviation.** Twelve fixtures are not
+an input class, and a valid `int16` construction moves the same quantity by
+three orders of magnitude more. What survives is the comparison between the two
+filter constructions, which is what decided the design. It is not a measurement
+of any candidate recording.
 
 *Citation:* this project's own measurement, Claude Session 44, 2026-08-18.
+
+### This project's own measurement — isolating a chunk from its neighbours, Session 45
+
+*What it covers.* `agents/Claude/tools/probe_rc007_round3.py` and its records
+`rc007_round3_2026-08-18.txt` / `.json`. An independent re-derivation of RC-007
+Round 2's two counterexamples, built from scipy and numpy directly rather than
+by calling either the reviewer's probe or this project's earlier
+`probe_filter_chain.py`, plus the measurements Draft 31's repair rests on.
+Five results. **Filtering one 13,020-sample chunk without its real neighbours
+changes the retained MAD scale by `-0.002284447` at one seed and `+0.002834418`
+at another**, with worst retained samples of `0.547247` and `0.547407` uV, on a
+fixture that is a centre chunk of quantized 6 uV noise between opposite
+plateaus at +/-29,866 stored counts --- valid `int16` at the measured
+2.34375 uV conversion. **With the margin drawn from the real neighbours instead,
+the same comparison is at machine precision** --- `4e-16` relative on the
+plateau fixture, `5e-15` on ordinary noise, worst retained samples `3.9e-05`
+and `1.8e-04` uV. **The per-window mean removal Draft 30 applied is worth at
+most `1.746e-10` uV** and is dropped. **The split-half spread falls from 4 to 1**
+under reciprocal temporal factors. **The window grid's coverage bound is tight
+at `g` rather than `g + 1` chunks**, verified exhaustively in both directions.
+
+*How it informed the project.* It is the evidence behind Draft 31's whole
+response to RC-007 Round 2. The first result confirms the reviewer's blocker
+independently; the second is why Section 19.3 now reads three chunks per window
+instead of one; the third is why the mean-removal step is gone; the fourth is
+why Section 19.5's one-way claim is withdrawn; and the fifth is a defect the
+review did not find, caught by one of this probe's own checks failing.
+
+*Boundary.* **None of these numbers is a bound and Section 19.3 says so.** They
+are measurements on constructed signals, and the thing that made the previous
+entry's figure unsafe --- promoting a fixture result into a general property ---
+applies to these equally. What carries the repair is structural rather than
+numerical: with the margin drawn from the recording there is no isolated-window
+construction left to bound. Two of this probe's own initial expectations were
+wrong and were corrected toward what was measured.
+
+*Citation:* this project's own measurement, Claude Session 45, 2026-08-18.
+
+---
 
 ---
 

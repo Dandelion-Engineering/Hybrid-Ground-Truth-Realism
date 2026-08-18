@@ -44,6 +44,8 @@ LAYOUT_REL = os.path.join("agents", "Claude", "tools",
 REPORT_REL = os.path.join("agents", "Claude", "tools",
                           "raw_ap_layout_CSHL047_Probe01_2026-08-18.txt")
 FILTER_REL = os.path.join("agents", "Claude", "tools", "filter_chain_2026-08-18.json")
+ROUND3_REL = os.path.join("agents", "Claude", "tools",
+                          "rc007_round3_2026-08-18.json")
 TIMING_REL = os.path.join("Reproducibility Packet", "results", "host_timing_index.jsonl")
 
 # Digests recorded when each span was approved. Sections 1-16 and 17 come from
@@ -67,6 +69,7 @@ SATURATION_SNR = 40.0            # declared in Section 19.6, not cited
 MAD_SCALE_TEXT = "0.6744897501960817"
 MAD_SCALE = 0.6744897501960817
 K_WINDOWS = 60
+CHUNKS_PER_WINDOW = 3            # the window's chunk plus the two margin donors
 MARGIN_SAMPLES = 500
 SAMPLE_RATE_HZ = 30000.0
 CUTOFF_HZ = 300.0
@@ -95,6 +98,35 @@ RETIRED_QUOTED_ONLY = {
     "the stale relaxation restatement": "`12.5 → 25.0",
 }
 
+# Strings Draft 30 carried that Draft 31 superseded. These are checked the same
+# way as RETIRED_QUOTED_ONLY inside the section body -- they may appear only in
+# the record of what was withdrawn -- but NOT against the status line, because
+# Draft 31's status line quotes several of them inside its own retraction of
+# them. What the status line must carry instead is the replacement value, and
+# the status-line block below asserts each of those directly.
+SUPERSEDED_QUOTED_ONLY = {
+    "the isolated-window bound": "+1e-06",
+    "the loose coverage duration": "74.214",
+    "the old retained core": "12,020",
+    "the old half window": "6,010",
+    "the one-chunk transfer projection": "319,010,455",
+}
+
+# Statements Draft 30 made that Draft 31 removes outright. Unlike the values
+# above these may not survive anywhere, because each one is a rule or a claim
+# rather than a number a retraction has to quote.
+SUPERSEDED_ABSENT = {
+    "the mean-removal step": "**Per-channel mean removal**",
+    "the isolated-margin deviation": "That is the entire deviation.",
+    "the one-way non-stationarity claim":
+        "Non-stationarity can only add to the disagreement",
+    "the discharged gate-3 precondition":
+        "host-aggregate precondition is discharged by gate 2",
+    "the draft 30 grid formula": "floor( k · (C − 1) / (K − 1) + 0.5 )",
+    "the loose coverage premise": "`g + 1 = 171`",
+    "the reviewed-once claim": "This section has been reviewed once",
+}
+
 
 # How many times each value is restated inside Section 19. A number restated
 # four times and mutated once still appears, so a substring search passes while
@@ -103,17 +135,20 @@ RETIRED_QUOTED_ONLY = {
 # census catches the same shape for values that are not in a table. A deliberate
 # edit that changes a count updates this table; an accidental one goes red.
 RESTATEMENTS = {
-    "74.214": 5,          # the guaranteed-detection duration
-    "12,020": 3,          # retained samples after the margin
-    "6,010": 4,           # the split-half length
+    "73.780": 7,          # the guaranteed-detection duration
+    "74.214": 3,          # the loose one Draft 30 published, quoted only
+    "6,510": 6,           # the split-half length
     "16.667": 3,          # the margin in milliseconds
-    "500 samples": 3,     # the margin in samples
+    "500 samples": 5,     # the margin in samples
     "padlen=18": 3,       # the pinned scipy padding length
-    "13,020": 5,          # the chunk length in samples
-    "9,999": 4,           # whole chunks inside the extent
+    "14,020": 4,          # the filtered block including both margins
+    "13,020": 14,         # the chunk length and the retained core
+    "9,999": 3,           # whole chunks inside the extent
     "2.34375": 2,         # the least significant bit in microvolts
-    "9,999,360": 2,       # the uncompressed chunk in bytes
+    "9,999,360": 1,       # the uncompressed chunk in bytes
     "26.04": 2,           # the sampled coverage in seconds
+    "957,031,364": 2,     # the three-chunk transfer projection
+    "0.547": 4,           # the isolated-window sample error in microvolts
 }
 
 
@@ -214,6 +249,10 @@ def fmt(value, places):
 def grid_indices(n_chunks, k_windows):
     """Return Section 19.4's window grid.
 
+    A window centre needs a full chunk on each side of it, because that is
+    where the filter margin comes from, so the eligible centres run from 1 to
+    C - 2 rather than over the whole full-chunk extent.
+
     Args:
         n_chunks: C, the number of whole chunks inside the AP extent.
         k_windows: K, the number of windows.
@@ -222,7 +261,7 @@ def grid_indices(n_chunks, k_windows):
         The list of chunk indices, using the section's explicit
         floor(x + 0.5) rather than a language's rounding rule.
     """
-    return [int(math.floor(k * (n_chunks - 1) / (k_windows - 1) + 0.5))
+    return [1 + int(math.floor(k * (n_chunks - 3) / (k_windows - 1) + 0.5))
             for k in range(k_windows)]
 
 
@@ -267,6 +306,7 @@ def main():
     layout = json.loads(read_text(os.path.join(root, LAYOUT_REL)))
     report = read_text(os.path.join(root, REPORT_REL))
     filt = json.loads(read_text(os.path.join(root, FILTER_REL)))
+    round3 = json.loads(read_text(os.path.join(root, ROUND3_REL)))
     checks = Checks()
 
     # --- the earlier sections must not have moved -------------------------
@@ -285,17 +325,21 @@ def main():
     # findings, and a number carried into it is as public as one in the section
     # body. It is therefore checked separately rather than assumed to agree with
     # the section it summarises.
-    status = span(doc, "**Status:** Draft 30", "**Status:** Draft 29")
-    checks.check("draft 30 status line present", status.startswith("**Status:** Draft 30"))
-    checks.check("draft 29 status line retained below it",
+    status = span(doc, "**Status:** Draft 31", "**Status:** Draft 30")
+    checks.check("draft 31 status line present", status.startswith("**Status:** Draft 31"))
+    checks.check("draft 30 status line retained below it",
+                 "**Status:** Draft 30 — Claude Session 44" in doc)
+    checks.check("draft 29 status line retained below that",
                  "**Status:** Draft 29 — Claude Session 43" in doc)
-    checks.check("draft 30 status line hands off to draft 29",
-                 status.rstrip().endswith("Draft 29's own status line follows."))
+    checks.check("draft 31 status line hands off to draft 30",
+                 status.rstrip().endswith("Draft 30's own status line follows."))
 
     # --- strings the repair had to remove ---------------------------------
     # The two subsections that record the withdrawal. Anything quoted from
     # draft 29 has to live inside one of them.
     withdrawal = sec19[sec19.index("### 19.8 "):sec19.index("### 19.9 ")]         + sec19[sec19.index("### 19.11 "):]
+    checks.check("the withdrawal record covers 19.11 and 19.12",
+                 "### 19.12 " in withdrawal)
     for label, text_value in RETIRED_ABSENT.items():
         checks.check("draft 29's %s is gone from the section" % label,
                      text_value not in sec19, text_value)
@@ -309,6 +353,16 @@ def main():
                      % (sec19.count(text_value), withdrawal.count(text_value)))
         checks.check("draft 29's %s is not asserted in the status line" % label,
                      text_value not in status, text_value)
+    for label, text_value in SUPERSEDED_ABSENT.items():
+        checks.check("draft 30's %s is gone from the section" % label,
+                     text_value not in sec19, text_value)
+    for label, text_value in SUPERSEDED_QUOTED_ONLY.items():
+        checks.check("draft 30's %s survives only inside the withdrawal record"
+                     % label,
+                     sec19.count(text_value) == withdrawal.count(text_value)
+                     and withdrawal.count(text_value) > 0,
+                     "%d in section, %d in the withdrawal record"
+                     % (sec19.count(text_value), withdrawal.count(text_value)))
 
     # --- the recorded layout, and the section's reading of it -------------
     n_samples, n_channels = layout["shape"]
@@ -383,16 +437,40 @@ def main():
                  fmt(projected_chunk, 0) == "5,316,841", fmt(projected_chunk, 0))
     checks.check("section quotes the per-chunk projection", "5,316,841" in sec19)
 
-    projected_run = K_WINDOWS * chunk_uncompressed * ratio
-    checks.check("projected run 319,010,455",
-                 fmt(projected_run, 0) == "319,010,455", fmt(projected_run, 0))
-    checks.check("section quotes the run projection", "319,010,455" in sec19)
+    # A window now costs three chunks: its own, and the two that supply the
+    # filter margin. The projection is stated as three times Draft 30's rather
+    # than as a fresh number, so a mutation of either one shows up as a
+    # disagreement between them.
+    chunks_read = CHUNKS_PER_WINDOW * K_WINDOWS
+    checks.check("180 chunks are transferred", chunks_read == 180,
+                 str(chunks_read))
+    projected_run = chunks_read * chunk_uncompressed * ratio
+    checks.check("projected run 957,031,364",
+                 fmt(projected_run, 0) == "957,031,364", fmt(projected_run, 0))
+    checks.check("section quotes the run projection", "957,031,364" in sec19)
+    checks.check("section quotes the chunk count", "**180 chunks**" in sec19)
+    checks.check("projection is exactly three times the one-chunk read",
+                 abs(projected_run
+                     - CHUNKS_PER_WINDOW * K_WINDOWS * projected_chunk) < 1e-6)
     checks.check("section calls the run figure a projection",
                  "not a measurement of any chunk" in sec19)
+    drift_bytes = 88599226
+    checks.check("run is 10.8 times the drift measurement",
+                 fmt(projected_run / drift_bytes, 1) == "10.8",
+                 fmt(projected_run / drift_bytes, 1))
+    checks.check("section quotes the drift-run multiple", "**10.8 times**" in sec19)
+    checks.check("section prices the refused cheaper arrangement",
+                 "twenty windows of five chunks" in sec19)
 
-    float_bytes = chunk_t * chunk_c * 8
-    checks.check("float64 window 39,997,440", float_bytes == 39997440, str(float_bytes))
-    checks.check("section quotes the float64 window", "39,997,440" in sec19)
+    block_bytes = (chunk_t + 2 * MARGIN_SAMPLES) * chunk_c * 8
+    checks.check("filtered block float64 43,069,440", block_bytes == 43069440,
+                 str(block_bytes))
+    checks.check("section quotes the filtered block", "43,069,440" in sec19)
+    three_chunks_int16 = CHUNKS_PER_WINDOW * chunk_t * chunk_c * itemsize
+    checks.check("three chunks int16 29,998,080", three_chunks_int16 == 29998080,
+                 str(three_chunks_int16))
+    checks.check("section quotes the three-chunk int16 figure",
+                 "29,998,080" in sec19)
 
     # --- the window grid, and the coverage it licenses ---------------------
     indices = grid_indices(full_chunks, K_WINDOWS)
@@ -401,20 +479,56 @@ def main():
     checks.check("grid has K distinct indices", len(set(indices)) == K_WINDOWS,
                  str(len(set(indices))))
     checks.check("grid is strictly increasing", min(gaps) > 0, str(min(gaps)))
-    checks.check("grid starts at chunk 0", indices[0] == 0, str(indices[0]))
-    checks.check("grid ends at the last full chunk", indices[-1] == full_chunks - 1,
+    checks.check("grid starts at chunk 1", indices[0] == 1, str(indices[0]))
+    checks.check("grid ends at chunk C-2", indices[-1] == full_chunks - 2,
                  str(indices[-1]))
+    checks.check("every centre has a full chunk on each side",
+                 indices[0] >= 1 and indices[-1] <= full_chunks - 2)
     checks.check("largest grid gap is 170", gap == 170, str(gap))
     checks.check("section quotes the gap", "`g = 170` chunks" in sec19)
     checks.check("section quotes the first grid indices",
-                 "`0, 169, 339, …, 9,829, 9,998`" in sec19)
+                 "`%d, %d, %d, …, %s, %s`"
+                 % (indices[0], indices[1], indices[2],
+                    "{:,}".format(indices[-2]), "{:,}".format(indices[-1]))
+                 in sec19,
+                 "%d %d %d %d %d" % (indices[0], indices[1], indices[2],
+                                     indices[-2], indices[-1]))
+    checks.check("section says the centres need both neighbours",
+                 "a full chunk on each side of it" in sec19)
+    checks.check("section says a window transfers three chunks",
+                 "transfers three chunks and retains one" in sec19)
 
-    guaranteed_s = (gap + 1) * chunk_seconds
-    checks.check("guaranteed-detection duration 74.214",
-                 fmt(guaranteed_s, 3) == "74.214", fmt(guaranteed_s, 3))
-    checks.check("section quotes the guaranteed duration", "74.214 s" in sec19)
+    # The coverage bound is the tight one, and both directions are verified
+    # here rather than argued: a run of g consecutive chunks always holds a
+    # centre, and a run of g-1 exists that holds none. Draft 30 published g+1,
+    # which is true but does not follow from its own premise.
+    grid_set = set(indices)
+    covers_g = all(any(i in grid_set for i in range(start, start + gap))
+                   for start in range(indices[0], indices[-1] - gap + 2))
+    misses_g_minus_1 = any(
+        not any(i in grid_set for i in range(start, start + gap - 1))
+        for start in range(indices[0], indices[-1] - gap + 3))
+    checks.check("every run of g chunks holds a centre", covers_g)
+    checks.check("a run of g-1 chunks can hold none, so the bound is tight",
+                 misses_g_minus_1)
+    longest_unsampled = 0
+    run = 0
+    for i in range(indices[0], indices[-1] + 1):
+        run = 0 if i in grid_set else run + 1
+        longest_unsampled = max(longest_unsampled, run)
+    checks.check("longest unsampled run is g-1", longest_unsampled == gap - 1,
+                 str(longest_unsampled))
+
+    guaranteed_s = gap * chunk_seconds
+    checks.check("guaranteed-detection duration 73.780",
+                 fmt(guaranteed_s, 3) == "73.780", fmt(guaranteed_s, 3))
+    checks.check("section quotes the guaranteed duration", "73.780 s" in sec19)
     checks.check("section states the unsampled-run length",
                  "`g − 1 = 169`" in sec19)
+    checks.check("section states the tight bound in chunks",
+                 "`g = 170` consecutive whole chunks" in sec19)
+    checks.check("section says the bound is tight",
+                 "tight in both directions" in sec19)
     checks.check("section states what the grid cannot see",
                  "is invisible to every quantity in this section" in sec19)
 
@@ -447,25 +561,92 @@ def main():
     checks.check("section quotes the closed-form impulse value",
                  "`−1/13020`" in sec19)
 
+    # Draft 30 argued the isolated-window margin from the filter's slowest
+    # pole and published a transient bound from it. Draft 31 does not isolate
+    # the window at all, so those four figures are no longer claims the section
+    # makes; the record still carries them and they are checked here for
+    # internal consistency only, not against the section text.
     radius = filt["butterworth"]["max_pole_radius"]
     tau = filt["butterworth"]["tau_samples"]
-    checks.check("section quotes the pole radius",
-                 "`%s`" % fmt(radius, 9) in sec19, fmt(radius, 9))
-    checks.check("section quotes the time constant in samples",
-                 "**%s samples" % fmt(tau, 3) in sec19, fmt(tau, 3))
-    checks.check("section quotes the time constant in milliseconds",
-                 "(%s ms)**" % fmt(1000.0 * tau / SAMPLE_RATE_HZ, 3) in sec19,
-                 fmt(1000.0 * tau / SAMPLE_RATE_HZ, 3))
-    margins_in_tau = MARGIN_SAMPLES / tau
-    checks.check("margin is 9.703 time constants",
-                 fmt(margins_in_tau, 3) == "9.703", fmt(margins_in_tau, 3))
-    checks.check("section quotes the margin in time constants",
-                 "**%s time constants**" % fmt(margins_in_tau, 3) in sec19,
-                 fmt(margins_in_tau, 3))
-    residual = math.exp(-margins_in_tau)
-    checks.check("residual factor 6.1e-05",
-                 "%.1e" % residual == "6.1e-05", "%.1e" % residual)
-    checks.check("section quotes the residual factor", "`6.1e-05`" in sec19)
+    checks.check("filter record pole radius is inside the unit circle",
+                 0.0 < radius < 1.0, fmt(radius, 9))
+    checks.check("filter record time constant agrees with its pole",
+                 abs(tau + 1.0 / math.log(radius)) < 1e-6, fmt(tau, 6))
+    checks.check("the retired pole-radius argument is gone from the section",
+                 fmt(radius, 9) not in sec19)
+    checks.check("the retired transient bound is gone from the section",
+                 "`6.1e-05`" not in sec19)
+
+    # Round 3's own record. Every figure Section 19.3 and Section 19.12 quote
+    # about isolating a chunk is read back out of the probe that measured it.
+    r3_iso = {item["seed"]: item for item in round3["groups"]["f4r1_isolated"]}
+    r3_margin = round3["groups"]["draft31_real_margin"]
+    r3_grid = round3["groups"]["draft31_grid"]
+    r3_mean = round3["groups"]["mean_removal"]
+    r3_split = round3["groups"]["f7r1_split_half"]
+    checks.check("round 3 probe ran clean",
+                 round3["checks_failed"] == 0 and round3["checks_run"] >= 25,
+                 str(round3["checks_failed"]))
+    neg = min(item["relative_sigma_error"] for item in r3_iso.values())
+    pos = max(item["relative_sigma_error"] for item in r3_iso.values())
+    worst_sample = max(item["worst_sample_error_uv"] for item in r3_iso.values())
+    checks.check("isolation error is negative at one seed", neg < 0.0, repr(neg))
+    checks.check("isolation error is positive at another", pos > 0.0, repr(pos))
+    # The document writes a Unicode minus, not an ASCII hyphen.
+    checks.check("section quotes the negative isolation error",
+                 "**−%s%%**" % fmt(abs(100.0 * neg), 3) in sec19,
+                 fmt(100.0 * neg, 3))
+    checks.check("section quotes the positive isolation error",
+                 "**+%s%%**" % fmt(100.0 * pos, 3) in sec19, fmt(100.0 * pos, 3))
+    checks.check("section quotes the isolated sample error",
+                 "**%s µV**" % fmt(worst_sample, 3) in sec19,
+                 fmt(worst_sample, 3))
+    checks.check("isolation error is more than a thousand times 1e-06",
+                 max(abs(neg), abs(pos)) > 1000.0 * 1e-6)
+    checks.check("section says the isolation error has no fixed direction",
+                 "in no fixed direction" in sec19)
+    checks.check("section says which way the two figures compare",
+                 "more than a thousand times the claimed figure" in sec19)
+    checks.check("section quotes the independent re-derivation per seed",
+                 "`%s` and `%s`" % (fmt(neg, 9), fmt(pos, 9)) in sec19
+                 or "`−%s` and `+%s`"
+                 % (fmt(abs(neg), 9), fmt(pos, 9)) in sec19,
+                 "%s %s" % (fmt(neg, 9), fmt(pos, 9)))
+    r3_samples = sorted(item["worst_sample_error_uv"] for item in r3_iso.values())
+    checks.check("section quotes both re-derived sample errors",
+                 "worst samples `%s` and `%s µV`"
+                 % (fmt(r3_samples[0], 6), fmt(r3_samples[1], 6)) in sec19,
+                 "%s %s" % (fmt(r3_samples[0], 6), fmt(r3_samples[1], 6)))
+    checks.check("section quotes where the margin samples come from",
+                 "the **last 500 samples of the chunk before it** and the "
+                 "**first 500 samples of the chunk after it**" in sec19)
+    checks.check("section states the cancelled spread",
+                 "the spread is exactly **%d**"
+                 % int(r3_split["cancelled_spread"]) in sec19)
+    checks.check("section states the estimation-only spread",
+                 "the nearest-rank p10/p90 spread is exactly **%d**"
+                 % int(r3_split["estimation_only_spread"]) in sec19)
+    checks.check("section says a pass rests on R_space alone",
+                 "reaches it on `R_space_sampled` alone" in sec19)
+    checks.check("real-neighbour residual is at machine precision",
+                 all(abs(item["relative_sigma_error"]) < 1e-12
+                     for item in r3_margin))
+    checks.check("section refuses to promote the residual into a bound",
+                 "fixture diagnostics and are not a bound" in sec19)
+    checks.check("section states no bound on the chunk-size difference",
+                 "**No bound is claimed on the difference between two chunk "
+                 "sizes, and the reason is a measurement.**" in sec19)
+    mean_worst = max(item["worst_sample_difference_uv"] for item in r3_mean)
+    checks.check("section quotes the dropped mean-removal effect",
+                 "**%.3e µV**" % mean_worst in sec19, "%.3e" % mean_worst)
+    checks.check("round 3 grid agrees with this checker's grid",
+                 r3_grid["first_centre"] == indices[0]
+                 and r3_grid["last_centre"] == indices[-1]
+                 and r3_grid["largest_gap_chunks"] == gap
+                 and r3_grid["guaranteed_detection_chunks"] == gap)
+    checks.check("round 3 records the split-half cancellation",
+                 r3_split["estimation_only_spread"] == 4.0
+                 and r3_split["cancelled_spread"] == 1.0)
 
     # The isolated-window study is what licenses the margin, so the section's
     # four reported figures are read back out of the record it came from rather
@@ -493,7 +674,8 @@ def main():
                  "**`+%s%%`**" % fmt(100.0 * brick_150, 2) in sec19,
                  fmt(100.0 * brick_150, 2))
     checks.check("section quotes the butterworth sample error",
-                 "%s µV**" % fmt(butter_sample, 4) in sec19, fmt(butter_sample, 4))
+                 "its worst retained sample by %s µV" % fmt(butter_sample, 4)
+                 in sec19, fmt(butter_sample, 4))
 
     checks.check("SpikeInterface auto margin is 16.667 ms",
                  fmt(si_margin_ms, 3) == "16.667", fmt(si_margin_ms, 3))
@@ -501,7 +683,19 @@ def main():
                  round(si_margin_ms * SAMPLE_RATE_HZ / 1000.0) == MARGIN_SAMPLES,
                  str(si_margin_ms * SAMPLE_RATE_HZ / 1000.0))
     checks.check("section quotes the margin in samples and milliseconds",
-                 "**500 samples (16.667 ms)**" in sec19)
+                 "**500 margin samples (16.667 ms)**" in sec19)
+    checks.check("section says the margin is real recorded signal",
+                 "**14,020-sample block every sample of which is a real "
+                 "recorded sample**" in sec19)
+    checks.check("section names the identity it now claims",
+                 "**it is `FilterRecording.get_traces` for a chunk of 13,020 "
+                 "samples**" in sec19)
+    checks.check("section says SpikeInterface takes the margin from neighbours",
+                 "takes that margin from real neighbouring samples and strips "
+                 "it after filtering" in sec19)
+    checks.check("section says padlen does not depend on the block length",
+                 "a property of the filter rather than of the block length"
+                 in sec19)
     checks.check("section names the SpikeInterface margin rule",
                  "`5 × (1000 / freq_min)`" in sec19)
     checks.check("section names the filter defaults it inherits",
@@ -514,28 +708,49 @@ def main():
     # siblings while every individual number still appears somewhere.
     checks.check("parameter table carries the windows row",
                  "| windows | `K = %d`, at chunk indices "
-                 "`floor(k·(C−1)/(K−1) + 0.5)` |" % K_WINDOWS in sec19)
+                 "`1 + floor(k·(C−3)/(K−1) + 0.5)` |" % K_WINDOWS in sec19)
     checks.check("parameter table carries the high-pass row",
                  "| high-pass | fifth-order Butterworth at %d Hz, `sos`, "
                  "forward–backward via `sosfiltfilt`, `padtype=\"odd\"`, "
                  "`padlen=18` |" % int(CUTOFF_HZ) in sec19)
     checks.check("parameter table carries the margin row",
-                 "| margin | %d samples (%s ms) at each end, after the filter |"
+                 "| margin | %d samples (%s ms) at each end, **taken from the "
+                 "neighbouring chunks** and discarded after the filter |"
                  % (MARGIN_SAMPLES, fmt(si_margin_ms, 3)) in sec19)
+    checks.check("parameter table carries the split row",
+                 "| split | two disjoint halves of the retained "
+                 "%s samples, %s each |"
+                 % ("{:,}".format(chunk_t), "{:,}".format(chunk_t // 2))
+                 in sec19)
     checks.check("section names sosfiltfilt", "`scipy.signal.sosfiltfilt`" in sec19)
     checks.check("section says the anchor filter is zero phase", "zero phase" in sec19)
 
-    kept = chunk_t - 2 * MARGIN_SAMPLES
+    # The margin is drawn from the neighbouring chunks now, so the whole chunk
+    # survives the discard: the block is 13,020 + two margins and the retained
+    # core is the chunk itself.
+    block = chunk_t + 2 * MARGIN_SAMPLES
+    kept = block - 2 * MARGIN_SAMPLES
     half = kept // 2
-    checks.check("retained samples 12,020", kept == 12020, str(kept))
-    checks.check("half window 6,010", half == 6010, str(half))
-    checks.check("section quotes the retained count", "**12,020**" in sec19)
-    checks.check("section quotes the half window", "6,010" in sec19)
+    checks.check("filtered block 14,020", block == 14020, str(block))
+    checks.check("retained samples 13,020", kept == chunk_t, str(kept))
+    checks.check("half window 6,510", half == 6510, str(half))
+    checks.check("section quotes the filtered block", "**14,020-sample block"
+                 in sec19)
+    checks.check("section quotes the retained count",
+                 "**retaining exactly the window chunk's 13,020 samples**"
+                 in sec19)
+    checks.check("section quotes the half window", "6,510" in sec19)
 
     rel_se = 1.16 / math.sqrt(half)
-    checks.check("relative standard error 1.50 percent",
-                 fmt(rel_se * 100.0, 2) == "1.50", fmt(rel_se * 100.0, 2))
-    checks.check("section quotes the relative standard error", "**1.50%**" in sec19)
+    checks.check("relative standard error 1.44 percent",
+                 fmt(rel_se * 100.0, 2) == "1.44", fmt(rel_se * 100.0, 2))
+    checks.check("section quotes the relative standard error", "**1.44%**" in sec19)
+    r_null_ideal = math.exp(2.0 * 1.2816 * rel_se * math.sqrt(2.0))
+    checks.check("ideal split-half ratio 1.05",
+                 fmt(r_null_ideal, 2) == "1.05", fmt(r_null_ideal, 2))
+    checks.check("section quotes the ideal split-half ratio", "**1.05**" in sec19)
+    checks.check("section gives the closed form it came from",
+                 "`exp(2 · 1.2816 · s√2)`" in sec19)
     checks.check("section says the samples are not independent",
                  "these samples are not independent" in sec19)
 
@@ -667,7 +882,21 @@ def main():
         "the native-amplitude refusal": "cannot become a gate now",
         "the audit values are never consumed": "reported and never consumed",
         "R_null is silent on bias": "silent on estimation *bias*",
-        "the section has been reviewed once": "This section has been reviewed once",
+        "the section has been reviewed twice": "This section has been reviewed twice",
+        "the three-round limit": "the final response the three-round limit allows",
+        "R_null is one-sided": "**`R_null_sampled` is one-sided.**",
+        "a pass rests on R_space alone": "passes on `R_space_sampled`",
+        "the label is not a certificate":
+            "**The label is a recorded comparison and not a certificate**",
+        "the refused interleaved split":
+            "A refinement was considered and is not taken in this draft",
+        "the follow-up must precede the first run":
+            "must be resolved before the estimator's first run",
+        "the chunk boundaries are a pinned parameter":
+            "a parameter of the anchor pipeline rather than a departure from it",
+        "the gate-3 arithmetic is conditional":
+            "there is none here for §19 to discharge",
+        "the round 2 record": "### 19.12 Draft 31",
         "the scipy pin": "`scipy==1.18.0`",
         "numpy did not move": "without moving `numpy` from `2.5.2`",
         "the sampled-grid boundary": "not over the recording",
@@ -679,21 +908,28 @@ def main():
 
     # --- the status line must publish the same numbers ---------------------
     for label, text_value in {
-        "the strict level tolerance": "`10.0 → 25.0 µV`",
-        "the withdrawal": "host admissibility is\nfive gates",
-        "the renamed quantities": "`sigma_worst_sampled`",
-        "the new grid formula": "`floor(k(C-1)/(K-1) + 0.5)`",
-        "the guaranteed duration": "**74.214 s**",
-        "the margin": "**500 samples (16.667 ms)**",
-        "the closed-form impulse": "`-1/13020`",
-        "the brick wall error": "+1.14%",
-        "the butterworth error": "**+1e-06**",
-        "no host is pinned": "No host is pinned",
+        "the retained core": "retaining the chunk's full 13,020 samples",
+        "the filtered block": "**14,020-sample block of real recorded signal**",
+        "the half window": "**6,510**",
+        "the guaranteed duration": "**170 chunks, 73.780 s**",
+        "the transfer projection": "**957,031,364 bytes**",
+        "the negative isolation error": "**−0.228%**",
+        "the positive isolation error": "**+0.283%**",
+        "the withdrawal of the isolation bound":
+            "**the isolated-window deviation is not bounded — it no longer exists.**",
+        "the refusal to bound the chunk-size difference":
+            "this draft states **no bound** on that difference",
+        "the one-way withdrawal": "**The one-way claim is withdrawn:**",
+        "what a low null certifies": "**low value certifies nothing**",
+        "the gate-3 clarification":
+            "no longer calls a gate-3 host-aggregate precondition discharged",
+        "the coverage defect": "not 171 and 74.214 s",
+        "no threshold moved": "**No threshold value moved at all:**",
+        "no host is pinned": "**No host is pinned",
         "no estimator was written": "no estimator was written",
-        "the scipy pin": "`scipy==1.18.0`",
     }.items():
         checks.check("status line carries %s" % label,
-                     text_value.replace("\n", " ") in " ".join(status.split()),
+                     " ".join(text_value.split()) in " ".join(status.split()),
                      text_value)
 
     # --- every restatement of a value must agree with its siblings --------
