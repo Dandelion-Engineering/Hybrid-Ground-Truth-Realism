@@ -1,0 +1,76 @@
+
+1. The closed sections are still closed
+PASS  the document is LF throughout
+PASS  span ## 1.-> ## 17. byte-identical  [144664 bytes 700b3b9a]
+PASS  span ## 17.-> ## 18. byte-identical  [21864 bytes dc73b87f]
+PASS  span ## 18.-> ## 19. byte-identical  [20579 bytes 8af3e62c]
+
+2. The repair - the unconditional claim on the two operative surfaces
+PASS  19.5 carries the withdrawn wording exactly once  [found 1]
+PASS    ... and that one occurrence is inside the withdrawal sentence
+PASS  19.5 asserts the claim as withdrawn
+PASS  19.5 states the condition instead
+PASS  19.5 says a high null there changes the label and not the disposition
+PASS  19.5 attributes the asymmetry to 16.7 rather than inventing it
+PASS  19.5 records that the withdrawn claim was found by F7-R2
+PASS  19.10 no longer carries the unconditional bullet
+PASS  19.10 carries the conditioned bullet
+
+3. The repair - the two record surfaces, by the document's own conventions
+PASS  19.12 is marked as a record with one claim superseded by 19.13
+PASS  19.12's supersession names the condition
+PASS  19.12's interleaved-split follow-up is declared closed
+PASS  Draft 31's retained status line still carries its own claim, per the stack rule
+PASS  Draft 32's line sits above it and states the correction
+PASS  Draft 32's line names the four surfaces
+PASS  Draft 32's line ends by handing the stack to Draft 31
+
+4. The rule is written down where the branches are
+PASS  the asymmetry rule appears in exactly 4 places  [found 4]
+PASS    ... one of them is in 19.5
+PASS    ... one of them is in 19.6
+PASS    ... one of them is in 19.10
+PASS    ... one of them is in the status stack
+PASS  19.6 names the two places the null appears
+PASS  19.6 keeps all four ordered branches
+PASS  19.6's branch 4 is unchanged
+
+5. The tracked split is settled, with its direction and its limit
+PASS  19.5 no longer defers the split
+PASS  19.5 pins contiguous halves
+PASS  19.5 states the mechanism it is refusing
+PASS  19.5 states the DIRECTION of the refused alternative
+PASS  19.5 states what the choice does not fix
+PASS  19.5 labels its own argument unmeasured
+
+6. Section 19.13 records the change
+PASS  19.13 records: F7-R2
+PASS  19.13 records: Convergence Decision
+PASS  19.13 records: 39 checks, 0 failed
+PASS  19.13 records: 4 of 4 caught
+PASS  19.13 records: agree in all four cells
+PASS  19.13 records: does not change which host
+PASS  19.13 records: Nothing executable
+PASS  19.13 records the strongest argument against the repair taken
+
+7. Restatement census, recounted by region rather than assumed
+PASS  73.780 appears 7/2/2 times in 19.1-19.12 / 19.13 / the stack  [found 7/2/2]
+PASS  6,510 appears 6/1/1 times in 19.1-19.12 / 19.13 / the stack  [found 6/1/1]
+PASS  13,020 appears 14/1/3 times in 19.1-19.12 / 19.13 / the stack  [found 14/1/3]
+PASS  957,031,364 appears 2/2/2 times in 19.1-19.12 / 19.13 / the stack  [found 2/2/2]
+PASS  no pre-existing section-19 restatement moved
+
+8. The closed card's checker as a regression baseline
+PASS  the RC-007 checker still runs to completion  [288 checks, 6 failed]
+PASS  it still runs 288 checks  [288 checks, 6 failed]
+PASS  exactly 6 checks went red  [6 red]
+PASS  expected red: section states R_null is one-sided
+PASS  expected red: section states the refused interleaved split
+PASS  expected red: section restates 73.780 exactly 7 times
+PASS  expected red: section restates 6,510 exactly 6 times
+PASS  expected red: section restates 13,020 exactly 14 times
+PASS  expected red: section restates 957,031,364 exactly 2 times
+PASS  no unexpected check went red  [none]
+
+Summary
+57 checks, 0 failed

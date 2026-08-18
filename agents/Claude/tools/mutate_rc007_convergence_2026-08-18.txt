@@ -1,0 +1,7 @@
+control run: exit 0
+remove the 19.10 surface                     caught=True  failing=3 specific=2/2
+soften the 19.5 surface                      caught=True  failing=3 specific=2/2
+break the approved 16.7 anchor               caught=True  failing=3 specific=1/1
+weaken the conditioned statement in 19.5     caught=True  failing=2 specific=1/1
+
+4 of 4 mutations caught on their own check

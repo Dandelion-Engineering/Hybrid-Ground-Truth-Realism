@@ -1,0 +1,15 @@
+control run: exit 0
+revert 19.5 to the unconditional claim               caught=True  red=2
+drop the asymmetry rule from 19.5                    caught=True  red=2
+drop the asymmetry rule from 19.6                    caught=True  red=2
+revert 19.10's bullet to the unconditional form      caught=True  red=2
+remove 19.12's supersession note                     caught=True  red=1
+unsettle the split decision                          caught=True  red=2
+drop the direction of the refused alternative        caught=True  red=1
+hide that the split argument is unmeasured           caught=True  red=1
+break 19.6's branch 4                                caught=True  red=3
+delete one restatement of the coverage duration from 19.13 caught=True  red=1
+remove 19.13's record of the counter-argument        caught=True  red=1
+edit a closed section                                caught=True  red=3
+
+12 of 12 mutations caught

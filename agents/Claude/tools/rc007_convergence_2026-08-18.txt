@@ -1,0 +1,72 @@
+
+1. Candidate authentication - the frozen Draft-31 state
+PASS  selection document SHA-256 is the frozen Draft-31 digest  [24e78a5ad139245b197286edd1acaf8bea42bc75af3378883b3180d29a923755]
+PASS  closed span ## 1.-> ## 17. is byte-identical  [144664 bytes 700b3b9a]
+PASS  closed span ## 17.-> ## 18. is byte-identical  [21864 bytes dc73b87f]
+PASS  closed span ## 18.-> ## 19. is byte-identical  [20579 bytes 8af3e62c]
+
+2. Surface census - where the unconditional claim lives
+PASS  every heading used for locating occurs exactly once  [18 headings]
+PASS  unconditional surface present exactly 1 time(s): status line, Draft 31  [count 1]
+PASS    ... and it sits in status-line stack (front matter)  [located in status-line stack (front matter)]
+PASS  unconditional surface present exactly 1 time(s): section 19.5  [count 1]
+PASS    ... and it sits in ### 19.5  [located in ### 19.5]
+PASS  unconditional surface present exactly 1 time(s): section 19.10  [count 1]
+PASS    ... and it sits in ### 19.10  [located in ### 19.10]
+PASS  unconditional surface present exactly 1 time(s): section 19.12  [count 1]
+PASS    ... and it sits in ### 19.12  [located in ### 19.12]
+PASS  the unconditional claim is live on FOUR surfaces, not three  [count 4]
+      Codex's Round-3 convergence statement names three live surfaces:
+      the status line, section 19.5 and section 19.10. The fourth is in
+      section 19.12, the record subsection for Draft 31, which is live
+      prose in the present tense and is not marked superseded.
+PASS  the correctly conditioned statement is present exactly once: section 19.5, second statement  [count 1]
+
+3. The noise gate's own branches, executed
+PASS  branch order gives 'passes' for low  R_space, low  R_null  [passes]
+PASS  branch order gives 'unmeasurable' for low  R_space, high R_null  [unmeasurable]
+PASS  branch order gives 'fails on homogeneity (resolved heterogeneity)' for high R_space, low  R_null  [fails on homogeneity (resolved heterogeneity)]
+PASS  branch order gives 'fails on homogeneity (resolution-limited)' for high R_space, high R_null  [fails on homogeneity (resolution-limited)]
+PASS  the high/high state is NOT withheld under the branch order  [fails on homogeneity (resolution-limited)]
+PASS  Codex's counterexample reproduces: R_space=3, R_null=3, M=2 fails on homogeneity
+      The prose says a value above M is sufficient to withhold the
+      measurement. The branches withhold in one of the two high-null
+      cases. The blocker is real and it is not disputed.
+
+4. The approved drift gate, executed beside it
+PASS  section 16.7 anchor present exactly once  [a candidate passes drift only when both `Delta_1]
+PASS    ... and it lies inside the closed, approved 1->17 span  [offset 159037]
+PASS  section 16.7 anchor present exactly once  [If `Delta_10min > L`, the candidate fails]
+PASS    ... and it lies inside the closed, approved 1->17 span  [offset 159117]
+PASS  section 16.7 anchor present exactly once  [If `Delta_10min <= L` but `Q95_null > L`, the ca]
+PASS    ... and it lies inside the closed, approved 1->17 span  [offset 159277]
+PASS  drift rule gives 'passes' for low  Delta, low  Q95  [passes]
+PASS  drift rule gives 'unmeasurable' for low  Delta, high Q95  [unmeasurable]
+PASS  drift rule gives 'fails on drift (resolved drift)' for high Delta, low  Q95  [fails on drift (resolved drift)]
+PASS  drift rule gives 'fails on drift (noise-limited)' for high Delta, high Q95  [fails on drift (noise-limited)]
+
+5. Cell-by-cell comparison of the two gates
+PASS  same kind of disposition in cell: low  R_space, low  R_null  [passes vs passes]
+PASS  same kind of disposition in cell: low  R_space, high R_null  [unmeasurable vs unmeasurable]
+PASS  same kind of disposition in cell: high R_space, low  R_null  [fails vs fails]
+PASS  same kind of disposition in cell: high R_space, high R_null  [fails vs fails]
+PASS  the two gates agree in all four cells  [0 mismatch(es)]
+      Section 16.7 is approved, closed and unedited since Session 17.
+      It resolves the high/high cell as a failure, exactly as section
+      19.6 does. The null there can convert a would-be pass into an
+      unmeasurable rejection; it never converts a would-be failure.
+
+6. What each permitted repair would do to that agreement
+PASS  reordering changes exactly one cell  [high R_space, high R_null]
+PASS  the cell it changes is the high/high one  [high R_space, high R_null]
+PASS  after reordering, the noise gate disagrees with approved 16.7 in that one cell  [unmeasurable vs fails on drift (noise-limited)]
+      Repair (a) - condition the prose on R_space_sampled <= M - edits
+      four prose surfaces and leaves every branch, threshold and number
+      untouched, and keeps section 19.6 in the parallel with 16.7 that
+      section 19.5 itself claims.
+      Repair (b) - give a high null precedence - changes the executable
+      rule and puts the noise gate out of parallel with an approved,
+      closed section in exactly the cell under dispute.
+
+Summary
+39 checks, 0 failed

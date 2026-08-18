@@ -1,0 +1,116 @@
+{
+  "cells_agreeing": 4,
+  "checks_failed": 0,
+  "checks_total": 39,
+  "conditioned_surface_count": 1,
+  "document_bytes": 288813,
+  "document_sha256": "24e78a5ad139245b197286edd1acaf8bea42bc75af3378883b3180d29a923755",
+  "drift_gate_truth_table": [
+    {
+      "Delta_10min": 5.0,
+      "Q95_null": 5.0,
+      "case": "low  Delta, low  Q95",
+      "disposition": "passes"
+    },
+    {
+      "Delta_10min": 5.0,
+      "Q95_null": 30.0,
+      "case": "low  Delta, high Q95",
+      "disposition": "unmeasurable"
+    },
+    {
+      "Delta_10min": 30.0,
+      "Q95_null": 5.0,
+      "case": "high Delta, low  Q95",
+      "disposition": "fails on drift (resolved drift)"
+    },
+    {
+      "Delta_10min": 30.0,
+      "Q95_null": 30.0,
+      "case": "high Delta, high Q95",
+      "disposition": "fails on drift (noise-limited)"
+    }
+  ],
+  "frozen_spans": [
+    {
+      "bytes": 144664,
+      "from": "## 1.",
+      "sha256": "700b3b9a4cd3a1b0f7342e2d4678fbe1cac87f68da6fbb2635ebc5b865cdad59",
+      "to": "## 17."
+    },
+    {
+      "bytes": 21864,
+      "from": "## 17.",
+      "sha256": "dc73b87f64550d941ca99c9889668e45da688428cc791d8a8fe8d9c60303f72a",
+      "to": "## 18."
+    },
+    {
+      "bytes": 20579,
+      "from": "## 18.",
+      "sha256": "8af3e62cd2540472a7a3466ee975d85701feab3e7c7dec05d7c3ddf16f821017",
+      "to": "## 19."
+    }
+  ],
+  "noise_gate_truth_table": [
+    {
+      "R_null": 1.5,
+      "R_space": 1.5,
+      "case": "low  R_space, low  R_null",
+      "disposition": "passes",
+      "measurement_withheld": false
+    },
+    {
+      "R_null": 3.0,
+      "R_space": 1.5,
+      "case": "low  R_space, high R_null",
+      "disposition": "unmeasurable",
+      "measurement_withheld": true
+    },
+    {
+      "R_null": 1.5,
+      "R_space": 3.0,
+      "case": "high R_space, low  R_null",
+      "disposition": "fails on homogeneity (resolved heterogeneity)",
+      "measurement_withheld": false
+    },
+    {
+      "R_null": 3.0,
+      "R_space": 3.0,
+      "case": "high R_space, high R_null",
+      "disposition": "fails on homogeneity (resolution-limited)",
+      "measurement_withheld": false
+    }
+  ],
+  "reordering_changed_cells": [
+    "high R_space, high R_null"
+  ],
+  "repair_a_preserves_parallel": true,
+  "repair_b_preserves_parallel": false,
+  "unconditional_surface_count": 4,
+  "unconditional_surfaces": [
+    {
+      "count": 1,
+      "label": "status line, Draft 31",
+      "located_in": "status-line stack (front matter)",
+      "offset": 2133
+    },
+    {
+      "count": 1,
+      "label": "section 19.5",
+      "located_in": "### 19.5",
+      "offset": 238192
+    },
+    {
+      "count": 1,
+      "label": "section 19.10",
+      "located_in": "### 19.10",
+      "offset": 270037
+    },
+    {
+      "count": 1,
+      "label": "section 19.12",
+      "located_in": "### 19.12",
+      "offset": 284333
+    }
+  ]
+}

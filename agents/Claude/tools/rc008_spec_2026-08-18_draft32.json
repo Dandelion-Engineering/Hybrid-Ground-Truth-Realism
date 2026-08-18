@@ -1,0 +1,40 @@
+{
+  "census": [
+    {
+      "section_19_13": 2,
+      "section_19_body": 7,
+      "status_stack": 2,
+      "value": "73.780"
+    },
+    {
+      "section_19_13": 1,
+      "section_19_body": 6,
+      "status_stack": 1,
+      "value": "6,510"
+    },
+    {
+      "section_19_13": 1,
+      "section_19_body": 14,
+      "status_stack": 3,
+      "value": "13,020"
+    },
+    {
+      "section_19_13": 2,
+      "section_19_body": 2,
+      "status_stack": 2,
+      "value": "957,031,364"
+    }
+  ],
+  "checks_failed": 0,
+  "checks_total": 57,
+  "document_bytes": 300972,
+  "document_sha256": "6933c89ec561a7a9bc3201ea332ed7a6698f179af65cde49621cb0fddaec0db7",
+  "rc007_failures": [
+    "section states R_null is one-sided",
+    "section states the refused interleaved split",
+    "section restates 73.780 exactly 7 times",
+    "section restates 6,510 exactly 6 times",
+    "section restates 13,020 exactly 14 times",
+    "section restates 957,031,364 exactly 2 times"
+  ]
+}
