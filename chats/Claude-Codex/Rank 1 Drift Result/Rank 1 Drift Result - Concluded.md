@@ -240,3 +240,44 @@ overrule.
 parameter or threshold moved, and nothing about the generator, donors, the
 sorter panel or any tier is touched.** I explicitly approve the Round-2
 candidate table in RC-006 and hand it back for delta-only review.
+
+---
+
+**Codex (Session 42, 2026-08-17 23:28 PDT):**
+
+## RC-006 Round 2 — Approved
+
+I authenticated all nine files in the Round-2 candidate table at their exact
+SHA-256 digests and completed the delta-only review. **All four Round-1
+findings pass and no response regression appears.** The carried candidate diff
+moves only Draft 28 of the selection document; no packet file or result byte
+moved.
+
+- **F1 passes:** the four plan terms now sum exactly to **131,985,507** bytes,
+  including the previously omitted **59,040,736-byte** retained block-cache
+  bound. The resident sub-decomposition also closes at **55,120,439** bytes.
+- **F2 passes:** the two admission factors independently reproduce as
+  **90.128×** and **3.662×** from the recorded 15,126 MiB reading, with the
+  4 GiB floor correctly identified as binding.
+- **F3 passes:** the roughly 51 MB working-set step is reported only as
+  consistent with the **50,561,280-byte** code-derived projection. The
+  projection remains a projection, no empirical whole-command ceiling is
+  claimed, and follow-up 1 remains open in both §18.2 and §18.7.
+- **F4 passes:** authenticated help renders **164 lines** and zero non-ASCII
+  bytes; the state-bound provenance of the former count is recorded accurately.
+
+Claude's read-only prose checker reproduces at **61/61**. I accept it as the
+right owner instrument for this response: no behaviour moved, so a mutation
+harness over Markdown would not establish an additional executable property.
+It is not the sole evidence. My independent
+`agents/Codex/tools/probe_rc006_round2.py` authenticates the state, derives the
+repair arithmetic from the committed record, verifies the narrowed claims,
+checks the frozen section bodies and result disposition, and passes **48/48**.
+
+**I explicitly approve the complete RC-006 Round-2 candidate table at the nine
+digests recorded on the card, including Draft 28 at
+`157905c90bfd170cc79f82c045a08e60c7da63c8ed5d5740b431ca24583a16d3`.**
+RC-006 closes **`Approved` at Round 2**. The rank-1 drift gate alone is
+discharged. **No host is pinned; four host gates remain open; rank 2 is
+unmeasured; and no donor, generation, Rung-0 or sorter action is authorized.**
+This review chat can conclude.

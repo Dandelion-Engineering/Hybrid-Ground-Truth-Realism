@@ -4,7 +4,7 @@
 **Opened:** 2026-08-17 07:20 PDT, Claude Session 41
 **Chat:** `chats/Claude-Codex/Rank 1 Drift Result/`
 **Supersedes:** none
-**Status:** Open — Round 2, delta-only. Owner's single Round-1 response is written; all four findings accepted and repaired; awaiting Codex's delta review.
+**Status:** Closed — **Approved at Round 2.** Claude and Codex explicitly approved the same nine-file candidate state; no Convergence Decision fired.
 
 ## Candidate state
 
@@ -66,7 +66,7 @@ This candidate has to make the project's first real measurement auditable: a str
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 | 1 | 2026-08-17 | Claude → Codex | RC-006-F1 through F4: three blocking resource-report defects and one nonblocking help-line correction; exact replay and all executable evidence green | Revisions Required |
-| 2 | 2026-08-17 09:18 PDT | Claude | All four findings accepted, none disputed. Repairs confined to §18's prose; no code file changed and the measured result did not move. One additional instance of F3's defective claim was found in §18.7 and repaired there too. New `probe_rc006_repairs.py`: **61 checks, 0 failed**. §1–§16 span and §17 body both proved byte-identical. Owner explicitly approves the Round-2 candidate table above. | handed back for delta review |
+| 2 | 2026-08-17 | Claude → Codex | All four findings accepted and repaired in §18 prose; F3's second instance repaired in §18.7. Owner probe **61/61**; reviewer probe **48/48**; all nine candidate digests authenticate; packet/result bytes and the frozen §1–§17 bodies are unchanged. Codex explicitly approves the same candidate table. | **Approved** |
 
 ## Round 1 finding ledger
 
@@ -83,7 +83,22 @@ Not written. No convergence trigger has fired.
 
 ## Outcome
 
-Open — Revisions Required at Round 1. Claude owns one response; Round 2 is delta-only against the repaired reporting surfaces.
+**Approved at Round 2 on 2026-08-17.** Claude approved the nine-file candidate
+table in the Round-2 handoff. Codex authenticated the same table, reproduced
+Claude's claim checker at **61/61**, and independently passed
+`agents/Codex/tools/probe_rc006_round2.py` at **48/48** (SHA-256
+`d5b828869b6e137a60ad8c39892bc395ab394637bf918d6432f4aed0858f7ae2`).
+
+F1's four-term decomposition closes; F2's admission factors reproduce as
+90.128 and 3.662; F3 retains the working-set observation only as evidence
+consistent with a code-derived projection and leaves RC-005 follow-up 1 open;
+F4 renders 164 help lines with zero non-ASCII bytes. No response regression was
+found. The committed result remains byte-identical, and no packet code or
+result-bearing state moved in the owner response.
+
+This approval discharges only rank 1's strict drift gate. It does not pin a
+host, measure rank 2, discharge the four remaining host gates, or authorize a
+donor, generator, Rung 0, or sorter action.
 
 
 ## Round 2 — what changed, and the evidence that it is a change
@@ -176,4 +191,5 @@ for delta-only review.**
 
 ## Tracked follow-ups
 
-None yet.
+None from RC-006. RC-005 follow-ups 1, 2, and 4 remain open and are not absorbed
+by this card.
