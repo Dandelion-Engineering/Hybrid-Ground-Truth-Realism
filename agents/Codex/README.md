@@ -28,9 +28,11 @@ agents/Codex/
 │  ├── probe_rc006_round1.py
 │  ├── probe_rc006_round2.py
 │  ├── probe_rc007_round1.py
-│  └── probe_rc007_round2.py
+│  ├── probe_rc007_round2.py
+│  ├── probe_rc007_round3.py
+│  └── probe_rc007_round3_2026-08-18.txt
 ├── Session Summaries/
-│  └── HumanReport1.md … HumanReport44.md
+│  └── HumanReport1.md … HumanReport45.md
 └── Progress Reports/
    ├── Progress Report Phase 1 Close.md
    ├── Progress Report Amendment Compute Schedule.md
@@ -65,6 +67,7 @@ agents/Codex/
 - **`tools/probe_rc006_round2.py`** — independent offline RC-006 delta evidence. It authenticates the nine-file response, proves that no packet or result file moved, derives both corrected resource decompositions and admission factors from the committed JSON record, verifies the narrowed working-set language and open follow-up, rechecks the frozen §1–§17 spans and unchanged disposition, and renders the 164-line ASCII-only help surface. It passes 48/48.
 - **`tools/probe_rc007_round1.py`** — independent offline RC-007 full-pass evidence. It authenticates Draft 29 and reruns the owner checker; catches the stale relaxed ladder and missing lower-bound verdict; constructs the peak-versus-peak-to-peak ceiling counterexample and overlapping-disposition case; proves the sixty-window grid misses a one-chunk excursion; evaluates the ideal FFT high-pass impulse in the retained centre; checks the in-force Claim Sheet's host-specific effective-SNR gate against the proposed four-gate supersession; and confirms the layout probe contains no Python-level sample slice. It passes 12/12.
 - **`tools/probe_rc007_round2.py`** — independent offline RC-007 delta evidence. It authenticates all eight Draft-30 files and three frozen document spans, checks the repaired level/verdict/grid contract, constructs two valid int16-lattice neighbour contexts that move the isolated-chunk Butterworth MAD estimate by −0.228% and +0.283%, and shows that reciprocal temporal changes can collapse the split-half p10/p90 spread from 4 to 1. It passes 31/31 and reads no archive, candidate sample or network resource.
+- **`tools/probe_rc007_round3.py`** and **`tools/probe_rc007_round3_2026-08-18.txt`** — independent offline RC-007 final-delta evidence. They authenticate all eight Draft-31 files and frozen spans, reproduce the real-neighbour filter repair, tightened 170-chunk / 73.780-second coverage theorem and 957,031,364-byte transfer projection, then exercise the four-case ordered-branch truth table. They show that the high-space/high-null state is a homogeneity failure under the branches even though three live surfaces call high null sufficient to withhold the measurement. The probe passes 39/39 and reads no archive, candidate sample or network resource.
 - **`Session Summaries/HumanReport<N>.md`** — permanent detailed session reports for the director.
 - **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 40 count-based report; the next cadence report is Session 48.
 

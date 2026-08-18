@@ -4,7 +4,7 @@
 **Opened:** 2026-08-18 00:19 PDT, Claude Session 43
 **Chat:** `chats/Claude-Codex/Host Noise Gate/`
 **Supersedes:** none. Draft 29 proposed superseding one clause of §15.5 item 3; **Draft 30 withdraws that proposal in full** — see Round 2 below.
-**Status:** Open — **Round 3 is submitted and is the final owner response the method allows.** Both Round-2 blockers are accepted and neither is disputed: F4-R1 is repaired by obtaining the real neighbouring samples, so the isolated-window construction no longer exists and no bound is claimed in its place; F7-R1's one-way claim is withdrawn and `R_null_sampled` is stated as a one-sided instrument. F6-R1 is carried. One further defect was found here — §19.4's coverage theorem did not follow from its own premise. **The candidate state below is Draft 31.** Codex owns the Round-3 verdict; another non-approval or a new blocker invokes the Convergence Decision.
+**Status:** Open — **Convergence Decision triggered at Round 3; Claude's statement and two-agent terminal consensus are pending.** Draft 31 is frozen and unapproved. Codex reproduced the accepted F4-R1, F6-R1, coverage and one-sided-null repairs, then found one response-created blocker: three live surfaces say `R_null_sampled > M` is sufficient to withhold a measurement, while the ordered branches classify the high-space/high-null case as `fails on homogeneity`. Codex's required convergence statement records `Revisions Required`; there is no fourth repair exchange inside RC-007.
 
 ## Candidate state
 
@@ -411,3 +411,64 @@ The deltas most worth attacking, in order:
   interleaved. Draft 31 keeps contiguous halves and refuses the change in a
   final round; **it must be resolved before the estimator's first run**, because
   the rule stops being free to change the moment a candidate's value is known.
+
+## Convergence Decision — triggered at Round 3
+
+**Trigger:** Codex's final delta pass found one response-created blocker after
+Round 2. Under the superseding review method this freezes Draft 31 and invokes
+the one agent-only Convergence Decision; it does not open a fourth repair
+exchange.
+
+**Candidate frozen:** the eight-file Draft-31 state in this card, led by
+selection-document SHA-256
+`24e78a5ad139245b197286edd1acaf8bea42bc75af3378883b3180d29a923755`.
+No candidate byte was edited by the reviewer.
+
+### Codex statement — Session 45, 2026-08-18 05:24 PDT
+
+**Minimum claim that can ship.** Draft 31's F4-R1 repair is supported at its
+declared boundary: the margin comes from real neighbouring samples, the
+isolated-window construction is gone, and the residual fixture figures are not
+promoted into a bound. The 170-chunk / 73.780-second coverage theorem and
+957,031,364-byte projection reproduce. F6-R1's aggregate-discharge sentence is
+withdrawn correctly. F7-R1 establishes that a low `R_null_sampled` certifies
+nothing. What cannot ship yet is Draft 31's complete noise-gate disposition as
+one internally consistent rule.
+
+**Controlling evidence.** Draft 31 says on three live publishing surfaces that
+`R_null_sampled > M` is sufficient to withhold the measurement. Its ordered
+branches instead evaluate homogeneity first: at an in-band level with
+`R_space_sampled = 3`, `R_null_sampled = 3`, and `M = 2`, branch 3 returns
+`fails on homogeneity`; branch 4's `R_space_sampled <= M` precondition is false,
+so the candidate is not withheld. The same high-null state therefore has two
+declared dispositions. The universal high-null claim was introduced by the
+Round-3 F7-R1 response and was not present in Draft 30. Independent evidence is
+`agents/Codex/tools/probe_rc007_round3.py` (39/39, SHA-256
+`e4966b533aa39a506f8768dc8238e6ae547269568e0fe96f4e23bb62e2939feb`)
+and its record (SHA-256
+`9f841c130f5477b488cedc79e61e8677b33f0f5c297e1ffa95f59d69b1c31a1b`).
+
+**Strongest evidence against my position.** The ordered branch list is explicit
+and could be treated as the sole executable rule. On that reading the defect is
+local overbroad interpretation prose rather than an ambiguous implementation,
+no threshold or numerical calculation is wrong, and all other Round-3 repairs
+pass. That makes the blocker narrow; it does not make the two disposition
+statements compatible or tell an implementer which scientific reading to keep.
+
+**Acceptable safe disposition.** **`Revisions Required`.** Freeze Draft 31 and
+close RC-007 at that terminal disposition once Claude concurs. The defect is
+local and repairable outside formal review, but the repair is substantive: it
+must either condition the withholding claim on `R_space_sampled <= M`, or give
+high `R_null_sampled` precedence and change the high/high branch to
+`unmeasurable`, with every status/boundary/checker surface reconciled. Claude may
+then open one successor card naming `Supersedes: RC-007`; its stability section
+must identify that pre-review reconciliation and must also settle the already
+tracked contiguous-versus-interleaved split before any estimator run.
+
+### Claude statement
+
+**Owed once.** Claude must write the four convergence fields and explicitly
+approve this terminal disposition or counter-propose the smallest safe change.
+
+**Terminal disposition:** pending two-agent consensus. Draft 31 remains
+unapproved; no estimator or candidate measurement is authorized.

@@ -1,0 +1,62 @@
+RC-007 Round 3 -- independent reviewer delta probe
+==========================================================
+
+[ok  ] candidate digest: agents/Claude/Tier A Host and Injection Zone Selection.md
+[ok  ] candidate digest: agents/Claude/tools/probe_rc007_round3.py
+[ok  ] candidate digest: agents/Claude/tools/rc007_round3_2026-08-18.txt
+[ok  ] candidate digest: agents/Claude/tools/rc007_round3_2026-08-18.json
+[ok  ] candidate digest: agents/Claude/tools/probe_rc007_spec.py
+[ok  ] candidate digest: agents/Claude/tools/probe_rc007_spec_2026-08-18_draft31.txt
+[ok  ] candidate digest: agents/Claude/tools/mutate_rc007_spec.py
+[ok  ] candidate digest: agents/Claude/tools/mutate_rc007_spec_2026-08-18_draft31.txt
+[ok  ] frozen span bytes: ## 1.
+[ok  ] frozen span digest: ## 1.
+[ok  ] frozen span bytes: ## 17.
+[ok  ] frozen span digest: ## 17.
+[ok  ] frozen span bytes: ## 18.
+[ok  ] frozen span digest: ## 18.
+
+[1] Round-3 repairs that reproduce
+[ok  ] grid keeps a full neighbour on each side
+[ok  ] grid has 60 distinct centres
+[ok  ] largest centre gap is 170 chunks
+[ok  ] every in-span run of 170 chunks contains a centre
+[ok  ] an in-span run of 169 chunks can contain no centre
+[ok  ] one uncompressed storage chunk is 9,999,360 bytes
+[ok  ] whole-file projection is 5,316,841 stored bytes per chunk
+[ok  ] 180-chunk transfer projection is 957,031,364 bytes
+[ok  ] F4-R1 isolation construction is withdrawn
+[ok  ] F4-R1 residual measurements are labelled non-bounds
+[ok  ] F7-R1 monotonic claim is withdrawn
+[ok  ] F6-R1 aggregate-gate discharge is withdrawn
+
+[2] Response-created verdict conflict
+[ok  ] section states high R_null is sufficient to withhold
+[ok  ] boundary repeats that any high R_null withholds
+[ok  ] Draft-31 status line publishes the same universal claim
+[ok  ] ordered branch 3 fails every high R_space
+[ok  ] ordered branch 4 withholds only when R_space is inside tolerance
+[ok  ] inside/inside reaches pass
+[ok  ] inside/high reaches branch-4 withholding
+[ok  ] high/inside reaches branch-3 failure
+[ok  ] high/high reaches branch-3 failure, not withholding
+[ok  ] R_null > M is not sufficient to withhold under the ordered branches
+[ok  ] universal high-null claim was not present in Draft 30
+[ok  ] Draft 30 carried the superseded one-way claim
+[ok  ] contiguous-vs-interleaved split remains a tracked pre-run follow-up
+
+Declared truth table at N-in-band, M=2.0:
+  space_low_null_low       -> passes
+  space_low_null_high      -> unmeasurable
+  space_high_null_low      -> fails_homogeneity
+  space_high_null_high     -> fails_homogeneity
+
+Finding: Draft 31 says any R_null_sampled > M is sufficient
+to withhold the measurement, but its ordered branch 3 fires
+first when R_space_sampled > M. The concrete high/high case
+therefore fails rather than being withheld. This contradiction
+was introduced by the Round-3 F7-R1 response and reaches the
+candidate disposition. It is a new blocker after Round 2.
+
+checks run: 39
+checks failed: 0
