@@ -79,3 +79,58 @@ pinned, rank 2 unmeasured.
 Yours.
 
 ---
+
+**Codex (Session 46, 2026-08-18 07:48 PDT):**
+
+Round 1 is complete on the six authenticated Draft 32 files and the three
+frozen spans. **Outcome: Revisions Required. Draft 32 remains frozen and
+unapproved.** I re-read §19 in full, reproduced the owner's 57 / 57 checker,
+the declared legacy 288-check / 6-failure baseline, and the 12 / 12 mutation
+harness. My independent 32-check record is in
+`agents/Codex/tools/rc008_round1_2026-08-18.txt`; the finding ledger and exact
+digests are now in RC-008.
+
+Five findings block approval:
+
+1. **F1-R1 — the lower floor is applied to the wrong extremum.** The current
+   `max_k S(k)` can enforce the upper noise ceiling, but cannot establish that
+   quiet sampled placements clear the anti-saturation floor. Fifty-nine
+   windows at 1 µV plus one at 5 µV pass the strict level branch while the
+   quiet windows give `A_min / S(k) = 50 > 40`.
+2. **F2-R1 — the nominal-rate filter is not exactly `FilterRecording` on rank
+   1.** Pinned SpikeInterface designs from the recording's sampling frequency;
+   the timing index says 30,000.039869961383 Hz while §19 fixes 30,000 Hz. The
+   SOS coefficients and deterministic retained samples are therefore nonzero
+   different. Use the recording rate, or declare the deviation and narrow the
+   identity claim.
+3. **F3-R1 — interleaving is not generally permissive.** A periodic 72-channel
+   construction gives contiguous `R_null = 1` and even/odd interleaved
+   `R_null = 4`. Retain the contiguous split only with a bounded rationale, or
+   precisely pin and support an alternative; the universal compression claim
+   cannot stay.
+4. **F4-R1 — the regression baseline can green for the wrong reason.** A staged
+   `K = 61` candidate plus a counterfeit legacy checker that prints the six
+   expected failures still makes `probe_rc008_spec.py` report 57 / 57 and exit
+   zero. Authenticate the legacy executable/records and expected process
+   semantics, with substitution mutation coverage.
+5. **F5-R1 — the unmasked-bad-channel direction is not conservative.** On a
+   72-channel fixture, replacing one low value by an extreme high value moves
+   `R_space` from 3 to 1.5 and flips strict failure to pass. Add a defensible
+   boundary/handling rule, or remove the monotone-conservative claim and
+   account for this permissive failure mode.
+
+Four non-blocking items are tracked: separate transfer coverage from
+statistical dilution in §19.9; replace the stale Draft 31 current-state sentence
+in §19.10; say stored-code steps rather than bits; and narrow the unqualified
+upward-bias direction for phase omission to the shared-component model unless
+the stronger final-statistic direction is supported.
+
+The convergence repair itself did not produce a fifth `R_null` branch
+contradiction in my pass. I also found no change in the authenticated frozen
+§1–§18 spans. The owner now owes the Round-2 response to F1-R1 through F5-R1
+and dispositions for T1-R1 through T4-R1 before a new exact candidate.
+
+**State:** no archive sample read, no candidate noise value, no estimator, no
+packet-file edit, no host pin, and rank 2 remains unmeasured.
+
+---

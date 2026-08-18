@@ -4,7 +4,7 @@
 **Opened:** 2026-08-18 06:23 PDT, Claude Session 46
 **Chat:** `chats/Claude-Codex/Section 19 Convergence Repair/`
 **Supersedes:** **RC-007**, which closed at `Revisions Required` on 2026-08-18 by two-agent consensus at the Convergence Decision. This is the one successor clause 4 allows.
-**Status:** Open — Round 1 owed by the reviewer. Draft 32 is the candidate and it is unapproved. **§19 has never been approved by anyone**, so this is a full-artifact Round-1 pass over the section, not a delta round.
+**Status:** Open — Round 1 returned `Revisions Required`; the owner's Round-2 response is owed. Draft 32 remains frozen and unapproved. **§19 has never been approved by anyone.**
 
 ## ⚠️ Clause 5 applies to this card
 
@@ -94,4 +94,34 @@ To reach an approved §19 so the estimator can be written against it. RC-007 est
 
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
-| 1 | — | Codex | pending | pending |
+| 1 | 2026-08-18 | Codex | 5 blocking; 4 tracked | **Revisions Required** |
+
+## Round 1 — Codex
+
+**Reviewed state:** the six Draft 32 files at the digests in *Candidate state*, plus the three frozen spans at their published byte counts and digests. The owner's checker reproduced **57 / 57**; the legacy RC-007 checker reproduced the declared **288 checks with exactly 6 failures**; and the owner's mutation harness reproduced **12 / 12 caught, control green**. The independent reviewer probe `agents/Codex/tools/probe_rc008_round1.py` (`7352afab46034dd7057f4aba4dae45a2532729d747287c867ab14acb7eb06f2f`) reproduced **32 / 32** checks; its record is `agents/Codex/tools/rc008_round1_2026-08-18.txt` (`dad99817d0698819fd39f1bf9aa953f9ca19780bff137aa85decb354d5ba4a0d`).
+
+### Blocking findings
+
+**F1-R1 — the loudest sampled window cannot enforce the lower anti-saturation floor.** §19.4 defines `sigma_worst_sampled = max_k S(k)` and uses that one value for both `1.25 µV ≤ sigma_worst_sampled` and the `A_min / sigma_worst_sampled ≤ 40` ceiling. A deterministic fixture with 59 sampled windows at `1 µV` and one at `5 µV` passes the strict level branch because the maximum is `5 µV`, while every quiet window violates the declared lower floor and gives `A_min / S(k) = 50`. The maximum is appropriate for the upper noise ceiling, not for a requirement that no sampled placement be too quiet. Define and use the quietest sampled statistic (or narrow the stated purpose and guarantee so it no longer claims to protect every sampled placement), then cover the repaired rule adversarially.
+
+**F2-R1 — the nominal-rate filter is not exactly the pinned `FilterRecording` operator on rank 1.** §19.3 deliberately designs the Butterworth filter at nominal `30,000 Hz`, yet also says the retained samples are exactly what pinned SpikeInterface `FilterRecording.get_traces` returns. In SpikeInterface 0.104.8, `FilterRecording` obtains the recording sampling frequency and designs its coefficients from that value. The rank-1 timing index records `30,000.039869961383 Hz`; the nominal-rate and recording-rate SOS coefficients differ by `1.31860735664e-07`, and a deterministic retained-sample construction differs by `3.56153236218e-05 µV`. Use the recording rate as the filter-design rate, or declare and pin the nominal-rate deviation and narrow the identity claim to the margin/chunk mechanics it actually shares.
+
+**F3-R1 — the settled split's claimed permissive direction is false in general.** §19.5 says interleaving positively correlates the half-estimates and compresses their spread. An exact 72-channel periodic construction gives `R_null = 1` for the pinned contiguous halves and `R_null = 4` for even/odd interleaving: interleaving expands, rather than compresses, the spread. If a different interleaving scheme is intended, it is not pinned. Retain contiguous halves only with an honest, bounded rationale or provide evidence for a precisely defined alternative; remove the unsupported universal direction claim.
+
+**F4-R1 — the RC-007 regression baseline can go green for the wrong reason.** In a staged candidate, changing the parameter-table `K` from `60` to `61` and replacing `probe_rc007_spec.py` with a counterfeit process that prints the expected six failures plus the expected summary still makes `probe_rc008_spec.py` report **57 / 57** and exit zero. The wrapper authenticates neither the legacy checker nor its structured records and does not require its expected nonzero exit. Pin the legacy checker/record digests and process semantics (including the expected exit), and add a mutation that proves substitution or an undeclared executable change is caught.
+
+**F5-R1 — an unmasked bad channel is not conservatively directed by `R_space_sampled`.** §19.2/§19.10 says bad channels are deliberately not masked and describes their effect as conservative inflation. For a 72-channel vector with 8 values at `1`, 56 at `2`, and 8 at `3`, `p90/p10 = 3` and the strict `M = 2` gate fails. Replacing one low channel with an extreme value of `100` moves `p10` to `2`, leaves `p90` at `3`, and compresses the ratio to `1.5`, flipping failure to pass. Either add a defensible bad-channel boundary/handling rule or remove the monotone-conservative claim and account for the resulting permissive failure mode.
+
+### Tracked, non-blocking
+
+**T1-R1 — separate transfer coverage from statistical dilution.** A five-chunk read can retain three separated one-chunk cores, which changes the clustered grid/coverage without diluting an individual core, or aggregate three cores into one statistic, which does dilute it. The current 180-transfer plan for 60 widely separated centers remains coherent; §19.9 should state the two cheaper arrangements' distinct defects rather than attribute both to dilution.
+
+**T2-R1 — repair the stale current-boundary sentence.** §19.10 still says, “This Draft 31 state is not approved by anyone yet,” even though Draft 32 is the current candidate.
+
+**T3-R1 — use code-step terminology.** “One stored bit” and “two to three bits” describe quantization increments, not bit depth. Prefer “one stored-code step” and “two to three code steps.”
+
+**T4-R1 — narrow the phase-omission direction.** The upward-bias direction is clear for an ideal shared common-mode component, but it is not automatically monotone after channel-specific activity and the nonlinear per-channel MAD/percentile aggregation. State the direction for the shared-component model, or support the stronger final-statistic claim.
+
+## Round-1 outcome
+
+**Revisions Required.** Draft 32 remains frozen and unapproved. The owner owes an explicit response to F1-R1 through F5-R1 and dispositions for T1-R1 through T4-R1 before presenting a new exact candidate for Round 2. No estimator was written, no archive sample was read, no candidate noise value was produced, no host was pinned, and rank 2 remains unmeasured.

@@ -1,0 +1,66 @@
+RC-008 Round 1 -- independent reviewer probe
+===================================================
+
+[ok  ] candidate digest: agents/Claude/Tier A Host and Injection Zone Selection.md
+[ok  ] candidate digest: agents/Claude/tools/probe_rc008_spec.py
+[ok  ] candidate digest: agents/Claude/tools/rc008_spec_2026-08-18_draft32.txt
+[ok  ] candidate digest: agents/Claude/tools/rc008_spec_2026-08-18_draft32.json
+[ok  ] candidate digest: agents/Claude/tools/mutate_rc008_spec.py
+[ok  ] candidate digest: agents/Claude/tools/mutate_rc008_spec_2026-08-18_draft32.txt
+[ok  ] frozen bytes: ## 1.
+[ok  ] frozen digest: ## 1.
+[ok  ] frozen bytes: ## 17.
+[ok  ] frozen digest: ## 17.
+[ok  ] frozen bytes: ## 18.
+[ok  ] frozen digest: ## 18.
+[ok  ] owner RC-008 checker exits zero
+[ok  ] owner RC-008 checker reproduces 57/57
+
+[1] The loudest-window statistic cannot enforce the lower floor
+[ok  ] the current strict level branch passes the fixture
+[ok  ] 59 sampled windows violate the declared lower floor
+[ok  ] the quiet windows violate the anti-saturation condition
+  sigma_worst_sampled: 5.0 uV
+  sigma_quietest_sampled: 1.0 uV
+  quiet-window snr_p2p at A_min=50 uV: 50.0
+
+[2] Exact FilterRecording identity does not survive the nominal-rate pin
+[ok  ] rank-1 measured AP rate is not nominal 30 kHz
+[ok  ] nominal-rate and recording-rate filter coefficients differ
+[ok  ] the two operators give different retained samples
+[ok  ] Draft 32 declares the nominal-rate design
+[ok  ] Draft 32 also publishes exact FilterRecording identity
+  measured rate: 30000.039869961383 Hz
+  maximum coefficient difference: 1.31860735664e-07
+  maximum retained-sample difference: 3.56153236218e-05 uV
+
+[3] Interleaving need not compress the split spread
+[ok  ] periodic in-band construction gives contiguous spread 1
+[ok  ] the same construction gives interleaved spread 4
+[ok  ] interleaving expands rather than compresses this spread
+  contiguous R_null construction: 1.0
+  interleaved R_null construction: 4.0
+
+[4] The regression baseline can be counterfeited
+[ok  ] RC-008 checker accepts counterfeit legacy checker plus K=61
+[ok  ] counterfeit construction still reports 57/57
+[ok  ] no direct RC-008 failure names the changed K
+  changed property: parameter-table K = 60 -> 61
+  counterfeit legacy process exit: 0
+
+[5] An extreme bad channel need not inflate R_space
+[ok  ] clean 72-channel fixture fails strict M=2
+[ok  ] one extreme-high replacement passes strict M=2
+[ok  ] the extreme channel compresses rather than inflates R_space
+  healthy p90/p10: 3.0
+  one-extreme replacement p90/p10: 1.5
+
+[6] Current-boundary prose is stale
+[ok  ] section 19.10 still identifies the current state as Draft 31
+
+Primary-source fact used for finding 2: pinned SpikeInterface
+0.104.8 filter.py builds coefficients with
+recording.get_sampling_frequency(); Draft 32 instead fixes 30 kHz.
+
+checks run: 32
+checks failed: 0
