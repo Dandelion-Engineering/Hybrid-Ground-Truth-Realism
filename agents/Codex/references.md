@@ -1,16 +1,16 @@
 # References — Codex
 
-Running source ledger for Codex. Entries record what each source establishes and how it informed a project decision. Links and DOIs were verified through live searches on 2026-08-11.
+Running source ledger for Codex. Entries record what each source establishes and how it informed a project decision. Links and DOIs were verified through live searches on 2026-08-11; the RC-007 filter-source links below were rechecked on 2026-08-18.
 
 ## Verified sources
 
 ### Buccino et al. 2026 — anchor evaluation pipeline
 
-**Buccino, A. P., Sridhar, A., Feng, D., Svoboda, K., & Siegle, J. H. (2026). Efficient and reproducible pipelines for spike sorting large-scale electrophysiology data. _eLife_, 15, RP110170.** [https://doi.org/10.7554/eLife.110170.3](https://doi.org/10.7554/eLife.110170.3)
+**Buccino, A. P., Sridhar, A., Feng, D., Svoboda, K., & Siegle, J. H. (2026). Efficient and reproducible pipelines for spike sorting large-scale electrophysiology data. _eLife_, 15, RP110170.** [https://doi.org/10.7554/eLife.110170.3](https://doi.org/10.7554/eLife.110170.3) · [reviewed-preprint methods](https://elifesciences.org/reviewed-preprints/110170v2) · [current official SpikeInterface filter source](https://github.com/SpikeInterface/spikeinterface/blob/main/src/spikeinterface/preprocessing/filter.py)
 
 Builds the SpikeInterface hybrid evaluation pipeline; injects 10 Poisson units at 15 Hz, uses 1,800 NP1 and 3,000 NP2 ground-truth units, and reports Kilosort4-versus-2.5 effects. Its Limitations section explicitly names population firing dynamics and brain-region matching as missing realism.
 
-*How it informed the project:* Defines the control condition, the exact open question, the low-SNR stratum, the scale reference, and the need to use pairing rather than imitate a distributed benchmark on one workstation. For RC-007, the official methods text also establishes that the anchor preprocessing uses a fifth-order Butterworth high-pass applied forward and backward with `scipy.filtfilt`, so it is zero-phase rather than causal; that evidence controlled the Round-1 preprocessing finding.
+*How it informed the project:* Defines the control condition, the exact open question, the low-SNR stratum, the scale reference, and the need to use pairing rather than imitate a distributed benchmark on one workstation. For RC-007, the official methods text establishes a fifth-order 300-Hz Butterworth high-pass applied forward and backward, while current SpikeInterface source implements the `forward-backward` direction with `sosfiltfilt` and derives the automatic high-pass margin as five periods (16.667 ms at 300 Hz). This controlled the Round-1 source correction and authenticated the filter family/margin adopted in Draft 30; it does not establish Draft 30's isolated-chunk error bound, which required independent numerical testing.
 
 ### Pachitariu et al. 2024 — Kilosort4 and realism-sensitive benchmarks
 
