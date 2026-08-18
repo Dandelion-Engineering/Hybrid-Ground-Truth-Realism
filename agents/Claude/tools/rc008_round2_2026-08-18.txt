@@ -1,0 +1,72 @@
+
+1. F1-R1  the maximum cannot enforce the lower floor
+      S(k): 59 windows at 1.0 uV, one at 5.0 uV
+      max = 5.000 uV, min = 1.000 uV, floor = 1.25 uV, N = 10.0 uV
+PASS  the maximum clears the ceiling
+PASS  the maximum clears the floor, so branch 2 does not fire on it
+PASS  the minimum violates the floor
+PASS  59 of 60 sampled windows violate it
+PASS  the quiet windows exceed the anti-saturation ceiling on SNR  [A_min/S(k) = 50.0]
+PASS  the loud window does not  [A_min/S(k) = 10.0]
+
+2. F2-R1  the nominal design rate is not the recording's own
+      max |sos(nominal) - sos(rank-1 whole-span rate)| = 1.31860735664e-07
+      max |sos(rank-1 whole-span) - sos(rank-1 head estimate)| = 7.72297781282e-11
+PASS  the two designs are not identical
+PASS  but the deviation is small in the coefficients
+PASS  'the recording's rate' is itself not one number  [whole-span and head-estimate designs differ by 7.723e-11]
+PASS  the two probes in the same session declare different rates  [Probe01 30000.039869961 Hz vs Probe00 30000.000000000 Hz]
+PASS  scipy's default padlen is 18 at the nominal rate  [padlen 18]
+PASS  and is unchanged at the recording rate  [padlen 18]
+      margin at nominal rate: 500.000000 samples -> int 500, floor 500, round 500
+      margin at recording rate: 500.000664 samples -> int 500, floor 500, round 500
+      margin at head rate: 500.000665 samples -> int 500, floor 500, round 500
+PASS  the margin is 500 samples at every rate under every rounding
+      worst retained sample moves by 5.80471775891e-06 uV
+      the retained scale estimate moves by 4.10656441279e-07 relative (6.121762549 vs 6.121760035 uV)
+PASS  the retained samples are not identical either
+PASS  this is a single-fixture diagnostic and not a bound  [one seed, one channel, quantized 6 uV noise]
+      the 300 Hz corner moves by 0.000399 Hz at rank 1's declared rate
+
+3. F3-R1  interleaving does not universally compress the spread
+PASS  the fixture is 72 channels of 13,020 retained samples  [(72, 13020)]
+      contiguous halves: R_null = 1.000000000
+      even/odd interleaved: R_null = 4.000000000
+PASS  contiguous halves give exactly 1
+PASS  even/odd interleaving gives exactly 4
+PASS  so interleaving EXPANDED the spread on this construction
+PASS  and it crosses the strict tolerance while contiguous does not
+PASS  every channel's contiguous ratio is exactly 1
+
+4. F5-R1  a percentile ratio is not monotone in one channel
+      nearest-rank ranks at n=72: p10 = rank 8, p90 = rank 65
+      base band: p90/p10 = 3.000 / 1.000 = 3.000
+      one quiet channel replaced by 100: p90/p10 = 3.000 / 2.000 = 1.500
+PASS  the base band fails the strict spatial tolerance
+PASS  the band with one extreme channel passes it
+PASS  so an unmasked bad channel moved the statistic PERMISSIVELY
+PASS  a dead channel below the p10 rank leaves the ratio alone  [p10 1.000 -> 1.000]
+PASS  enough dead channels do drive it to +inf
+
+5. T1-R1  the two cheaper arrangements have two defects
+PASS  the pinned grid still gives g = 170  [g = 170]
+PASS  its guarantee is still 170 chunks  [170 chunks, 73.780 s]
+      pinned: 60 windows, 180 transfers, guarantee 73.780 s
+PASS  the five-chunk arrangement retains the same 60 cores  [60 cores]
+      clustered: 20 groups of 5, 100 transfers, g = 524, guarantee 524 chunks = 227.416 s
+PASS  its coverage guarantee is much worse than the pinned grid's  [227.416 s vs 73.780 s]
+      twenty single-chunk windows: 60 transfers, g = 527, guarantee 527 chunks = 228.718 s
+PASS  twenty single-chunk windows degrade the guarantee too  [228.718 s]
+      a 3x excursion of one chunk reads 3.0210 in a one-chunk window and 1.3327 in a three-chunk window
+PASS  aggregating three cores dilutes the excursion  [44.1% of the undiluted value]
+PASS  the two defects are different: one is coverage, one is dilution
+
+6. T4-R1  the phase-omission direction, and where it stops
+      shared-component model: median sigma after CMR is 2.9426 aligned and 4.7191 with the phase shift left in
+PASS  leaving the shift in raises the level statistic
+PASS  under the shared-component model every channel rises  [72 of 72 channels rise]
+PASS  the SPATIAL statistic does not inherit that direction  [R_space 1.0418 -> 1.0406, the opposite way]
+      so the direction is a claim about the level under one model, and not a claim about every statistic this section computes
+
+Summary
+36 checks, 0 failed

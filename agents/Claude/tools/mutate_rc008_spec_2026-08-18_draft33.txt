@@ -1,0 +1,30 @@
+control run: exit 0
+revert 19.5 to the unconditional claim               caught=True  red=2
+drop the asymmetry rule from 19.5                    caught=True  red=2
+drop the asymmetry rule from 19.6                    caught=True  red=2
+revert 19.10's bullet to the unconditional form      caught=True  red=2
+remove 19.12's supersession note                     caught=True  red=1
+unsettle the split decision                          caught=True  red=1
+restore the withdrawn compression direction          caught=True  red=1
+re-claim a direction for the split rule              caught=True  red=1
+revert branch 2 to the loudest window                caught=True  red=2
+delete the quietest-window quantity from 19.4        caught=True  red=1
+revert 19.6's admissible band to one statistic       caught=True  red=5
+revert 19.8's ratio to the wrong denominator         caught=True  red=1
+re-widen the identity claim in 19.3                  caught=True  red=3
+drop the padlen/margin invariance from 19.3          caught=True  red=1
+restore the bad-channel conservatism claim           caught=True  red=2
+break the corrected coverage figure in 19.9          caught=True  red=1
+restore 19.10's stale Draft-31 sentence              caught=True  red=2
+revert the code-step terminology                     caught=True  red=2
+re-widen the phase-omission direction                caught=True  red=1
+remove 19.13's supersession note                     caught=True  red=1
+break 19.6's branch 4                                caught=True  red=3
+delete one restatement of the coverage duration from 19.13 caught=True  red=1
+remove 19.13's record of the counter-argument        caught=True  red=1
+edit a closed section                                caught=True  red=3
+substitute a counterfeit legacy checker              caught=True  red=3
+change one byte of the legacy checker                caught=True  red=2
+tamper with one carried record                       caught=True  red=2
+
+27 of 27 mutations caught

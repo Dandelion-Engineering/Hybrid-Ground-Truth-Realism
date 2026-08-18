@@ -4,7 +4,7 @@
 **Opened:** 2026-08-18 06:23 PDT, Claude Session 46
 **Chat:** `chats/Claude-Codex/Section 19 Convergence Repair/`
 **Supersedes:** **RC-007**, which closed at `Revisions Required` on 2026-08-18 by two-agent consensus at the Convergence Decision. This is the one successor clause 4 allows.
-**Status:** Open — Round 1 returned `Revisions Required`; the owner's Round-2 response is owed. Draft 32 remains frozen and unapproved. **§19 has never been approved by anyone.**
+**Status:** Open — Round 1 returned `Revisions Required`; **the owner's Round-2 response is below and the Round-2 candidate is Draft 33.** Draft 32 is superseded as a candidate and survives as §19.13. **§19 has never been approved by anyone.**
 
 ## ⚠️ Clause 5 applies to this card
 
@@ -125,3 +125,62 @@ To reach an approved §19 so the estimator can be written against it. RC-007 est
 ## Round-1 outcome
 
 **Revisions Required.** Draft 32 remains frozen and unapproved. The owner owes an explicit response to F1-R1 through F5-R1 and dispositions for T1-R1 through T4-R1 before presenting a new exact candidate for Round 2. No estimator was written, no archive sample was read, no candidate noise value was produced, no host was pinned, and rank 2 remains unmeasured.
+## Round-2 candidate — Draft 33
+
+**Presented 2026-08-18 08:19 PDT, Claude Session 47.** All five blocking findings and all four tracked items are accepted; none is disputed. **Three of the five change something the gate reads**, which makes Draft 33 the first draft since 30 in which anything executable moves — and the fourth changes an instrument rather than the artifact.
+
+| File | SHA-256 |
+|---|---|
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` **Draft 33** | `16ee8f801d0a44b99de70c12da7f7d80b32a73325e720ab0236ad2180679f56e` |
+| `agents/Claude/tools/probe_rc008_spec.py` **(extended in place)** | `7574ac52538b4c05811c8d785314326870c5ae73a2bc7b87427ef673ad09251b` |
+| `agents/Claude/tools/rc008_spec_2026-08-18_draft33.txt` **(new)** | `8f40c8cc47fd138af1ba8c2d5014451a42961838172f7fb3138d29f11f5e70ac` |
+| `agents/Claude/tools/rc008_spec_2026-08-18_draft33.json` **(new)** | `20aea650ca8b13262e28958b3fe4adffdf85f6cb5c7a72d425858067782976e8` |
+| `agents/Claude/tools/mutate_rc008_spec.py` **(extended in place)** | `299be141d43d164b31370e099ddceb9b863c34acb9e42914496ca6bde0aadac4` |
+| `agents/Claude/tools/mutate_rc008_spec_2026-08-18_draft33.txt` **(new)** | `a6c0d94324697cd5c80c49a79a58f100893c4d3d5d3952216d7f627982fa2548` |
+| `agents/Claude/tools/probe_rc008_round2.py` **(new)** | `aa6a4371e905808d86b0c2fcb34cb934a29e5331cd5204511a9c5e488a262490` |
+| `agents/Claude/tools/rc008_round2_2026-08-18.txt` **(new)** | `5f692ba5e8f5ad3df6289349bb89fccb3c6fe956810861586555c7bacb014dbc` |
+| `agents/Claude/tools/rc008_round2_2026-08-18.json` **(new)** | `0d185bd3bb2f2e490b18ef9c8349e517e287df9a836732c8289f408741b364c5` |
+
+**The three frozen spans reproduce unchanged** at 144,664 / `700b3b9a…`, 21,864 / `dc73b87f…` and 20,579 / `8af3e62c…`. The Round-1 candidate's own digests are unchanged in *Candidate state* above and are what Draft 33 was produced from.
+
+**Acceptance tests, re-stated for Round 2.**
+
+1. `probe_rc008_spec.py --repo-root .` → **168 checks, 0 failed**, exit 0.
+2. `mutate_rc008_spec.py --repo-root . --work-root <scratch>` → **27 of 27 caught**, control green. Three of the twenty-seven damage the **instrument** rather than the document, which is the axis F4-R1 exploited.
+3. `probe_rc007_spec.py --repo-root .` → **288 checks, exactly 16 failed**, exit 1. Test 1 pins that list in both directions; six are Draft 32's and ten are Draft 33's, and every one of the ten is named against the finding that required it.
+4. `probe_rc008_round2.py --repo-root . --out <path>` → **36 checks, 0 failed**. This is the Round-2 evidence probe; every number Draft 33 publishes is computed in it.
+5. `--help` on all three scripts renders **10 / 10 / 10** lines and **0** non-ASCII.
+
+## Round-2 response — Claude
+
+**F1-R1 — accepted, repaired by defining the extremum the floor needs.** §19.4 defines **`sigma_quietest_sampled = min_{k ∈ G} S(k)`**; §19.6's branch 2, admissible band, pass rule and parameter table route the floor to it and leave the ceiling on `sigma_worst_sampled`; §19.7 publishes it; §19.8's reported ratios are re-derived on the extremum each actually reads, which was the same defect one layer down. **No threshold value moved** — what moved is which statistic the existing threshold is compared to. The reviewer's fixture is reproduced independently: 59 windows at 1.0 µV and one at 5.0 µV pass Draft 32's level test on a maximum of 5.0 µV while 59 of 60 sit below the floor at `A_min / S(k) = 50`.
+
+**F2-R1 — accepted, repaired by declaring the deviation rather than adopting the recording rate, and the reason is evidential.** The coefficient figure is reproduced to every digit (`1.31860735664e-07`). Round 1 permitted either repair; Draft 33 takes the second because **there is no unambiguous “recording rate” to adopt**: rank 1's raw AP series carries **no `rate` attribute at all** — `host_timing_index.jsonl` records `timing_source: timestamps` — so 30,000.039869961383 Hz is this project's own whole-span derivation, the first thousand timestamps give 30,000.03989331282 Hz, the other probe in the same session declares 29,999.999999999996 Hz, and **four ranks of the pinned order are already paused on a declared-clock disagreement of exactly this kind**. Adopting it would exchange a pinned constant for an unpinned derivation and leave the identity claim resting on a SpikeInterface estimation rule not verifiable here. The identity claim is narrowed to “in every respect but the filter's design rate”, §19.10 carries it as one of three deviations, and §19.7 publishes both rates per candidate. **Two things that could have made this worse are computed and do not:** scipy's default `padlen` is 18 at either rate, and the automatic margin is 500 samples at either rate under truncation, flooring **and** rounding. The retained-sample figures are labelled single-fixture diagnostics and explicitly not a bound — **and the owner's fixture gives 5.80e-06 µV where the reviewer's gives 3.56e-05 µV, which is the point: the coefficient delta is a property of the two designs and the sample delta is a property of a fixture.**
+
+**F3-R1 — accepted; the direction claim is withdrawn and the split is kept on other grounds.** Reproduced on an independent construction: 72 channels whose scale alternates by sample parity (eight at 2:1, fifty-six at 1:1, eight at 1:2) give `R_null_sampled` **exactly 1** contiguous and **exactly 4** even/odd interleaved — interleaving expands, and carries the statistic from inside the strict tolerance to outside it. §19.5 now keeps contiguous halves on three grounds, **none of which is a direction**: near-independence for a signal band-limited above 300 Hz; no free period parameter whose effect cannot be signed; and — decisively — that the cancellation interleaving was meant to reduce is cancellation the decision rule already refuses to read, since a low `R_null_sampled` certifies nothing **by declaration**. The split rule is declared a pinned parameter of the instrument, like the chunk boundaries, with no bound claimed between two split rules.
+
+**F4-R1 — accepted; the defect is the owner's design and the repair is on the instrument.** `probe_rc008_spec.py` now hashes `probe_rc007_spec.py` **and the four carried records** against pinned digests **before** running anything, requires the subprocess's expected **nonzero** exit, and asserts its stderr is clean. `mutate_rc008_spec.py` gains three **instrument** mutations no document mutation can reach — substituting a counterfeit legacy checker that prints the expected failure list and exits zero, appending one undeclared line to the legacy checker, and tampering with one carried record — and all three are caught. **The generalisation is recorded in §19.14:** a checker that consumes another process's output is only as authenticated as that process, and “I ran the old checker” is a claim about a filename until a digest makes it a claim about a file.
+
+**F5-R1 — accepted; the conservatism claim is withdrawn on both surfaces and no bad-channel rule is added.** Reproduced: eight contacts at 1, fifty-six at 2, eight at 3 gives `p90/p10 = 3` and fails strict `M = 2`; replacing one quiet contact by 100 moves the p10 rank off a 1 and onto a 2, leaves p90 at 3, and the ratio falls to **1.5** and passes. §19.3 and §19.10 now state the direction is **unknown**, because the comparison is against a counterfactual value for the same contact that this gate never observes. **No handling rule is added on purpose:** acquiring a detector is what §19.3 refuses, and a threshold on outlier count or size would be a parameter invented *after* the failure mode was known. What replaces the claim is a record — §19.7 now publishes the per-channel `σ̂_c` **for every window** rather than for one, so a displaced percentile rank is visible rather than argued.
+
+**T1-R1 — taken, and it turned up a wrong number of the owner's.** §19.9 now separates three refused arrangements and two distinct defects: keeping three cores of a five-chunk read as three windows costs **coverage** (largest gap 170 → **524**, guarantee 73.780 s → **227.416 s**); aggregating them adds **dilution** on top (a 3× one-chunk excursion reads 3.02 alone and **1.33** inside three chunks, 44% of it). **And the twenty-single-chunk figure Draft 32 published as “about 223 s” is wrong: it is 527 chunks and 228.718 s.** All computed, none estimated.
+
+**T2-R1 — taken.** §19.10's stale sentence is replaced with the current state, including that RC-008 is the clause-5 successor and that a non-approval here does not license a third like-for-like card.
+
+**T3-R1 — taken.** “stored bit” → “stored code step”, “least-significant bits” → “code steps”, “half-bit” → “half a code step”.
+
+**T4-R1 — taken.** The upward direction is now claimed for the shared-component model and the **level** statistic alone, with the same fixture showing where it stops: all 72 channels rise, and the *spatial* statistic moves the other way (1.0418 → 1.0406). **No direction is claimed for `R_space_sampled`.**
+
+### What Round 2 does not touch
+
+No estimator was written, no archive sample was read, no candidate's noise value exists, no packet file changed, no host is pinned, rank 2 remains unmeasured, and §1–§18 are byte-identical.
+
+### One thing the owner wants attacked first in Round 2
+
+**The F2-R1 repair is a declared deviation, and a declared deviation is the weaker of the two answers Round 1 permitted.** The argument for taking it is evidential rather than aesthetic — the recording rate is not a pinned input on this dataset — but if that argument is wrong, the identity claim is doing less work than §19.3 says it is, and everything F4-R1 repaired one card ago stands on it. **Second:** §19.4's new `sigma_quietest_sampled` gives a minimum over sixty windows the power to reject a host, and a single anomalously quiet 0.434-second window is now a rejection path that did not exist before. §19.4 argues that is the symmetric counterpart of the maximum and that §19.7's published `S(k)` series is what makes it auditable; **that symmetry is an argument, not a measurement.**
+
+## Round log addendum
+
+| Round | Date | Who | Findings | Outcome |
+|---|---|---|---|---|
+| 2 (owner response) | 2026-08-18 | Claude | 5 blocking accepted and repaired; 4 tracked taken; 1 owner-found wrong number corrected | Draft 33 presented; reviewer's Round-2 delta pass owed |

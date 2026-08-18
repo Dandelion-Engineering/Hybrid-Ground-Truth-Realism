@@ -1,23 +1,23 @@
 # Summary of Only Necessary Context — Claude
 
-**Rewritten at the end of Claude Session 46 · 2026-08-18 06:30 PDT**
-**Next session is Claude Session 47. No count-based progress report is due** (they fall at 8, 16, 24, 32, 40, **48**). A phase transition or an approved amendment would still trigger one.
+**Rewritten at the end of Claude Session 47 · 2026-08-18 08:19 PDT**
+**Next session is Claude Session 48, and a count-based progress report IS DUE** (8, 16, 24, 32, 40, **48**). Write it after the normal session work, not instead of it.
 
 ## 0. WHAT THIS SESSION DID, IN ONE PARAGRAPH
 
-**Codex's Round-3 verdict was `Revisions Required` on one response-created blocker (F7-R2), which triggered the project's first Convergence Decision. I concurred, RC-007 is CLOSED at `Revisions Required` by two-agent consensus, and the repair was then made OUTSIDE formal review as Draft 32.** F7-R2: Draft 31 said a high `R_null_sampled` is *sufficient* to withhold the measurement, and §19.6's ordered branches contradict that at the high-space/high-null state — branch 3 fires and the candidate **fails on homogeneity**. **The claim was live on FOUR surfaces, not the three Codex named** — the fourth is §19.12. **The repair makes the prose yield to the branches**, decided against approved text rather than preference: **§16.7's drift rule has the identical asymmetry in the identical cell**, the two rules agree in all four cells, and reordering §19.6 would have broken that parallel in exactly the disputed cell. **The tracked contiguous-versus-interleaved split is SETTLED as contiguous.** **RC-008 is open**, with a new chat, and **clause 5 now binds**.
+**Codex's RC-008 Round 1 returned `Revisions Required` with five blocking findings and four tracked items. All nine are accepted, none is disputed, and the Round-2 candidate is Draft 33.** **Three of the five change something the gate reads — the first executable movement in §19 since Draft 30 — and no threshold value moved.** **F1-R1:** a maximum cannot enforce a floor, so §19.4 defines **`sigma_quietest_sampled = min_k S(k)`** and branch 2 reads it; the same defect was one layer down in §19.8 and is repaired there too. **F2-R1:** the nominal 30,000 Hz design rate is not the rate SpikeInterface would use, so the identity claim is narrowed and the nominal rate becomes a **third declared deviation** — the alternative is refused because **rank 1's series carries no `rate` attribute at all**. **F3-R1:** interleaving does not universally compress the split-half spread, so Draft 32's direction claim is withdrawn; the split stays contiguous on three non-directional grounds. **F4-R1 is mine and is a design error:** the checker authenticated the document and not the instrument reading it. **F5-R1:** an unmasked bad channel is not conservatively directed; the claim is withdrawn and no rule replaces it. **T1-R1 also found a wrong number of mine — "about 223 s" is 228.718 s.**
 
 ## 0.1 The review method — read this before you review anything
 
 **The method is in `Playbooks/review-cycle.md` as a superseding section at the top of that file, and it supersedes the rest of it. Read that section in full.** The shape: the **owner** writes a **Review Card** in `Review Cards/` *before* review begins, naming candidate state, scope, purpose, acceptance tests, blocking severity and exclusions; **Round 1 is the only full-artifact pass**, with one numbered ledger of all reasonably discoverable findings; rounds 2+ are delta-only; a pre-existing blocker found later is a **LATE-BLOCKER** and must say why it was missed; **at most three owner-reviewer round-trips**.
 
-**⚠️ AND NOW THE PART THAT HAS ACTUALLY FIRED.** *Convergence in place of escalation*, five clauses, binding since 2026-08-14:
+**⚠️ *Convergence in place of escalation*, five clauses, binding since 2026-08-14, and it has already fired once:**
 
 1. **A second LATE-BLOCKER, or ANY new blocker after Round 2, freezes the candidate and runs ONE agent-only Convergence Decision.** Each agent writes, once: minimum claim that can ship · controlling evidence · **strongest evidence against its own position** · one acceptable safe disposition.
 2. **Evidence determines what may ship; consensus determines what happens next.** An in-scope executable counterexample defeats a universal or one-way safety claim. **Underdetermined evidence is NOT resolved in favour of approval.**
 3. Safe dispositions: local repairable blocker → **`Revisions Required`**; purpose-level → `Split/Redesign Required`; non-blocking → `Approved with Follow-ups`. **Both agents approve the DISPOSITION, not the belief.**
 4. **Close the card, repair OUTSIDE formal review, then ONE successor card naming `Supersedes:`**, whose stability section identifies the material pre-review change.
-5. **⚠️ CLAUSE 5 BINDS NOW.** If the successor also reaches a non-approval, **no second like-for-like successor is allowed** — the work must be split or redesigned with the changed boundary named.
+5. **⚠️ CLAUSE 5 BINDS ON RC-008 RIGHT NOW.** RC-008 is RC-007's one successor. **If RC-008 closes at a non-approval, no second like-for-like successor is allowed** — the work must be split or redesigned with the changed boundary named. **Round 1 already returned `Revisions Required`, which is not itself a close; the ordinary Round-2 route is what this session took. But clause 1 means any NEW blocker after Round 2 freezes Draft 33 and triggers a Convergence Decision.**
 
 **Both statements go into the Review Card**, not only the chat.
 
@@ -27,36 +27,34 @@
 
 | Artifact | State |
 |---|---|
-| `Claim Sheet.md` | **A1–A6 all `In force`.** Whole-file `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365`. **Not touched S44, S45 or S46.** |
+| `Claim Sheet.md` | **A1–A6 all `In force`.** Whole-file `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365`. **Not touched S44–S47.** |
 | `Accessible Claim Sheet.md` | Synchronized, same six. `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`. |
 | `Study Guide/Pass 1….tex` / `.pdf` | Same-state approved, `d33e74d7…` / `75e14232…`. Unchanged since Session 4. |
-| `agents/Claude/Tier A Host and Injection Zone Selection.md` | **Draft 32, `6933c89ec561a7a9bc3201ea332ed7a6698f179af65cde49621cb0fddaec0db7`, 300,972 bytes. §19 IS RC-008's SCOPE — a FULL Round-1 pass, because §19 has never been approved. §1–§18 unedited and proved in this state: §1–§16 144,664 B `700b3b9a…`; §17 21,864 B `dc73b87f…`; §18 body 20,579 B `8af3e62c…`. Do not reopen §1–§18.** |
-| `Reproducibility Packet/` | **NOTHING CHANGED IN S43–S46.** `results/host_drift_CSHL047_Probe01.txt` `a2d32508…`, `.json` `2e125d41…`, `scripts/measure_host_drift.py` `20070982…`, `check_runbook_consistency.py` `35cea57d…`, `README.md` `806aefaf…`, `utils/band_drift.py` `eace4cd3…`, `archive_units.py` `ed0766f2…`, `missing_depth.py` `ef974027…`. |
-| **`agents/Claude/tools/probe_rc007_convergence.py`** | **NEW S46. `4f65da238dce443b38272ccf69112c63d0f2284227f186882e2af81e6f157882` — 39 checks, 0 failed AGAINST DRAFT 31**, the state it is evidence for. **⚠️ It goes red against Draft 32 (38 checks, 4 failed) BY DESIGN** — it authenticates the frozen candidate, and a closed card's evidence script is allowed to go red. Do not "fix" it. Synthetic only, no archive. |
-| **`…/rc007_convergence_2026-08-18.txt` / `.json`** | **NEW. `bb1a78aa…` / `a0de6881…`.** |
-| **`…/mutate_rc007_convergence.py`** | **NEW. `98f6b8b69212047ac629054a3f1d240c7e0f4da94c8cf302a6be76b2624ed2b8` — 4 of 4 caught on their OWN check, control green.** Record `16d5694d…`. |
-| **`…/probe_rc008_spec.py`** | **NEW. `885e8d2d0bbf003428df0aab735ddcb99e2085c307a3a4cf1fcd81a6c4801de4` — 57 checks, 0 failed.** The Draft-32 owner checker. Records `a503957d…` / `2342ff94…`. |
-| **`…/mutate_rc008_spec.py`** | **NEW. `72628d4bc80e94ed6b2744b5ec5dbd2444093d49bbca07fbc3ba92a31b858829` — 12 of 12 caught, control green.** Record `c5acce90…`. |
-| `…/probe_rc007_spec.py` · `mutate_rc007_spec.py` · `probe_rc007_round3.py` + records | **UNCHANGED S46 and NOT extended** — RC-007 is closed. `ef37577e…` · `16a5f883…` · `54aeff57…`. **`probe_rc007_spec.py` now returns 288 checks with EXACTLY 6 expected reds against Draft 32, and that is a deliberate instrument, not rot.** |
-| `…/probe_filter_chain.py` · `probe_raw_ap_layout.py` + their records | **UNCHANGED** `ef96ce21…` / `dfcea89d…` / `b9f3e089…` · `ddef6e33…` / `f992c394…` / `4896a14f…`. |
-| `…/probe_rc006_repairs.py` · `test_measure_host_drift.py` · `test_missing_depth.py` · `test_band_drift.py` · `mutation_test_runbook_checker.py` · `mutate_rc002_repairs.py` | `512e31fc…` (61) · `79c9bb5c…` (543) · `435272af…` (86) · `946df906…` (103) · `d443ded0…` (18/18) · `97860ad9…` (32). **None re-run S43–S46 — no code they cover changed.** |
-| Root `README.md` | **86 dated log entries**, banner at 2026-08-18. |
-| `Review Cards/RC-007 …` | **CLOSED — `Revisions Required`, two-agent consensus, 2026-08-18.** |
-| **`Review Cards/RC-008 Host Noise Gate, Convergence Repair.md`** | **OPEN. Round 1 owed by Codex. ⚠️ CLAUSE 5 APPLIES.** |
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` | **Draft 33, `16ee8f801d0a44b99de70c12da7f7d80b32a73325e720ab0236ad2180679f56e`, 325,190 bytes.** §19 is RC-008's scope. **§1–§18 unedited and re-proved in this state: §1–§16 144,664 B `700b3b9a…`; §17 21,864 B `dc73b87f…`; §18 body 20,579 B `8af3e62c…`. Do not reopen §1–§18.** |
+| `Reproducibility Packet/` | **NOTHING CHANGED IN S43–S47.** `results/host_drift_CSHL047_Probe01.txt` `a2d32508…`, `.json` `2e125d41…`, `scripts/measure_host_drift.py` `20070982…`, `check_runbook_consistency.py` `35cea57d…`, `README.md` `806aefaf…`, `utils/band_drift.py` `eace4cd3…`, `archive_units.py` `ed0766f2…`, `missing_depth.py` `ef974027…`. |
+| **`agents/Claude/tools/probe_rc008_spec.py`** | **EXTENDED IN PLACE S47. `7574ac52538b4c05811c8d785314326870c5ae73a2bc7b87427ef673ad09251b` — 168 checks, 0 failed.** Records `8f40c8cc…` / `20aea650…` (`…_draft33.*`); Draft 32's records are kept beside them. |
+| **`…/mutate_rc008_spec.py`** | **EXTENDED IN PLACE S47. `299be141d43d164b31370e099ddceb9b863c34acb9e42914496ca6bde0aadac4` — 27 of 27 caught, control green.** Record `a6c0d943…` (CRLF, like every captured-stdout mutation record). |
+| **`…/probe_rc008_round2.py`** | **NEW S47. `aa6a4371e905808d86b0c2fcb34cb934a29e5331cd5204511a9c5e488a262490` — 36 checks, 0 failed.** Records `5f692ba5…` / `0d185bd3…`. **Every number Draft 33 publishes is computed here.** Synthetic only, no archive. |
+| `…/probe_rc007_spec.py` + `mutate_rc007_spec.py` + `probe_rc007_round3.py` + `probe_rc007_convergence.py` + `mutate_rc007_convergence.py` | **UNCHANGED and NOT extended — RC-007 is closed.** `ef37577e…` · `16a5f883…` · `54aeff57…` · `4f65da23…` · `98f6b8b6…`. **`probe_rc007_spec.py` now returns 288 checks with EXACTLY 16 expected reds against Draft 33, and that is a deliberate instrument, not rot.** |
+| `…/probe_filter_chain.py` · `probe_raw_ap_layout.py` + records | **UNCHANGED** `ef96ce21…` / `dfcea89d…` / `b9f3e089…` · `ddef6e33…` / `f992c394…` / `4896a14f…`. |
+| `…/probe_rc006_repairs.py` · `test_measure_host_drift.py` · `test_missing_depth.py` · `test_band_drift.py` · `mutation_test_runbook_checker.py` · `mutate_rc002_repairs.py` | `512e31fc…` (61) · `79c9bb5c…` (543) · `435272af…` (86) · `946df906…` (103) · `d443ded0…` (18/18) · `97860ad9…` (32). **None re-run S43–S47 — no code they cover changed.** |
+| Root `README.md` | **88 dated log entries**, banner at 2026-08-18. |
+| `Review Cards/RC-008 …` | **OPEN. Round 1 `Revisions Required`; the owner's Round-2 response and Draft 33 are on the card. Codex owes the Round-2 delta pass. ⚠️ CLAUSE 5 APPLIES.** |
 
 ## 2. The first thing to do next session
 
-**Read `chats/Claude-Codex/Section 19 Convergence Repair/` before anything else.** My RC-008 Round-1 request is the last message; Codex's Round-1 findings are what you are waiting on.
+**Read `chats/Claude-Codex/Section 19 Convergence Repair/` before anything else.** My Round-2 response is the last message; Codex's Round-2 delta findings are what you are waiting on.
 
-- **`chats/Claude-Codex/Section 19 Convergence Repair/` — active, on Codex.** RC-008 Round 1.
+- **`chats/Claude-Codex/Section 19 Convergence Repair/` — active, on Codex.** RC-008 Round 2, delta-only.
 - `chats/Claude-Codex-Human/Review Method Change/` — **active and stays active** by Randy's request. **Nothing pending.**
-- **`chats/Claude-Codex/Host Noise Gate/` is CONCLUDED** with a `Summary.md` that carries RC-007's whole arc. **All fifteen other chats are concluded.**
+- **All sixteen other chats are concluded**, each with a `Summary.md`. `Host Noise Gate/Summary.md` carries RC-007's whole arc.
 
 **What can be done next, in order of readiness:**
 
-1. **Respond to Codex's RC-008 Round 1.** It is a full-artifact pass, so expect a numbered ledger over the whole of §19, not a delta.
-2. **Then implement the estimator** against whatever §19 says *after* RC-008 closes — a packet utility plus a synthetic harness, the shape `band_drift.py` took after §16 closed. **Do not write it before RC-008 closes.** **The split-half question is no longer a blocker on this: it is settled as contiguous.**
+1. **Respond to Codex's RC-008 Round 2.** It is delta-only. **⚠️ A new blocker there freezes Draft 33 and triggers a Convergence Decision under clause 1.**
+2. **Then implement the estimator** against whatever §19 says *after* RC-008 closes — a packet utility plus a synthetic harness, the shape `band_drift.py` took after §16 closed. **Do not write it before RC-008 closes.**
 3. **Rank 2 (NYU-12 Probe01) can be measured** for drift — unpaused, unmeasured, command unchanged.
+4. **Session 48 owes a count-based progress report.**
 
 **⚠️ Rank 1's drift command, verbatim, from inside the packet folder — runbook step 11:**
 
@@ -64,52 +62,77 @@
 
 Add `--plan-only` for the sizing pass. **Measure free RAM against `peak_resident_bytes`, not `resident_bytes`.** About three minutes, 88.6 MB, 93 requests; `run_in_background`.
 
-## 3. §19 AT DRAFT 32 — THE NOISE GATE AS IT NOW STANDS
+## 3. §19 AT DRAFT 33 — THE NOISE GATE AS IT NOW STANDS
 
-**Nothing has been measured with it. These are symbols with definitions, not values.** **The three gated quantities are `sigma_worst_sampled`, `R_space_sampled`, `R_null_sampled`** — the `_sampled` suffix is load-bearing.
+**Nothing has been measured with it. These are symbols with definitions, not values.** **The gated quantities are now FOUR: `sigma_worst_sampled`, `sigma_quietest_sampled`, `R_space_sampled`, `R_null_sampled`** — the `_sampled` suffix is load-bearing on all four.
 
-### 3.1 The pinned chain (§19.3) — FOUR steps, UNCHANGED at Draft 32
+### 3.1 The pinned chain (§19.3) — FOUR steps
 
 1. scale `int16 → µV` by the asset's own `conversion`; `offset` must be exactly 0
-2. **high-pass on a 14,020-SAMPLE BLOCK OF REAL RECORDED SAMPLES** — the window's chunk plus the last 500 samples of chunk `i−1` and the first 500 of chunk `i+1` — fifth-order Butterworth at 300 Hz, `sos`, `sosfiltfilt`, `padtype="odd"`, `padlen=18`, designed at the **nominal 30,000 Hz**; then **discard the 500 margin samples at each end, retaining exactly the chunk's 13,020 samples**
+2. **high-pass on a 14,020-SAMPLE BLOCK OF REAL RECORDED SAMPLES** — the window's chunk plus the last 500 samples of chunk `i−1` and the first 500 of chunk `i+1` — fifth-order Butterworth at 300 Hz, `sos`, `sosfiltfilt`, `padtype="odd"`, `padlen=18`, **designed at the NOMINAL 30,000 Hz**; then **discard the 500 margin samples at each end, retaining exactly the chunk's 13,020 samples**
 3. **common median reference across all 384 probe channels**, per sample
 4. `σ̂_c = MAD / 0.6744897501960817`
 
-**⚠️ THE IDENTITY CLAIM IS THE LOAD-BEARING ONE AND IT STILL RESTS ON READING SOURCE.** SpikeInterface is **not installed**. §19.3 says its retained samples are what `FilterRecording.get_traces` returns for a 13,020-sample chunk at `margin_ms="auto"`. **Codex checked it against the 0.104.8 release at RC-007 Round 3 and it held** — the fifth-order SOS Butterworth, `sosfiltfilt`, the `5 × (1000/freq_min)` auto margin, real neighbouring samples and post-filter stripping are all that release's. **It is still the first thing RC-008 should attack.**
+**⚠️ THE IDENTITY CLAIM IS NARROWED AT DRAFT 33 AND THAT IS F2-R1.** §19.3 now says the retained samples are `FilterRecording.get_traces` **in every respect but the filter's design rate**. SpikeInterface designs from the recording's own sampling frequency; this gate designs at nominal.
 
-**Two declared deviations and ONE PINNED PARAMETER:** phase shift omitted → **σ̂ biased upward**; bad channels not masked → **`R_space_sampled` inflated in both directions**; and **the chunk boundaries are pinned to the file's storage chunks — a *parameter* of the anchor pipeline. NO BOUND IS CLAIMED on the difference between two chunk sizes.** Nominal-rate design costs at most **0.003 Hz** of corner shift.
+**Why the other repair was refused, and it is evidence rather than taste.** **Rank 1's raw AP series carries NO `rate` attribute** — `host_timing_index.jsonl` gives `timing_source: timestamps`. So `30,000.039869961383 Hz` is *our own* whole-span derivation; the first 1,000 timestamps give `30,000.03989331282`; **Probe00 in the same session declares `29,999.999999999996`**; and **four ranks are already paused on a declared-clock disagreement of exactly this kind**. Adopting it swaps a pinned constant for an unpinned derivation and leaves the claim resting on a SpikeInterface estimation rule we cannot verify without installing it.
 
-### 3.2 The grid, the quantities and the coverage bound (§19.4) — UNCHANGED
+**What the deviation does NOT touch, computed:** **`padlen` is 18 at either rate**; **the margin is 500 samples at either rate under truncation, flooring AND rounding** (500.000000 vs 500.000664). **What it does touch:** SOS coefficients differ by at most **1.31860735664e-07** (Codex's figure to every digit); the corner moves **0.000399 Hz** at rank 1 and at most **0.003 Hz** across the 21 AP series. **The retained-sample figures are single-fixture diagnostics and NOT a bound — mine is 5.80e-06 µV, Codex's 3.56e-05 µV, on different fixtures, which is the argument.**
+
+**THREE DECLARED DEVIATIONS NOW, plus ONE PINNED PARAMETER:**
+
+1. **phase shift omitted** → **σ̂ biased upward UNDER THE SHARED-COMPONENT MODEL and FOR THE LEVEL STATISTIC ONLY** (T4-R1). All 72 channels rise on the fixture; **the spatial statistic moves the other way (1.0418 → 1.0406). No direction is claimed for `R_space_sampled`.**
+2. **bad channels not masked** → **DIRECTION UNKNOWN (F5-R1).** See 3.5.
+3. **nominal design rate** → above.
+4. Pinned parameter: **the chunk boundaries are the file's storage chunks. NO BOUND IS CLAIMED between two chunk sizes.**
+
+### 3.2 The grid, the quantities and the coverage bound (§19.4)
 
 - **A window centre needs a FULL CHUNK ON EACH SIDE**, so eligible centres are `1 … C − 2` and `K = 60` centres sit at **`i_k = 1 + floor(k·(C−3)/(K−1) + 0.5)`**. Rank 1: `1, 170, 340, …, 9,828, 9,997`.
 - **Reading a window transfers THREE chunks and retains ONE.**
 - **Largest gap `g = 170`; longest unsampled run `169`; any interval fully containing `170` consecutive chunks holds a sampled window = 73.780 s at rank 1. TIGHT IN BOTH DIRECTIONS.** Coverage 26.04 s, **0.600%**.
-- `S(k)` = median over band channels of `σ̂_c(k)`; **`sigma_worst_sampled = max_{k∈G} S(k)`**.
+- `S(k)` = median over band channels of `σ̂_c(k)`.
+- **`sigma_worst_sampled = max_{k∈G} S(k)`** — reads the **ceiling** `N`.
+- **⚠️ `sigma_quietest_sampled = min_{k∈G} S(k)` — NEW AT DRAFT 33, reads the FLOOR.** F1-R1: a maximum cannot enforce a floor. Fixture: 59 windows at 1.0 µV and one at 5.0 µV pass Draft 32's level test on a maximum of 5.0 while 59 of 60 sit below 1.25 and give `A_min/S(k) = 50 > 40`.
 - **`R_space_sampled = max_{k∈G} (p90/p10 across band channels)`.** **Nearest-rank: `p10` = rank `ceil(0.10·n)`, `p90` = rank `ceil(0.90·n)`; at n=72 ranks 8 and 65.**
 - **`R_null_sampled`** = the same ratio over `σ̂_c^A/σ̂_c^B` from two **contiguous** disjoint halves of the retained 13,020 (**6,510 each**).
 - **`max/median` is published and consumed by nothing.**
 
-### 3.3 ⚠️ `R_null_sampled` IS ONE-SIDED **AND ACTS IN ONE PLACE** — THIS IS WHAT DRAFT 32 REPAIRED
+### 3.3 `R_null_sampled` IS ONE-SIDED AND ACTS IN ONE PLACE — settled at RC-007, unchanged at Draft 33
 
-An observed `r_c(k)` is a **product** of an estimation-disagreement factor and a true temporal factor, and products cancel (Codex's construction: estimation factors `[0.5]×8, [1]×56, [2]×8` give spread exactly **4**; reciprocal temporal factors make every observed ratio 1 and the spread exactly **1**).
-
-**⚠️ THE RULE, AND IT IS NOW WRITTEN IN §19.5, §19.6, §19.10 AND THE STATUS LINE:**
+An observed `r_c(k)` is a **product** of an estimation-disagreement factor and a true temporal factor, and products cancel.
 
 > **`R_null_sampled` can convert a would-be pass into `unmeasurable`, and can change how a failure reads; it never converts a would-be failure into anything else.**
 
-- **Above `M` withholds the measurement ONLY WHERE `R_space_sampled ≤ M`.** Draft 31 said "sufficient", full stop, and that is what F7-R2 found.
+- **Above `M` withholds the measurement ONLY WHERE `R_space_sampled ≤ M`.**
 - **At or below `M`: CERTIFIES NOTHING.** A candidate that passes, passes on `R_space_sampled` **alone**.
 - Branch 3's `resolved heterogeneity` label is **a recorded comparison, not a certificate**.
-- **That asymmetry is §16.7's, transposed** — the drift gate says a larger `Q95_null` can only move the decision toward the unmeasurable rejection and can only change a failing label, and the two rules **agree cell for cell in all four states**.
+- **That asymmetry is §16.7's, transposed** — the two rules agree cell for cell in all four states.
 
-**⚠️ THE SPLIT IS SETTLED: CONTIGUOUS, decided at S46 before any value was known.** Interleaving would reduce the cancellation by making the two half-estimates **share their local epochs**, which correlates them positively and **compresses the spread in the PERMISSIVE direction** on the one side the decision rule uses. Contiguous halves touch at one boundary and are close to independent above 300 Hz. **The argument is structural and unmeasured and §19.5 labels itself so.** RC-007's F7-R1 follow-up is **closed by decision**, not carried.
+### 3.4 ⚠️ THE SPLIT IS CONTIGUOUS, AND DRAFT 32'S REASON FOR IT IS WITHDRAWN (F3-R1)
 
-### 3.4 The thresholds (§19.6) — NOTHING HAS EVER MOVED
+**Draft 32 claimed interleaving correlates the half-estimates and COMPRESSES the spread in the permissive direction. That is false as a universal direction.** Reproduced on a construction independent of Codex's: 72 channels whose scale alternates by **sample parity** — eight at 2:1 even/odd, fifty-six at 1:1, eight at 1:2. Contiguous halves hold equal numbers of both parities → every ratio exactly 1 → **`R_null` exactly 1**. Even/odd interleaving separates them → **`R_null` exactly 4**. **Interleaving EXPANDED it, from inside the strict tolerance to outside.**
+
+**The split stays contiguous on three grounds, NONE of which is a direction:**
+
+1. Two disjoint stretches meeting at one boundary are close to independent for a signal band-limited above 300 Hz; interleaved subsets of the same 434 ms are not.
+2. An interleaved split has a free **period** parameter whose effect cannot be signed. Pinning it is how a gate ends up tuned rather than declared.
+3. **Decisive: the goal that motivated interleaving is not one the decision rule can cash.** It was proposed to reduce cancellation; a low `R_null_sampled` certifies nothing **by declaration**, so there is nowhere to spend the improvement.
+
+**The split rule is a PINNED PARAMETER of the instrument, like the chunk boundaries. NO BOUND is claimed between two split rules.**
+
+### 3.5 ⚠️ AN UNMASKED BAD CHANNEL HAS NO CLAIMED DIRECTION (F5-R1)
+
+**Every draft through 32 said a dead channel lowers p10 and a saturating one raises p90, so both inflate `R_space_sampled` and the check is conservative. The premises are true and the conclusion is false: a percentile ratio is not monotone in one channel's value.** Eight contacts at 1, fifty-six at 2, eight at 3 → `p90/p10 = 3`, fails strict `M = 2`. Replace **one** quiet contact by 100 → p10's rank moves off a 1 and onto a 2, p90 stays at 3 → **ratio 1.5, and it passes.**
+
+**The direction is declared UNKNOWN**, because the comparison is against a counterfactual value for the same contact this gate never observes. **NO BAD-CHANNEL RULE IS ADDED, ON PURPOSE** — acquiring a detector is what §19.3 refuses, and a threshold on outlier count or size would be a parameter invented after the failure mode was known. **What replaces it is a record: §19.7 publishes the per-channel `σ̂_c` FOR EVERY WINDOW.**
+
+### 3.6 The thresholds (§19.6) — NOTHING HAS EVER MOVED
 
 | | strict | relaxed | derivation |
 |---|---|---|---|
-| **floor** | **1.25 µV** | **1.25 µV — does not relax** | `A_min/40`, the anti-saturation condition |
-| **`N`** (level, µV) | **10.0** | **25.0** | `A_min/5` and `A_max/8`, **both multipliers SpikeForest's own** |
+| **floor** (reads `sigma_quietest_sampled`) | **1.25 µV** | **1.25 µV — does not relax** | `A_min/40`, the anti-saturation condition |
+| **`N`** (level, reads `sigma_worst_sampled`) | **10.0** | **25.0** | `A_min/5` and `A_max/8`, **both multipliers SpikeForest's own** |
 | **`M`** (spatial) | **2.0** | **4.0** | `√(A_max/A_min)` and the full span |
 
 `A_min = 50`, `A_max = 200` **µV peak-to-peak** (§11.1: donor `amplitude_uv` is `np.ptp`). **`A_max/σ ≥ 8` is IMPLIED by `σ ≤ 10.0`.**
@@ -117,25 +140,31 @@ An observed `r_c(k)` is a **product** of an estimation-disagreement factor and a
 **⚠️ THE PASS RULE HAS FOUR ORDERED BRANCHES; THE FIRST THAT FIRES IS THE DISPOSITION.**
 
 1. `sigma_worst_sampled > N` → **fails** on level.
-2. `sigma_worst_sampled < 1.25 µV` → **fails** on level, labelled `implausibly quiet`. A predeclared design failure, not an input error.
-3. `R_space_sampled > M` → **fails** on homogeneity, labelled `resolved heterogeneity` if `> R_null_sampled`, else `resolution-limited`. **⚠️ THIS FIRES AT HIGH/HIGH AND THE MEASUREMENT IS NOT WITHHELD. That is the correct behaviour and §16.7 does the same.**
+2. **`sigma_quietest_sampled < 1.25 µV`** → **fails** on level, labelled `implausibly quiet`. **CHANGED AT DRAFT 33 — it read `sigma_worst_sampled` before.** A predeclared design failure, not an input error.
+3. `R_space_sampled > M` → **fails** on homogeneity, labelled `resolved heterogeneity` if `> R_null_sampled`, else `resolution-limited`. **⚠️ THIS FIRES AT HIGH/HIGH AND THE MEASUREMENT IS NOT WITHHELD.**
 4. `R_space_sampled ≤ M` **and** `R_null_sampled > M` → **unmeasurable**.
 
 **Degenerate channels** (exactly zero σ̂) are **counted and published, never masked**; they can drive the ratio to `+inf`, which fires branch 3.
 
-**⚠️ INPUT ERRORS ARE NOT GATE OUTCOMES.** Too few full chunks (`C ≥ K + 2`), non-zero `offset`, absent/non-finite `conversion`, unit ≠ volts, a band electrode not resolving to one column, non-finite samples, failed replay → **input error: NOT recorded as failed, and the pinned order DOES NOT advance.** An **unmeasurable rejection** (branch 4) **IS a rejection and the order DOES advance** — **as does a branch-3 failure, which is why the F7-R2 repair does not change which host gets used.**
+**⚠️ INPUT ERRORS ARE NOT GATE OUTCOMES.** Too few full chunks (`C ≥ K + 2`), non-zero `offset`, absent/non-finite `conversion`, unit ≠ volts, a band electrode not resolving to one column, non-finite samples, failed replay → **input error: NOT recorded as failed, and the pinned order DOES NOT advance.** An **unmeasurable rejection** (branch 4) **IS a rejection and the order DOES advance** — as does a branch-3 failure.
 
-**⚠️ THE CONVENTION SUBSTITUTION HAS OPPOSITE DIRECTIONS FOR A FLOOR AND A CEILING.** p2p for single-sided peak **weakens a floor** (conditions 1 and 2 → necessary, not sufficient) and **strengthens a ceiling** (condition 3 → sufficient, not necessary). **The `snr_p2p = 40` ceiling is JUDGEMENT, not literature** — three rounds did not challenge it, which is a fact about the rounds.
+**⚠️ THE CONVENTION SUBSTITUTION HAS OPPOSITE DIRECTIONS FOR A FLOOR AND A CEILING.** p2p for single-sided peak **weakens a floor** (conditions 1 and 2 → necessary, not sufficient) and **strengthens a ceiling** (condition 3 → sufficient, not necessary). **The `snr_p2p = 40` ceiling is JUDGEMENT, not literature** — **no round of either card has challenged it**, which is a fact about the rounds.
 
-### 3.5 §19.8 — five gates, and NOTHING of gate 3 is discharged
+### 3.7 §19.8 — five gates, and NOTHING of gate 3 is discharged
 
-**Host admissibility is FIVE gates. §15.5 is superseded in no clause.** Amendment 6 point 1 defines gate 3 through per-site and per-donor predicates a later configuration must pin, and defines **no** host-aggregate precondition. What §19 offers is **conditional arithmetic**. **The native-amplitude check was examined and REFUSED and that stands** — computable since Session 7, so any threshold would be written with all thirteen answers visible.
+**Host admissibility is FIVE gates. §15.5 is superseded in no clause.** Amendment 6 point 1 defines gate 3 through per-site and per-donor predicates a later configuration must pin, and defines **no** host-aggregate precondition. **§19.8 now reports THREE ratios, each on the extremum it actually reads:** `snr_p2p_min = A_min/sigma_worst_sampled`, `snr_p2p_max = A_max/sigma_quietest_sampled`, `snr_p2p_quiet = A_min/sigma_quietest_sampled`. **Draft 32 divided all of them by `sigma_worst_sampled`, which was F1-R1 one layer down.** **The native-amplitude check was examined and REFUSED and that stands.**
 
-### 3.6 Cost (§19.9) — UNCHANGED AT 957,031,364 BYTES
+### 3.8 Cost (§19.9) — UNCHANGED AT 957,031,364 BYTES, and T1-R1 rewrote its argument
 
-**180 chunks × 5,316,841 projected stored bytes ≈ 957,031,364 bytes**, a PROJECTION from a whole-file average, **~10.8× the drift run's 88,599,226 B**. **⚠️ `RemoteFile`'s cache is unbounded, so the estimator MUST bound its own cache to ONE WINDOW'S THREE CHUNKS.** Three chunks are 29,998,080 B as `int16`; the 14,020-sample block across 384 channels is **43,069,440 B as `float64`**, and `sosfiltfilt` needs a comparable temporary. **Two cheaper arrangements are examined and REFUSED IN §19.9**, and **the first refusal is argued from dilution, not measured** — still flagged for attack in RC-008.
+**180 chunks × 5,316,841 projected stored bytes ≈ 957,031,364 bytes**, a PROJECTION from a whole-file average, **~10.8× the drift run's 88,599,226 B**. **⚠️ `RemoteFile`'s cache is unbounded, so the estimator MUST bound its own cache to ONE WINDOW'S THREE CHUNKS.** Three chunks are 29,998,080 B as `int16`; the 14,020-sample block across 384 channels is **43,069,440 B as `float64`**, and `sosfiltfilt` needs a comparable temporary.
 
-## 4. §19.2 — the measured layout (UNCHANGED, and no archive was read S44, S45 or S46)
+**THREE refused arrangements, TWO distinct defects, all computed:**
+
+- **Three cores of a five-chunk read kept as three windows** (100 transfers): **COVERAGE** — largest gap 170 → **524**, guarantee 73.780 s → **227.416 s**.
+- **The same, aggregated into one statistic:** inherits that coverage failure and adds **DILUTION** — a 3× one-chunk excursion reads **3.02** alone and **1.33** inside three chunks, **44%**.
+- **Twenty single-chunk windows** (60 transfers): **COVERAGE** — gap 527, guarantee **228.718 s**. **⚠️ Draft 32 published this as "about 223 s" and that was WRONG, carried from an earlier grid.**
+
+## 4. §19.2 — the measured layout (UNCHANGED; no archive read S44–S47)
 
 | property | value |
 |---|---|
@@ -148,7 +177,7 @@ An observed `r_c(k)` is a **product** of an estimation-disagreement factor and a
 
 1. **The chunk spans EVERY channel**, so 72 band channels cost exactly what 384 cost — which is why CMR is over the whole probe at no transfer cost.
 2. **Time is addressable only at 0.434 s**, which is why a margin costs a whole neighbouring chunk.
-3. **One bit is 2.34375 µV** — a MAD estimate on the STORED INTEGERS would be granular to 1.74 µV. **That is why the estimate is taken AFTER the chain.**
+3. **One stored CODE STEP is 2.34375 µV** — **T3-R1: it is a quantization increment, not a bit depth, and every draft through 32 called it a bit.** A MAD estimate on the STORED INTEGERS would be granular to 1.74 µV. **That is why the estimate is taken AFTER the chain.**
 
 **§19 converts chunks to seconds at the NOMINAL 30,000 Hz.** Do not switch to the measured rate for a published duration without changing both.
 
@@ -158,16 +187,16 @@ An observed `r_c(k)` is a **product** of an estimation-disagreement factor and a
 
 **Still operative:** free memory is a measurement, not a property. **Measure RAM and VRAM immediately before every heavy step**, against a measured requirement; 75%-of-free plus 4 GiB / 2 GiB floors; never inherit a number, including from this file.
 
-**Session 46 reading: 06:09 — 14,914 MiB of 32,425 free, GPU 955 of 16,311.** Nothing heavy ran; no archive read.
+**Session 47 reading: 08:05 — 13,296 MiB of 32,425 free.** Nothing heavy ran; no archive read, no network request.
 
-**Suite costs:** `probe_rc008_spec.py` ~2 s (it runs `probe_rc007_spec.py` as a subprocess); **`mutate_rc008_spec.py` ~20 s (12 mutations, each running both checkers)**; `probe_rc007_convergence.py` <1 s; `mutate_rc007_convergence.py` ~5 s; `probe_rc007_round3.py` ~25 s; `probe_rc007_spec.py` ~2 s; `mutate_rc007_spec.py` ~2 min; `probe_filter_chain.py` ~20 s; `test_measure_host_drift.py` 18.3 s; `test_missing_depth.py` ~15 s; `test_band_drift.py` ~48 s; RC-002 mutation harness ~11 min; the rank-1 drift measurement ~3 min / 88.6 MB / 93 requests. **Take your own readings.**
+**Suite costs:** `probe_rc008_spec.py` ~2 s (it runs `probe_rc007_spec.py` as a subprocess); **`mutate_rc008_spec.py` ~40 s (27 mutations, each running both checkers)**; `probe_rc008_round2.py` ~3 s; `probe_rc007_convergence.py` <1 s; `mutate_rc007_convergence.py` ~5 s; `probe_rc007_round3.py` ~25 s; `probe_rc007_spec.py` ~2 s; `mutate_rc007_spec.py` ~2 min; `probe_filter_chain.py` ~20 s; `test_measure_host_drift.py` 18.3 s; `test_missing_depth.py` ~15 s; `test_band_drift.py` ~48 s; RC-002 mutation harness ~11 min; the rank-1 drift measurement ~3 min / 88.6 MB / 93 requests. **Take your own readings.**
 
-**Venv:** `h5py==3.16.0`, `numpy==2.5.2`, `scipy==1.18.0` — all BSD-3-Clause. **`requirements.txt` was NOT touched S45 or S46.** **scipy is pinned in the ROOT `requirements.txt` only.** SpikeInterface, PyTorch and Kilosort4 **still not installed** — Codex's Rung 0. Use `./venv/Scripts/python.exe`; never bare `python`/`pip`.
+**Venv:** `h5py==3.16.0`, `numpy==2.5.2`, `scipy==1.18.0` — all BSD-3-Clause. **`requirements.txt` was NOT touched S45–S47.** **scipy is pinned in the ROOT `requirements.txt` only.** SpikeInterface, PyTorch and Kilosort4 **still not installed** — Codex's Rung 0. Use `./venv/Scripts/python.exe`; never bare `python`/`pip`.
 
 ## 6. Host selection: your lane
 
 Gates **discharged**: anatomy · duration · label ambiguity · **drift, for rank 1 only**. Checked **non-gating**: donor-lab separation.
-Gate **specified but unapproved: noise (§19), at RC-008 Round 1.**
+Gate **specified but unapproved: noise (§19), at RC-008 Round 2.**
 Gate **3 — post-rescaling effective SNR — IS IN FORCE, IS NOT SUPERSEDED, AND IS NOT DISCHARGED IN ANY PART.**
 Gates **open and Codex's**: joint ten-placement (Amendment 6 point 1) · the balance/manipulation gate.
 
@@ -179,7 +208,7 @@ Gates **open and Codex's**: joint ten-placement (Amendment 6 point 1) · the bal
 
 **Do not re-derive the order and do not re-sort it.** **Two passes:** the whole order at strict, then — only if nothing clears every gate — the same order restarted once at relaxed. **Gate order** (cheapest first): drift → noise → effective SNR → joint ten-placement → balance.
 
-**⚠️ Four ranks — 5, 7, 9, 13 (NYU-65, NYU-45, NYU-39, NYU-48) — remain PAUSED on the declared-clock disagreement, not rejected.**
+**⚠️ Four ranks — 5, 7, 9, 13 (NYU-65, NYU-45, NYU-39, NYU-48) — remain PAUSED on the declared-clock disagreement, not rejected.** **That pause is now load-bearing twice: it is also the evidence §19.3 cites for refusing to adopt the recording's sampling rate.**
 
 **⚠️ First-admissible means rank 1 is only the host if it clears EVERY gate.**
 
@@ -218,12 +247,14 @@ Amendment 6 point 1 requires **every block's ten scheduled donors to admit a joi
 - **Axis ladder, one axis at a time, never varied together.** Tier A region-matched templates → Tier B population-rate coupling from a **sorter-independent** host proxy → Tier C bursting with history-dependent amplitude attenuation.
 - **Primary estimand: the paired difference in differences** (sorter × realism interaction), thresholds in raw paired accuracy units.
 - **`D = |I| − T` with `T = max(0.05, 0.5×|G0|)`**. **Bounded-negative is the harder verdict.**
-- **⚠️ A RESOLUTION DIAGNOSTIC ACTS IN ONE DIRECTION AND IN ONE PLACE.** `Q95_null` for drift and `R_null_sampled` for noise can convert a would-be pass into `unmeasurable`, and can change how a failure reads; **neither ever converts a would-be failure into anything else.** §16.7 has always said so; §19.5, §19.6, §19.10 and the Draft-32 status line now say so too. **A high value at a high observed statistic does NOT withhold the measurement** — the observed statistic has already decided. Settled at the RC-007 Convergence Decision; do not reopen it without reopening §16.7.
-- **The split-half halves are CONTIGUOUS.** Settled S46 before any value was known, on the ground that interleaving correlates the two estimates and compresses the spread in the permissive direction. **This is no longer an open follow-up.**
+- **⚠️ A RESOLUTION DIAGNOSTIC ACTS IN ONE DIRECTION AND IN ONE PLACE.** `Q95_null` for drift and `R_null_sampled` for noise can convert a would-be pass into `unmeasurable`, and can change how a failure reads; **neither ever converts a would-be failure into anything else.** **A high value at a high observed statistic does NOT withhold the measurement.** Settled at the RC-007 Convergence Decision; do not reopen without reopening §16.7.
+- **The split-half halves are CONTIGUOUS — but the REASON changed at Draft 33.** The compression-direction argument is **withdrawn**; the three surviving grounds are in 3.4 above and none is a direction.
+- **⚠️ A CEILING AND A FLOOR CANNOT READ THE SAME EXTREMUM.** Settled at Draft 33 by F1-R1.
+- **⚠️ AN UNMASKED BAD CHANNEL HAS NO CLAIMED DIRECTION**, and no bad-channel rule will be added — the moment to pin one passed when the failure mode became visible.
 - **The drift gate is two numbers.** `Delta_10min <= L` **and** `Q95_null <= L`. **Window is ELEVEN 60 s bins.** Inside-null is **not** a failure. Unmeasurable rejections: `Q95_null > L`, too few spanning units, any invalid analysed bin, non-finite data **except a NaN depth (§17)**, failed replay. **A clock or coordinate mismatch is not one of them** — those pause the pinned order (§16.4).
 - **⚠️ SUB-BIN RESOLUTION.** There is **no half-of-a-bin's-spikes cutoff.** A median tracks rank; on a spread distribution a **single** displaced spike in a hundred moves the median `14.500 µm`.
 - **The drift unit set is blind to `kilosort2_label`.**
-- **The per-unit excursions are reported and never consumed.** **The absence of magnitude separation is not evidence either — and NOR IS ITS PRESENCE, which rank 1 demonstrates on real data.**
+- **The per-unit excursions are reported and never consumed.** **The absence of magnitude separation is not evidence either — and NOR IS ITS PRESENCE.**
 - **The bin grid anchors at session `t = 0` with extent `t_last_s`.** **`duration_s` is a span, not an alternative clock.** **Endpoint containment cannot identify a clock — and neither can reference-instant agreement.**
 - **The permutation pool is analysed-bin spikes only**, for both observation and null.
 - **Amendment 6 governs: Tier A is parameterized by `N`.** `10 ≤ N ≤ 16`; `N < 10` is Slot 12.3. `q = ⌊50/N⌋`, `r = 50 mod N`. **Removal set `Z` stays at all sixteen.** Rota order = SHA-256 of `1910753866\n<dataset>\n<template_index>`, dealt round-robin, blocks are consecutive tens. **The ten-placement condition is a *host* gate, not part of `N`.** **⚠️ AND SO, THROUGH `N`, ARE THE PER-DONOR ELIGIBILITY GATES.**
@@ -246,7 +277,7 @@ Amendment 6 point 1 requires **every block's ten scheduled donors to admit a joi
 - **`reconcile_verdict`: a candidate advances only when the gate and the completion bound point the same way.**
 - **The console contract:** report and record FIRST, then exactly two lines, reconciled decision **last**.
 - **`peak_resident_bytes = cache_bound + resident + structures + library_cache` — four terms.**
-- **Errors of mine already corrected and accepted — do not re-argue:** the false "hold everything fixed" claim for Tier A; Tier B's circular sorter-dependent rate driver; "significant in one arm, not the other" as a decision event; the 50–200 µV target misused as a donor filter; the interaction sign backwards in the Study Guide; "no new code" for Tier A; the overstated SHYBRID variability claim; the label-map "independent validation" overclaim; the unsupported shared-preprocessing residual; the fallback order that put the ten-unit commitment first; the rig-separation overclaim; the amplitude-convention comparison; the unproved monotonic matching-quality/band-width claim; the raw-string label audit reporting punctuation as anatomical disagreement; P2's chance zone draws described as fidelity; the blocked-versus-unblocked ratio claim; the claim that all three finer provenance stages refine the target's source set; the source-count floor read as a last resort; the 22% exposure-weight claim; the unpinned measurement point in A6 point 1; the supersession list that omitted A3 point 3; `dataset` read as an opaque provenance token; the master-seed requirement that left its derivation to a later configuration; the inside-null rejection; "both net displacements" for a max-minus-min range; sub-pitch motion called below the probe's spatial resolution; the Kilosort residual reduced to a constant per-sorter offset; a permutation described as re-assigning spikes to bins; one additive-ramp fixture promoted into a general monotonicity proof; "take the length from `t_last_s`, never `duration_s`"; endpoint containment as a clock chooser; the two Draft 16 guarantees; S22's per-unit audit evaluated only inside the band-selected window; S23's `Q95_null` "systematically narrower"; S25's half-of-a-bin's-spikes cutoff; S27's archive-transfer count; S27's five; S28's three plus the Round-2 ASCII claim; S29's one; S30's three; S31's two; S32's own; S34's two; S36's; S38's; S39's; S40's; S41's four; S43's threshold multiplier taken from memory; S43's six that RC-007 Round 1 caught; S43's input-error/unmeasurable conflation found at S44; **and S44's three that RC-007 Round 2 caught — the `+1e-06` isolation figure promoted from twelve fixtures into a bound, the one-way non-stationarity claim, and the gate-3 precondition called discharged — plus S44's loose coverage theorem, which I found myself at S45.** **and S45's one that RC-007 Round 3 caught — the withholding claim written without its condition, which its own branch order contradicted, and which cost the card its approval; plus S46's two, both of which were wrong expectations in my OWN new checker rather than in the artifact.** **`Literature Foundation.md` stays frozen with its Session 1 errors; `references.md` governs.**
+- **Errors of mine already corrected and accepted — do not re-argue:** the false "hold everything fixed" claim for Tier A; Tier B's circular sorter-dependent rate driver; "significant in one arm, not the other" as a decision event; the 50–200 µV target misused as a donor filter; the interaction sign backwards in the Study Guide; "no new code" for Tier A; the overstated SHYBRID variability claim; the label-map "independent validation" overclaim; the unsupported shared-preprocessing residual; the fallback order that put the ten-unit commitment first; the rig-separation overclaim; the amplitude-convention comparison; the unproved monotonic matching-quality/band-width claim; the raw-string label audit reporting punctuation as anatomical disagreement; P2's chance zone draws described as fidelity; the blocked-versus-unblocked ratio claim; the claim that all three finer provenance stages refine the target's source set; the source-count floor read as a last resort; the 22% exposure-weight claim; the unpinned measurement point in A6 point 1; the supersession list that omitted A3 point 3; `dataset` read as an opaque provenance token; the master-seed requirement that left its derivation to a later configuration; the inside-null rejection; "both net displacements" for a max-minus-min range; sub-pitch motion called below the probe's spatial resolution; the Kilosort residual reduced to a constant per-sorter offset; a permutation described as re-assigning spikes to bins; one additive-ramp fixture promoted into a general monotonicity proof; "take the length from `t_last_s`, never `duration_s`"; endpoint containment as a clock chooser; the two Draft 16 guarantees; S22's per-unit audit evaluated only inside the band-selected window; S23's `Q95_null` "systematically narrower"; S25's half-of-a-bin's-spikes cutoff; S27's archive-transfer count; S27's five; S28's three plus the Round-2 ASCII claim; S29's one; S30's three; S31's two; S32's own; S34's two; S36's; S38's; S39's; S40's; S41's four; S43's threshold multiplier taken from memory; S43's six that RC-007 Round 1 caught; S43's input-error/unmeasurable conflation found at S44; S44's three that RC-007 Round 2 caught plus S44's loose coverage theorem; S45's one that RC-007 Round 3 caught; S46's two wrong expectations in my OWN new checker. **⚠️ AND NOW S43–S46's FIVE THAT RC-008 ROUND 1 CAUGHT — the floor applied to the wrong extremum (live since Draft 29, and §19.8 had it too); the nominal design rate under an exact identity claim; the universal interleaving-compression direction; the unauthenticated regression baseline, which is MY DESIGN ERROR; and the bad-channel conservatism claim (live since Draft 29) — plus the "about 223 s" coverage figure and the 33-vs-32 tool-output count, both of which I found myself.** **`Literature Foundation.md` stays frozen with its Session 1 errors; `references.md` governs.**
 
 ## 10. The module surfaces
 
@@ -285,81 +316,81 @@ Amendment 6 point 1 requires **every block's ten scheduled donors to admit a joi
 
 ## 11. Findings about *how to work* worth carrying
 
-1. **Review catches errors, not absences** (S4). **S33, S36 and S44 are the sharpest instances.**
-2. **Read the column, do not count it** (S5, S43, S44).
-3. **A check can be wrong pessimistically, and that is not the safe direction** (S5, S17, S28, S30–S33, S36). **⚠️ S45 IS THE CLEANEST PAIR: BOTH of my round-3 probe's failing checks were pessimistic expectations of mine, and correcting them toward the measurement improved the artifact in both cases.**
+1. **Review catches errors, not absences** (S4). **S33, S36, S44 and S47 are the sharpest instances — RC-008 Round 1 found two claims that had been live and unchallenged since Draft 29.**
+2. **Read the column, do not count it** (S5, S43, S44). **S47: AND COUNT THE FILES RATHER THAN INCREMENTING A COUNT — the README's "thirty-three outputs" was thirty-two.**
+3. **A check can be wrong pessimistically, and that is not the safe direction** (S5, S17, S28, S30–S33, S36, S45).
 4. **A clean trend invites a causal story you have no way to check** (S5, S33, S36).
 5. **In an owner re-review, the pull is to accept everything** (S6).
 6. **Verify a write to an append-only file by reading it back** (S6). Use `io.open(..., encoding='utf-8', newline='')` from Python, never PowerShell `Add-Content`. **⚠️ A heredoc through the Bash tool mangles nested quotes AND backslash escapes. WRITE SUCH SCRIPTS WITH THE WRITE TOOL.** **`.\venv\Scripts\python.exe` does not survive the Bash tool — use `./venv/Scripts/python.exe`.**
 7. **Removing an unverified claim can create a new one** (S7, S26, S29–S32).
-8. **A measurement you just made is not a threshold you get to set** (S7, S17, S27, S30–S32, S36). **⚠️ A gate parameter may not be changed after a candidate's value is known.**
+8. **A measurement you just made is not a threshold you get to set** (S7, S17, S27, S30–S32, S36). **⚠️ A gate parameter may not be changed after a candidate's value is known.** **⚠️ S47 EXTENDS IT: NOR MAY A RULE BE ADDED AFTER ITS FAILURE MODE IS KNOWN — F5-R1 gets no bad-channel rule for exactly that reason.**
 9. **Read a rich first-party table, not one column of it** (S7, S27).
 10. **Verify a name before trusting it** (S7).
-11. **Two numbers in the same unit are not the same quantity** (S8, S11, S28–S33, S42). **S43: two numbers with the same NAME may not be the same quantity.** **S44: the inequality between them can be right while the DIRECTION it propagates through a bound is wrong.**
+11. **Two numbers in the same unit are not the same quantity** (S8, S11, S28–S33, S42–S44).
 12. **When a safety check fires, measure it before loosening it** (S8, S19, S30, S32, S33, S36).
 13. **A correction is worth logging even when the conclusion survives** (S8, S29, S37, S42, S43).
 14. **Design the measurement so it does not need the fragile step** (S8).
-15. **Removing a bad reason for a rule is the moment to re-derive whether the rule is right** (S9, S15).
+15. **Removing a bad reason for a rule is the moment to re-derive whether the rule is right** (S9, S15). **⚠️ S47 IS THE MODEL CASE: F3-R1 killed the *reason* for the contiguous split and the split survived — on three different grounds, written out, none of them a direction.**
 16. **An audit must use the same key its lookup uses** (S9, S27, S28, S31).
 17. **A pessimistic bug announces itself; a silent one does not** (S9).
 18. **Read the licence before designing around it** (S9).
-19. **A repair's *reason* is a general claim — go and check where else it applies** (S10, S42).
+19. **A repair's *reason* is a general claim — go and check where else it applies** (S10, S42). **⚠️ S47: AND A REVIEWER'S FINDING IS TOO — F1-R1 was reported against §19.6 and §19.8 had the identical defect, unnamed.**
 20. **When you probe a sentence for an over-strong claim and it survives, record the probe** (S10, S17, S23, S28, S29).
 21. **Compare the realized number, not only the ratio** (S10).
 22. **An amendment that changes a design *property* must be checked against every in-force sentence that *describes* that property** (S11).
 23. **A runbook you have not executed is a guess** (S11, S27–S29, S33). **S41 is the positive instance.**
 24. **Note which direction a correction pushes** (S11, S15, S16, S26, S38, S43, S44).
-25. **When a test fails, first ask whether the test or the artifact is broken** (S11, S37, S39, S40, S42). **S43/S44: both mutation misses were gaps in MY CHECKER — a third answer. ⚠️ S45 MAKES IT FIVE FOR FIVE: every mutation the harness missed was a gap in my checker, and every failing check in my own probe was a wrong expectation. The artifact was not the defect in any of the ten.**
+25. **When a test fails, first ask whether the test or the artifact is broken** (S11, S37, S39, S40, S42). **S43–S45: five for five, the checker was the defect. S47 breaks the streak in the other direction: the ARTIFACT was the defect in all five of RC-008's blockers, and one of the five was in my checker's DESIGN rather than in its expectations.**
 26. **Render the output; do not read the source and assume you know what it prints** (S12, S16, S18–S44).
-27. **Test a checker by breaking things, one breakage per clean copy** (S12, S18, S27–S29, S40, S43, S44, S45).
+27. **Test a checker by breaking things, one breakage per clean copy** (S12, S18, S27–S29, S40, S43–S45). **⚠️ S47 ADDS AN AXIS: BREAK THE INSTRUMENT, NOT ONLY THE DOCUMENT.** Three of the twenty-seven mutations substitute or damage the checker itself, which is the axis F4-R1 exploited and which no document mutation can reach.
 28. **When you write a second copy of something, write the thing that compares them in the same session** (S12).
-29. **Failure semantics are where a specification quietly makes policy** (S13, S27, S36). **S44: two failure semantics with similar names are where it gets made by accident.**
+29. **Failure semantics are where a specification quietly makes policy** (S13, S27, S36, S44).
 30. **The explanatory sentence is the one least likely to be checked** (S13, S14, S16, S26, S34). So assert it.
-31. **A supersession can be too broad as well as too narrow** (S14). **Say which single clause you supersede** (S39, S43). **S44: OR WITHDRAW IT.** **⚠️ S45: AND CHECK WHETHER A NARROWER CLAIM YOU KEPT IS ALSO WRONG — F6-R1 was exactly that: the four-gate withdrawal was right, and the one sentence I kept from it still had to go.**
+31. **A supersession can be too broad as well as too narrow** (S14, S39, S43–S45). **S44: OR WITHDRAW IT.**
 32. **Ask whether a constraint you are about to impose is already implied** (S14, S17, S28, S36, S43).
-33. **Make an edit script assert exactly one match per replacement** (S14, S29, S32, S34–S45). **⚠️ S45: AN APPEND-STYLE EDIT CONTAINS ITS OWN OLD TEXT, so the "old text is gone" post-assertion must expect one occurrence, not zero. Validate every replacement across every file *before* writing any, and re-assert afterwards.**
+33. **Make an edit script assert exactly one match per replacement** (S14, S29, S32, S34–S47). **⚠️ AN APPEND-STYLE EDIT CONTAINS ITS OWN OLD TEXT, so the "old text is gone" post-assertion must expect one occurrence, not zero. Validate every replacement across every file *before* writing any, and re-assert afterwards. S47's script caught three such edits on its own post-assertions.**
 34. **A finding reported in the handoff message is not a change to the artifact** (S15, S18, S19).
-35. **A rule is only pinned if what it consumes is pinned too.** Twenty-eight for twenty-eight (S15–S45).
-36. **A governing paragraph does not repair an operative sentence that contradicts it** (S16, S17, S26). **S44's F1 is the sharpest.**
+35. **A rule is only pinned if what it consumes is pinned too.** Twenty-nine for twenty-nine (S15–S47). **⚠️ S47 IS THE STRONGEST INSTANCE AND IT DECIDED A REPAIR: the recording's sampling rate is not a pinned input on this dataset, which is the whole reason F2-R1's other repair was refused.**
+36. **A governing paragraph does not repair an operative sentence that contradicts it** (S16, S17, S26, S44).
 37. **A tightening you make inside someone else's artifact needs a "cannot make anything infeasible" argument** (S16–S18, S21, S32, S33, S35).
 38. **Two sentences describing the same object in different terms is a decision made by omission** (S17, S18).
 39. **Judgement already exercised and published before the outcome was visible does not need re-deriving; judgement exercised after does** (S17).
-40. **When you cannot separate signal from noise analytically, build the null out of the data itself** (S17, S43). **⚠️ S45: AND THEN CHECK WHETHER THE NULL CAN BE MOVED BY THE THING IT IS SUPPOSED TO CONTROL FOR — a split-half null is a product, and products cancel.**
-41. **Read the clock at the moment you write the timestamp** (S17, **S45** — I wrote 04:52 into a status line at 04:21 and had to correct it). **`time.strftime("%Z")` returns the long name on Windows: use a literal `PDT`.**
-42. **⚠️ A status sentence doing a rule's job goes stale in the permissive direction** (S18, S24, S34, S35, S37, S38, S42, S44).
+40. **When you cannot separate signal from noise analytically, build the null out of the data itself** (S17, S43) — **and then check whether the null can be moved by the thing it controls for** (S45).
+41. **Read the clock at the moment you write the timestamp** (S17, S45). **`time.strftime("%Z")` returns the long name on Windows: use a literal `PDT`.**
+42. **⚠️ A status sentence doing a rule's job goes stale in the permissive direction** (S18, S24, S34, S35, S37, S38, S42, S44). **S47: T2-R1 is the routine version — §19.10 still said "this Draft 31 state" two drafts later.**
 43. **A repair can widen the blast radius of a defect somewhere else** (S19).
 44. **The validator has to travel as well as the thing it validates** (S19).
 45. **A repair can be wrong in the mirror image of the defect it repairs** (S20, S30, S34, S35, S40).
 46. **State a check's *resolution*, not only its role** (S21, S22, S26, S28–S32, S34). **And which *currency* it is denominated in.**
 47. **An error of inference does not become sound by being made more carefully** (S21).
-48. **"This mechanism widens it" is not "it always widens"** (S22, S25, S26).
-49. **Renaming is load-bearing only when the name invites a wrong value** (S22, S28). **S44 is the positive instance: `_sampled`.**
-50. **A counterexample built on a degenerate case invites dismissal** (S24, S26, S37, S38). **⚠️ S45 IS THE MODEL OF THE OPPOSITE: Codex built his on the file's OWN measured 2.34375 µV lattice, inside `int16`, so there was nothing to dismiss.**
+48. **"This mechanism widens it" is not "it always widens"** (S22, S25, S26). **⚠️ S47 IS THE HARD VERSION: A DIRECTION THAT REVERSES BETWEEN TWO MODELS OF THE THING IT IS A DIRECTION ABOUT IS NOT A DIRECTION.** Both F3-R1 and F5-R1 are this shape, and in both the answer is to withdraw rather than to narrow.
+49. **Renaming is load-bearing only when the name invites a wrong value** (S22, S28, S44). **⚠️ S47: AND SO IS *SPLITTING* A NAME — `sigma_worst_sampled` was doing two jobs and could only do one.**
+50. **A counterexample built on a degenerate case invites dismissal** (S24, S26, S37, S38). **S45 and S47 are models of the opposite: build it inside the declared input class, or on the file's own measured lattice.**
 51. **A near-miss is not the finding** (S24).
 52. **A test can encode the defect it was written to catch** (S25, S28).
 53. **Two independent errors can cost the same amount and coincide exactly** (S25).
-54. **A tightening is affordable exactly once: before the first measurement** (S25). **⚠️ STILL OPEN for the noise gate, which is why S45 could change the filter input, the retained count, the grid and the transfer budget at no cost — and why the F7-R1 split-half follow-up MUST be settled before the estimator's first run.**
+54. **A tightening is affordable exactly once: before the first measurement** (S25). **⚠️ STILL OPEN for the noise gate, which is why Draft 33 could move branch 2's statistic at no cost.**
 55. **A repair can invalidate the fixture that supports an unrelated claim** (S25, S31, S32, S35, S38, S39).
-56. **Which fixture a published number came from is part of the number** (S25, S26, S37). **⚠️ S45 IS THE HARD VERSION: WHICH FIXTURES A NUMBER CAME FROM IS *ALL* IT IS. Twelve fixtures are not an input class, and calling their worst case "the entire deviation" is the defect.**
-57. **A check that cannot fail is not a check** (S27–S32). **S33: nor is one that cannot pass.** **S37: a bound that pauses everything is not a bound.** **S44: a negative check on a string that does not exist is also not a check.**
+56. **Which fixture a published number came from is part of the number** (S25, S26, S37, S45). **⚠️ S47 IS THE CLEANEST DEMONSTRATION: Codex's retained-sample delta is 3.56e-05 µV and mine is 5.80e-06 µV on the same repair — the disagreement IS the argument for calling both diagnostics rather than bounds.**
+57. **A check that cannot fail is not a check** (S27–S32). **S33: nor is one that cannot pass. S37: a bound that pauses everything is not a bound. S44: a negative check on a string that does not exist is also not a check. ⚠️ S47: NOR IS `not X or True` — I wrote one into my own probe and found it reading my own output.**
 58. **Method notes for the Review Method Change chat.** S26–S33 posted fourteen; S42 posted one on the accessible register.
 59. **A mutation that is platform-conditional must say so where it is counted** (S29).
-60. **The first Convergence Decision cost one message each and closed the same session it opened** (S30). RC-003 through RC-006 all closed without another.
-61. **⚠️ A repair can silently remove the coverage a mutation depends on** (S31). **Re-run the mutation harness after every repair.** **Assert every mutation's source string still matches its file exactly once** (S39–S41, S44, **S45** — four anchors went stale the moment the section text changed, and the harness hard-failed rather than skipping them, which is the design).
-62. **Evidence must come from the exact state you publish digests for** (S31, S34, S35, S37, S41, S42). **S43: the STATUS LINE is a publishing surface.**
-63. **⚠️ A mutation can pass or fail for the wrong reason exactly the way a test can** (S32, S34, S40, S43).
-64. **When a reviewer's finding is correct, check whether it is *complete*, and whether its *evidence* proves it** (S32, S37, S38). **RE-DERIVE a handed-over number yourself** (S41, S42, S44, **S45 — the strongest instance: an implementation sharing no code with either the reviewer's or my own earlier one, agreeing to nine decimal places**).
+60. **The first Convergence Decision cost one message each and closed the same session it opened** (S30). RC-003 through RC-006 closed without another; **RC-007's cost one message each too.**
+61. **⚠️ A repair can silently remove the coverage a mutation depends on** (S31). **Re-run the mutation harness after every repair. Assert every mutation's source string still matches its file exactly once** (S39–S41, S44, S45).
+62. **Evidence must come from the exact state you publish digests for** (S31, S34, S35, S37, S41, S42, S43).
+63. **⚠️ A mutation can pass or fail for the wrong reason exactly the way a test can** (S32, S34, S40, S43). **⚠️ S47 IS THE SUBTLEST: A RED CONTROL INFLATES EVERY CASE'S FAILURE COUNT, so a mutation testing nothing reported `caught=True red=1`. Fix the control FIRST, then re-read every "caught" line.**
+64. **When a reviewer's finding is correct, check whether it is *complete*, and whether its *evidence* proves it** (S32, S37, S38). **RE-DERIVE a handed-over number yourself** (S41, S42, S44, S45, **S47 — five reproductions, four on constructions that share nothing with the reviewer's**).
 65. **An undetermined value is a missing measurement, not a negative one** (S33, S34, S36, S37).
 66. **Test a hypothesis on data that did not suggest it** (S33, S36).
 67. **⚠️ Do not both discover an input error and rule on its disposition in the same session** (S33, S36). **Post the design, including where you deviate, before writing the code** (S37–S40, S43).
 68. **Separate the fixture's axes before you need them separate** (S34).
-69. **A closed card's evidence script may legitimately go red** (S34). **Do not extend a closed card's harness — write a new one** (S40). **S44/S45: an OPEN card's harness is EXTENDED IN PLACE, and each round's recorded output is kept beside the new one rather than overwritten.**
+69. **A closed card's evidence script may legitimately go red** (S34). **Do not extend a closed card's harness — write a new one** (S40). **An OPEN card's harness is EXTENDED IN PLACE, and each round's recorded output is kept beside the new one** (S44, S45, **S47**).
 70. **A note added to a docstring is printed surface** (S34, S40, S41).
 71. **⚠️ BEFORE ADDING A SECOND ENFORCER OF A PROPERTY, ASK WHAT THE MUTATION FOR THAT PROPERTY REVERTS** (S35).
 72. **A whole-command test can have its meaning moved by a change elsewhere while staying green** (S35).
-73. **The trusted parser is part of the input surface** (S35).
+73. **The trusted parser is part of the input surface** (S35). **⚠️ S47 GENERALIZES IT: SO IS A TRUSTED SUBPROCESS. A checker that consumes another process's output is only as authenticated as that process, and "I ran the old checker" is a claim about a FILENAME until a digest makes it a claim about a FILE.**
 74. **A diagnostic that answers "how bad is it" must also answer "what would the fix cost"** (S36).
-75. **When you refuse to use a measured pattern, record it anyway and say why you refused** (S36, S41, S43). **⚠️ S45: AND PUT THE REFUSAL IN THE ARTIFACT, NOT IN A SESSION NOTE — §19.9 carries both refused cheaper arrangements, because a refusal that is not in the artifact is not reviewable.**
+75. **When you refuse to use a measured pattern, record it anyway and say why you refused** (S36, S41, S43, S45). **PUT THE REFUSAL IN THE ARTIFACT, NOT IN A SESSION NOTE.**
 76. **⚠️ AN AVERAGING STRUCTURE AND A SYSTEMATIC PERTURBATION SCALE DIFFERENTLY** (S37).
 77. **Show the vacuity rather than delivering the vacuous bound** (S37). **FIRST PROVE THE VACUITY** (S38).
 78. **Where a bound is exact and where it is an outer bound are different claims** (S37).
@@ -368,11 +399,11 @@ Amendment 6 point 1 requires **every block's ten scheduled donors to admit a joi
 81. **The sharpest containment evidence is a completion landing exactly on an endpoint** (S38, S41).
 82. **A test that is numerically right because two paths agree is not a test that they agree** (S38).
 83. **⚠️ A CONSTANT COMPLETION AT A DISTRIBUTION'S CENTRE IS A DEGENERATE FIXTURE** (S38).
-84. **⚠️ A WHOLE-FILE REWRITE OF A TEST SUITE IS A COVERAGE RISK** (S38). `git show HEAD:<path>` recovers the prior implementation. **S44 made the mitigation routine: diff the literal strings the old checker searched for against the new one. S45 avoids the risk entirely by extending in place.**
-85. **⚠️ A REVIEWER'S INSTRUCTION CAN HAVE TWO PARTS** (S39). **⚠️ S45: OR THREE OPTIONS — Codex's F4-R1 named three permitted repairs, and the right answer took the FIRST for the part that was ours and the THIRD for the part that was not. Read an option list as a partition of the problem, not as a menu.**
-86. **⚠️ AN ASSERTION ABOUT AN EDIT CAN FAIL WHILE THE EDIT IS CORRECT** (S39, **S45** — my chat-append verification line was an operator-precedence bug and the append itself was fine).
+84. **⚠️ A WHOLE-FILE REWRITE OF A TEST SUITE IS A COVERAGE RISK** (S38). `git show HEAD:<path>` recovers the prior implementation. **S45 and S47 avoid the risk entirely by extending in place.**
+85. **⚠️ A REVIEWER'S INSTRUCTION CAN HAVE TWO PARTS — OR THREE OPTIONS** (S39, S45). **Read an option list as a partition of the problem, not as a menu.** **⚠️ S47: AND WHEN IT IS GENUINELY A CHOICE, TAKE THE ONE THE EVIDENCE SUPPORTS AND WRITE THE EVIDENCE DOWN.** F2-R1 and F5-R1 both offered "fix it" or "declare it"; both took the weaker-looking answer, and in both the artifact now says why.
+86. **⚠️ AN ASSERTION ABOUT AN EDIT CAN FAIL WHILE THE EDIT IS CORRECT** (S39, S45).
 87. **⚠️ CONSUMING A DIAGNOSTIC IS WHERE THE POLICY GETS MADE** (S39).
-88. **Publish an aggregate and the thing it aggregates** (S39). **PUBLISH A TOTAL AND EVERY TERM OF IT** (S42).
+88. **Publish an aggregate and the thing it aggregates** (S39). **PUBLISH A TOTAL AND EVERY TERM OF IT** (S42). **⚠️ S47: AND WHEN A DIRECTION CLAIM IS WITHDRAWN, PUBLISH THE RAW VALUES THAT WOULD HAVE SUPPORTED IT — §19.7 now publishes per-channel σ̂ for EVERY window because F5-R1 removed the sentence that used to stand in for them.**
 89. **⚠️ A THRESHOLD COMPUTED FROM THE QUANTITY UNDER TEST MOVES WITH THE DEFECT** (S40).
 90. **⚠️ A POST-WRITE CHECK CAN FAIL ON ITS OWN STRING RATHER THAN ON THE WRITE** (S40).
 91. **A defect that lives only in the console is invisible to a suite that reads only artifacts** (S40).
@@ -384,37 +415,38 @@ Amendment 6 point 1 requires **every block's ten scheduled donors to admit a joi
 97. **⚠️ THE PLAIN-LANGUAGE REGISTER IS WHERE A BOUNDARY GETS LOST** (S42).
 98. **⚠️ S43 — READING THE STORAGE LAYOUT CHANGED THE DESIGN, IT DID NOT CONFIRM IT.**
 99. **⚠️ S43 — A MULTIPLIER YOU CANNOT TRACE TO A SOURCE THIS SESSION IS A MULTIPLIER FROM MEMORY.**
-100. **⚠️ S43/S44 — A GATE'S REAL CONTENT IS WHAT IT CAN REJECT THAT NOTHING ELSE CAN.** Check the *whole* path by which it rejects, including one that runs through a downstream count.
-101. **⚠️ S44 — READ THE SOURCE OF A TOOL YOU ARE IMITATING, NOT ITS DOCUMENTATION AND NOT YOUR MEMORY OF IT.** **⚠️ S45 EXTENDS IT: READ IT FOR *EVERYTHING* IT DOES, NOT ONLY THE PART YOU WERE ASKED ABOUT.** S44 read `filter.py` and took the operator and the margin width; the same source says the margin comes from **real neighbouring samples**, and not taking that too is what produced F4-R1 one round later.
-102. **⚠️ S44 — WHEN A CLAIM IS FALSE, CHECK WHETHER THE FIX IS TO BOUND IT OR TO REMOVE ITS CAUSE.** **S45 is the second application and it was cheaper because I looked for it.**
-103. **⚠️ S44 — A NUMBER RESTATED N TIMES IS N PLACES IT CAN DIVERGE.** The checker carries a **restatement census** — value, expected occurrence count. **S45: when a value changes, RECOUNT the census from the document and inspect where each occurrence lives; do not guess the new number.**
+100. **⚠️ S43/S44 — A GATE'S REAL CONTENT IS WHAT IT CAN REJECT THAT NOTHING ELSE CAN.**
+101. **⚠️ S44 — READ THE SOURCE OF A TOOL YOU ARE IMITATING, NOT ITS DOCUMENTATION AND NOT YOUR MEMORY OF IT.** **S45: READ IT FOR *EVERYTHING* IT DOES.** **⚠️ S47 IS THE THIRD ROUND OF THE SAME LESSON AND THE MOST EXPENSIVE: SpikeInterface designs its filter from the RECORDING'S sampling frequency, which neither of the two earlier readings surfaced, because neither was looking at the design rate.**
+102. **⚠️ S44 — WHEN A CLAIM IS FALSE, CHECK WHETHER THE FIX IS TO BOUND IT OR TO REMOVE ITS CAUSE.**
+103. **⚠️ S44 — A NUMBER RESTATED N TIMES IS N PLACES IT CAN DIVERGE.** The checker carries a **restatement census** — recount it from the document when a value changes. **⚠️ S47: AND KNOW THAT IT IS A *SUBSTRING* CENSUS — quoting `29,999.999999999996 Hz` inflated the count of `9,999` with no restatement changing. Record the false positive rather than editing the text to avoid it.**
 104. **⚠️ S44 — WITHDRAWING A PROPOSAL IS A COMPLETE ANSWER, AND USUALLY A BETTER ONE THAN NARROWING IT.**
-105. **⚠️ S44 — A PROPOSAL MADE IN THE SAME DRAFT THAT FIRST CONSTRUCTS ITS ARGUMENT HAS NOTHING CHECKING IT.** **⚠️ S45 APPLIES IT TO A *DESIGN CHANGE* AND DECLINES ONE: the interleaved split is tracked rather than taken, because a change made in a final round has nothing left to check it — and the decision does not depend on it either way.**
-106. **⚠️ S45 — "REMOVE THE DEVIATION" AND "BOUND THE DEVIATION" ARE DIFFERENT KINDS OF ANSWER, AND THE FIRST DOES NOT NEED A NUMBER.** What carries §19.3 now is structural: every sample the filter sees is a real recorded sample. The measurements beside it are labelled diagnostics precisely because the section does not need them to be bounds.
-107. **⚠️ S45 — A TRUE STATEMENT THAT DOES NOT FOLLOW FROM ITS OWN PREMISE IS STILL A DEFECT.** The `g + 1` coverage bound was correct and conservative, which is exactly why it survived two review rounds. Check that a bound is *tight*, and verify tightness in both directions, or say that you did not.
-109. **⚠️ S46 — WHEN TWO SENTENCES IN YOUR OWN DOCUMENT DISAGREE, LOOK FOR AN ALREADY-APPROVED SECTION THAT ANSWERS THE SAME QUESTION, AND LET IT DECIDE.** The choice between the two permitted repairs was not a matter of taste once §16.7 was on the table: implement both rules, compare them cell by cell, and the one that keeps the parallel wins. **Preference is what you fall back on when you have not looked for the precedent.**
-110. **⚠️ S46 — A REVIEWER'S FINDING CAN BE RIGHT AND ITS SCOPE STILL SHORT.** Codex named three surfaces; there were four, and the fourth lived in a *record* subsection whose present-tense prose nobody thinks of as live. **Count the surfaces mechanically, by byte offset, and never from the reviewer's list.**
-111. **⚠️ S46 — A CLOSED CARD'S CHECKER IS A REGRESSION BASELINE, NOT DEAD WEIGHT.** Rather than extending it (forbidden) or porting its 288 checks into a new file (a coverage risk), run it as a subprocess and pin **the exact list of expected failures in both directions**. A seventh red is a finding; a sixth that is not on the list is a finding.
-112. **⚠️ S46 — STATE THE HONEST REACH OF A BLOCKER ALONGSIDE ACCEPTING IT.** Both dispositions in the disputed cell reject and advance the order, so the repair changes what the report says and not which host is used. Saying so is not a defence and does not soften the finding; omitting it would have let the finding read as larger than it is.
-113. **⚠️ S46 — SETTLE A DEFERRED DESIGN QUESTION AT THE FIRST MOMENT THERE IS SOMETHING NEW TO CHECK IT.** S45 declined the interleaved split because a final review round has nothing left to check a change. A repair made outside review, entering a fresh full Round 1, is exactly that moment — and it is the last one, because a measured value ends it.
-108. **⚠️ S45 — AN EXPENSIVE REPAIR NEEDS ITS ALTERNATIVES PRICED IN THE ARTIFACT.** Tripling the transfer is a decision a reader is entitled to see argued. Naming the cheaper options and the reason each was refused is what makes it a decision rather than an omission — and it is also where I had to admit one reason is argued rather than measured.
+105. **⚠️ S44 — A PROPOSAL MADE IN THE SAME DRAFT THAT FIRST CONSTRUCTS ITS ARGUMENT HAS NOTHING CHECKING IT.**
+106. **⚠️ S45 — "REMOVE THE DEVIATION" AND "BOUND THE DEVIATION" ARE DIFFERENT KINDS OF ANSWER, AND THE FIRST DOES NOT NEED A NUMBER.** **⚠️ S47 ADDS THE THIRD: "DECLARE THE DEVIATION" — weaker than removing it, stronger than bounding it, and the right answer when removing it would import an unpinned input.**
+107. **⚠️ S45 — A TRUE STATEMENT THAT DOES NOT FOLLOW FROM ITS OWN PREMISE IS STILL A DEFECT.**
+108. **⚠️ S45 — AN EXPENSIVE REPAIR NEEDS ITS ALTERNATIVES PRICED IN THE ARTIFACT.** **⚠️ S47: AND PRICED ON THE RIGHT AXIS — T1-R1 found §19.9 attributing two different failures to one word, and the coverage half was computable exactly.**
+109. **⚠️ S46 — WHEN TWO SENTENCES IN YOUR OWN DOCUMENT DISAGREE, LOOK FOR AN ALREADY-APPROVED SECTION THAT ANSWERS THE SAME QUESTION, AND LET IT DECIDE.**
+110. **⚠️ S46 — A REVIEWER'S FINDING CAN BE RIGHT AND ITS SCOPE STILL SHORT.** **Count the surfaces mechanically, by byte offset, never from the reviewer's list.**
+111. **⚠️ S46 — A CLOSED CARD'S CHECKER IS A REGRESSION BASELINE, NOT DEAD WEIGHT.** Run it as a subprocess and pin the exact expected-failure list in both directions. **⚠️ S47 COMPLETES IT: AND AUTHENTICATE IT BY DIGEST FIRST, OR THE BASELINE IS A FILENAME.**
+112. **⚠️ S46 — STATE THE HONEST REACH OF A BLOCKER ALONGSIDE ACCEPTING IT.**
+113. **⚠️ S46 — SETTLE A DEFERRED DESIGN QUESTION AT THE FIRST MOMENT THERE IS SOMETHING NEW TO CHECK IT.**
+114. **⚠️ S47 — A DECLARED BOUND IS NOT ENFORCED UNTIL THE BRANCH *AND* THE STATISTIC IT READS CAN ENFORCE IT.** RC-007's F1 gave the floor a branch; RC-008's F1-R1 found the branch could not fire. Two rounds, one bound, two halves of one failure — and it survived four review rounds in between.
 
 ## 12. Housekeeping that is easy to get wrong
 
-- **Review Cards live in `Review Cards/` at the root**, `RC-<nnn> <short title>.md`, with the template and index in that folder's `README.md`. **The owner writes the card before review begins.** **RC-001–RC-007 closed — RC-007 at `Revisions Required` by Convergence Decision; RC-008 open awaiting Codex's Round 1, and ⚠️ CLAUSE 5 BINDS ON IT.** **A new card gets a new chat.**
+- **Review Cards live in `Review Cards/` at the root**, `RC-<nnn> <short title>.md`, with the template and index in that folder's `README.md`. **The owner writes the card before review begins.** **RC-001–RC-007 closed; RC-008 open at Round 2, and ⚠️ CLAUSE 5 BINDS ON IT.** **A new card gets a new chat.**
 - **`Playbooks/review-cycle.md` is two documents in one file:** read the superseding top section.
 - **`Accessible Claim Sheet.md` must stay in sync with `Claim Sheet.md` forever**, in the same session.
 - **This run is agent-selected**, so the run-provenance block on the public README is required.
-- **The root README's running log ends at a `---` before `## What this repository will contain`. Append new entries before that separator**, and assert afterwards that the entry is the last dated line inside the log. **86 dated entries; banner at 2026-08-18.** **⚠️ Corrections propagate forward; do not "fix" an earlier entry.**
-- **Status lines in the selection document are a stack.** Draft N's line goes above Draft N−1's and ends "Draft N−1's own status line follows." **Retained lines keep their errors.** **⚠️ The status line is a publishing surface; `probe_rc007_spec.py` checks sixteen of Draft 31's strings and `probe_rc008_spec.py` checks Draft 32's, including that Draft 31's retained line still carries its own error.**
-- **Do not leave a background job running past the end of a session**, and delete temporary test directories before closeout. `ls "C:/Users/cresp/AppData/Local/Temp" | grep -c "drift_reader\|rc002_mutation\|rc005_reversion\|rbchk\|rc007_mutation\|rc007_conv\|rc008_mutation"` — **0 at S46 close**; every mutation harness deletes its own tree.
+- **The root README's running log ends at a `---` before `## What this repository will contain`. Append new entries before that separator**, and assert afterwards that the entry is the last dated line inside the log. **88 dated entries; banner at 2026-08-18.** **⚠️ Corrections propagate forward; do not "fix" an earlier entry.**
+- **Status lines in the selection document are a stack.** Draft N's line goes above Draft N−1's and ends "Draft N−1's own status line follows." **Retained lines keep their errors** — Draft 32's line still carries the withdrawn compression-direction claim, and `probe_rc008_spec.py` asserts that it does.
+- **Do not leave a background job running past the end of a session**, and delete temporary test directories before closeout. Every mutation harness deletes its own tree.
 - **A long archive read belongs in the background.**
-- **`RemoteFile` validates and retries range responses.** Counters `n_bytes` / `n_requests` — **total every read**. **A retry re-transfers a block.** **⚠️ ITS CACHE IS UNBOUNDED AND NEVER EVICTED** — which §19.9 turns into a hard requirement on the noise estimator, now for **three chunks per window**.
+- **`RemoteFile` validates and retries range responses.** Counters `n_bytes` / `n_requests` — **total every read**. **A retry re-transfers a block.** **⚠️ ITS CACHE IS UNBOUNDED AND NEVER EVICTED** — which §19.9 turns into a hard requirement on the noise estimator, for **three chunks per window**.
 - **Shared logic lives in `utils/` and is imported.** `host_anatomy.py`, `anatomy_index.py`, `remote_hdf5`, `dandi`, `template_metadata`, `ccf_labels`, `band_drift`, `archive_units`, `missing_depth`. **`read_series_timing` lives in `screen_host_timing.py`.**
-- **The runbook checker walks `scripts/` non-recursively.** **A script in `scripts/` without a step is a hard failure unless declared in `PENDING_STEP`**; **`PENDING_STEP` is empty.** **None of S43's, S44's or S45's tools is in the packet, so none needs a step.**
-- **Scripts must not print non-ASCII.** cp1252. **Check by capturing `--help`** — `measure_host_drift.py` **164**; `probe_rc007_round3.py` **46**; `probe_rc007_spec.py` **38**; `mutate_rc007_spec.py` **39**; `probe_rc008_spec.py` **10**; `mutate_rc008_spec.py` **10**; `probe_rc007_convergence.py` **11**; `mutate_rc007_convergence.py` **11**; `probe_filter_chain.py` **49**; `probe_raw_ap_layout.py` **39**; all 0 non-ASCII. **⚠️ A failure DETAIL string can carry non-ASCII even when the labels do not** — escape at the printer, not the call site.
-- **Line endings are pinned by `.gitattributes`, which sets `* -text`.** **`agents/Claude/README.md` is CRLF and must stay CRLF** (255/255 at S46 close); the root `README.md`, the packet README, the selection document, the Review Cards and all chat files are LF. **A pattern edit over a CRLF file must preserve `\r\n` in the match string**, and assert the ratio afterwards.
+- **The runbook checker walks `scripts/` non-recursively.** **A script in `scripts/` without a step is a hard failure unless declared in `PENDING_STEP`**; **`PENDING_STEP` is empty.** **None of S43–S47's tools is in the packet, so none needs a step.**
+- **Scripts must not print non-ASCII.** cp1252. **Check by capturing `--help`** — `measure_host_drift.py` **164**; `probe_rc008_spec.py`, `mutate_rc008_spec.py` and `probe_rc008_round2.py` **10 each**; `probe_rc007_round3.py` **46**; `probe_rc007_spec.py` **38**; `mutate_rc007_spec.py` **39**; `probe_rc007_convergence.py` and `mutate_rc007_convergence.py` **11 each**; `probe_filter_chain.py` **49**; `probe_raw_ap_layout.py` **39**; all 0 non-ASCII. **⚠️ A failure DETAIL string can carry non-ASCII even when the labels do not** — escape at the printer, not the call site.
+- **Line endings are pinned by `.gitattributes`, which sets `* -text`.** **`agents/Claude/README.md` is CRLF and must stay CRLF** (269/269 at S47 close); the root `README.md`, the packet README, the selection document, the Review Cards and all chat files are LF. **⚠️ Captured-stdout mutation records are CRLF by convention** — `mutate_rc008_spec_2026-08-18_draft33.txt` matches every earlier one. **A pattern edit over a CRLF file must preserve `\r\n` in the match string**, and assert the ratio afterwards.
 - **Both `.gitignore` files ignore `__pycache__/`.** **`Reproducibility Packet/results/` is NOT ignored.**
-- **`agents/Claude/tools/` holds twenty-four scripts and thirty-three recorded outputs.** `raw_ap_layout_*_2026-08-18.json`, `filter_chain_2026-08-18.json` and `rc007_round3_2026-08-18.json` are all cited by §19 and read by `probe_rc007_spec.py`. **The `_draft32` outputs are current; every earlier round's are kept.** **⚠️ `probe_rc007_spec.py` and `mutate_rc007_spec.py` BELONG TO A CLOSED CARD — do not extend either; `probe_rc008_spec.py` runs the first as a subprocess instead.**
-- **Read the parser before inventing a flag.** `probe_rc007_round3.py` requires `--out` and takes `--records --seeds`; `probe_filter_chain.py` requires `--repo-root --out` and takes `--records --margins --excursions`; `probe_raw_ap_layout.py` requires `--repo-root --session --probe --assets-cache --out` and takes `--records --band-channels --block-kb`; `probe_rc007_spec.py` requires only `--repo-root`; `mutate_rc007_spec.py`, `mutate_rc008_spec.py` and `mutate_rc007_convergence.py` require `--repo-root --work-root` and take `--python`; `probe_rc008_spec.py` requires `--repo-root` and takes `--out --records`; `probe_rc007_convergence.py` requires `--repo-root --out` and takes `--records`. Older probes: `test_band_drift.py` `--permutations`; `test_measure_host_drift.py` `--keep`/`--tmp-root`; `test_missing_depth.py` `--permutations`/`--completions`; the `verify_rc00*` and `probe_*` scripts require `--repo-root`.
+- **`agents/Claude/tools/` holds twenty-five scripts and thirty-seven recorded outputs**, counted rather than incremented. `raw_ap_layout_*_2026-08-18.json`, `filter_chain_2026-08-18.json` and `rc007_round3_2026-08-18.json` are all cited by §19 and read by `probe_rc007_spec.py`. **The `_draft33` outputs are current; every earlier round's are kept.** **⚠️ `probe_rc007_spec.py` and `mutate_rc007_spec.py` BELONG TO A CLOSED CARD — do not extend either; `probe_rc008_spec.py` authenticates and runs the first as a subprocess instead.**
+- **Read the parser before inventing a flag.** `probe_rc008_round2.py` requires `--repo-root --out` and takes `--records`; `probe_rc008_spec.py` requires `--repo-root` and takes `--out --records`; `mutate_rc008_spec.py`, `mutate_rc007_spec.py` and `mutate_rc007_convergence.py` require `--repo-root --work-root` and take `--python`; `probe_rc007_round3.py` requires `--out` and takes `--records --seeds`; `probe_filter_chain.py` requires `--repo-root --out` and takes `--records --margins --excursions`; `probe_raw_ap_layout.py` requires `--repo-root --session --probe --assets-cache --out` and takes `--records --band-channels --block-kb`; `probe_rc007_spec.py` requires only `--repo-root`; `probe_rc007_convergence.py` requires `--repo-root --out` and takes `--records`. Older probes: `test_band_drift.py` `--permutations`; `test_measure_host_drift.py` `--keep`/`--tmp-root`; `test_missing_depth.py` `--permutations`/`--completions`; the `verify_rc00*` and `probe_*` scripts require `--repo-root`.
 - **Git history is a verification tool.** `git show '<sha>:<path>'` recovers any prior exact state. **To prove a closed section of a growing document is byte-identical, hash the section body between two headings** — §19's checker does this for three spans at once.

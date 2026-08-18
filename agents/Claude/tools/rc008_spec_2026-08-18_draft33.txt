@@ -1,0 +1,199 @@
+
+1. The closed sections are still closed
+PASS  the document is LF throughout
+PASS  span ## 1.-> ## 17. byte-identical  [144664 bytes 700b3b9a]
+PASS  span ## 17.-> ## 18. byte-identical  [21864 bytes dc73b87f]
+PASS  span ## 18.-> ## 19. byte-identical  [20579 bytes 8af3e62c]
+
+2. The repair - the unconditional claim on the two operative surfaces
+PASS  19.5 carries the withdrawn wording exactly once  [found 1]
+PASS    ... and that one occurrence is inside the withdrawal sentence
+PASS  19.5 asserts the claim as withdrawn
+PASS  19.5 states the condition instead
+PASS  19.5 says a high null there changes the label and not the disposition
+PASS  19.5 attributes the asymmetry to 16.7 rather than inventing it
+PASS  19.5 records that the withdrawn claim was found by F7-R2
+PASS  19.10 no longer carries the unconditional bullet
+PASS  19.10 carries the conditioned bullet
+
+3. The repair - the two record surfaces, by the document's own conventions
+PASS  19.12 is marked as a record with one claim superseded by 19.13
+PASS  19.12's supersession names the condition
+PASS  19.12's interleaved-split follow-up is declared closed
+PASS  Draft 31's retained status line still carries its own claim, per the stack rule
+PASS  Draft 32's line sits above it and states the correction
+PASS  Draft 32's line names the four surfaces
+PASS  Draft 32's line ends by handing the stack to Draft 31
+PASS  Draft 33's line sits above Draft 32's
+PASS  Draft 33's line ends by handing the stack to Draft 32
+PASS  Draft 32's retained line still carries its withdrawn direction claim, per the stack rule
+
+4. The rule is written down where the branches are
+PASS  the asymmetry rule appears in exactly 4 places  [found 4]
+PASS    ... one of them is in 19.5
+PASS    ... one of them is in 19.6
+PASS    ... one of them is in 19.10
+PASS    ... one of them is in the status stack
+PASS  19.6 names the two places the null appears
+PASS  19.6 keeps all four ordered branches
+PASS  19.6's branch 4 is unchanged
+
+5. The split is settled, and Draft 33 withdraws its direction
+PASS  19.5 no longer defers the split
+PASS  19.5 still pins contiguous halves
+PASS  19.5 withdraws the compression claim rather than restating it
+PASS    ... and attributes the refutation to F3-R1
+PASS  19.5 reproduces the refutation on its own construction
+PASS  19.5 records both exact values, 1 and 4
+PASS  19.5 says interleaving EXPANDED the spread
+PASS  19.5 replaces the direction with three non-directional grounds
+PASS    ... ground 3 is that the decision rule cannot cash the goal
+PASS  19.5 declares the split rule a pinned parameter with no bound
+PASS  19.5 no longer claims a permissive direction for interleaving
+
+6. Section 19.13 records the change
+PASS  19.13 records: F7-R2
+PASS  19.13 records: Convergence Decision
+PASS  19.13 records: 39 checks, 0 failed
+PASS  19.13 records: 4 of 4 caught
+PASS  19.13 records: agree in all four cells
+PASS  19.13 records: does not change which host
+PASS  19.13 records: Nothing executable
+PASS  19.13 records the strongest argument against the repair taken
+
+7. Restatement census, recounted by region rather than assumed
+PASS  73.780 appears 7/2/2/2/0 times in 19.1-19.12 / 19.13 / 19.14 / the stack / sections 1-18  [found 7/2/2/2/0]
+PASS    ... and those five regions account for every occurrence  [13 regional vs 13 in the file]
+PASS  6,510 appears 6/1/1/2/0 times in 19.1-19.12 / 19.13 / 19.14 / the stack / sections 1-18  [found 6/1/1/2/0]
+PASS    ... and those five regions account for every occurrence  [10 regional vs 10 in the file]
+PASS  13,020 appears 15/1/1/4/0 times in 19.1-19.12 / 19.13 / 19.14 / the stack / sections 1-18  [found 15/1/1/4/0]
+PASS    ... and those five regions account for every occurrence  [21 regional vs 21 in the file]
+PASS  957,031,364 appears 2/2/1/3/0 times in 19.1-19.12 / 19.13 / 19.14 / the stack / sections 1-18  [found 2/2/1/3/0]
+PASS    ... and those five regions account for every occurrence  [8 regional vs 8 in the file]
+PASS  500 samples appears 6/0/1/4/0 times in 19.1-19.12 / 19.13 / 19.14 / the stack / sections 1-18  [found 6/0/1/4/0]
+PASS    ... and those five regions account for every occurrence  [11 regional vs 11 in the file]
+PASS  14,020 appears 5/0/0/1/0 times in 19.1-19.12 / 19.13 / 19.14 / the stack / sections 1-18  [found 5/0/0/1/0]
+PASS    ... and those five regions account for every occurrence  [6 regional vs 6 in the file]
+PASS  2.34375 appears 2/0/1/1/0 times in 19.1-19.12 / 19.13 / 19.14 / the stack / sections 1-18  [found 2/0/1/1/0]
+PASS    ... and those five regions account for every occurrence  [4 regional vs 4 in the file]
+PASS  9,999 appears 4/0/0/0/1 times in 19.1-19.12 / 19.13 / 19.14 / the stack / sections 1-18  [found 4/0/0/0/1]
+PASS    ... and those five regions account for every occurrence  [5 regional vs 5 in the file]
+
+8. The closed card's checker as a regression baseline
+PASS  F4-R1: the baseline is authenticated BEFORE it is run  [5 files pinned by digest]
+PASS  authenticated: probe_rc007_spec.py  [ef37577e27116167]
+PASS  authenticated: raw_ap_layout_CSHL047_Probe01_2026-08-18.txt  [f992c394480eef57]
+PASS  authenticated: raw_ap_layout_CSHL047_Probe01_2026-08-18.json  [4896a14f46454188]
+PASS  authenticated: filter_chain_2026-08-18.json  [b9f3e089e2b94e2d]
+PASS  authenticated: rc007_round3_2026-08-18.json  [51e762669c53a57c]
+PASS  every file the baseline reads is the pinned one
+PASS  the baseline exits nonzero, as a red run must  [exit 1]
+PASS  the baseline wrote nothing to stderr  [clean]
+PASS  the RC-007 checker still runs to completion  [288 checks, 16 failed]
+PASS  it still runs 288 checks  [288 checks, 16 failed]
+PASS  exactly 16 checks went red  [16 red]
+PASS  expected red: section states R_null is one-sided
+PASS  expected red: section states the refused interleaved split
+PASS  expected red: section restates 73.780 exactly 7 times
+PASS  expected red: section restates 6,510 exactly 6 times
+PASS  expected red: section restates 13,020 exactly 14 times
+PASS  expected red: section restates 957,031,364 exactly 2 times
+PASS  expected red: section prices the refused cheaper arrangement
+PASS  expected red: section names the identity it now claims
+PASS  expected red: section carries the admissible band
+PASS  expected red: section carries the pass rule's own band
+PASS  expected red: section states the section has been reviewed twice
+PASS  expected red: section states the three-round limit
+PASS  expected red: section restates 500 samples exactly 5 times
+PASS  expected red: section restates 14,020 exactly 4 times
+PASS  expected red: section restates 9,999 exactly 3 times
+PASS  expected red: section restates 2.34375 exactly 2 times
+PASS  no unexpected check went red  [none]
+
+9. F1-R1  the floor reads its own extremum
+PASS  19.4 defines sigma_quietest_sampled
+PASS  19.4 records that a maximum cannot enforce a floor
+PASS  19.4 reproduces the fixture rather than citing it
+PASS  19.4 names the anti-saturation number the fixture violates
+PASS  19.6's branch 2 reads the quietest window
+PASS  19.6's branch 2 no longer reads the loudest
+PASS  19.6's admissible band splits the two ends
+PASS  19.6's pass rule splits them too
+PASS  the old one-statistic band is gone from 19.6
+PASS  19.6's table routes each threshold to its statistic
+PASS  19.7 publishes both extrema
+PASS  19.8 re-derives its three ratios on the right extremum
+PASS  19.8 records that Draft 32 used one denominator for all of them
+
+10. F2-R1  the design rate is a declared deviation
+PASS  19.3 narrows the identity claim
+PASS  19.3 declares the deviation rather than hedging it
+PASS  19.3 accepts the finding by name
+PASS  19.3 gives the reason the other repair is refused
+PASS    ... including the two disagreeing derivations
+PASS    ... and the paused ranks
+PASS  19.3 states what the deviation does NOT touch, computed
+PASS  19.3 states what it does touch, with the coefficient figure
+PASS  19.3 refuses to promote the fixture figures into a bound
+PASS  19.3 counts three deviations now
+PASS  19.7 publishes both rates so the deviation is auditable
+
+11. F5-R1  the bad-channel conservatism claim is withdrawn
+PASS  19.3 withdraws it by name
+PASS  19.3 reproduces the counterexample
+PASS  19.3 states the direction is unknown, not conservative
+PASS  19.3 names the counterfactual that makes it unknowable
+PASS  19.3 no longer claims the check is conservative there
+PASS  19.3 replaces the claim with a published record
+PASS  19.7 actually publishes per-channel values for every window
+
+12. The four tracked items
+PASS  T1: 19.9 separates coverage from dilution
+PASS  T1: the clustered arrangement's coverage number is stated
+PASS  T1: the dilution number is stated
+PASS  T1: the stale 223 s figure is corrected and the correction said
+PASS  T2: 19.10's stale Draft-31 sentence is gone
+PASS  T2: 19.10 states the current state instead
+PASS  T2: 19.10 names the clause-5 successor
+PASS  T3: the code-step terminology is in 19.2
+PASS  T3: no 'stored bit' survives outside the record subsections
+PASS  T4: 19.3 narrows the phase direction to one model
+PASS  T4: 19.3 says where the direction stops
+PASS  T4: 19.3 claims no direction for the spatial statistic
+PASS  T4: 19.6 carries the narrowed form
+
+13. Section 19.14 records the round, and 19.13 is superseded
+PASS  19.14 records: F1-R1
+PASS  19.14 records: F2-R1
+PASS  19.14 records: F3-R1
+PASS  19.14 records: F4-R1
+PASS  19.14 records: F5-R1
+PASS  19.14 records: T1-R1
+PASS  19.14 records: T2-R1
+PASS  19.14 records: T3-R1
+PASS  19.14 records: T4-R1
+PASS  19.14 records: All nine are accepted
+PASS  19.14 records: No threshold value moved
+PASS  19.14 records: 228.718 s
+PASS  19.14 records: no host is pinned
+PASS  19.14 names the F4-R1 defect as the owner's
+PASS  19.14 states the F2-R1 repair is the weaker-looking one
+PASS  19.14 states the split's three grounds carry no direction
+PASS  19.14 states the withdrawal without restating the claim as live
+PASS  19.13 carries a supersession note in 19.11's own style
+PASS  19.13's supersession names the withdrawn direction
+PASS  19.13 is otherwise unedited: it still records the F7-R2 repair
+
+14. The Round-2 evidence probe's record
+PASS  the Round-2 evidence record exists
+PASS  it ran clean  [36 checks, 0 failed]
+PASS  F1's fixture is the one 19.4 describes
+PASS  F2's coefficient delta is the figure 19.3 publishes
+PASS  F2's margin is 500 at every rate in the record
+PASS  F3's two values are the ones 19.5 publishes
+PASS  F5's two values are the ones 19.3 publishes
+PASS  T1's guarantees are the ones 19.9 publishes
+PASS  T1's dilution figures are the ones 19.9 publishes
+
+Summary
+168 checks, 0 failed

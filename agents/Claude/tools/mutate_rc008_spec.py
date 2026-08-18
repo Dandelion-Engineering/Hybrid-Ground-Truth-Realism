@@ -35,6 +35,7 @@ CARRIED = [
     os.path.join(TOOLS, "raw_ap_layout_CSHL047_Probe01_2026-08-18.txt"),
     os.path.join(TOOLS, "filter_chain_2026-08-18.json"),
     os.path.join(TOOLS, "rc007_round3_2026-08-18.json"),
+    os.path.join(TOOLS, "rc008_round2_2026-08-18.json"),
     os.path.join("Reproducibility Packet", "results", "host_timing_index.jsonl"),
 ]
 
@@ -61,14 +62,61 @@ MUTATIONS = [
      "its claims superseded by §19.13:",
      "**This subsection records Draft 31 and is left as written:"),
     ("unsettle the split decision",
-     "the answer is **contiguous halves**",
-     "the answer is not taken in this draft"),
-    ("drop the direction of the refused alternative",
-     "register, in the **permissive** direction, on the one side",
-     "register, in some direction, on the one side"),
-    ("hide that the split argument is unmeasured",
-     "**This argument is structural and unmeasured**",
-     "**This argument is settled**"),
+     "**The split is contiguous, and the reason Draft 32 gave for it is "
+     "withdrawn.**",
+     "**The split is deferred again.**"),
+    ("restore the withdrawn compression direction",
+     "**Interleaving expanded the spread, and expanded it from inside the "
+     "strict tolerance to outside it.**",
+     "**Interleaving compressed the spread, as Draft 32 said it would.**"),
+    ("re-claim a direction for the split rule",
+     "§19.5 now keeps contiguous halves on three grounds and none of them "
+     "is a direction",
+     "§19.5 now keeps contiguous halves on the direction it always had"),
+    # -- Draft 33's own repairs ------------------------------------------
+    ("revert branch 2 to the loudest window",
+     "2. **Level, too quiet.** `sigma_quietest_sampled < 1.25 µV`",
+     "2. **Level, too quiet.** `sigma_worst_sampled < 1.25 µV`"),
+    ("delete the quietest-window quantity from 19.4",
+     "   - **`sigma_quietest_sampled = min_{k ∈ G} S(k)`** — the "
+     "quietest sampled window's band level, in µV;\n",
+     ""),
+    ("revert 19.6's admissible band to one statistic",
+     "So the admissible band is **`sigma_worst_sampled ≤ N`** together "
+     "with **`1.25 µV ≤ sigma_quietest_sampled`**",
+     "So the admissible band is **`1.25 µV ≤ sigma_worst_sampled "
+     "≤ N`**"),
+    ("revert 19.8's ratio to the wrong denominator",
+     "`snr_p2p_max = A_max / sigma_quietest_sampled`",
+     "`snr_p2p_max = A_max / sigma_worst_sampled`"),
+    ("re-widen the identity claim in 19.3",
+     "`FilterRecording.get_traces` for a chunk of 13,020 samples in every "
+     "respect but the filter's design rate**",
+     "`FilterRecording.get_traces` for a chunk of 13,020 samples**"),
+    ("drop the padlen/margin invariance from 19.3",
+     "scipy's default `padlen` is **18** at both rates",
+     "scipy's default `padlen` is unchanged"),
+    ("restore the bad-channel conservatism claim",
+     "the direction every draft through 32 claimed for that is withdrawn.**",
+     "and the spatial check is conservative in the presence of them.**"),
+    ("break the corrected coverage figure in 19.9",
+     "the guarantee is **228.718 s**",
+     "the guarantee is **223 s**"),
+    ("restore 19.10's stale Draft-31 sentence",
+     "**RC-008's Round 1 returned `Revisions Required` on five blocking "
+     "findings and four tracked items; Draft 33 is the owner's Round-2 "
+     "response and it is unreviewed**",
+     "**This Draft 31 state is not approved by anyone yet**"),
+    ("revert the code-step terminology",
+     "**One stored code step is 2.34375 µV.**",
+     "**One stored bit is 2.34375 µV.**"),
+    ("re-widen the phase-omission direction",
+     "**No direction at all is claimed for `R_space_sampled`.**",
+     "The same direction holds for `R_space_sampled`."),
+    ("remove 19.13's supersession note",
+     "**This subsection records Draft 32 and is left as written, with one of "
+     "its claims superseded by §19.14:",
+     "**This subsection records Draft 32 and is left as written:"),
     ("break 19.6's branch 4",
      "4. **Resolution.** `R_space_sampled ≤ M` and `R_null_sampled > M` "
      "→ **unmeasurable**",
@@ -86,13 +134,63 @@ MUTATIONS = [
 ]
 
 
-def stage(case_root, repo_root, doc_text):
+# RC-008 F4-R1: the wrapper trusted a subprocess by filename. These mutations
+# leave the document untouched and damage the INSTRUMENT instead, which is the
+# axis the reviewer's staged counterfeit exploited and which no document
+# mutation can reach.
+COUNTERFEIT = '''"""A counterfeit legacy checker that prints what the wrapper wants to see."""
+import sys
+
+EXPECTED = %r
+
+for name in EXPECTED:
+    print("[FAIL] %%s" %% name)
+print("288 checks, %%d failed" %% len(EXPECTED))
+sys.exit(0)
+'''
+
+
+def expected_failures(repo_root):
+    """Return the wrapper's own expected-failure list, read from its source."""
+    text = io.open(os.path.join(repo_root, PROBE), encoding="utf-8").read()
+    start = text.index("EXPECTED_RC007_FAILURES = [")
+    end = text.index("]", start)
+    names = []
+    for line in text[start:end].splitlines()[1:]:
+        line = line.strip()
+        if line.startswith('"'):
+            names.append(line.split('"')[1])
+    return names
+
+
+def file_mutations(repo_root):
+    """Return (name, relative path, replacement bytes) instrument mutations."""
+    legacy = os.path.join(TOOLS, "probe_rc007_spec.py")
+    record = os.path.join(TOOLS, "filter_chain_2026-08-18.json")
+    original_record = io.open(os.path.join(repo_root, record),
+                              encoding="utf-8").read()
+    return [
+        ("substitute a counterfeit legacy checker", legacy,
+         COUNTERFEIT % (expected_failures(repo_root),)),
+        ("change one byte of the legacy checker", legacy,
+         io.open(os.path.join(repo_root, legacy), encoding="utf-8").read()
+         + "\n# an undeclared executable change\n"),
+        ("tamper with one carried record", record,
+         original_record.replace("\n", "\n", 1) + " "),
+    ]
+
+
+def stage(case_root, repo_root, doc_text, overrides=None):
+    overrides = overrides or {}
     for rel in [DOC, PROBE] + CARRIED:
         target = os.path.join(case_root, rel)
         parent = os.path.dirname(target)
         if not os.path.isdir(parent):
             os.makedirs(parent)
-        if rel == DOC:
+        if rel in overrides:
+            io.open(target, "w", encoding="utf-8",
+                    newline="").write(overrides[rel])
+        elif rel == DOC:
             io.open(target, "w", encoding="utf-8", newline="").write(doc_text)
         else:
             shutil.copy(os.path.join(repo_root, rel), target)
@@ -118,6 +216,7 @@ def main(argv=None):
 
     caught = 0
     stale = 0
+    total = len(MUTATIONS)
     problems = []
     try:
         control = os.path.join(work, "control")
@@ -154,14 +253,31 @@ def main(argv=None):
             else:
                 problems.append("%s: not caught" % name)
 
+        instrument = file_mutations(repo_root)
+        for index, (name, rel, replacement) in enumerate(instrument):
+            case = os.path.join(work, "f%d" % index)
+            stage(case, repo_root, original, {rel: replacement})
+            result = subprocess.run(
+                [python, os.path.join(case, PROBE), "--repo-root", case],
+                capture_output=True, text=True)
+            reds = [line for line in result.stdout.splitlines()
+                    if line.startswith("FAIL")]
+            ok = result.returncode != 0 and bool(reds)
+            print("%-52s caught=%-5s red=%d" % (name, ok, len(reds)))
+            if ok:
+                caught += 1
+            else:
+                problems.append("%s: not caught" % name)
+
+        total = len(MUTATIONS) + len(instrument)
         print("")
-        print("%d of %d mutations caught" % (caught, len(MUTATIONS)))
+        print("%d of %d mutations caught" % (caught, total))
         for problem in problems:
             print("PROBLEM: %s" % problem)
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
-    return 0 if caught == len(MUTATIONS) and not problems and not stale else 1
+    return 0 if caught == total and not problems and not stale else 1
 
 
 if __name__ == "__main__":
