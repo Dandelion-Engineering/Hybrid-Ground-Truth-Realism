@@ -1,0 +1,101 @@
+[ok  ] sections 1-16 byte count 144664
+[ok  ] sections 1-16 digest
+[ok  ] section 17 byte count 21864
+[ok  ] section 17 digest
+[ok  ] section 18 byte count 20579
+[ok  ] section 18 digest
+[ok  ] section 19 present
+[ok  ] document is LF only
+[ok  ] draft 29 status line present
+[ok  ] layout dtype int16
+[ok  ] layout gzip level 4
+[ok  ] layout no shuffle
+[ok  ] layout chunk spans all channels
+[ok  ] layout channel_conversion absent
+[ok  ] layout offset is zero
+[ok  ] layout unit is volts
+[ok  ] report says no sample was read
+[ok  ] layout table row for shape
+[ok  ] layout table row for dtype
+[ok  ] layout table row for logical size
+[ok  ] layout table row for stored size
+[ok  ] layout table row for chunk shape
+[ok  ] layout table row for conversion
+[ok  ] LSB microvolts 2.34375
+[ok  ] section quotes the LSB
+[ok  ] quantization sd 0.677
+[ok  ] section quotes the quantization sd
+[ok  ] MAD half-bit granularity 1.74
+[ok  ] section quotes the granularity
+[ok  ] chunk seconds 0.434
+[ok  ] section quotes the chunk length
+[ok  ] full chunks 9999
+[ok  ] partial samples 1020
+[ok  ] section quotes the full-chunk count
+[ok  ] section quotes the partial remainder
+[ok  ] compression ratio 0.53172
+[ok  ] section quotes the ratio
+[ok  ] chunk uncompressed 9,999,360
+[ok  ] section quotes the uncompressed chunk
+[ok  ] projected stored per chunk 5,316,841
+[ok  ] section quotes the per-chunk projection
+[ok  ] projected run 319,010,455
+[ok  ] section quotes the run projection
+[ok  ] section calls the run figure a projection
+[ok  ] float64 window 39,997,440
+[ok  ] section quotes the float64 window
+[ok  ] coverage seconds 26.04
+[ok  ] section quotes the coverage
+[ok  ] spacing seconds 72.3
+[ok  ] section quotes the spacing
+[ok  ] retained samples 12,720
+[ok  ] half window 6,360
+[ok  ] section quotes the retained count
+[ok  ] section quotes the half window
+[ok  ] edge discard is 5 ms
+[ok  ] relative standard error 1.46 percent
+[ok  ] section quotes the relative standard error
+[ok  ] section says the samples are not independent
+[ok  ] strict level tolerance 10.0
+[ok  ] relaxed level tolerance 25.0
+[ok  ] strict spatial tolerance 2.0
+[ok  ] declared floor 1.25
+[ok  ] condition 2 is implied by condition 1
+[ok  ] implied factor is 20
+[ok  ] section carries strict level, as a bound on sigma
+[ok  ] section carries implied grading condition, as a bound on sigma
+[ok  ] section carries declared floor, as a bound on sigma
+[ok  ] section carries the admissible band
+[ok  ] section carries the level ladder
+[ok  ] section carries the spatial derivation
+[ok  ] section carries the relaxed spatial rung
+[ok  ] section states condition 2 is implied
+[ok  ] section states the relaxed spatial rung is the full span
+[ok  ] section states one relaxed pass, not two
+[ok  ] section quotes the MAD scale constant
+[ok  ] section names the probe noise specification
+[ok  ] section says no estimator was written
+[ok  ] section says no candidate noise value is known
+[ok  ] section states the necessary-not-sufficient posture
+[ok  ] section declares the saturation ceiling as judgement
+[ok  ] section names the phase-shift omission and its direction
+[ok  ] section names the unbounded reader cache
+[ok  ] section supersedes one clause of 15.5 item 3
+[ok  ] section states four gates rather than five
+[ok  ] section refuses the native-amplitude gate
+[ok  ] section says the audit values are never consumed
+[ok  ] section says R_null is silent on bias
+[ok  ] section says it has not been reviewed
+[ok  ] status quotes the strict level tolerance
+[ok  ] section says both multipliers are the source's own
+[ok  ] status quotes the relaxed level tolerance
+[ok  ] status quotes the strict spatial tolerance
+[ok  ] status quotes the chunk shape
+[ok  ] status quotes the LSB
+[ok  ] status quotes the chunk length in seconds
+[ok  ] status states the four-gate supersession
+[ok  ] status says no estimator code was written
+[ok  ] status says no noise value was measured
+[ok  ] status says no host is pinned
+
+99 checks, 0 failed

@@ -1,0 +1,14 @@
+[control ] exit 0, 0 checks failed -- expected 0 and 0
+[caught  ] layout figure: chunk shape in the table -- 1 checks failed
+[caught  ] derived projection: whole run transfer -- 1 checks failed
+[caught  ] threshold in the status line: strict level tolerance -- 1 checks failed
+[caught  ] threshold in the section body: strict spatial tolerance -- 1 checks failed
+[caught  ] boundary: the necessary-not-sufficient posture -- 1 checks failed
+[caught  ] boundary in the section body: the four-gates supersession -- 1 checks failed
+[caught  ] boundary in the status line: the four-gates supersession -- 1 checks failed
+[caught  ] frozen span: section 18 body -- 2 checks failed
+[caught  ] record: the recorded offset -- 1 checks failed
+[caught  ] record: the recorded compression level -- 1 checks failed
+[caught  ] report: the no-samples-read statement -- 1 checks failed
+
+11 of 11 mutations caught, 0 failures

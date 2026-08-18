@@ -501,6 +501,184 @@ Claude Session 35.
 
 ---
 
+### The anchor pipeline's own preprocessing chain, read this session
+
+**What it covers.** The four transformations the anchor pipeline applies before
+sorting, read from the *eLife* 110170 article page on 2026-08-18: a phase-shift
+correction for the multiplexed converters; a high-pass filter, "by default, a
+high-pass filter with a cutoff frequency of 300 Hz is applied to preserve
+high-frequency information in spike waveforms"; a denoising step that masks
+noisy or dead channels and then applies either a common median reference or a
+spatial high-pass, where "by default, CMR is used, since destriping can create
+artifacts in spike waveforms"; and DREDge motion estimation, estimated but not
+applied by default. The same page restates the hybrid generation this project
+already had on the record — ten units, Poisson, 15 Hz mean rate, rescaled to a
+user-defined range with 50–200 µV as the example.
+
+**How it informed the work.** §19.3 of the Tier A selection document pins the
+noise gate's preprocessing chain *to this chain*, minus the two steps it cannot
+honestly reproduce, rather than inventing a chain of its own. The 300 Hz cutoff
+and the global median reference are taken from here; the phase-shift omission
+and the bad-channel-masking omission are declared against it, each with the
+direction of its effect stated. Without this the gate would have been measuring
+a signal nobody else measures.
+
+*Boundary.* Read from the article page, not from the pipeline source. What the
+implementation does at a given commit is a separate question this entry does not
+answer, and §19.3 does not claim its chain equals the pipeline's — only that its
+steps are the pipeline's steps.
+
+*Link:* [elifesciences.org/articles/110170](https://elifesciences.org/articles/110170)
+
+*Citation:* as the `[ANCHOR]` entry above. Read again for this purpose on
+2026-08-18, Claude Session 43.
+
+---
+
+### SpikeForest's SNR definition, and the two thresholds it states
+
+**What it covers.** Read from the *eLife* 55167 article page on 2026-08-18. The
+paper defines SNR as "the ratio between the peak absolute amplitude of this
+average spike waveform and the estimated noise on the channel where this peak
+amplitude occurs," with noise estimated as the median absolute deviation divided
+by 0.6745. It includes ground-truth units in its headline accuracy averages only
+above an adjustable threshold "here set to 8," and reports a secondary analysis
+over units with SNR ≥ 5. It also states that the accuracy/SNR relationship is
+**sorter-dependent** — for IronClust "the SNR and log ISI-vr are predictive of
+accuracy," while for KiloSort2 and MountainSort4 firing rate is the only
+predictive metric, and KiloSort2 "can retain high accuracy down to lower SNR
+than other sorters, but not for all such low-SNR units."
+
+**How it informed the work.** Three separate things in §19. First, the scale
+estimator: the MAD-over-0.6745 convention is this source's, not this project's,
+and §19.3 pins the exact normal quantile `0.6744897501960817` while naming the
+`1.5e-5` relative difference from the paper's rounded figure. Second, both rungs
+of the level-tolerance ladder: `A_min/5 = 10.0 µV` strict and `A_max/8 =
+25.0 µV` relaxed use **5 and 8, this source's own two numbers**, applied to the
+two ends of the pinned amplitude range, so no multiplier in the derivation is
+this project's. An earlier draft of §19 used a four-sigma detection scale that
+this session could not verify from a primary source; it was replaced rather than
+kept and labelled. Third, the *absence* of a saturation number: the
+sorter-dependence finding is precisely why no published figure pins where
+accuracy saturates, which is why §19.6's `snr_p2p = 40` ceiling is declared as
+judgement and §19.10 says so.
+
+**The convention boundary this source creates, and how §19 handles it.** Its SNR
+is a **single-sided peak** over the noise estimate. This project's injection
+target is a **peak-to-peak** span (§11.1). The extremum is at most the
+peak-to-peak span with no fixed ratio, so applying its thresholds to a
+peak-to-peak quantity is the *weaker* requirement, and §19.6 therefore states
+every bound as a necessary and not a sufficient condition. **No conversion
+between the two conventions is performed anywhere**, which is the §11.2 rule
+applied to a new pair of quantities.
+
+*Link:* [elifesciences.org/articles/55167](https://elifesciences.org/articles/55167)
+
+*Citation:* as the Magland et al. entry above. Read for this purpose on
+2026-08-18, Claude Session 43.
+
+---
+
+### SpikeInterface's `snr` quality metric — the amplitude convention, from the documentation
+
+**What it covers.** The stable documentation page for the `snr` quality metric,
+read 2026-08-18. `SNR = A_µs / σ_b`, where the amplitude is "the amplitude of
+the largest peak (positive or negative) of the median waveform on the best
+channel" and the noise is "the median absolute deviation of the signal on the
+best channel, which is a robust estimator of the standard deviation of the
+noise," at the normal scale factor. The page attributes the metric to Lemon and
+Jackson and the implementation to the AllenSDK.
+
+**How it informed the work.** It is the second, independent confirmation that
+the field's SNR is a **single-sided extremum** over a MAD-derived σ, which is
+what makes §19.6's refusal to convert conventions a rule rather than a
+precaution. One source stating a convention is a convention; two sources
+stating the same one is the convention the reader will assume, which is exactly
+why a peak-to-peak quantity carrying the same word would be a §11.1-family
+error.
+
+*Boundary.* Documentation for the current stable release, not the pinned version
+this project will eventually install. The convention is stable across releases
+as far as this page shows; the exact scale constant should be re-read against the
+installed version when the stack goes in.
+
+*Link:* [spikeinterface.readthedocs.io/en/stable/modules/metrics/qualitymetrics/snr.html](https://spikeinterface.readthedocs.io/en/stable/modules/metrics/qualitymetrics/snr.html)
+
+*Citation:* SpikeInterface developers, *Signal-to-noise ratio (snr)*,
+SpikeInterface documentation, stable release. Accessed 2026-08-18, Claude
+Session 43. The framework paper is the Buccino et al. 2020 entry above.
+
+---
+
+### Neuropixels 1.0's AP-band noise and converter resolution, read this session
+
+**What it covers.** Read from the PubMed Central copy of Jun et al. 2017 on
+2026-08-18: AP-band input-referred noise of **5.1 ± 0.6 µV RMS** for the
+switchable configuration and **5.7 ± 0.8 µV RMS** for the passive one; the AP
+band defined as 0.3–10 kHz; selectable gain from 50× to 2500×; and **10-bit
+analog-to-digital converters**, chosen "to minimize base area and power
+consumption."
+
+**How it informed the work.** Two things in §19, both structural. First, the
+converter resolution explains the `conversion` attribute this project measured
+independently on the raw asset — **2.34375 µV per stored bit** — and the two
+together make the quantization argument in §19.2: a MAD estimate computed on the
+stored integers would be granular to about **1.74 µV** on a quantity whose whole
+plausible range is roughly 5 to 15 µV, which is why §19.3 takes the estimate
+*after* the pinned chain and not before it. Without the published noise figure,
+"two to three bits" would have been a guess rather than a number. Second, the
+5.1–5.7 µV figures are what let §19.6 state that its declared lower bound of
+1.25 µV is not expected to bind, and say so with a source rather than an
+intuition.
+
+*Boundary.* These are the probe paper's own characterization figures, measured
+under its conditions, and they are not a prediction of what an in-vivo IBL
+recording will report after this project's declared preprocessing. §19 uses them
+for scale and for the quantization argument, and gates on neither.
+
+*Link:* [pmc.ncbi.nlm.nih.gov/articles/PMC5955206/](https://pmc.ncbi.nlm.nih.gov/articles/PMC5955206/)
+
+*Citation:* as the Jun et al. 2017 entry above. Read for this purpose on
+2026-08-18, Claude Session 43.
+
+---
+
+### The raw AP stream's storage layout (this project's own result)
+
+**What it covers.** `agents/Claude/tools/probe_raw_ap_layout.py` reads one raw
+AP `ElectricalSeries` object header and its scaling attributes and never slices
+the sample array. On rank 1's raw asset `d54fbf42-bb56-462c-b63a-36b9911753ec`,
+series `ElectricalSeriesProbe01AP`: 130,188,000 samples × 384 channels, `int16`,
+**gzip level 4**, chunk shape **13,020 × 384**, logical 99,984,384,000 bytes,
+stored 53,163,508,785 bytes, `conversion` 2.34375e-06, `offset` 0.0, unit
+`volts`, and **no `channel_conversion` table**. The run cost 192 range requests
+and 12,582,912 bytes. Recorded at
+`agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.{txt,json}`.
+
+**How it informed the work.** It decided three things in §19 that would
+otherwise have been assumptions. The chunk spans **every** channel, so reading
+the 72-channel injection band costs exactly what reading all 384 costs — which
+is why the common median reference is computed over the whole probe, at no
+transfer cost, and why that choice needed noting rather than defending. Time is
+addressable only at 0.434 s, so the sampling window is one chunk rather than a
+duration someone preferred. And the compression ratio, 0.53172, is what turns
+`K = 60` windows into the §19.9 transfer projection of 319,010,455 bytes — a
+**projection from a whole-file average**, explicitly not a measurement of any
+chunk, since no chunk of this dataset has been transferred.
+
+*Boundary.* One asset. Chunk shape, compression, `conversion` and the absence of
+`channel_conversion` are properties of rank 1's raw file, not of DANDI 000409,
+and §19.6 makes each of them a required confirmation on any other candidate
+rather than an inherited fact.
+
+*Link:* the asset is addressed through the tracked listing
+`Reproducibility Packet/results/dandi_000409_assets.json`; the dataset is
+[DANDI 000409](https://dandiarchive.org/dandiset/000409), CC-BY-4.0.
+
+*Citation:* this project's own measurement, Claude Session 43, 2026-08-18.
+
+---
+
 ## Pending — sources identified but not yet verified
 
 These are named in `Literature Foundation.md` §5.4 and are **not** citable until an entry appears above.

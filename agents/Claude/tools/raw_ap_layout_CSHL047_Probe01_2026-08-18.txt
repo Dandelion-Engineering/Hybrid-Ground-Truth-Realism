@@ -1,0 +1,33 @@
+Raw AP storage layout -- metadata only, no samples read
+==============================================================
+session      : b52182e7-39f6-4914-9717-136db589706e
+probe        : Probe01
+raw asset    : sub-CSHL047/sub-CSHL047_ses-b52182e7-39f6-4914-9717-136db589706e_desc-raw_ecephys.nwb
+series       : ElectricalSeriesProbe01AP
+
+shape        : 130188000 samples x 384 channels
+dtype        : int16 (2 bytes/sample)
+logical size : 99984384000 bytes
+stored size  : 53163508785 bytes
+chunks       : [13020, 384]
+filters      : compression=gzip opts=4 shuffle=False fletcher32=False scaleoffset=None
+
+scaling attributes
+  conversion  : 2.34375e-06
+  offset      : 0.0
+  resolution  : -1.0
+  unit        : volts
+  channel_conversion: absent
+
+transfer plan per contiguous window
+   1.0 s -> 30000 samples, 72 band channels, layout chunked
+           chunk [13020, 384] = 9999360 B; touches 4 x 1 chunks
+           stored bytes 39997440 (worst-case straddle in both axes, uncompressed chunk size)
+   5.0 s -> 150000 samples, 72 band channels, layout chunked
+           chunk [13020, 384] = 9999360 B; touches 13 x 1 chunks
+           stored bytes 129991680 (worst-case straddle in both axes, uncompressed chunk size)
+
+io           : 192 requests, 12582912 bytes
+
+This probe reads dataset descriptions and the channel gain table only.
+No sample value was read, so no gate quantity is disclosed by it.

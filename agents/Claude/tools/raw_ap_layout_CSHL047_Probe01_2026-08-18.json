@@ -1,0 +1,71 @@
+{
+ "channel_conversion": null,
+ "chunks": [
+  13020,
+  384
+ ],
+ "dtype": "int16",
+ "filters": {
+  "compression": "gzip",
+  "compression_opts": 4,
+  "fletcher32": false,
+  "scaleoffset": null,
+  "shuffle": false
+ },
+ "io": {
+  "bytes": 12582912,
+  "requests": 192
+ },
+ "itemsize": 2,
+ "logical_bytes": 99984384000,
+ "plan_rate_hz": 30000.0,
+ "plans": [
+  {
+   "band_channels": 72,
+   "basis": "worst-case straddle in both axes, uncompressed chunk size",
+   "chunk_shape": [
+    13020,
+    384
+   ],
+   "chunk_stored_bytes": 9999360,
+   "chunks_channel": 1,
+   "chunks_time": 4,
+   "layout": "chunked",
+   "stored_bytes": 39997440,
+   "window_s": 1.0,
+   "window_samples": 30000
+  },
+  {
+   "band_channels": 72,
+   "basis": "worst-case straddle in both axes, uncompressed chunk size",
+   "chunk_shape": [
+    13020,
+    384
+   ],
+   "chunk_stored_bytes": 9999360,
+   "chunks_channel": 1,
+   "chunks_time": 13,
+   "layout": "chunked",
+   "stored_bytes": 129991680,
+   "window_s": 5.0,
+   "window_samples": 150000
+  }
+ ],
+ "probe": "Probe01",
+ "raw_asset_id": "d54fbf42-bb56-462c-b63a-36b9911753ec",
+ "raw_path": "sub-CSHL047/sub-CSHL047_ses-b52182e7-39f6-4914-9717-136db589706e_desc-raw_ecephys.nwb",
+ "scaling": {
+  "conversion": 2.34375e-06,
+  "offset": 0.0,
+  "resolution": -1.0,
+  "unit": "volts"
+ },
+ "series_name": "ElectricalSeriesProbe01AP",
+ "session": "b52182e7-39f6-4914-9717-136db589706e",
+ "shape": [
+  130188000,
+  384
+ ],
+ "stored_size_bytes": 53163508785,
+ "timing_source": "timestamps"
+}
