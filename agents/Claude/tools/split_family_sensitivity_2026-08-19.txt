@@ -1,0 +1,24 @@
+
+1. The sweep is well posed
+PASS  the family has 32 members  [p = 1 ... 6510]
+PASS  all 1,024 member-against-fixture values are finite  [0 non-finite of 1,024]
+PASS  R_space_sampled stays inside strict M on every fixture  [R_space in 1.000000 ... 1.666667, so branch 4 is what decides]
+
+2. Every member is the wrong choice on some data
+PASS  every member withholds on the fixture at its own block length  [32 of 32 members]
+PASS  no member passes every fixture  [0 members never withhold]
+PASS  and no member withholds on every fixture  [0 members always withhold]
+PASS  so no member is uniformly cautious and none is uniformly permissive  [the family has no dominating member]
+
+3. How lonely a pinned choice can be
+PASS  on at least one fixture exactly one member withholds  [fixtures with a single withholding member: [2]]
+PASS  on that fixture the other 31 members all pass  [a pin can be the only rule that sees the structure]
+PASS  the two rules RC-008 argued about disagree on the p_t = 1 fixture  [p=1 withholds, p=6,510 passes]
+PASS  and they disagree the OTHER way on the p_t = 6,510 fixture  [p=6,510 withholds, p=1 passes]
+
+4. The boundary on all of the above
+PASS  every fixture was evaluated against all 32 members  [32 fixtures x 32 members, none skipped]
+NOTE  32 constructed fixtures, each built to be visible to one member; no claim is made here about real data
+
+Summary
+12 checks, 0 failed
