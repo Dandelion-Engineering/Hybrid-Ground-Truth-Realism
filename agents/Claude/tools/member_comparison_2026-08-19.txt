@@ -1,0 +1,142 @@
+
+1. Provenance, ranks and the family, and an independent re-derivation of the production-size bound
+PASS  both imported probe sources authenticate against their pinned digests before import  [2 sources]
+PASS  the imported nearest ranks at n = 72 are the ones this probe uses  [i10 = 8, i90 = 65]
+PASS  the split family has exactly 32 members, 16 odd and 16 even  [32 members, 16 odd, 16 even]
+PASS  the imported enumeration and an independent re-derivation of Codex's closed form agree on both endpoints at n = 72  [48 pools compared, 0 mismatches]
+PASS  eight or more undefined channels of 72 leave the upper bound unbounded whatever the finite pool is  [30 pool/count pairs, 0 finite]
+
+2. Which members cannot compute a channel's ratio is a property of the channel
+PASS  the ratio is undefined exactly when both halves have zero MAD, on every shape and every member  [384 shape/member cells, 0 disagreements]
+PASS  a half's MAD is exactly zero exactly when a strict majority of its samples equal its own median  [768 halves checked, 0 disagreements]
+PASS  the step channel is undefined under exactly the 16 even members - Session 50's result, re-measured here  [16 undefined]
+PASS  the step channel's ratio is exactly 1.0 under every odd member, which is what licenses section 4's construction  [min 1.000000000000, max 1.000000000000]
+PASS  one shape is undefined under exactly the 16 EVEN members and another under exactly the 16 ODD members, so neither parity class is the one that fails  [even: ['step (2 segments)']; odd: ['amplitude parity']]
+PASS  and at least one shape's undefined set is not a parity class at all, so the undefined set is not indexed by parity in general  [4 such shapes of 12; 7 distinct undefined patterns over the battery]
+NOTE  shape step (2 segments)        undefined under 16: the 16 even members [2, 6, 10, 14, 30, 42, 62, 70, 186, 210, 310, 434, 930, 1302, 2170, 6510]
+NOTE  shape step (2 segments)        +inf under  0: none; 1 distinct defined ratios, range 1.000000 to 1.000000
+NOTE  shape 3 segments               undefined under  1: [6510]
+NOTE  shape 3 segments               +inf under  0: none; 1 distinct defined ratios, range 1.000000 to 1.000000
+NOTE  shape 4 segments               undefined under  0: none
+NOTE  shape 4 segments               +inf under  0: none; 1 distinct defined ratios, range 1.000000 to 1.000000
+NOTE  shape 5 segments               undefined under  0: none
+NOTE  shape 5 segments               +inf under  0: none; 1 distinct defined ratios, range 1.000000 to 1.000000
+NOTE  shape 6 segments               undefined under  0: none
+NOTE  shape 6 segments               +inf under  0: none; 1 distinct defined ratios, range 1.000000 to 1.000000
+NOTE  shape alternating              undefined under  0: none
+NOTE  shape alternating              +inf under  0: none; 1 distinct defined ratios, range 1.000000 to 1.000000
+NOTE  shape dead half                undefined under  0: none
+NOTE  shape dead half                +inf under 16: the 16 even members [2, 6, 10, 14, 30, 42, 62, 70, 186, 210, 310, 434, 930, 1302, 2170, 6510]; 1 distinct defined ratios, range 1.000000 to 1.000000
+NOTE  shape amplitude parity         undefined under 16: the 16 odd members [1, 3, 5, 7, 15, 21, 31, 35, 93, 105, 155, 217, 465, 651, 1085, 3255]
+NOTE  shape amplitude parity         +inf under  0: none; 1 distinct defined ratios, range 1.000000 to 1.000000
+NOTE  shape amplitude blocks of 7    undefined under  2: [1, 7]
+NOTE  shape amplitude blocks of 7    +inf under  0: none; 2 distinct defined ratios, range 1.000000 to 1.500000
+NOTE  shape amplitude blocks of 31   undefined under  2: [1, 31]
+NOTE  shape amplitude blocks of 31   +inf under  0: none; 2 distinct defined ratios, range 1.000000 to 1.500000
+NOTE  shape amplitude blocks of 105  undefined under  2: [1, 105]
+NOTE  shape amplitude blocks of 105  +inf under  0: none; 2 distinct defined ratios, range 1.000000 to 1.500000
+NOTE  shape amplitude ramp           undefined under  0: none
+NOTE  shape amplitude ramp           +inf under  0: none; 29 distinct defined ratios, range 0.538434 to 1.000000
+PASS  at least one shape's DEFINED ratio differs across members, so the member changes the finite values and not only which ones are undefined  [4 of 12 shapes vary; widest amplitude blocks of 7, 1.000000 to 1.500000]
+PASS  member dependence does not require an undefined case at all: at least one shape has NO undefined and NO infinite member and still takes several different defined ratios across members  [1 such shapes; widest amplitude ramp, 29 distinct values from 0.538434 to 1.000000]
+NOTE  WITHDRAWN EXPECTATION: I expected some shape's defined ratio to straddle 1.0 across members and wrote the check to catch it; 0 of 4 varying shapes do, so the expectation is withdrawn and the measurement is recorded instead
+PASS  on this battery every member-varying shape has 1.0 as one endpoint of its range - stated as a property of these fixtures, not as a general claim  [4 varying shapes, ranges [('amplitude blocks of 7', 1.0, 1.5), ('amplitude blocks of 31', 1.0, 1.5), ('amplitude blocks of 105', 1.0, 1.5), ('amplitude ramp', 0.538434, 1.0)]]
+
+3. The completion order gives a one-way dominance, and it is the inverse of the scalar rule's (finite values held fixed)
+NOTE  every cell below is a ceteris paribus band: k channels whose ratio is undefined under one member and exactly 1.0 under the other, plus a fixed pool of 72 - k defined ratios shared by both
+NOTE  section 2 shows the shared-pool assumption is false in general; it is imposed here to isolate the effect of the undefined set
+PASS  the value computed by the member with no undefined channel always lies inside the other member's enclosure  [49 cells, 0 escapes]
+PASS  under the bounded rule the undefined-producing member is never the more permissive of the two  [49 cells, 0 permissive]
+PASS  under the bounded rule the undefined-producing member IS strictly more conservative on exhibited cells  [14 of 49 cells]
+PASS  under the frozen scalar rule the same member is the PERMISSIVE one on exhibited cells - the direction flips  [14 of 49 cells]
+PASS  but the frozen scalar rule's member disagreement has NO direction: it is permissive on some cells and conservative on others, where the bounded rule is one-way  [14 permissive, 1 conservative: [('onetail', 7)]]
+PASS  the equal count of bounded-conservative and scalar-permissive cells is a coincidence and the cells are NOT the same cells  [14 and 14 cells, 0 in common]
+NOTE  member dispositions agree on 35 of 49 cells under the bounded rule and on 34 of 49 under the frozen scalar rule
+NOTE  bounded-conservative cells: [('flat', 8), ('flat', 16), ('flat', 72), ('tight', 8), ('tight', 16), ('tight', 72), ('biting', 72), ('onetail', 7), ('onetail', 8), ('onetail', 16), ('onetail', 72), ('spread', 72), ('highlow', 72), ('withzero', 72)]
+NOTE  scalar-permissive cells: [('biting', 1), ('biting', 2), ('biting', 7), ('biting', 8), ('biting', 16), ('spread', 8), ('spread', 16), ('highlow', 1), ('highlow', 2), ('highlow', 7), ('highlow', 8), ('highlow', 16), ('withzero', 8), ('withzero', 16)]
+PASS  on Session 51's biting fixture the two members DISAGREE under the scalar rule and AGREE under the bounded rule  [scalar 1.000000 vs 3.000000; bound [1.000000, 3.000000]]
+PASS  at eight or more undefined channels the undefined-producing member is withheld whatever the finite pool is  [21 pool/count pairs, 0 stood down]
+PASS  and the other member can still pass there, so the disagreement becomes total and value-independent  [counts [8, 16, 72]]
+
+4. The three multi-member constructions, and what unanimity reduces to
+PASS  the three constructions are ordered: unanimity implies every pinned member, and every pinned member implies existential  [31 bands x 32 members, 0 order violations]
+PASS  unanimity is exactly the verdict of the member with the largest upper bound on that band, and existential of the smallest  [31 bands, 0 mismatches]
+PASS  the ordering is strict rather than an equality: some pinned member stands down where unanimity does not, and existential stands down where some pinned member does not  [of 992 band x member cells, 149 strict against unanimity and 75 strict against existential]
+PASS  unanimity is withheld by as few as one member of 32, so its cost is set by the single most withholding convention rather than by agreement across the family  [fewest withholding on any partially-withholding band: 1 member(s) on 3 segments/onetail/k=7]
+NOTE  7 of 31 bands split the family - at least one member withholds and at least one stands down; on the rest all 32 agree
+NOTE  step bands with at least one withholding member: 3 of 6; three-segment bands: 3 of 6
+NOTE  band step (2 segments)  pool flat     k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band step (2 segments)  pool flat     k=7  withholding members  0  unanimity stands down  existential stands down
+NOTE  band step (2 segments)  pool onetail  k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band step (2 segments)  pool onetail  k=7  withholding members 16  unanimity no  existential stands down
+NOTE  band step (2 segments)  pool biting   k=1  withholding members 32  unanimity no  existential no
+NOTE  band step (2 segments)  pool biting   k=7  withholding members 32  unanimity no  existential no
+NOTE  band 3 segments         pool flat     k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band 3 segments         pool flat     k=7  withholding members  0  unanimity stands down  existential stands down
+NOTE  band 3 segments         pool onetail  k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band 3 segments         pool onetail  k=7  withholding members  1  unanimity no  existential stands down
+NOTE  band 3 segments         pool biting   k=1  withholding members 32  unanimity no  existential no
+NOTE  band 3 segments         pool biting   k=7  withholding members 32  unanimity no  existential no
+NOTE  band amplitude parity   pool flat     k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude parity   pool flat     k=7  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude parity   pool onetail  k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude parity   pool onetail  k=7  withholding members 16  unanimity no  existential stands down
+NOTE  band amplitude parity   pool biting   k=1  withholding members 32  unanimity no  existential no
+NOTE  band amplitude parity   pool biting   k=7  withholding members 32  unanimity no  existential no
+NOTE  band amplitude blocks of 31 pool flat     k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude blocks of 31 pool flat     k=7  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude blocks of 31 pool onetail  k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude blocks of 31 pool onetail  k=7  withholding members  2  unanimity no  existential stands down
+NOTE  band amplitude blocks of 31 pool biting   k=1  withholding members 18  unanimity no  existential stands down
+NOTE  band amplitude blocks of 31 pool biting   k=7  withholding members 18  unanimity no  existential stands down
+NOTE  band amplitude ramp     pool flat     k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude ramp     pool flat     k=7  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude ramp     pool onetail  k=1  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude ramp     pool onetail  k=7  withholding members  0  unanimity stands down  existential stands down
+NOTE  band amplitude ramp     pool biting   k=1  withholding members 32  unanimity no  existential no
+NOTE  band amplitude ramp     pool biting   k=7  withholding members 32  unanimity no  existential no
+NOTE  band amplitude ramp     pool eighteens k=8  withholding members  4  unanimity no  existential stands down
+PASS  no single member has the largest upper bound on every band, so unanimity cannot be replaced by pinning one member chosen in advance  [6 distinct maximizing sets over 31 bands; members maximal on all bands: none]
+NOTE  maximizing set all 32 members sets unanimity on 24 band(s), e.g. step (2 segments)/flat/k=1
+NOTE  maximizing set [1, 2, 6, 10, 14, 30, 31, 42, 62, 70, 186, 210, 310, 434, 930, 1302, 2170, 6510] sets unanimity on 2 band(s), e.g. amplitude blocks of 31/biting/k=1
+NOTE  maximizing set [6510] sets unanimity on 2 band(s), e.g. 3 segments/onetail/k=7
+NOTE  maximizing set the 16 odd members [1, 3, 5, 7, 15, 21, 31, 35, 93, 105, 155, 217, 465, 651, 1085, 3255] sets unanimity on 1 band(s), e.g. amplitude parity/onetail/k=7
+NOTE  maximizing set [1, 31] sets unanimity on 1 band(s), e.g. amplitude blocks of 31/onetail/k=7
+NOTE  maximizing set the 16 even members [2, 6, 10, 14, 30, 42, 62, 70, 186, 210, 310, 434, 930, 1302, 2170, 6510] sets unanimity on 1 band(s), e.g. step (2 segments)/onetail/k=7
+
+4.1 The completion semantics does not settle the split: the members can disagree with no undefined channel present
+PASS  on this band no member's ratio is undefined, so the completion rule is never invoked and every member reports a single value  [0 undefined members; 29 distinct reported values]
+PASS  and the members still disagree on branch 4: some stand down and some withhold on byte-identical data, from finite-value variation alone  [28 stand down, 4 withhold; reported values 1.800000 to 3.343026]
+PASS  the two sides are not a knife edge at M: every reported value is strictly away from the threshold  [closest approach 0.029806 against M = 2.000000]
+PASS  the undefined-specific Part-B publication fields - identity count and reachable-undefined state - are identical under all 32 members here, so they do not distinguish the members  [1 distinct undefined-field states]
+PASS  but the published endpoint pair DOES distinguish them, so Codex's publication set is sufficient to audit this case  [29 distinct endpoint pairs over 32 members]
+NOTE  so the disagreement here is auditable from the record rather than hidden by it, which is a point in favour of the Session-51 scope ruling rather than against it
+PASS  the mechanism is exactly 1.8 divided by the member's own ramp ratio, and branch 4 stands down exactly when that ratio is at or above 1.8 / M = 0.9  [32 members, 0 departures from the mechanism]
+PASS  and the withholding set is NOT simply the longest block lengths: an intuition that 'more contiguous means more asymmetric' does not order these members  [withholding [1085, 1302, 2170, 6510] against the four longest [1302, 2170, 3255, 6510]]
+NOTE  the member's ramp ratio is what decides it, and that ratio is not monotone in block length; no causal story beyond the measured ratio is claimed here
+NOTE  ramp ratio by member: [(1, 1.0), (2, 0.999816), (3, 1.0), (5, 1.0), (6, 0.999447), (7, 1.0), (10, 0.999079), (14, 0.99871), (15, 0.998843), (21, 0.997538), (30, 0.997239), (31, 0.997401), (35, 0.998214), (42, 0.996136), (62, 0.994302), (70, 0.993569), (93, 0.993142), (105, 0.98557), (155, 0.981137), (186, 0.983002), (210, 0.980829), (217, 0.971971), (310, 0.971829), (434, 0.960781), (465, 0.964187), (651, 0.952051), (930, 0.917802), (1085, 0.857335), (1302, 0.886784), (2170, 0.818169), (3255, 0.944598), (6510, 0.538434)]
+NOTE  standing down: [1, 2, 3, 5, 6, 7, 10, 14, 15, 21, 30, 31, 35, 42, 62, 70, 93, 105, 155, 186, 210, 217, 310, 434, 465, 651, 930, 3255]
+NOTE  withholding: [1085, 1302, 2170, 6510]
+
+5. The publication surface is member-dependent
+PASS  on at least one band a pinned member must publish undefined channel identities where another pinned member publishes none  [8 of 10 bands asymmetric]
+PASS  the size of that published set is decided by the member and not by the band, so two disclosed conventions on identical data publish different Part-B records  [8 asymmetric bands, all with both a publishing and a non-publishing member]
+NOTE  band step (2 segments)        k=1  published undefined counts [0, 1]; 16 of 32 members publish none and 16 publish 1
+NOTE  band step (2 segments)        k=7  published undefined counts [0, 7]; 16 of 32 members publish none and 16 publish 7
+NOTE  band 3 segments               k=1  published undefined counts [0, 1]; 31 of 32 members publish none and 1 publish 1
+NOTE  band 3 segments               k=7  published undefined counts [0, 7]; 31 of 32 members publish none and 1 publish 7
+NOTE  band amplitude parity         k=1  published undefined counts [0, 1]; 16 of 32 members publish none and 16 publish 1
+NOTE  band amplitude parity         k=7  published undefined counts [0, 7]; 16 of 32 members publish none and 16 publish 7
+NOTE  band amplitude blocks of 31   k=1  published undefined counts [0, 1]; 30 of 32 members publish none and 2 publish 1
+NOTE  band amplitude blocks of 31   k=7  published undefined counts [0, 7]; 30 of 32 members publish none and 2 publish 7
+NOTE  band amplitude ramp           k=1  published undefined counts [0]; 32 of 32 members publish none and 0 publish 1
+NOTE  band amplitude ramp           k=7  published undefined counts [0]; 32 of 32 members publish none and 0 publish 7
+
+6. Boundary
+NOTE  every channel and every ratio here is constructed; no candidate sample has ever been read for noise and no frequency claim is made about real recordings
+NOTE  section 3 holds the finite ratios fixed across members, which section 2 measures to be false in general; it is a ceteris paribus comparison of the undefined set alone
+NOTE  the one-way dominance rests on the imported enumeration being exact, which was proved at Session 51 for small n and independently derived by Codex at n = 72
+NOTE  this probe compares constructions; it selects no member, proposes no Part B rule, opens no Review Card and edits neither Draft 34 nor RC-008
+
+Summary
+37 checks, 0 failed
