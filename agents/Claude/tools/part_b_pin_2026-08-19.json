@@ -1,0 +1,1240 @@
+{
+  "authenticated_sources": {
+    "probe_completion_bounds.py": "2c1c78beaf7345edf91e8393df70b8d049bfa0b462684c3463053b5431afddec",
+    "probe_member_comparison.py": "b653bc0c214f6a0c419489bafde244185d4bd61acc882b64e9edd2baa75a6f42",
+    "probe_null_ratio_undefined.py": "4d21c7578011c0f01b956fbed10a670ff78cbc34c46d6c3c061dbcc8fc63eb66"
+  },
+  "bands": {
+    "parity": {
+      "1": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "10": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "105": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "1085": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "1302": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "14": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "15": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "155": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "186": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "2": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "21": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "210": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "217": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "2170": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "3": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "30": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "31": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "310": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "3255": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "35": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "42": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "434": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "465": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "5": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "6": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "62": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "651": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "6510": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "7": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "70": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      },
+      "93": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 4.0,
+        "undefined_channels": 0,
+        "upper": 4.0
+      },
+      "930": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.0,
+        "undefined_channels": 0,
+        "upper": 1.0
+      }
+    },
+    "parity_summary": {
+      "pinned_disposition": "passes",
+      "stand_down": [
+        2,
+        6,
+        10,
+        14,
+        30,
+        42,
+        62,
+        70,
+        186,
+        210,
+        310,
+        434,
+        930,
+        1302,
+        2170,
+        6510
+      ],
+      "withhold": [
+        1,
+        3,
+        5,
+        7,
+        15,
+        21,
+        31,
+        35,
+        93,
+        105,
+        155,
+        217,
+        465,
+        651,
+        1085,
+        3255
+      ]
+    },
+    "ramp": {
+      "1": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8,
+        "undefined_channels": 0,
+        "upper": 1.8
+      },
+      "10": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8016598785829558,
+        "undefined_channels": 0,
+        "upper": 1.8016598785829558
+      },
+      "105": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.826354155333468,
+        "undefined_channels": 0,
+        "upper": 1.826354155333468
+      },
+      "1085": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 2.0995288976888675,
+        "undefined_channels": 0,
+        "upper": 2.0995288976888675
+      },
+      "1302": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 2.0298060108843097,
+        "undefined_channels": 0,
+        "upper": 2.0298060108843097
+      },
+      "14": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.802324258681383,
+        "undefined_channels": 0,
+        "upper": 1.802324258681383
+      },
+      "15": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8020857142857143,
+        "undefined_channels": 0,
+        "upper": 1.8020857142857143
+      },
+      "155": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8346056851085026,
+        "undefined_channels": 0,
+        "upper": 1.8346056851085026
+      },
+      "186": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8311263306320407,
+        "undefined_channels": 0,
+        "upper": 1.8311263306320407
+      },
+      "2": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8003318533085464,
+        "undefined_channels": 0,
+        "upper": 1.8003318533085464
+      },
+      "21": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8044433962264148,
+        "undefined_channels": 0,
+        "upper": 1.8044433962264148
+      },
+      "210": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8351818816412007,
+        "undefined_channels": 0,
+        "upper": 1.8351818816412007
+      },
+      "217": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8519062686006083,
+        "undefined_channels": 0,
+        "upper": 1.8519062686006083
+      },
+      "2170": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 2.200034138431339,
+        "undefined_channels": 0,
+        "upper": 2.200034138431339
+      },
+      "3": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8,
+        "undefined_channels": 0,
+        "upper": 1.8
+      },
+      "30": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8049842319821554,
+        "undefined_channels": 0,
+        "upper": 1.8049842319821554
+      },
+      "31": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8046899865822075,
+        "undefined_channels": 0,
+        "upper": 1.8046899865822075
+      },
+      "310": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.852177978648796,
+        "undefined_channels": 0,
+        "upper": 1.852177978648796
+      },
+      "3255": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.9055723245431702,
+        "undefined_channels": 0,
+        "upper": 1.9055723245431702
+      },
+      "35": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8032212885154064,
+        "undefined_channels": 0,
+        "upper": 1.8032212885154064
+      },
+      "42": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8069817913158586,
+        "undefined_channels": 0,
+        "upper": 1.8069817913158586
+      },
+      "434": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8734751461759123,
+        "undefined_channels": 0,
+        "upper": 1.8734751461759123
+      },
+      "465": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8668572236269692,
+        "undefined_channels": 0,
+        "upper": 1.8668572236269692
+      },
+      "5": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8,
+        "undefined_channels": 0,
+        "upper": 1.8
+      },
+      "6": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8009957435038495,
+        "undefined_channels": 0,
+        "upper": 1.8009957435038495
+      },
+      "62": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8103159808347071,
+        "undefined_channels": 0,
+        "upper": 1.8103159808347071
+      },
+      "651": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8906544573121462,
+        "undefined_channels": 0,
+        "upper": 1.8906544573121462
+      },
+      "6510": {
+        "disposition": "unmeasurable",
+        "label": null,
+        "scalar_spread": 3.34302644573686,
+        "undefined_channels": 0,
+        "upper": 3.34302644573686
+      },
+      "7": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8,
+        "undefined_channels": 0,
+        "upper": 1.8
+      },
+      "70": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8116513832164598,
+        "undefined_channels": 0,
+        "upper": 1.8116513832164598
+      },
+      "93": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.8124303232998888,
+        "undefined_channels": 0,
+        "upper": 1.8124303232998888
+      },
+      "930": {
+        "disposition": "passes",
+        "label": null,
+        "scalar_spread": 1.9612069657330875,
+        "undefined_channels": 0,
+        "upper": 1.9612069657330875
+      }
+    },
+    "ramp_summary": {
+      "pinned_disposition": "unmeasurable",
+      "stand_down": [
+        1,
+        2,
+        3,
+        5,
+        6,
+        7,
+        10,
+        14,
+        15,
+        21,
+        30,
+        31,
+        35,
+        42,
+        62,
+        70,
+        93,
+        105,
+        155,
+        186,
+        210,
+        217,
+        310,
+        434,
+        465,
+        651,
+        930,
+        3255
+      ],
+      "withhold": [
+        1085,
+        1302,
+        2170,
+        6510
+      ]
+    }
+  },
+  "closed_form_generalization": [
+    {
+      "closed_form_holds": true,
+      "half": 30,
+      "matches_half": true,
+      "unique_two_run_member": [
+        30
+      ]
+    },
+    {
+      "closed_form_holds": true,
+      "half": 100,
+      "matches_half": true,
+      "unique_two_run_member": [
+        100
+      ]
+    },
+    {
+      "closed_form_holds": true,
+      "half": 210,
+      "matches_half": true,
+      "unique_two_run_member": [
+        210
+      ]
+    },
+    {
+      "closed_form_holds": true,
+      "half": 1024,
+      "matches_half": true,
+      "unique_two_run_member": [
+        1024
+      ]
+    }
+  ],
+  "geometry": [
+    {
+      "closed_form_runs": 13020,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 1,
+      "runs_half_a": 6510,
+      "runs_half_b": 6510,
+      "total_runs": 13020
+    },
+    {
+      "closed_form_runs": 6510,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 2,
+      "runs_half_a": 3255,
+      "runs_half_b": 3255,
+      "total_runs": 6510
+    },
+    {
+      "closed_form_runs": 4340,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 3,
+      "runs_half_a": 2170,
+      "runs_half_b": 2170,
+      "total_runs": 4340
+    },
+    {
+      "closed_form_runs": 2604,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 5,
+      "runs_half_a": 1302,
+      "runs_half_b": 1302,
+      "total_runs": 2604
+    },
+    {
+      "closed_form_runs": 2170,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 6,
+      "runs_half_a": 1085,
+      "runs_half_b": 1085,
+      "total_runs": 2170
+    },
+    {
+      "closed_form_runs": 1860,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 7,
+      "runs_half_a": 930,
+      "runs_half_b": 930,
+      "total_runs": 1860
+    },
+    {
+      "closed_form_runs": 1302,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 10,
+      "runs_half_a": 651,
+      "runs_half_b": 651,
+      "total_runs": 1302
+    },
+    {
+      "closed_form_runs": 930,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 14,
+      "runs_half_a": 465,
+      "runs_half_b": 465,
+      "total_runs": 930
+    },
+    {
+      "closed_form_runs": 868,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 15,
+      "runs_half_a": 434,
+      "runs_half_b": 434,
+      "total_runs": 868
+    },
+    {
+      "closed_form_runs": 620,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 21,
+      "runs_half_a": 310,
+      "runs_half_b": 310,
+      "total_runs": 620
+    },
+    {
+      "closed_form_runs": 434,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 30,
+      "runs_half_a": 217,
+      "runs_half_b": 217,
+      "total_runs": 434
+    },
+    {
+      "closed_form_runs": 420,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 31,
+      "runs_half_a": 210,
+      "runs_half_b": 210,
+      "total_runs": 420
+    },
+    {
+      "closed_form_runs": 372,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 35,
+      "runs_half_a": 186,
+      "runs_half_b": 186,
+      "total_runs": 372
+    },
+    {
+      "closed_form_runs": 310,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 42,
+      "runs_half_a": 155,
+      "runs_half_b": 155,
+      "total_runs": 310
+    },
+    {
+      "closed_form_runs": 210,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 62,
+      "runs_half_a": 105,
+      "runs_half_b": 105,
+      "total_runs": 210
+    },
+    {
+      "closed_form_runs": 186,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 70,
+      "runs_half_a": 93,
+      "runs_half_b": 93,
+      "total_runs": 186
+    },
+    {
+      "closed_form_runs": 140,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 93,
+      "runs_half_a": 70,
+      "runs_half_b": 70,
+      "total_runs": 140
+    },
+    {
+      "closed_form_runs": 124,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 105,
+      "runs_half_a": 62,
+      "runs_half_b": 62,
+      "total_runs": 124
+    },
+    {
+      "closed_form_runs": 84,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 155,
+      "runs_half_a": 42,
+      "runs_half_b": 42,
+      "total_runs": 84
+    },
+    {
+      "closed_form_runs": 70,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 186,
+      "runs_half_a": 35,
+      "runs_half_b": 35,
+      "total_runs": 70
+    },
+    {
+      "closed_form_runs": 62,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 210,
+      "runs_half_a": 31,
+      "runs_half_b": 31,
+      "total_runs": 62
+    },
+    {
+      "closed_form_runs": 60,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 217,
+      "runs_half_a": 30,
+      "runs_half_b": 30,
+      "total_runs": 60
+    },
+    {
+      "closed_form_runs": 42,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 310,
+      "runs_half_a": 21,
+      "runs_half_b": 21,
+      "total_runs": 42
+    },
+    {
+      "closed_form_runs": 30,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 434,
+      "runs_half_a": 15,
+      "runs_half_b": 15,
+      "total_runs": 30
+    },
+    {
+      "closed_form_runs": 28,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 465,
+      "runs_half_a": 14,
+      "runs_half_b": 14,
+      "total_runs": 28
+    },
+    {
+      "closed_form_runs": 20,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 651,
+      "runs_half_a": 10,
+      "runs_half_b": 10,
+      "total_runs": 20
+    },
+    {
+      "closed_form_runs": 14,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 930,
+      "runs_half_a": 7,
+      "runs_half_b": 7,
+      "total_runs": 14
+    },
+    {
+      "closed_form_runs": 12,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 1085,
+      "runs_half_a": 6,
+      "runs_half_b": 6,
+      "total_runs": 12
+    },
+    {
+      "closed_form_runs": 10,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 1302,
+      "runs_half_a": 5,
+      "runs_half_b": 5,
+      "total_runs": 10
+    },
+    {
+      "closed_form_runs": 6,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 2170,
+      "runs_half_a": 3,
+      "runs_half_b": 3,
+      "total_runs": 6
+    },
+    {
+      "closed_form_runs": 4,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 3255,
+      "runs_half_a": 2,
+      "runs_half_b": 2,
+      "total_runs": 4
+    },
+    {
+      "closed_form_runs": 2,
+      "half_a_samples": 6510,
+      "half_b_samples": 6510,
+      "member": 6510,
+      "runs_half_a": 1,
+      "runs_half_b": 1,
+      "total_runs": 2
+    }
+  ],
+  "identity_demonstration": {
+    "existential_agreements": 2000,
+    "n_vectors": 2000,
+    "regimes": {
+      "all_above": 667,
+      "all_below": 667,
+      "straddling": 666
+    },
+    "unanimity_agreements": 2000
+  },
+  "per_shape": {
+    "amplitude_parity": {
+      "infinite_members": [],
+      "n_distinct_defined": 1,
+      "pinned_value": 1.0,
+      "undefined_members": [
+        1,
+        3,
+        5,
+        7,
+        15,
+        21,
+        31,
+        35,
+        93,
+        105,
+        155,
+        217,
+        465,
+        651,
+        1085,
+        3255
+      ],
+      "values": {
+        "1": NaN,
+        "10": 1.0,
+        "105": NaN,
+        "1085": NaN,
+        "1302": 1.0,
+        "14": 1.0,
+        "15": NaN,
+        "155": NaN,
+        "186": 1.0,
+        "2": 1.0,
+        "21": NaN,
+        "210": 1.0,
+        "217": NaN,
+        "2170": 1.0,
+        "3": NaN,
+        "30": 1.0,
+        "31": NaN,
+        "310": 1.0,
+        "3255": NaN,
+        "35": NaN,
+        "42": 1.0,
+        "434": 1.0,
+        "465": NaN,
+        "5": NaN,
+        "6": 1.0,
+        "62": 1.0,
+        "651": NaN,
+        "6510": 1.0,
+        "7": NaN,
+        "70": 1.0,
+        "93": NaN,
+        "930": 1.0
+      }
+    },
+    "amplitude_ramp": {
+      "infinite_members": [],
+      "n_distinct_defined": 29,
+      "pinned_value": 0.5384342688330871,
+      "undefined_members": [],
+      "values": {
+        "1": 1.0,
+        "10": 0.9990786948176582,
+        "105": 0.9855700739878372,
+        "1085": 0.8573351869466599,
+        "1302": 0.8867842495036302,
+        "14": 0.9987104103658442,
+        "15": 0.9988426109428757,
+        "155": 0.9811372626884366,
+        "186": 0.9830015383912387,
+        "2": 0.9998156710342393,
+        "21": 0.9975375252913408,
+        "210": 0.9808292126283759,
+        "217": 0.9719714385761915,
+        "2170": 0.8181691222679982,
+        "3": 1.0,
+        "30": 0.9972386285188309,
+        "31": 0.9974012231368948,
+        "310": 0.9718288527073079,
+        "3255": 0.944598101481937,
+        "35": 0.9982135922330097,
+        "42": 0.9961362137961699,
+        "434": 0.9607813606036419,
+        "465": 0.9641872861079984,
+        "5": 1.0,
+        "6": 0.9994471150154346,
+        "62": 0.9943015578805472,
+        "651": 0.9520512820512822,
+        "6510": 0.5384342688330871,
+        "7": 1.0,
+        "70": 0.9935686394609908,
+        "93": 0.9931416269414115,
+        "930": 0.9178021654268247
+      }
+    },
+    "parity_flat": {
+      "infinite_members": [],
+      "n_distinct_defined": 1,
+      "pinned_value": 1.0,
+      "undefined_members": [],
+      "values": {
+        "1": 1.0,
+        "10": 1.0,
+        "105": 1.0,
+        "1085": 1.0,
+        "1302": 1.0,
+        "14": 1.0,
+        "15": 1.0,
+        "155": 1.0,
+        "186": 1.0,
+        "2": 1.0,
+        "21": 1.0,
+        "210": 1.0,
+        "217": 1.0,
+        "2170": 1.0,
+        "3": 1.0,
+        "30": 1.0,
+        "31": 1.0,
+        "310": 1.0,
+        "3255": 1.0,
+        "35": 1.0,
+        "42": 1.0,
+        "434": 1.0,
+        "465": 1.0,
+        "5": 1.0,
+        "6": 1.0,
+        "62": 1.0,
+        "651": 1.0,
+        "6510": 1.0,
+        "7": 1.0,
+        "70": 1.0,
+        "93": 1.0,
+        "930": 1.0
+      }
+    },
+    "parity_scaled_high": {
+      "infinite_members": [],
+      "n_distinct_defined": 2,
+      "pinned_value": 1.0,
+      "undefined_members": [],
+      "values": {
+        "1": 2.0,
+        "10": 1.0,
+        "105": 2.0,
+        "1085": 2.0,
+        "1302": 1.0,
+        "14": 1.0,
+        "15": 2.0,
+        "155": 2.0,
+        "186": 1.0,
+        "2": 1.0,
+        "21": 2.0,
+        "210": 1.0,
+        "217": 2.0,
+        "2170": 1.0,
+        "3": 2.0,
+        "30": 1.0,
+        "31": 2.0,
+        "310": 1.0,
+        "3255": 2.0,
+        "35": 2.0,
+        "42": 1.0,
+        "434": 1.0,
+        "465": 2.0,
+        "5": 2.0,
+        "6": 1.0,
+        "62": 1.0,
+        "651": 2.0,
+        "6510": 1.0,
+        "7": 2.0,
+        "70": 1.0,
+        "93": 2.0,
+        "930": 1.0
+      }
+    },
+    "parity_scaled_low": {
+      "infinite_members": [],
+      "n_distinct_defined": 2,
+      "pinned_value": 1.0,
+      "undefined_members": [],
+      "values": {
+        "1": 0.5,
+        "10": 1.0,
+        "105": 0.5,
+        "1085": 0.5,
+        "1302": 1.0,
+        "14": 1.0,
+        "15": 0.5,
+        "155": 0.5,
+        "186": 1.0,
+        "2": 1.0,
+        "21": 0.5,
+        "210": 1.0,
+        "217": 0.5,
+        "2170": 1.0,
+        "3": 0.5,
+        "30": 1.0,
+        "31": 0.5,
+        "310": 1.0,
+        "3255": 0.5,
+        "35": 0.5,
+        "42": 1.0,
+        "434": 1.0,
+        "465": 0.5,
+        "5": 0.5,
+        "6": 1.0,
+        "62": 1.0,
+        "651": 0.5,
+        "6510": 1.0,
+        "7": 0.5,
+        "70": 1.0,
+        "93": 0.5,
+        "930": 1.0
+      }
+    },
+    "periodic_direct": {
+      "infinite_members": [],
+      "n_distinct_defined": 1,
+      "pinned_value": 0.999999999999996,
+      "undefined_members": [],
+      "values": {
+        "1": 1.0,
+        "10": 0.9999999999999816,
+        "105": 0.9999999999998864,
+        "1085": 1.0000000000000304,
+        "1302": 1.0000000000000142,
+        "14": 0.9999999999999756,
+        "15": 1.0000000000000806,
+        "155": 0.9999999999999599,
+        "186": 1.0,
+        "2": 0.999999999999996,
+        "21": 0.9999999999999408,
+        "210": 1.0000000000000266,
+        "217": 1.0000000000000038,
+        "2170": 1.0000000000000142,
+        "3": 0.9999999999999813,
+        "30": 0.9999999999999958,
+        "31": 0.9999999999999719,
+        "310": 1.0000000000000242,
+        "3255": 0.999999999999979,
+        "35": 1.0000000000000144,
+        "42": 1.0,
+        "434": 1.0000000000000142,
+        "465": 1.0000000000001112,
+        "5": 0.9999999999999716,
+        "6": 0.999999999999996,
+        "62": 1.0000000000000242,
+        "651": 1.0000000000000617,
+        "6510": 0.999999999999996,
+        "7": 1.000000000000081,
+        "70": 1.0000000000000244,
+        "93": 1.0000000000000888,
+        "930": 1.0
+      }
+    },
+    "periodic_tiled": {
+      "infinite_members": [],
+      "n_distinct_defined": 1,
+      "pinned_value": 1.0,
+      "undefined_members": [],
+      "values": {
+        "1": 0.9999999999999714,
+        "10": 1.0,
+        "105": 0.9999999999999688,
+        "1085": 1.0000000000000302,
+        "1302": 1.0,
+        "14": 1.0,
+        "15": 1.0000000000000615,
+        "155": 0.9999999999999888,
+        "186": 1.0,
+        "2": 1.0,
+        "21": 0.9999999999999788,
+        "210": 1.0,
+        "217": 1.000000000000019,
+        "2170": 1.0,
+        "3": 0.9999999999999513,
+        "30": 1.0,
+        "31": 0.9999999999999035,
+        "310": 1.0,
+        "3255": 1.0000000000000089,
+        "35": 1.0000000000000402,
+        "42": 1.0,
+        "434": 1.0,
+        "465": 1.0000000000000082,
+        "5": 0.999999999999903,
+        "6": 1.0,
+        "62": 1.0,
+        "651": 0.9999999999999738,
+        "6510": 1.0,
+        "7": 0.9999999999999887,
+        "70": 1.0,
+        "93": 1.0000000000001092,
+        "930": 1.0
+      }
+    },
+    "two_segment_step": {
+      "infinite_members": [],
+      "n_distinct_defined": 1,
+      "pinned_value": NaN,
+      "undefined_members": [
+        2,
+        6,
+        10,
+        14,
+        30,
+        42,
+        62,
+        70,
+        186,
+        210,
+        310,
+        434,
+        930,
+        1302,
+        2170,
+        6510
+      ],
+      "values": {
+        "1": 1.0,
+        "10": NaN,
+        "105": 1.0,
+        "1085": 1.0,
+        "1302": NaN,
+        "14": NaN,
+        "15": 1.0,
+        "155": 1.0,
+        "186": NaN,
+        "2": NaN,
+        "21": 1.0,
+        "210": NaN,
+        "217": 1.0,
+        "2170": NaN,
+        "3": 1.0,
+        "30": NaN,
+        "31": 1.0,
+        "310": NaN,
+        "3255": 1.0,
+        "35": 1.0,
+        "42": NaN,
+        "434": NaN,
+        "465": 1.0,
+        "5": 1.0,
+        "6": NaN,
+        "62": NaN,
+        "651": 1.0,
+        "6510": NaN,
+        "7": 1.0,
+        "70": NaN,
+        "93": 1.0,
+        "930": NaN
+      }
+    }
+  },
+  "pinned_member": 6510,
+  "retained_samples": 13020,
+  "selectors": {
+    "maximum_fragmentation": [
+      1
+    ],
+    "minimum_fragmentation": [
+      6510
+    ]
+  },
+  "threshold_m": 2.0
+}

@@ -1,0 +1,48 @@
+
+1. The uniqueness of the contiguous member is a closed form
+PASS  an independent factorization of 6,510 gives the same 32-member family as the authenticated trial division  [32 members, 1 ... 6510]
+PASS  every member splits the retained core into two halves of 6,510 samples  [6510 samples per half]
+PASS  the measured run count equals the closed form 2 * (6510 / p) for every member  [32 of 32 agree]
+PASS  exactly one member has two runs and it is p = 6510  [two-run members [6510]]
+PASS  both halves are a single contiguous interval for exactly that one member  [contiguous members [6510]]
+PASS  every other member fragments the window into at least four alternating runs  [smallest other run count 4, largest 13020]
+PASS  the same closed form and the same uniqueness hold at four other half lengths  [half lengths [30, 100, 210, 1024]]
+
+2. Geometry alone does not select the member
+PASS  the minimum-fragmentation selector chooses p = 6510 and nothing else  [minimizers [6510]]
+PASS  the maximum-fragmentation selector chooses p = 1 and nothing else  [maximizers [1] at 13020 runs]
+PASS  both selectors read only the declared family and core length, so both are outcome-independent  [neither takes a channel argument]
+PASS  two outcome-independent geometry selectors therefore disagree, so geometry alone does not privilege the midpoint  [[6510] versus [1]]
+NOTE  what privileges p = 6510 is the early-versus-late estimand, not the fact that the selector avoids reading data; the eventual candidate should carry the estimand as the ground
+
+3. What the pinned member sees, and what it cannot see
+PASS  on a monotone amplitude ramp the pinned member returns the smallest ratio of all 32, so it is the most extreme member  [minimum 0.538434 at [6510]]
+PASS  on the same ramp the even/odd member returns a ratio at or very near 1.0, so it is nearly blind to monotone structure  [p=1 ratio 1.000000000000]
+PASS  on the simplest parity channel no member returns a finite contrast at all: the sixteen odd members are undefined and the sixteen even members return exactly 1.0  [16 undefined, 16 at exactly 1.0]
+NOTE  that shape therefore cannot demonstrate fast-structure sensitivity, because each parity class is constant and the member that would separate them sees 0/0; the scaled construction below is section 19.5's own answer to that
+PASS  on a parity channel that varies within each parity class the pinned member returns exactly 1.0  [p=6510 ratio 1.000000000000]
+PASS  on that same channel the even/odd member returns the underlying 2:1 contrast instead  [p=1 ratio 2.000000000000]
+PASS  so the pinned member is among the minimizers there, having been the unique minimizer on the ramp  [minimum 1.000000 at 16 members]
+PASS  the pinned member is one of the members whose ratio is undefined on a mid-window step, so the completion rule is live for it and not optional  [16 undefined members]
+PASS  the even/odd member is defined on that same step channel  [p=1 ratio 1.000000000000]
+PASS  on a channel periodic at the half length exactly the sixteen even members return exactly 1.0  [16 blind members]
+PASS  the pinned member is one of those blind members  [p=6510 ratio 1.000000000000]
+PASS  the mechanism is that both halves hold the same multiset exactly when 6510 / p is odd, which is exactly when p is even  [16 members with equal half multisets]
+PASS  evaluating the same sinusoid across the whole core instead of tiling it agrees with the tiled form to floating point  [direct p=6510 ratio 1.000000000000, 400.921659 Hz]
+NOTE  no claim is made here about how much power a real band carries at those frequencies; section 19.5 records the same family and this probe only partitions the members by it
+
+4. The pin has no uniform direction at the decision
+PASS  the parity band reproduces the two numbers frozen section 19.5 publishes for it: exactly 4 under the even/odd member and exactly 1 under the contiguous one  [p=1 gives 4.000000, p=6510 gives 1.000000]
+PASS  on the ramp band the pinned member withholds while other members stand down  [28 stand down, 4 withhold]
+PASS  on the parity band the pinned member stands down while other members withhold  [16 stand down, 16 withhold]
+PASS  so the pinned member is strictly more withholding than some member on one band and strictly less on another  [no uniform direction over these two bands]
+NOTE  both bands are constructed to separate the members and neither is a claim about a real recording; what they establish is that no direction may be asserted for the pin
+
+5. The discriminating power of the two extremal identities
+PASS  min(v) <= M and any(v <= M) agree on every random vector, including vectors that are not member values at all  [2000 of 2000]
+PASS  max(v) <= M and all(v <= M) agree on every random vector by the same identity  [2000 of 2000]
+PASS  the demonstration covers all three regimes, so the agreement is not an artifact of only easy or only hard vectors  [667 below, 667 above, 666 straddling]
+NOTE  the two checks written that way in agents/Codex/tools/probe_part_b_policy.py therefore cannot fail on any input; the claim they state is true and was established at Session 52 over 30 bands with the two sides computed from different objects
+
+Summary
+30 checks, 0 failed

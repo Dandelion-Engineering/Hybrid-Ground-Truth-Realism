@@ -1,0 +1,950 @@
+{
+  "by_action": {
+    "claim": 15,
+    "false-sentence": 1,
+    "ground": 15,
+    "publication": 3,
+    "rename": 24,
+    "semantics": 5
+  },
+  "by_class": {
+    "mixed": 8,
+    "not-a-surface": 6,
+    "part-a": 0,
+    "part-b": 44
+  },
+  "by_section": {
+    "19.10": {
+      "mixed": 1,
+      "not-a-surface": 1,
+      "part-a": 0,
+      "part-b": 8
+    },
+    "19.2": {
+      "mixed": 0,
+      "not-a-surface": 2,
+      "part-a": 0,
+      "part-b": 0
+    },
+    "19.5": {
+      "mixed": 2,
+      "not-a-surface": 0,
+      "part-a": 0,
+      "part-b": 29
+    },
+    "19.6": {
+      "mixed": 3,
+      "not-a-surface": 1,
+      "part-a": 0,
+      "part-b": 7
+    },
+    "19.7": {
+      "mixed": 2,
+      "not-a-surface": 0,
+      "part-a": 0,
+      "part-b": 0
+    },
+    "19.8": {
+      "mixed": 0,
+      "not-a-surface": 2,
+      "part-a": 0,
+      "part-b": 0
+    }
+  },
+  "document_sha256": "ecccfa565966276e203efef2794f180fe73a2e1e0cbc8beff97d3bd8916a6f89",
+  "historical_sections": [
+    "19.11",
+    "19.12",
+    "19.13",
+    "19.14",
+    "19.15"
+  ],
+  "historical_unit_count": 70,
+  "in_scope_sections": [
+    "19.10",
+    "19.5",
+    "19.6",
+    "19.7"
+  ],
+  "live_sections": [
+    "19.1",
+    "19.2",
+    "19.3",
+    "19.4",
+    "19.5",
+    "19.6",
+    "19.7",
+    "19.8",
+    "19.9",
+    "19.10"
+  ],
+  "live_units": [
+    {
+      "class": "not-a-surface",
+      "key": "857026c3c9b64495",
+      "line": 1213,
+      "primary_action": null,
+      "secondary_action": null,
+      "section": "19.2",
+      "text": "The estimator therefore computes its common reference over the whole probe at no additional transfer cost, which happens to be what the anchor pipeline does any",
+      "tier1": [],
+      "tier2": [
+        "split"
+      ]
+    },
+    {
+      "class": "not-a-surface",
+      "key": "ee19655477513e70",
+      "line": 1217,
+      "primary_action": null,
+      "secondary_action": null,
+      "section": "19.2",
+      "text": "A scale estimator computed on the *stored integers* would therefore be quantized: a median of absolute deviations over an integer lattice takes values on that l",
+      "tier1": [],
+      "tier2": [
+        "half"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "b3bb22e5daece73c",
+      "line": 1284,
+      "primary_action": "claim",
+      "secondary_action": "rename",
+      "section": "19.5",
+      "text": "**The split-half floor.** Within each window, after the margin discard, split the retained 13,020 samples into two disjoint halves of 6,510 \u2014 the first 6,510 an",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "6,510",
+        "half"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "eb5e18231d5f2d41",
+      "line": 1286,
+      "primary_action": "rename",
+      "secondary_action": "semantics",
+      "section": "19.5",
+      "text": "- **`R_null_sampled = max_k ( p90_c r_c(k) / p10_c r_c(k) )`, where `r_c(k) = \u03c3\u0302_c^A(k) / \u03c3\u0302_c^B(k)`**",
+      "tier1": [
+        "R_null_sampled",
+        "r_c",
+        "\u03c3\u0302_c^A",
+        "\u03c3\u0302_c^B"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "f99e8f437bc4484f",
+      "line": 1288,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**`R_null_sampled` is therefore a disagreement diagnostic rather than a pure estimation-noise floor:** what remains in it is estimation noise plus whatever with",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "b4a02f6400c08a13",
+      "line": 1288,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "It is withdrawn.** Each observed ratio `r_c(k)` is a *product* of an estimation-disagreement factor and a true temporal-scale-change factor, and two products ca",
+      "tier1": [
+        "r_c"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "6e4da48dce3f5b27",
+      "line": 1290,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**`R_null_sampled` is therefore a one-sided instrument, and \u00a719.6 uses only the side that holds \u2014 in one direction, and in one place.** A value **above** `M` wi",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "branch 4",
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "mixed",
+      "key": "a9b771c35f499275",
+      "line": 1290,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**Where `R_space_sampled` already exceeds `M`, branch 3 has fired and the candidate has failed on homogeneity; a high `R_null_sampled` there changes the label a",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "52b2078b202d639d",
+      "line": 1290,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**`R_null_sampled` can convert a would-be pass into `unmeasurable`, and can change how a failure reads; it never converts a would-be failure into anything else.",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "505b633576508b9a",
+      "line": 1290,
+      "primary_action": "rename",
+      "secondary_action": "claim",
+      "section": "19.5",
+      "text": "**Nothing in \u00a719 may read a low `R_null_sampled` as evidence that a passing candidate's homogeneity was resolvable**; a candidate that reaches a pass reaches it",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "983a7eb413d9dfcb",
+      "line": 1290,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**That is a statement about what the value certifies, not about whether it acts.** A low `R_null_sampled` is *necessary* for a pass, because branch 4 fires with",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "branch 4"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "e0039ff0f036f2bf",
+      "line": 1292,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**The split is contiguous, and the reason Draft 32 gave for it is withdrawn.** Draft 32 pinned contiguous halves on the claim that interleaving makes the two ha",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "interleav",
+        "contiguous",
+        "half"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "9e964a38c978973b",
+      "line": 1292,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "Contiguous halves each hold equal numbers of both parities, so every channel's ratio is exactly 1 and `R_null_sampled` is exactly **1**; even/odd interleaving s",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "interleav"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "afe7648e0218cc32",
+      "line": 1292,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**Interleaving expanded the spread, and expanded it from inside the strict tolerance to outside it.** The correlation argument is real for smoothly varying non-",
+      "tier1": [],
+      "tier2": [
+        "interleav"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "ff29184e1fb85721",
+      "line": 1294,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**Two of the three grounds Draft 33 gave for the contiguous split are withdrawn.** RC-008's F6-R2 refutes the first and the third, neither is disputed, and both",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "contiguous"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "bfc234da71147847",
+      "line": 1294,
+      "primary_action": "ground",
+      "secondary_action": "claim",
+      "section": "19.5",
+      "text": "Any frequency `f = m \u00d7 30,000 / 6,510` Hz repeats exactly across the two 6,510-sample halves, and every member of that family from `m = 66` upward \u2014 **304.14746",
+      "tier1": [],
+      "tier2": [
+        "6,510"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "4de76ae345d4d682",
+      "line": 1294,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "At the reviewer's `m = 87`, **400.921659 Hz**, the two halves are bit-identical, their correlation is exactly 1 and every `r_c` is exactly 1; 135 consecutive me",
+      "tier1": [
+        "r_c"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "e0e86d1a236a89df",
+      "line": 1294,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "Lying above the corner is not the same as carrying no structure at the half length, and this gate has no basis to assume the second, so the claim is withdrawn r",
+      "tier1": [],
+      "tier2": [
+        "half"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "b1969829e8071867",
+      "line": 1294,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**The third, which Draft 33 called decisive, said the decision rule cannot cash a lower `R_null_sampled`.** It can.",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "583dacbccdb2932e",
+      "line": 1294,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "On the same parity construction, whose `R_space_sampled` is exactly **1.5** against a strict `M = 2.0` with the level inside the band, the contiguous split reac",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "interleav",
+        "contiguous",
+        "branch 4",
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "ec568b977332ba6a",
+      "line": 1296,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**What bounds the choice is a reach rather than a direction, and the reach is exact.** The split rule enters the decision only through `R_null_sampled`, because",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "split"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "09e3e4268e47a83b",
+      "line": 1296,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "`R_null_sampled` in turn appears in exactly two places, branch 3's label and branch 4.",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "branch 4"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "2fdb82eff245282b",
+      "line": 1296,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "So changing the split rule **can move a candidate between `passes` and `unmeasurable`, and can relabel a homogeneity failure, and can do nothing else**: it can ",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "6f84caebe9d38b37",
+      "line": 1298,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**The one surviving ground is a statement about the parameter space, not about the statistic.** An interleaved split carries a free parameter, the period, whose",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "interleav",
+        "contiguous"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "45fdf94bb7b35d1f",
+      "line": 1298,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**That is why contiguous halves are kept, and it is now the whole of the reason.** It is not a claim that they are the safer of the two, and nothing in this sec",
+      "tier1": [],
+      "tier2": [
+        "contiguous"
+      ]
+    },
+    {
+      "class": "mixed",
+      "key": "b9096e9ed729a21c",
+      "line": 1298,
+      "primary_action": "ground",
+      "secondary_action": "publication",
+      "section": "19.5",
+      "text": "**The split rule is therefore a pinned parameter of this instrument, on the same footing as \u00a719.3's chunk boundaries, and no bound is claimed on the difference ",
+      "tier1": [
+        "R_null_sampled",
+        "\u03c1(k)"
+      ],
+      "tier2": [
+        "split"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "400b36b62cfbd6dc",
+      "line": 1300,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**Why this is measured rather than derived.** The MAD scale estimator has an asymptotic relative efficiency near 37% against the sample standard deviation for G",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "6,510"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "18961c272df0d47b",
+      "line": 1300,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "The split-half construction needs no such factor, because whatever the correlation does to one half it does to the other.",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "half"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "3da07521b144f80e",
+      "line": 1302,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**How `R_null_sampled` enters the decision, and how it does not.** It is the resolution condition, exactly parallel to \u00a716.7's `Q95_null <= L`:",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "d1ec6e5f67386ace",
+      "line": 1302,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**if `R_null_sampled` exceeds the spatial tolerance and `R_space_sampled` does not, the candidate is `unmeasurable` rather than passing or failing**, because th",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "36dd9fd7c6a7d761",
+      "line": 1304,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "**One thing `R_null_sampled` cannot do, stated because a reader will assume it can.** The split is in *time within a window*, so what it can register is estimat",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "split"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "f401d931747f2ba0",
+      "line": 1304,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "A systematic per-channel bias \u2014 a gain error, a reference artifact that lands on some contacts and not others \u2014 is identical in both halves and produces `r_c(k)",
+      "tier1": [
+        "r_c"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "a9f2abca9dccf225",
+      "line": 1304,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.5",
+      "text": "`R_null_sampled` is therefore silent on estimation *bias* however large it is, which is the same boundary \u00a716.5 states for `Q95_null` and is stated here rather ",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "aa56e4602ad57039",
+      "line": 1319,
+      "primary_action": "claim",
+      "secondary_action": "rename",
+      "section": "19.6",
+      "text": "| split | two disjoint halves of the retained 13,020 samples, 6,510 each | \u00a719.5 |",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "6,510"
+      ]
+    },
+    {
+      "class": "not-a-surface",
+      "key": "da12b137066b08a4",
+      "line": 1352,
+      "primary_action": null,
+      "secondary_action": null,
+      "section": "19.6",
+      "text": "Noise heterogeneity across the band adds a second, undesigned source of the same variation, and the rule fixed here is that it may contribute **at most half of ",
+      "tier1": [],
+      "tier2": [
+        "half"
+      ]
+    },
+    {
+      "class": "mixed",
+      "key": "4e69762901214597",
+      "line": 1358,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.6",
+      "text": "**The pass rule uses the level, the spread and the estimator's resolution \u2014 and its branches are ordered, which draft 29's were not.** At tolerances `N` and `M`",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "mixed",
+      "key": "18b4645eb576d892",
+      "line": 1358,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.6",
+      "text": "Draft 29 let `R_space_sampled > M` and `R_null_sampled > M` both fire and return two different answers for one candidate.",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "99dc110363657307",
+      "line": 1362,
+      "primary_action": "rename",
+      "secondary_action": "semantics",
+      "section": "19.6",
+      "text": "The report labels the failure `resolved heterogeneity` when `R_space_sampled > R_null_sampled` and `resolution-limited` otherwise.",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "resolution-limited",
+        "resolved heterogeneity"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "be06fcd76f0653f2",
+      "line": 1362,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.6",
+      "text": "**The label is a recorded comparison and not a certificate**, because \u00a719.5's cancellation makes a low `R_null_sampled` reachable without the estimator having r",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "28adcd864b1d5e80",
+      "line": 1363,
+      "primary_action": "rename",
+      "secondary_action": "semantics",
+      "section": "19.6",
+      "text": "**Resolution.** `R_space_sampled \u2264 M` and `R_null_sampled > M` \u2192 **unmeasurable**, because the estimator's own floor is wider than the tolerance and the homogen",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "3f1c1404da183d76",
+      "line": 1365,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.6",
+      "text": "**What the branch order makes of the null, stated as a rule rather than left to be read off four branches.** `R_null_sampled` appears in exactly two places abov",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "branch 4"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "032dfedc3ca2dffa",
+      "line": 1365,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.6",
+      "text": "So it **can convert a would-be pass into `unmeasurable`, and can change how a failure reads \u2014 and it never converts a would-be failure into anything else.** Whe",
+      "tier1": [],
+      "tier2": [
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "2409b6041d32604b",
+      "line": 1367,
+      "primary_action": "false-sentence",
+      "secondary_action": "semantics",
+      "section": "19.6",
+      "text": "The half-window ratio `r_c(k)` is handled identically: a channel with a zero denominator contributes `+inf`, and `R_null_sampled` reaches `+inf` only if enough ",
+      "tier1": [
+        "R_null_sampled",
+        "r_c"
+      ],
+      "tier2": [
+        "half"
+      ]
+    },
+    {
+      "class": "mixed",
+      "key": "93816031eb3b0a8b",
+      "line": 1369,
+      "primary_action": "semantics",
+      "secondary_action": null,
+      "section": "19.6",
+      "text": "**Input errors are not gate outcomes, and draft 29 confused the two.** Fewer full chunks inside the extent than the grid needs \u2014 `K` distinct centres must fit i",
+      "tier1": [],
+      "tier2": [
+        "branch 4",
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "mixed",
+      "key": "db777be9ba03bb2b",
+      "line": 1373,
+      "primary_action": "publication",
+      "secondary_action": "rename",
+      "section": "19.7",
+      "text": "RC-008's T7-R2 found it naming nothing on the only candidate this section has measured a layout for \u2014 `padtype`, `padlen` and the scipy version that produced th",
+      "tier1": [
+        "R_null_sampled",
+        "r_c",
+        "\u03c1(k)",
+        "\u03c3\u0302_c^A",
+        "\u03c3\u0302_c^B"
+      ],
+      "tier2": [
+        "half"
+      ]
+    },
+    {
+      "class": "mixed",
+      "key": "05b29556183f3924",
+      "line": 1375,
+      "primary_action": "publication",
+      "secondary_action": null,
+      "section": "19.7",
+      "text": "**The audit values are reported and never consumed.** `max/median`, `sigma_median_sampled`, the per-channel series, the `\u03c1(k)` series apart from the maximum the",
+      "tier1": [
+        "\u03c1(k)"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "not-a-surface",
+      "key": "794405d3f765c0ee",
+      "line": 1379,
+      "primary_action": null,
+      "secondary_action": null,
+      "section": "19.8",
+      "text": "**The first half of that is right and is kept.",
+      "tier1": [],
+      "tier2": [
+        "half"
+      ]
+    },
+    {
+      "class": "not-a-surface",
+      "key": "7f2d6f4ad3440a22",
+      "line": 1389,
+      "primary_action": null,
+      "secondary_action": null,
+      "section": "19.8",
+      "text": "**The lesson is worth keeping beside the withdrawal.** The question that dissolves a redundant gate \u2014 *what does it reject that the others do not* \u2014 was the rig",
+      "tier1": [],
+      "tier2": [
+        "half"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "16f7e52209b71eff",
+      "line": 1411,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "The `sigma_worst_sampled`, `R_space_sampled` and `R_null_sampled` above are symbols with definitions, not values.",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "mixed",
+      "key": "53798e56a8f0ccd1",
+      "line": 1414,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "- **`sigma_worst_sampled`, `sigma_quietest_sampled`, `R_space_sampled` and `R_null_sampled` are extrema over sixty sampled windows, not over the recording.** Th",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "51405c8e852c6a28",
+      "line": 1417,
+      "primary_action": "ground",
+      "secondary_action": "claim",
+      "section": "19.10",
+      "text": "- **The split rule is a pinned parameter of the instrument, its effect on the decision is real, and no direction is claimed for it.** `R_null_sampled` is comput",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "split",
+        "interleav",
+        "contiguous"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "70ab7ad91ea4456a",
+      "line": 1417,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "**Draft 33 then said the decision rule could not cash that difference, and RC-008's F6-R2 refuted it**: on the same construction, with the level in band and `R_",
+      "tier1": [],
+      "tier2": [
+        "split",
+        "interleav",
+        "contiguous",
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "d17d5b9221eb2916",
+      "line": 1417,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "What bounds the choice is a **reach** rather than a direction \u2014 the split acts only through `R_null_sampled`, which acts in exactly two places, so it can move a",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "split",
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "769e1ac41fe79761",
+      "line": 1417,
+      "primary_action": "ground",
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "**How much it can move a value is not bounded anywhere.** \u00a719.5 keeps contiguous halves on one surviving ground \u2014 that they carry no free parameter to choose \u2014 ",
+      "tier1": [],
+      "tier2": [
+        "contiguous"
+      ]
+    },
+    {
+      "class": "part-b",
+      "key": "28d6e14c943919dc",
+      "line": 1418,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "- **`R_null_sampled` registers estimation noise and within-window non-stationarity, and is silent on estimation bias**, however large that bias is.",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "bab48c7b1654313b",
+      "line": 1418,
+      "primary_action": "claim",
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "A passing `R_null_sampled` therefore licenses nothing about whether the band's per-channel estimates are systematically distorted, and it is not a pure noise fl",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": []
+    },
+    {
+      "class": "part-b",
+      "key": "fb3fbc94b926883a",
+      "line": 1419,
+      "primary_action": "rename",
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "- **`R_null_sampled` is one-sided, and it acts in one place.** A value above `M` withholds the measurement **only where `R_space_sampled \u2264 M`** \u2014 it can convert",
+      "tier1": [
+        "R_null_sampled"
+      ],
+      "tier2": [
+        "unmeasurable"
+      ]
+    },
+    {
+      "class": "not-a-surface",
+      "key": "bb036bf4948bf554",
+      "line": 1420,
+      "primary_action": null,
+      "secondary_action": null,
+      "section": "19.10",
+      "text": "**\u26a0\ufe0f RC-008 is the successor card clause 5 governs, and Round 3 is the last round the method allows.** If it does not reach same-state approval the candidate fr",
+      "tier1": [],
+      "tier2": [
+        "split"
+      ]
+    }
+  ],
+  "tier1_by_section": {
+    "19.10": {
+      "R_null_sampled": 7
+    },
+    "19.11": {
+      "R_null_sampled": 4,
+      "r_c": 1
+    },
+    "19.12": {
+      "R_null_sampled": 1
+    },
+    "19.13": {
+      "R_null_sampled": 2
+    },
+    "19.14": {
+      "R_null_sampled": 3
+    },
+    "19.15": {
+      "R_null_sampled": 5,
+      "r_c": 2,
+      "\u03c1(k)": 1
+    },
+    "19.5": {
+      "R_null_sampled": 18,
+      "r_c": 7,
+      "\u03c1(k)": 1,
+      "\u03c3\u0302_c^A": 1,
+      "\u03c3\u0302_c^B": 1
+    },
+    "19.6": {
+      "R_null_sampled": 7,
+      "r_c": 1
+    },
+    "19.7": {
+      "R_null_sampled": 1,
+      "r_c": 2,
+      "\u03c1(k)": 2,
+      "\u03c3\u0302_c^A": 1,
+      "\u03c3\u0302_c^B": 1
+    },
+    "status-stack": {
+      "R_null_sampled": 7
+    }
+  }
+}
