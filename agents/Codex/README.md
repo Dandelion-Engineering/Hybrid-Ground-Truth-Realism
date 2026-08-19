@@ -37,7 +37,7 @@ agents/Codex/
 │  ├── probe_split_family_dominance.py
 │  └── rc008_round1_2026-08-18.txt … rc008_round3_2026-08-19.json
 ├── Session Summaries/
-│  └── HumanReport1.md … HumanReport49.md
+│  └── HumanReport1.md … HumanReport50.md
 └── Progress Reports/
    ├── Progress Report Phase 1 Close.md
    ├── Progress Report Amendment Compute Schedule.md
@@ -94,7 +94,7 @@ agents/Codex/
 - `chats/Claude-Codex/Rank 1 Drift Result/` is concluded. RC-006 closed `Approved` at Round 2 on the exact nine-file state both agents approved. All four reporting findings are repaired, the owner checker passes 61/61, Codex's delta probe passes 48/48, and no packet or result byte moved in the response. Only rank 1's strict drift gate is discharged; no host is pinned.
 - `chats/Claude-Codex/Host Noise Gate/` is concluded. RC-007 closed `Revisions Required` by explicit two-agent consensus at the Convergence Decision; Draft 31 is frozen and unapproved.
 - `chats/Claude-Codex/Section 19 Convergence Repair/` is concluded. RC-008 closed `Split/Redesign Required` by explicit two-agent consensus; Draft 34 remains frozen and unapproved. Claude's family construction proves midpoint-contiguous and even/odd are two members of one 32-member fixed family, so the failed rationale cannot be narrowed. The required material change separates split-independent Part A from resolution-diagnostic Part B; Part A alone cannot certify a host.
-- `chats/Claude-Codex/Part B Resolution Diagnostic Design/` is active as open-ended pre-card design. Codex reproduced Claude's two Session-49 probes byte-for-byte but found that the sensitivity sweep's “no dominating member” conclusion is false on its own recorded matrix. The forward correction and independent 12/12 witness are posted there; no successor card or stable candidate exists yet.
+- `chats/Claude-Codex/Part B Resolution Diagnostic Design/` is active as open-ended pre-card design. Claude independently accepted and re-derived Codex's dominance correction, then found a valid-input `0/0` half-ratio case whose unhandled NaN path permissively reaches `passes`. Codex reproduced both new probes byte-for-byte and ruled that failure semantics precede member choice: `0/0` is estimator non-resolution rather than an input error or a scalar, and exact completion-interval bounds are the next design object to prove. No successor card, stable candidate or host-noise estimator exists yet.
 - `chats/Claude-Codex-Human/Review Method Change/` is active at Randy's request. The bounded agent-only Convergence Decision, successor-card lineage, and forced redesign after repeated non-approval are agreed and written into the superseding review method. The newest exchange records two reporting safeguards: pair accessible result sentences directly with the technical boundary list rather than translating from memory, and verify prose claims against correct instrument output independently rather than treating a green owner claim checker as sufficient by itself.
 - `Claim Sheet.md` and `Accessible Claim Sheet.md` are synchronized at SHA-256 `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365` / `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`. Amendments 1–6 are `In force`. The matching-rule prose, implementation/tests, host-dependent exact configuration, and manipulation gate remain separate approvals.
 - `Study Guide/Pass 1 - Conceptual Foundation.tex` and PDF are approved Phase 1 artifacts. Pass 2 remains a Phase 3 deliverable.
