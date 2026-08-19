@@ -1,0 +1,40 @@
+
+1. Candidate authentication and frozen spans
+PASS  authenticated: agents/Claude/Tier A Host and Injection Zone Selection.md  [16ee8f801d0a44b9]
+PASS  authenticated: agents/Claude/tools/probe_rc008_spec.py  [7574ac52538b4c05]
+PASS  authenticated: agents/Claude/tools/rc008_spec_2026-08-18_draft33.txt  [8f40c8cc47fd138a]
+PASS  authenticated: agents/Claude/tools/rc008_spec_2026-08-18_draft33.json  [20aea650ca8b1326]
+PASS  authenticated: agents/Claude/tools/mutate_rc008_spec.py  [299be141d43d164b]
+PASS  authenticated: agents/Claude/tools/mutate_rc008_spec_2026-08-18_draft33.txt  [a6c0d94324697cd5]
+PASS  authenticated: agents/Claude/tools/probe_rc008_round2.py  [aa6a4371e905808d]
+PASS  authenticated: agents/Claude/tools/rc008_round2_2026-08-18.txt  [5f692ba5e8f5ad3d]
+PASS  authenticated: agents/Claude/tools/rc008_round2_2026-08-18.json  [0d185bd3bb2f2e49]
+PASS  frozen span ## 1. -> ## 17.  [144664 bytes 700b3b9a]
+PASS  frozen span ## 17. -> ## 18.  [21864 bytes dc73b87f]
+PASS  frozen span ## 18. -> ## 19.  [20579 bytes 8af3e62c]
+
+2. Owner fast-probe replay
+PASS  owner RC-008 checker exits zero  [168 checks, 0 failed]
+PASS  legacy checker has the expected red exit  [288 checks, 16 failed]
+PASS  owner checker reports 168 / 0
+PASS  legacy checker reports 288 / 16
+
+3. F3-R1 response: the decision can cash the split difference
+PASS  the owner's contiguous fixture permits a pass  [passes]
+PASS  the owner's interleaved fixture withholds that pass  [unmeasurable]
+PASS  the split improvement has a decision destination  [passes -> unmeasurable]
+PASS  an above-300-Hz process can repeat exactly across the halves  [f=400.921659 Hz max_delta=1.006e-13]
+PASS  the repeated half-estimates are not independent  [corr=1.000000000000]
+
+4. F4-R1 response: one consumed record remains unauthenticated
+PASS  the legacy checker consumes the timing index
+PASS  the wrapper omits the timing index from its digest set  [5 authenticated paths]
+PASS  the counterfeit timing record differs byte-for-byte  [43c8f31d != 043a4ea4]
+PASS  the wrapper still goes green on that counterfeit record  [exit 0]
+
+5. Delta wording surfaces
+PASS  the four-statistic boundary still says all three
+PASS  the new floor coexists with the stale no-lean sentence
+
+Summary
+27 checks, 0 failed

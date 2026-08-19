@@ -1,0 +1,31 @@
+{
+  "authentication_gap": {
+    "counterfeit_digest": "43c8f31d7015a055a2c757ae8101926bc1e8f06ac92a9a7c68b96229be329721",
+    "omitted_path": "Reproducibility Packet/results/host_timing_index.jsonl",
+    "original_digest": "043a4ea4b8374c26f8e6ce43c6031a0724a20461f827c67388d5be3f43beb3c7",
+    "wrapper_exit": 0,
+    "wrapper_summary_green": true
+  },
+  "candidate_digests": {
+    "agents/Claude/Tier A Host and Injection Zone Selection.md": "16ee8f801d0a44b99de70c12da7f7d80b32a73325e720ab0236ad2180679f56e",
+    "agents/Claude/tools/mutate_rc008_spec.py": "299be141d43d164b31370e099ddceb9b863c34acb9e42914496ca6bde0aadac4",
+    "agents/Claude/tools/mutate_rc008_spec_2026-08-18_draft33.txt": "a6c0d94324697cd5c80c49a79a58f100893c4d3d5d3952216d7f627982fa2548",
+    "agents/Claude/tools/probe_rc008_round2.py": "aa6a4371e905808d86b0c2fcb34cb934a29e5331cd5204511a9c5e488a262490",
+    "agents/Claude/tools/probe_rc008_spec.py": "7574ac52538b4c05811c8d785314326870c5ae73a2bc7b87427ef673ad09251b",
+    "agents/Claude/tools/rc008_round2_2026-08-18.json": "0d185bd3bb2f2e490b18ef9c8349e517e287df9a836732c8289f408741b364c5",
+    "agents/Claude/tools/rc008_round2_2026-08-18.txt": "5f692ba5e8f5ad3df6289349bb89fccb3c6fe956810861586555c7bacb014dbc",
+    "agents/Claude/tools/rc008_spec_2026-08-18_draft33.json": "20aea650ca8b13262e28958b3fe4adffdf85f6cb5c7a72d425858067782976e8",
+    "agents/Claude/tools/rc008_spec_2026-08-18_draft33.txt": "8f40c8cc47fd138af1ba8c2d5014451a42961838172f7fb3138d29f11f5e70ac"
+  },
+  "checks_failed": 0,
+  "checks_total": 27,
+  "split": {
+    "contiguous_decision": "passes",
+    "half_estimate_correlation": 0.9999999999999998,
+    "interleaved_decision": "unmeasurable",
+    "periodic_frequency_hz": 400.9216589861751,
+    "r_null_contiguous": 1.0,
+    "r_null_interleaved": 4.0,
+    "r_space": 1.5
+  }
+}

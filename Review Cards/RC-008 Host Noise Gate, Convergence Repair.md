@@ -4,7 +4,7 @@
 **Opened:** 2026-08-18 06:23 PDT, Claude Session 46
 **Chat:** `chats/Claude-Codex/Section 19 Convergence Repair/`
 **Supersedes:** **RC-007**, which closed at `Revisions Required` on 2026-08-18 by two-agent consensus at the Convergence Decision. This is the one successor clause 4 allows.
-**Status:** Open — Round 1 returned `Revisions Required`; **the owner's Round-2 response is below and the Round-2 candidate is Draft 33.** Draft 32 is superseded as a candidate and survives as §19.13. **§19 has never been approved by anyone.**
+**Status:** Open — Rounds 1 and 2 returned `Revisions Required`; **Draft 33 is frozen and unapproved after the reviewer's Round-2 delta pass found two response-created blockers. Claude owns the final Round-3 response.** Draft 32 is superseded as a candidate and survives as §19.13. **§19 has never been approved by anyone.**
 
 ## ⚠️ Clause 5 applies to this card
 
@@ -184,3 +184,66 @@ No estimator was written, no archive sample was read, no candidate's noise value
 | Round | Date | Who | Findings | Outcome |
 |---|---|---|---|---|
 | 2 (owner response) | 2026-08-18 | Claude | 5 blocking accepted and repaired; 4 tracked taken; 1 owner-found wrong number corrected | Draft 33 presented; reviewer's Round-2 delta pass owed |
+| 2 (reviewer delta) | 2026-08-19 | Codex | 2 response-created blocking findings; 3 tracked wording findings | **Revisions Required**; Draft 33 frozen and unapproved; Claude owns final Round 3 |
+
+## Round 2 — Codex
+
+**Reviewed state:** the nine Draft-33 files at the digests in *Round-2
+candidate*, plus the three frozen spans at their published byte counts and
+digests. All nine authenticated. The owner's checker reproduced **168 / 168**;
+the legacy checker reproduced **288 checks with exactly 16 declared failures**;
+the mutation harness reproduced **27 / 27 caught with a green control**; and the
+owner's Round-2 evidence probe reproduced **36 / 36**. Codex's independent
+`agents/Codex/tools/probe_rc008_round2.py` passes **27 / 27** at SHA-256
+`50a57ddb9226bfc608692c3111340671f5c51d27424acbdd180ba4bdade13bc2`;
+its text/JSON records are `e721097e…` / `06cae352…`.
+
+### Blocking response regressions
+
+**F6-R2 — the replacement split rationale contradicts the ordered decision.**
+Section 19.5 calls it decisive that reducing cancellation is not a goal the
+rule can “cash,” because a low `R_null_sampled` certifies nothing. The same
+response's fixture establishes a direct decision destination. At an in-band
+level with `R_space_sampled = 1.5` and `M = 2`, contiguous
+`R_null_sampled = 1` reaches **passes**, while interleaved
+`R_null_sampled = 4` reaches branch 4 and **unmeasurable**. The split can
+therefore withhold a would-be pass. The first replacement ground is likewise
+not bounded: a 400.921659 Hz process, wholly above 300 Hz, can repeat exactly
+across the two 6,510-sample halves; across phase its half-estimates are
+perfectly correlated rather than close to independent. Keeping contiguous
+halves as a predeclared instrument parameter remains available, but these two
+grounds cannot support it. Remove the false claims and state the choice at its
+real boundary, or supply a bounded rationale that survives the counterexamples.
+
+**F7-R2 — the regression wrapper still omits one input its legacy checker
+reads.** `probe_rc007_spec.py` consumes
+`Reproducibility Packet/results/host_timing_index.jsonl`; the repaired
+`RC007_AUTHENTICATED` list contains five paths and omits that sixth input. The
+mutation harness copies the timing index but never mutates it. In a staged
+tree, a byte-different synthetic 21-series timing record preserving the two
+aggregates the legacy checker consumes still lets the wrapper report **168
+checks, 0 failed** and exit zero. That is the original F4-R1 defect class on an
+unlisted record, and it contradicts the wrapper's assertion that every file the
+baseline reads is pinned. Authenticate the timing index and add a substitution
+mutation that reaches it.
+
+### Tracked non-blocking delta findings
+
+- **T5-R2:** §19.10 lists four sampled extrema/ratios and then says a short
+  excursion is invisible to “all three.”
+- **T6-R2:** §19.3 gives the lower floor a voting minimum but retains the stale
+  sentence that §19.6 “does not lean on the floor.”
+- **T7-R2:** the document establishes that the raw series declares no rate and
+  later asks §19.7 to publish the candidate's “own declared rate.” Name the
+  whole-span derived timing-index rate if that is the intended diagnostic.
+
+## Round-2 outcome
+
+**Revisions Required.** Draft 33 remains frozen and unapproved. Claude owns the
+final Round-3 response to F6-R2 and F7-R2 and the three tracked items. This
+return does not itself trigger the Convergence Decision; if Round 3 does not
+reach explicit same-state approval, the card freezes and the decision fires.
+Clause 5 continues to forbid a second like-for-like successor after a
+non-approval here. No archive sample was read, no candidate noise value was
+produced, no estimator or packet file exists for this gate, no host was pinned,
+and rank 2 remains unmeasured.

@@ -1,133 +1,142 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 46 · 2026-08-18.**
+**Rewritten at the end of Codex Session 47 · 2026-08-19.**
 
-**Next Codex session will be Session 47. The next count-based progress report is
-due in Session 48.**
+**Next Codex session will be Session 48. A count-based director progress report
+is due in Session 48.**
 
 ## Current phase and controlling boundary
 
-**Phase 2 — Execution and specification review.** RC-007 closed
-`Revisions Required` by explicit two-agent consensus. RC-008 is its sole
-like-for-like successor under `Playbooks/review-cycle.md` clause 5. RC-008
-Round 1 returned **`Revisions Required`** on Draft 32 with five blocking and
-four tracked findings. Draft 32 is frozen and unapproved; Claude owns the
-Round-2 response.
+**Phase 2 — Execution and specification review.** RC-008, the sole successor to
+RC-007, remains open after **Round-1 and Round-2 `Revisions Required`** verdicts.
+Draft 33 SHA-256 `16ee8f801d0a44b99de70c12da7f7d80b32a73325e720ab0236ad2180679f56e`
+is frozen and unapproved. Claude owns the **final Round-3 response**.
 
-This is not a recording result. No host-noise estimator exists, no archive
-sample or candidate noise value has been read, no host is pinned, and rank 2 is
-unmeasured. Rank 1 has cleared only the approved strict drift gate. No
-host-dependent manifest, donor assignment, generation, Rung 0, or sorter
-execution is authorized.
+If Round 3 does not reach explicit same-state approval, the agent-only
+Convergence Decision fires. Under clause 5, a non-approval on RC-008 forbids a
+second like-for-like successor; the work must then split or redesign with the
+changed boundary named.
 
-## Draft-32 exact state and reproduced evidence
+This remains a specification, not a recording result. No host-noise estimator
+exists, no archive sample or candidate noise value has been read, no host is
+pinned, and rank 2 is unmeasured. Rank 1 has cleared only the approved strict
+drift gate. No host-dependent manifest, donor assignment, generation, Rung 0 or
+sorter execution is authorized.
 
-RC-008 authenticates six files. The selection document is Draft 32, SHA-256
-`6933c89ec561a7a9bc3201ea332ed7a6698f179af65cde49621cb0fddaec0db7`.
-The other five carded digests matched. Frozen spans remain §1–§16
-`700b3b9a…` over 144,664 bytes, §17 `dc73b87f…` over 21,864 bytes, and §18
-`8af3e62c…` over 20,579 bytes.
+## Draft-33 authentication and reproduced evidence
+
+All nine carded files authenticated:
+
+- selection document `16ee8f80…`;
+- specification checker `7574ac52…` and TXT/JSON `8f40c8cc…` / `20aea650…`;
+- mutation harness `299be141…` and record `a6c0d943…`;
+- owner Round-2 probe `aa6a4371…` and TXT/JSON `5f692ba5…` / `0d185bd3…`.
+
+The frozen spans reproduce: §1–§16 144,664 bytes / `700b3b9a…`; §17 21,864 /
+`dc73b87f…`; §18 20,579 / `8af3e62c…`.
 
 Owner evidence reproduced:
 
-- RC-008 checker: **57 / 57**, exit 0;
-- legacy RC-007 baseline: **288 checks with exactly six declared failures**,
-  exit 1;
-- RC-008 mutation harness: **12 / 12 caught**, green control.
+- RC-008 checker: **168 / 168**;
+- legacy RC-007 baseline: **288 checks, exactly 16 declared failures**;
+- mutation harness: **27 / 27 caught**, green control;
+- owner Round-2 evidence probe: **36 / 36**.
 
-Codex's `agents/Codex/tools/probe_rc008_round1.py` passes **32 / 32**. Digests:
+Codex's `agents/Codex/tools/probe_rc008_round2.py` passes **27 / 27**. Digests:
 
-- probe: `7352afab46034dd7057f4aba4dae45a2532729d747287c867ab14acb7eb06f2f`;
-- record: `dad99817d0698819fd39f1bf9aa953f9ca19780bff137aa85decb354d5ba4a0d`.
+- probe: `50a57ddb9226bfc608692c3111340671f5c51d27424acbdd180ba4bdade13bc2`;
+- text: `e721097e2eb6e8923e74fa1e6440a68af39bff569dfb05a74127171722f9b304`;
+- JSON: `06cae35207022b8d1d6d848e6c0e7c70e39f01832b9fa083084d070ede0a4019`.
 
-It authenticates Draft 32, invokes the owner checker, and reproduces all five
-concrete counterexamples. It reads no archive sample, candidate noise value or
-network resource.
+It reads no archive, candidate sample or network resource.
 
-## Round-1 blocking findings
+## Round-2 blocking findings
 
-### F1-R1 — lower floor uses the loudest sampled window
+### F6-R2 — the replacement split rationale contradicts the decision
 
-Section 19 uses `sigma_worst_sampled = max_k S(k)` for both the upper ceiling
-and lower anti-saturation floor. A fixture with 59 windows at `1 µV` and one at
-`5 µV` passes the strict branch, even though every quiet window violates the
-lower floor and gives `A_min / S(k) = 50 > 40`. Use a quietest sampled
-statistic for the lower floor, or narrow the guarantee so it does not claim to
-protect every sampled placement.
+Draft 33 withdraws the false claim that interleaving always compresses
+`R_null_sampled`, but its “decisive” replacement says reducing cancellation is
+not a goal the rule can cash. The response's own values refute that. At
+`R_space_sampled = 1.5`, `M = 2`:
 
-### F2-R1 — nominal-rate design contradicts exact filter identity
+- contiguous `R_null_sampled = 1` → **passes**;
+- interleaved `R_null_sampled = 4` → **unmeasurable**.
 
-Pinned SpikeInterface 0.104.8 designs `FilterRecording` coefficients from
-`recording.get_sampling_frequency()`. Draft 32 fixes nominal `30,000 Hz`; the
-rank-1 timing index records `30,000.039869961383 Hz`. SOS coefficients differ by
-`1.31860735664e-07` and a deterministic retained signal differs by
-`3.56153236218e-05 µV`. Use the recording rate, or declare the nominal-rate
-deviation and narrow the exact-identity claim.
+The split difference can therefore withhold a would-be pass. The first
+replacement ground is also not bounded: a 400.921659 Hz process, wholly above
+300 Hz, can repeat exactly across both 6,510-sample halves; across phase the two
+half-estimate series have correlation 1.0. High-pass frequency support does not
+establish near-independence.
 
-### F3-R1 — interleaving need not compress the split spread
+Claude may keep contiguous halves as a predeclared instrument parameter, but
+must remove the two false grounds and state the choice at its real boundary, or
+provide a bounded rationale that survives the counterexamples.
 
-A periodic 72-channel construction gives contiguous `R_null = 1` and even/odd
-interleaved `R_null = 4`. If another interleaving scheme was intended, it was
-not pinned. Keep contiguous halves only with a bounded rationale or support a
-precisely defined alternative; remove the universal permissive-direction
-claim.
+### F7-R2 — one legacy-checker input remains unauthenticated
 
-### F4-R1 — regression checker can green for the wrong reason
+`probe_rc007_spec.py` consumes
+`Reproducibility Packet/results/host_timing_index.jsonl`. Draft 33's
+`RC007_AUTHENTICATED` list pins five paths and omits that file. The mutation
+harness copies it but never mutates it.
 
-In a staged candidate, change parameter-table `K` from `60` to `61` and replace
-the unauthenticated legacy checker with a counterfeit printing the expected six
-failures and summary. The outer RC-008 checker still exits zero at **57 / 57**.
-Pin the legacy executable and record digests, require its expected process
-semantics including nonzero exit, and add substitution/undeclared-change
-mutation coverage.
+Codex staged a byte-different synthetic 21-series timing record preserving the
+two aggregates the legacy checker consumes. The repaired wrapper still exited
+zero at **168 checks, 0 failed**. This is the original F4-R1 defect class on an
+unlisted record. Claude must authenticate the timing-index digest and add a
+substitution mutation that reaches it.
 
-### F5-R1 — an extreme bad channel can make the gate permissive
+## Tracked non-blocking delta findings
 
-For a 72-channel vector with 8 values at `1`, 56 at `2`, and 8 at `3`,
-`p90/p10 = 3` and strict `M = 2` fails. Replacing one low value with `100`
-moves the ratio to `1.5`, flipping failure to pass. Add defensible bad-channel
-handling/bounds, or remove the claim that leaving bad channels unmasked is
-conservatively directed and account for the permissive failure mode.
+- **T5-R2:** §19.10 lists four sampled quantities and says a short excursion is
+  invisible to “all three.”
+- **T6-R2:** §19.3 now gives the lower floor a voting minimum but retains the
+  stale sentence that §19.6 “does not lean on the floor.”
+- **T7-R2:** the raw AP series declares no sampling rate, but §19.7 asks for the
+  candidate's “own declared rate.” Name the whole-span derived timing-index
+  rate if that is the intended diagnostic.
 
-## Tracked non-blocking findings
+## What verified clean in the response
 
-- **T1-R1:** distinguish clustered coverage loss from three-core statistical
-  aggregation/dilution in §19.9.
-- **T2-R1:** update §19.10's stale current-state sentence from Draft 31.
-- **T3-R1:** say stored-code step(s), not stored bit(s).
-- **T4-R1:** restrict phase-omission upward bias to the shared-component model
-  unless the stronger final nonlinear statistic direction is supported.
-
-No fifth live contradiction was found in the repaired `R_null_sampled` branch
-surfaces; those four Draft-32 surfaces agree with the ordered branches.
+- F1-R1's floor now reads `sigma_quietest_sampled`; the upper ceiling remains
+  on `sigma_worst_sampled`; no threshold value moved.
+- F2-R1 is honestly declared as a nominal-rate deviation. The design
+  coefficients differ by `1.31860735664e-07`; `padlen` remains 18 and the
+  automatic margin remains 500 samples under the compared rates. Fixture sample
+  effects are explicitly diagnostics, not bounds.
+- F5-R1's bad-channel conservatism claim is withdrawn and the per-channel scale
+  series is published for every window; no post-hoc detector threshold is added.
+- T1-R1's coverage/dilution distinction and corrected 228.718-second number
+  reproduce; T2-R1 through T4-R1 are taken on their stated boundaries.
 
 ## Immediate owner instructions
 
 **Immediate owner: Claude.** Read RC-008 and the active Section 19 Convergence
-Repair chat. Respond explicitly to F1-R1 through F5-R1 and dispose of T1-R1
-through T4-R1. Prepare a fully authenticated exact Round-2 candidate outside
-the frozen Draft-32 bytes, update the checker and mutation coverage, and record
-the response/digests in RC-008 before handing it back.
+Repair chat. Prepare the final Round-3 exact candidate that:
 
-Codex Session 47 should authenticate the complete owner response and perform a
-Round-2 delta review. Approval requires explicit same-state approval; a green
-owner suite or silence is not approval. If RC-008 eventually reaches a
-non-approval terminal disposition, clause 5 forbids another like-for-like
-successor and requires a named split/redesign.
+1. removes or bounds the two false split grounds while keeping any parameter
+   choice at its honest boundary;
+2. authenticates `host_timing_index.jsonl` and mutation-tests its substitution;
+3. disposes of T5-R2 through T7-R2;
+4. updates candidate digests and owner evidence before handoff.
 
-The Review Method Change chat remains active but has no outstanding director
-request.
+Codex Session 48 should authenticate only that final delta. Approval requires
+explicit same-state approval. If a blocker remains or a new blocker appears,
+freeze the state and run the one-time Convergence Decision rather than opening
+another repair round.
+
+The Review Method Change chat remains active at Randy's request and has no
+outstanding director action.
 
 ## Approved foundation and downstream gates
 
 - RC-001: drift definition and estimator closed `Approved`.
-- RC-002: closed unapproved; its sole successor RC-003 closed `Approved`.
+- RC-002: closed unapproved; sole successor RC-003 closed `Approved`.
 - RC-004: session reference-instant check closed `Approved`.
 - RC-005: missing-depth recovery closed `Approved with Follow-Ups`.
 - RC-006: rank-1 drift measurement/report closed `Approved`.
 - RC-007: closed `Revisions Required`; Draft 31 frozen and unapproved.
-- RC-008: open after Round-1 `Revisions Required`; Draft 32 frozen and
-  unapproved; owner Round-2 response owed.
+- RC-008: open after Round-1 and Round-2 `Revisions Required`; Draft 33 frozen
+  and unapproved; final owner response owed.
 - All six Claim Sheet amendments remain `In force`; contract hashes remain
   `2feda611…` / `679918f7…`.
 - The real-arm donor-matching prose remains same-state approved at Draft 6
@@ -139,5 +148,5 @@ and tests; calibrate footprint/placement; freeze exact matching outputs; obtain
 independent balance/manipulation approval; then seek separate generation and
 later Rung-0/sorter authorizations.
 
-`agents/Codex/Session Summaries/HumanReport46.md` is the detailed permanent
-record. No Session-46 cadence report was due.
+`agents/Codex/Session Summaries/HumanReport47.md` is the detailed permanent
+record. No Session-47 cadence report was due; Session 48 requires one.
