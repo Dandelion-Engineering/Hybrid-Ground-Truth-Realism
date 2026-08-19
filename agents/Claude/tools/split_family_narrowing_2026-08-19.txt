@@ -1,0 +1,43 @@
+
+1. Authenticate the record before reading it
+PASS  the source record is the one Codex audited  [SHA-256 f51b4949e8406b7bb237a49ecb3af985ce5127896a680e28c58b67f06a9b4fcb]
+PASS  it carries 32 members and one fixture row for each  [32 members, 32 rows]
+PASS  the members are exactly the divisors of 6,510  [6,510 = 2 * 3 * 5 * 7 * 31]
+
+2. Recompute the matrix along an independent path
+PASS  the recomputed withholding table agrees with the record for every one of the 1,024 cells  [0 of 32 fixture rows differ]
+PASS  and the recomputed R_space_sampled agrees to 1e-12 relative  [largest absolute difference 0.000e+00]
+PASS  R_space_sampled stays inside strict M on every fixture, so branch 4 is what decides  [R_space in 1.000000 ... 1.666667]
+
+2a. Where the 1,024 decisions actually sit against M = 2.0
+PASS  every withholding decision clears M by a wide margin, so the dominance structure is not read off ties  [77 withheld cells, closest is M + 0.777778]
+PASS  but 450 of the 1,024 cells sit EXACTLY at M, and every one of them is on the passing side  [branch 4's '>' is strict, so an exact tie passes]
+PASS  so a non-strict branch 4 would produce a different table  [450 cells would flip from pass to withhold]
+NOTE  this fixture family therefore supports claims about clearly separated values and must NOT be used to argue anything near M
+
+3. Re-derive the dominance structure without Codex's code
+PASS  the matrix contains 30 strict pairwise dominance relations  [30 found, against Codex's 30]
+PASS  they are exactly p=1 over the other 15 odd members and p=2 over the other 15 even members  [no cross-parity dominance]
+PASS  p=1 withholds on exactly the 16 odd-target fixtures  [signature size 16]
+PASS  p=2 withholds on exactly the 16 even-target fixtures  [signature size 16]
+PASS  p=1 and p=2 are incomparable and their union covers all 32  [disjoint, 16 + 16]
+PASS  every other odd member's signature is exactly {1, p}  [15 members, size 2 each]
+PASS  every other even member's signature is exactly {p}  [15 members, size 1 each]
+PASS  no two members share a signature  [32 distinct signatures]
+
+4. What Session 49 claimed, checked one statement at a time
+PASS  SURVIVES: every member withholds on the fixture built at its own block length  [32 of 32]
+PASS  SURVIVES: no member withholds on every fixture  [0 members always withhold]
+PASS  SURVIVES: no member withholds on no fixture  [0 members never withhold]
+PASS  SURVIVES: on the p_t = 2 fixture exactly one member withholds  [the other 31 pass]
+PASS  WITHDRAWN: 'the family has no dominating member' is false on this very matrix  [30 relations, so the Session-49 detail string is withdrawn]
+PASS  the Session-49 check that carried that string tested something weaker and that weaker thing is true  [the body was right; the detail string overreached]
+
+5. The boundary, and what is still open
+PASS  every fixture was evaluated against all 32 members  [32 fixtures x 32 members, none skipped]
+NOTE  32 CONSTRUCTED fixtures, each built to be visible to one member; the dominance structure is a property of that construction
+NOTE  nothing here defeats 'pin one member and disclose it' - distinct conventions are expected to disagree on member-matched fixtures
+NOTE  the two-member {1, 2} cover is a fact about this constructed set and is NOT proposed as a real-data diagnostic
+
+Summary
+24 checks, 0 failed

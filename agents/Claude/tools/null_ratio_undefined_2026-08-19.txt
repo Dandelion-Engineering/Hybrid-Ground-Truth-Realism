@@ -1,0 +1,42 @@
+
+1. The undefined case exists and is not the documented one
+PASS  the step channel's whole-core sigma_hat_c is nonzero, so section 19.6's own degenerate test does not catch it  [sigma_hat_c = 1.482602]
+PASS  yet under p = 6,510 both halves have exactly zero MAD  [sigma_hat^A = 0.0, sigma_hat^B = 0.0]
+PASS  so the ratio is 0/0, which is NaN and not +inf  [r_c = nan]
+
+2. And it is split-dependent, which is what makes it Part B
+PASS  the same channel under p = 1 gives a finite ratio of exactly 1.0  [r_c = 1.000000]
+PASS  exactly 16 of the 32 members are undefined on this one channel  [and 16 are finite]
+PASS  they are exactly the 16 EVEN members  [p = 2 ... 6510]
+PASS  and every one of the 16 odd members gives exactly 1.0, the best value the statistic can take  [no intermediate value occurs]
+
+2a. Why, checked rather than told
+PASS  6,510 carries exactly one factor of 2, so a member is even exactly when 6,510/p is odd  [true for all 32 members]
+PASS  a MAD is exactly zero whenever a strict majority of the samples share the median value  [7 of 10 equal gives MAD 0]
+PASS  under every even member both halves hold a strict majority of one step value, which is what drives both MADs to zero  [smallest majority share 0.500154]
+NOTE  whether a candidate has an undefined resolution diagnostic at all is therefore decided by the split rule that is not yet chosen: on this channel half the family is undefined and half is exactly 1.0
+
+3. The documented +inf case behaves exactly as documented
+PASS  a channel varying on half A and constant on half B gives +inf  [r_c = inf]
+PASS  with 8 of 72 such channels R_null_sampled is +inf and branch 4 fires  [disposition unmeasurable]
+PASS  with 7 of 72 it does not, which is what 'only if enough such channels reach the p90 rank' says  [p90 sits at rank 65 of 72]
+
+4. The undefined case is permissive in BOTH regimes
+PASS  with 7 of 72 undefined channels the NaNs sort above the p90 rank and never reach the comparison  [R_null_sampled = 1.000000, disposition passes]
+PASS  with 8 of 72 R_null_sampled is itself NaN  [R_null_sampled = nan]
+PASS  and NaN > M is False, so branch 4 does not fire  [the comparison is False, not an error]
+PASS  so the disposition of a wholly undefined resolution diagnostic is `passes`  [disposition passes]
+PASS  the contrast is exact: 8 undefined channels pass where 8 zero-denominator channels are unmeasurable  [same count, same rank, opposite disposition]
+
+5. 'Sort ascending' does not determine an answer with a NaN
+PASS  numpy.sort sinks NaN to the end, a convention section 19.4 does not state  [rank 65 of 72 is nan]
+PASS  Python's own sorted returns different rank-65 values for two permutations of the SAME multiset  [NaN-first gives 1.0, NaN-last gives nan]
+NOTE  NaN is unordered, so the nearest-rank rule needs a stated convention before it is implementable at all
+
+6. Boundary
+NOTE  constructed channels only; no candidate sample has ever been read for noise, and no frequency claim is made about real recordings
+NOTE  the claim is that the specification does not define the case, which is a property of the specification
+NOTE  this binds every Part B reading, including one that publishes R_null_sampled without letting it decide
+
+Summary
+20 checks, 0 failed
