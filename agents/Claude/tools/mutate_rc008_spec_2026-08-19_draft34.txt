@@ -1,0 +1,45 @@
+control run: exit 0
+revert 19.5 to the unconditional claim               caught=True  red=2
+drop the asymmetry rule from 19.5                    caught=True  red=2
+drop the asymmetry rule from 19.6                    caught=True  red=2
+revert 19.10's bullet to the unconditional form      caught=True  red=2
+remove 19.12's supersession note                     caught=True  red=1
+unsettle the split decision                          caught=True  red=1
+restore the withdrawn compression direction          caught=True  red=1
+re-claim a direction for the split rule              caught=True  red=2
+revert branch 2 to the loudest window                caught=True  red=2
+delete the quietest-window quantity from 19.4        caught=True  red=1
+revert 19.6's admissible band to one statistic       caught=True  red=5
+revert 19.8's ratio to the wrong denominator         caught=True  red=2
+re-widen the identity claim in 19.3                  caught=True  red=3
+drop the padlen/margin invariance from 19.3          caught=True  red=1
+restore the bad-channel conservatism claim           caught=True  red=2
+break the corrected coverage figure in 19.9          caught=True  red=1
+remove the clause-5 boundary from 19.10              caught=True  red=2
+revert the code-step terminology                     caught=True  red=2
+re-widen the phase-omission direction                caught=True  red=1
+remove 19.13's supersession note                     caught=True  red=1
+break 19.6's branch 4                                caught=True  red=3
+delete one restatement of the coverage duration from 19.13 caught=True  red=1
+remove 19.13's record of the counter-argument        caught=True  red=1
+edit a closed section                                caught=True  red=3
+restore the withdrawn independence ground            caught=True  red=1
+restore the withdrawn cash ground                    caught=True  red=1
+delete the decision destination from 19.5            caught=True  red=1
+break the truth-table counts in 19.5                 caught=True  red=1
+re-claim the split rule is the safer choice          caught=True  red=1
+revert 19.10 to three sampled quantities             caught=True  red=1
+restore 19.3's stale no-lean clause                  caught=True  red=1
+drop the floor's permissive direction from 19.10     caught=True  red=1
+restore the declared-rate phrasing in 19.7           caught=True  red=1
+revert 19.8's conditional to the stale pair          caught=True  red=2
+stop publishing the per-window null series           caught=True  red=1
+remove 19.14's supersession note                     caught=True  red=1
+re-widen 19.10's review history to Round 1           caught=True  red=1
+substitute a counterfeit legacy checker              caught=True  red=6 on=the named check
+change one byte of the legacy checker                caught=True  red=2 on=the named check
+tamper with one carried record                       caught=True  red=2 on=the named check
+re-serialize the timing index the baseline reads     caught=True  red=2 on=the named check
+unpin the timing index in the wrapper's own list     caught=True  red=2 on=the named check
+
+42 of 42 mutations caught

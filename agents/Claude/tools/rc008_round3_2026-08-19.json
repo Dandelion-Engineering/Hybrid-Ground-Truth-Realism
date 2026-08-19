@@ -1,0 +1,42 @@
+{
+  "ground_one": {
+    "correlation": 0.9999999999999999,
+    "f_min_hz": 304.147465437788,
+    "f_reviewer_hz": 400.9216589861751,
+    "m_min": 66,
+    "members_exact": 135,
+    "post_filter_max_half_delta": 5.3864591696983766e-05,
+    "post_filter_r_c": 0.9999999999999432
+  },
+  "ground_three": {
+    "M": 2.0,
+    "contiguous": "passes",
+    "interleaved": "unmeasurable",
+    "r_space": 1.5
+  },
+  "parity": {
+    "contiguous": 1.0,
+    "inside_M": [
+      "passes",
+      "unmeasurable"
+    ],
+    "interleaved": 4.0,
+    "loud_r_space": 4.5,
+    "outside_M": [
+      "fails-homogeneity-resolved",
+      "fails-homogeneity-resolved"
+    ],
+    "r_space": 1.5
+  },
+  "reach": {
+    "illegal": 0,
+    "moved": 9,
+    "relabelled": 6,
+    "unchanged": 57
+  },
+  "timing": {
+    "head_rate_hz": 30000.03989331282,
+    "rate_hz": 30000.039869961383,
+    "timing_source": "timestamps"
+  }
+}

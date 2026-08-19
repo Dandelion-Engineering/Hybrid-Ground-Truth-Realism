@@ -1,0 +1,249 @@
+{
+  "census": [
+    {
+      "section_19_13": 2,
+      "section_19_14": 2,
+      "section_19_15": 1,
+      "section_19_body": 7,
+      "sections_1_18": 0,
+      "status_stack": 2,
+      "value": "73.780"
+    },
+    {
+      "section_19_13": 1,
+      "section_19_14": 1,
+      "section_19_15": 3,
+      "section_19_body": 8,
+      "sections_1_18": 0,
+      "status_stack": 5,
+      "value": "6,510"
+    },
+    {
+      "section_19_13": 1,
+      "section_19_14": 1,
+      "section_19_15": 1,
+      "section_19_body": 16,
+      "sections_1_18": 0,
+      "status_stack": 5,
+      "value": "13,020"
+    },
+    {
+      "section_19_13": 2,
+      "section_19_14": 1,
+      "section_19_15": 1,
+      "section_19_body": 2,
+      "sections_1_18": 0,
+      "status_stack": 4,
+      "value": "957,031,364"
+    },
+    {
+      "section_19_13": 0,
+      "section_19_14": 1,
+      "section_19_15": 0,
+      "section_19_body": 6,
+      "sections_1_18": 0,
+      "status_stack": 4,
+      "value": "500 samples"
+    },
+    {
+      "section_19_13": 0,
+      "section_19_14": 0,
+      "section_19_15": 0,
+      "section_19_body": 5,
+      "sections_1_18": 0,
+      "status_stack": 1,
+      "value": "14,020"
+    },
+    {
+      "section_19_13": 0,
+      "section_19_14": 1,
+      "section_19_15": 0,
+      "section_19_body": 2,
+      "sections_1_18": 0,
+      "status_stack": 1,
+      "value": "2.34375"
+    },
+    {
+      "section_19_13": 0,
+      "section_19_14": 0,
+      "section_19_15": 0,
+      "section_19_body": 4,
+      "sections_1_18": 1,
+      "status_stack": 0,
+      "value": "9,999"
+    }
+  ],
+  "checks_failed": 0,
+  "checks_total": 241,
+  "document_bytes": 343106,
+  "document_sha256": "ecccfa565966276e203efef2794f180fe73a2e1e0cbc8beff97d3bd8916a6f89",
+  "rc007_declared_inputs": [
+    "Reproducibility Packet/results/host_timing_index.jsonl",
+    "agents/Claude/Tier A Host and Injection Zone Selection.md",
+    "agents/Claude/tools/filter_chain_2026-08-18.json",
+    "agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.json",
+    "agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.txt",
+    "agents/Claude/tools/rc007_round3_2026-08-18.json"
+  ],
+  "rc007_digests": {
+    "Reproducibility Packet/results/host_timing_index.jsonl": "043a4ea4b8374c26f8e6ce43c6031a0724a20461f827c67388d5be3f43beb3c7",
+    "agents/Claude/tools/filter_chain_2026-08-18.json": "b9f3e089e2b94e2d9e26743133d167bb258e3be169b5ce3f1b3fe625c7b72b15",
+    "agents/Claude/tools/probe_rc007_spec.py": "ef37577e271161677a637b34fcac18a930bb105d544b94992886116140c625dd",
+    "agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.json": "4896a14f46454188f758d575cbbfd9c79870ff471a01145e72b26118973a9162",
+    "agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.txt": "f992c394480eef5748131a55d4a394bbbcb858acd0a1a0f434de1ef1aa16ad6a",
+    "agents/Claude/tools/rc007_round3_2026-08-18.json": "51e762669c53a57cc3c4219547a000435b1a89d766cbc9ca7730c4f6a5c9717f"
+  },
+  "rc007_failures": [
+    "section prices the refused cheaper arrangement",
+    "section names the identity it now claims",
+    "section carries the admissible band",
+    "section carries the pass rule's own band",
+    "section states the section has been reviewed twice",
+    "section states the three-round limit",
+    "section states R_null is one-sided",
+    "section states the refused interleaved split",
+    "section restates 73.780 exactly 7 times",
+    "section restates 6,510 exactly 6 times",
+    "section restates 500 samples exactly 5 times",
+    "section restates 14,020 exactly 4 times",
+    "section restates 13,020 exactly 14 times",
+    "section restates 9,999 exactly 3 times",
+    "section restates 2.34375 exactly 2 times",
+    "section restates 957,031,364 exactly 2 times"
+  ],
+  "rc007_returncode": 1,
+  "round2": {
+    "checks_failed": 0,
+    "checks_total": 36,
+    "f1": {
+      "n_below_floor": 59,
+      "n_windows": 60,
+      "sigma_quietest_sampled": 1.0,
+      "sigma_worst_sampled": 5.0,
+      "snr_p2p_at_quietest": 50.0,
+      "snr_p2p_at_worst": 10.0
+    },
+    "f2": {
+      "coeff_delta": 1.318607356637358e-07,
+      "corner_shift_hz": 0.00039869961383374173,
+      "head_delta": 7.722977812818499e-11,
+      "margin_samples": {
+        "head": {
+          "exact": 500.00066488854696,
+          "floor": 500,
+          "int": 500,
+          "round": 500
+        },
+        "nominal": {
+          "exact": 500.0,
+          "floor": 500,
+          "int": 500,
+          "round": 500
+        },
+        "recording": {
+          "exact": 500.0006644993564,
+          "floor": 500,
+          "int": 500,
+          "round": 500
+        }
+      },
+      "padlen_nominal": 18,
+      "padlen_recording": 18,
+      "retained_sample_delta_uv": 5.804717758906008e-06,
+      "retained_sigma_relative_delta": 4.106564412786359e-07
+    },
+    "f3": {
+      "r_null_contiguous": 1.0,
+      "r_null_interleaved": 4.0,
+      "ratios_used": [
+        0.5,
+        1.0,
+        2.0
+      ]
+    },
+    "f5": {
+      "direction": "permissive",
+      "r_space_base": 3.0,
+      "r_space_one_extreme": 1.5,
+      "rank_p10": 8,
+      "rank_p90": 65
+    },
+    "numpy_version": "2.5.2",
+    "scipy_version": "1.18.0",
+    "t1": {
+      "clustered_five": {
+        "g": 524,
+        "guarantee_chunks": 524,
+        "guarantee_s": 227.416,
+        "transfers": 100
+      },
+      "dilution": {
+        "excursion": 3.0,
+        "fraction_retained": 0.4411653683492091,
+        "one_chunk": 3.0209674683082257,
+        "three_chunk": 1.332746225927176
+      },
+      "pinned": {
+        "g": 170,
+        "guarantee_chunks": 170,
+        "guarantee_s": 73.78,
+        "transfers": 180
+      },
+      "sparse_twenty": {
+        "g": 527,
+        "guarantee_chunks": 527,
+        "guarantee_s": 228.718,
+        "transfers": 60
+      }
+    },
+    "t4": {
+      "channels_rising": 72,
+      "median_sigma_aligned": 2.9425969847800983,
+      "median_sigma_shifted": 4.719105648259673,
+      "r_space_aligned": 1.0417802305954356,
+      "r_space_shifted": 1.0406154739510098
+    }
+  },
+  "round3": {
+    "ground_one": {
+      "correlation": 0.9999999999999999,
+      "f_min_hz": 304.147465437788,
+      "f_reviewer_hz": 400.9216589861751,
+      "m_min": 66,
+      "members_exact": 135,
+      "post_filter_max_half_delta": 5.3864591696983766e-05,
+      "post_filter_r_c": 0.9999999999999432
+    },
+    "ground_three": {
+      "M": 2.0,
+      "contiguous": "passes",
+      "interleaved": "unmeasurable",
+      "r_space": 1.5
+    },
+    "parity": {
+      "contiguous": 1.0,
+      "inside_M": [
+        "passes",
+        "unmeasurable"
+      ],
+      "interleaved": 4.0,
+      "loud_r_space": 4.5,
+      "outside_M": [
+        "fails-homogeneity-resolved",
+        "fails-homogeneity-resolved"
+      ],
+      "r_space": 1.5
+    },
+    "reach": {
+      "illegal": 0,
+      "moved": 9,
+      "relabelled": 6,
+      "unchanged": 57
+    },
+    "timing": {
+      "head_rate_hz": 30000.03989331282,
+      "rate_hz": 30000.039869961383,
+      "timing_source": "timestamps"
+    }
+  }
+}

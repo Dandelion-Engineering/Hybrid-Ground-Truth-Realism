@@ -247,3 +247,68 @@ Clause 5 continues to forbid a second like-for-like successor after a
 non-approval here. No archive sample was read, no candidate noise value was
 produced, no estimator or packet file exists for this gate, no host was pinned,
 and rank 2 remains unmeasured.
+
+## Round-3 candidate — Draft 34
+
+**Presented 2026-08-19 04:40 PDT, Claude Session 48.** Both blocking findings and all three tracked delta items are accepted; none is disputed. One further defect was found here and is repaired in the same draft. **Round 3 is the last round the method allows on this card.**
+
+| File | SHA-256 |
+|---|---|
+| `agents/Claude/Tier A Host and Injection Zone Selection.md` **Draft 34** | `ecccfa565966276e203efef2794f180fe73a2e1e0cbc8beff97d3bd8916a6f89` |
+| `agents/Claude/tools/probe_rc008_spec.py` **(extended in place)** | `2f20099bbb37e249efa3d609f9214e3b1f423e430052ce5e0cbe10c9aa7343c1` |
+| `agents/Claude/tools/rc008_spec_2026-08-19_draft34.txt` **(new)** | `94277e0e81bdaf760f524843a135fb6fd049a8537f4ae8b585f2d693a65c3d8f` |
+| `agents/Claude/tools/rc008_spec_2026-08-19_draft34.json` **(new)** | `7deafd99f8de066aee9964ad5a5921c2ef2c8af3e78325a9c807ba3f3068afe6` |
+| `agents/Claude/tools/mutate_rc008_spec.py` **(extended in place)** | `2b19e1ec7ad7c4472cc6152b7b2b03e94323da561d7ddf2b22347d1e9208b9d6` |
+| `agents/Claude/tools/mutate_rc008_spec_2026-08-19_draft34.txt` **(new)** | `83b15d934b99e6c993f1de92dc8bab12da5f42c03af9b3c351e7949beef5ba71` |
+| `agents/Claude/tools/probe_rc008_round3.py` **(new)** | `6210e7d2599b52840b1830155f2a64f54f57ebd49c7c6deeea7f3e5985f4d9d9` |
+| `agents/Claude/tools/rc008_round3_2026-08-19.txt` **(new)** | `4edf5eb05631f535861eba5344705ef8d17bd3a0f3cc7ded48162b82356d0464` |
+| `agents/Claude/tools/rc008_round3_2026-08-19.json` **(new)** | `3ca619e4896669b1190958397d388c2eff4a4aa07bd8d6f8cc0aa475340fe9c7` |
+
+**The three frozen spans reproduce unchanged** at 144,664 / `700b3b9a…`, 21,864 / `dc73b87f…` and 20,579 / `8af3e62c…`. Draft 33's own digests are unchanged in *Round-2 candidate* above and are what Draft 34 was produced from. Every earlier round's recorded outputs are kept beside the new ones.
+
+**One newly pinned input.** `Reproducibility Packet/results/host_timing_index.jsonl` is now authenticated by the wrapper at `043a4ea4b8374c26f8e6ce43c6031a0724a20461f827c67388d5be3f43beb3c7`. **The file itself is unchanged**; what changed is that the wrapper reads its digest before running the baseline.
+
+**Acceptance tests, re-stated for Round 3.**
+
+1. `probe_rc008_spec.py --repo-root .` → **241 checks, 0 failed**, exit 0.
+2. `mutate_rc008_spec.py --repo-root . --work-root <scratch>` → **42 of 42 caught**, control green. Five of the forty-two damage the **instrument** rather than the document, and each of those five now names the check that has to be the one going red, so a mutation caught by an unrelated failure is a visible problem rather than a silent pass.
+3. `probe_rc007_spec.py --repo-root .` → **288 checks, exactly 16 failed**, exit 1 — **the same sixteen as Round 2, by name.** Draft 34 caused no new class of legacy red; four of the sixteen are counts that grew further, and the wrapper's own census is what carries those.
+4. `probe_rc008_round3.py --repo-root . --out <path>` → **32 checks, 0 failed**. Every number Draft 34 publishes about F6-R2 is computed in it.
+5. `--help` renders **10 / 10 / 10 / 11** lines on the four RC-008 scripts and **0** non-ASCII, and every recorded output is 0 non-ASCII.
+
+## Round-3 response — Claude
+
+**F6-R2 — accepted in full; two of Draft 33's three grounds are false and both are withdrawn.** Neither is narrowed, and both refutations are reproduced independently in `probe_rc008_round3.py`.
+
+- **The near-independence ground.** The reviewer's 400.921659 Hz counterexample is not one frequency but a family, and deriving the family rather than checking the instance is what makes the ground unrecoverable: `f = m × 30,000 / 6,510` Hz has a period dividing one 6,510-sample half exactly for every integer `m`, and `f > 300 Hz` from **`m = 66`, 304.147465 Hz**, upward. One hundred and thirty-five consecutive members were built; all 135 give **bit-identical halves, correlation exactly 1 and `r_c` exactly 1**. The reviewer's figure is `m = 87`. Running the block through §19.3's own pinned chain leaves the agreement at `r_c = 1.000000000000`, so it is not an artifact of skipping the filter. **Lying above the corner is not the same as carrying no structure at the half length.**
+- **The ground Draft 33 called decisive.** It slid from *a low `R_null_sampled` certifies nothing* to *a low `R_null_sampled` does nothing*, and the branches disagree: a low value is **necessary** for a pass, because branch 4 fires without it. On the parity construction Draft 33 itself built — whose `R_space_sampled` is exactly **1.5** against strict `M = 2.0`, level in band — the contiguous split reaches **`passes`** and the interleaved split reaches **`unmeasurable`**. §19.5 now draws the certifies/gates distinction explicitly in the paragraph the slide came from.
+
+**What replaces them is a reach rather than a direction, and it is proved rather than exhibited.** The split enters the decision only through `R_null_sampled` — `R_space_sampled` is computed on the retained core, and both split rules are partitions of that identical core, which the probe checks by sorting rather than asserts — and `R_null_sampled` acts in exactly two places. Over the whole truth table that is **9 state pairs moved between `passes` and `unmeasurable`, 6 relabellings of a homogeneity failure, 57 untouched and no transition of any other kind**. So a change of split rule **can never turn a failure into a non-failure or a non-failure into a failure**, and *how much* it can move a value is not bounded anywhere. **The one surviving ground is about the parameter space, not the statistic:** an interleaved split has a free period whose effect cannot be signed and the contiguous split has no parameter to choose. §19.5 says that is the whole of the reason and explicitly refuses the reading that contiguous halves are the safer of the two.
+
+**F7-R2 — accepted; the repair is not a longer list.** A hand-maintained list cannot make a completeness claim about an input it does not know exists, which is exactly how Draft 33's five-entry list came to sit under a sentence asserting that *every* file the baseline reads is pinned. `probe_rc008_spec.py` now **parses `probe_rc007_spec.py`'s own source** for every `os.path.join` path constant it defines and fails if any of them is neither the candidate document nor a pinned digest — and raises rather than passing quietly if a path is computed instead of literal, because a computed path is one this check cannot see. The timing index is pinned. Two mutations reach the new surface: **re-serialising the timing index** (byte-different, every value and aggregate preserved — nothing but a digest can tell it from the original), and **removing the timing index's entry from the wrapper's own list**, which leaves every pinned digest correct and can only be caught by the derived check. Both are caught, and both name the check that must go red.
+
+**T5-R2 — taken.** §19.10 counts four sampled quantities.
+
+**T6-R2 — taken, and it had a consequence the finding did not ask for.** The stale clause is gone, but deleting it is not the whole repair: branch 2 rejects on `sigma_quietest_sampled` now, so under the same shared-component model the omitted phase shift makes that branch **permissive** — an upward-biased quietest window can fail to fire the floor on a genuinely too-quiet host and cannot fire it on one that is not. §19.3 states it and §19.10 carries it as a boundary.
+
+**T7-R2 — taken.** §19.7 asks for the series' `rate` attribute where one exists and the whole-span figure `host_timing_index.jsonl` derives from its timestamps where it does not, **labelled as which**, and records that rank 1 declares no rate at all — the same fact §19.3 uses to refuse F2-R1's other repair, which was pulling in the opposite direction two subsections apart.
+
+**One defect found here, and it is F1-R1 reaching one sentence further than either round noticed.** §19.8's conditional sentence still read *if anyone reports `A_min / sigma_worst_sampled` and `A_max / sigma_worst_sampled`*. Draft 33 repaired the reported ratios one paragraph above it and left the sentence describing them behind. It now names the two reported ratios that **are** §19.6's conditions rearranged — `snr_p2p_min` and `snr_p2p_quiet` — and says plainly that `snr_p2p_max` rearranges no condition at all. **Repairing it created a coverage gap in the owner's own harness**, because naming `snr_p2p_max` a second time gave the existing mutation somewhere to hide; the definition check is now anchored on its own clause and the occurrence count is asserted.
+
+**One thing is published that no finding asked for.** §19.7 now carries the full per-window `ρ(k)` series that `R_null_sampled` is the maximum of, on the same footing as the `S(k)` series and the per-channel `σ̂_c`. F6-R2 established that the split rule has a decision destination; a reader can now see sixty numbers rather than one, and the paragraph that used to argue the choice was harmless is gone.
+
+### What Round 3 does not touch
+
+**No threshold value moved and no branch moved.** `N` is `10.0` and `25.0 µV`, `M` is `2.0` and `4.0`, the floor is `1.25 µV` and does not relax, `K` is 60, the retained core is 13,020 samples with 6,510 in each half, **the split is still contiguous**, the grid and the 170-chunk / 73.780-second theorem are untouched, and the transfer projection is still 957,031,364 bytes. No estimator was written, no archive sample was read, no candidate's noise value exists, no packet file changed, no host is pinned, rank 2 remains unmeasured, and §1–§18 are byte-identical.
+
+### What the owner wants attacked first in Round 3
+
+1. **The surviving ground is thin, and Draft 34 says so rather than dressing it up.** *No free parameter to choose* is a reason to prefer the contiguous split; it is not evidence that the contiguous split resolves anything better. If that is not enough to pin an instrument parameter with a demonstrated decision destination, the honest disposition is to say so now — the choice is still free, and after the first candidate's value it is not.
+2. **The reach argument's second half rests on a definition.** `R_space_sampled` is untouched by the split because it is computed on the retained core; the probe checks that both split rules are partitions of that core, which is the fact the argument needs. If there is a way for a split rule to reach `R_space_sampled` that this framing hides, it defeats the bound, not just the wording.
+3. **The derived completeness check trusts its own parser.** It reads `_REL` constants from the baseline's source; a path the baseline builds any other way is invisible to it. It raises on a non-literal `_REL`, but it cannot see a path that is not named `_REL` at all.
+
+## Round log addendum
+
+| Round | Date | Who | Findings | Outcome |
+|---|---|---|---|---|
+| 3 (owner response) | 2026-08-19 | Claude | 2 blocking accepted and repaired; 3 tracked taken; 1 owner-found stale sentence corrected, plus the harness coverage gap that repair created | Draft 34 presented; reviewer's Round-3 delta pass owed. **Last round the method allows.** |

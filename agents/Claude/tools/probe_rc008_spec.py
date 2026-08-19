@@ -1,22 +1,25 @@
-"""Owner checker for Draft 32 of section 19 - the RC-007 convergence repair.
+"""Owner checker for section 19 across RC-008 - candidate Draft 34.
 
-RC-007 is closed at `Revisions Required`, so `probe_rc007_spec.py` is a closed
-card's evidence script and is not extended. This is a new checker for the new
-candidate, and it does three things the old one cannot:
+RC-008 is open, so this checker is EXTENDED IN PLACE each round and each
+round's recorded output is kept beside the new one. It covers Draft 32 (the
+RC-007 convergence repair), Draft 33 (RC-008 Round 1) and Draft 34 (RC-008
+Round 2), and it does four things:
 
-  1. It checks the repair itself - that the unconditional withholding claim is
-     gone from the two operative surfaces, that the two record surfaces are
-     handled by the document's own conventions instead (a supersession note in
-     the record subsection, a corrected line at the top of the status stack),
-     and that the asymmetry rule the branches always implemented is now written
-     down in all three operative places.
-  2. It settles the tracked split by asserting the decision is stated, with its
-     direction and its own limitation.
+  1. It checks each round's repair against the document, by section, including
+     that a claim a later round withdrew survives ONLY inside the sentence
+     that withdraws it, and that each record subsection carries the
+     supersession note the document's own convention requires.
+  2. It recounts the restatement census by region and asserts that the regions
+     partition the file, so a number restated somewhere no region covers has
+     nowhere to hide.
   3. It uses the closed card's checker as a REGRESSION BASELINE rather than
-     extending it: `probe_rc007_spec.py` is run as a subprocess and must return
-     exactly 288 checks with exactly the six failures this repair was supposed
-     to cause - no more, and no fewer. Every other property RC-007 established
-     is therefore still enforced by the instrument that established it.
+     extending it: `probe_rc007_spec.py` is run as a subprocess and must
+     return exactly 288 checks with exactly the sixteen failures these drafts
+     were supposed to cause - no more, and no fewer.
+  4. RC-008 F4-R1 and F7-R2: it authenticates that baseline BEFORE running it,
+     and it derives the list of files the baseline reads FROM THE BASELINE'S
+     OWN SOURCE rather than from a hand-maintained list, because a list cannot
+     make a completeness claim about an input it does not know exists.
 
 Usage:
 
@@ -25,6 +28,7 @@ Usage:
 """
 
 import argparse
+import ast
 import hashlib
 import io
 import json
@@ -52,10 +56,18 @@ RC007_AUTHENTICATED = [
      "b9f3e089e2b94e2d9e26743133d167bb258e3be169b5ce3f1b3fe625c7b72b15"),
     ("agents/Claude/tools/rc007_round3_2026-08-18.json",
      "51e762669c53a57cc3c4219547a000435b1a89d766cbc9ca7730c4f6a5c9717f"),
+    # RC-008 F7-R2: the legacy checker reads a SIXTH input and Draft 33's list
+    # named five. A byte-different synthetic record preserving the aggregates
+    # the checker consumes went unnoticed, which is F4-R1's defect class on an
+    # unlisted file.
+    ("Reproducibility Packet/results/host_timing_index.jsonl",
+     "043a4ea4b8374c26f8e6ce43c6031a0724a20461f827c67388d5be3f43beb3c7"),
 ]
 
 # The Draft-33 evidence probe, pinned the same way for the same reason.
 ROUND2_PROBE = "agents/Claude/tools/rc008_round2_2026-08-18.json"
+# The Draft-34 evidence probe.
+ROUND3_PROBE = "agents/Claude/tools/rc008_round3_2026-08-19.json"
 
 FROZEN_SPANS = [
     ("## 1. ", "## 17. ", 144664,
@@ -98,19 +110,21 @@ EXPECTED_RC007_FAILURES = [
 # counts that occurrence explicitly so the inflation is recorded rather than
 # waved at, which is the whole point of keeping a census.
 
-# number -> counts in (19.1-19.12, 19.13, 19.14, the status stack, sections
-# 1-18). The five regions partition the document, so their sum is asserted
+# number -> counts in (19.1-19.12, 19.13, 19.14, 19.15, the status stack,
+# sections 1-18). The regions partition the document, so their sum is asserted
 # against the whole-file count: a restatement that appears somewhere none of
-# them covers has nowhere to hide.
+# them covers has nowhere to hide. Draft 34 adds 19.15, which is a sixth
+# region rather than a widening of the fifth - a record subsection folded into
+# its predecessor is exactly how a census stops being a partition.
 CENSUS = [
-    ("73.780", 7, 2, 2, 2, 0),
-    ("6,510", 6, 1, 1, 2, 0),
-    ("13,020", 15, 1, 1, 4, 0),
-    ("957,031,364", 2, 2, 1, 3, 0),
-    ("500 samples", 6, 0, 1, 4, 0),
-    ("14,020", 5, 0, 0, 1, 0),
-    ("2.34375", 2, 0, 1, 1, 0),
-    ("9,999", 4, 0, 0, 0, 1),
+    ("73.780", 7, 2, 2, 1, 2, 0),
+    ("6,510", 8, 1, 1, 3, 5, 0),
+    ("13,020", 16, 1, 1, 1, 5, 0),
+    ("957,031,364", 2, 2, 1, 1, 4, 0),
+    ("500 samples", 6, 0, 1, 0, 4, 0),
+    ("14,020", 5, 0, 0, 0, 1, 0),
+    ("2.34375", 2, 0, 1, 0, 1, 0),
+    ("9,999", 4, 0, 0, 0, 0, 1),
 ]
 
 # The rule is stated in the two operative sections, in the branch list,
@@ -149,6 +163,43 @@ def section(text, start, end=None):
     return text[i:j]
 
 
+def baseline_inputs(source):
+    """Every relative path the legacy checker names, read from its own source.
+
+    RC-008 F7-R2: Draft 33 asserted that "every file the baseline reads is the
+    pinned one" against a HAND-MAINTAINED list, and the list had fallen one
+    input behind the checker. A list cannot make that claim about a file it
+    does not know exists, so the claim is derived instead: parse the legacy
+    module for its `*_REL = os.path.join(...)` constants and require each one
+    to be either the candidate document or a pinned digest.
+
+    Returns a sorted list of forward-slash relative paths. Raises if a `_REL`
+    constant is built from anything other than string literals, because a
+    computed path is a path this check cannot see.
+    """
+    tree = ast.parse(source)
+    found = []
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        names = [t.id for t in node.targets if isinstance(t, ast.Name)]
+        if not any(name.endswith("_REL") for name in names):
+            continue
+        call = node.value
+        if not (isinstance(call, ast.Call)
+                and isinstance(call.func, ast.Attribute)
+                and call.func.attr == "join"):
+            raise ValueError("%s is not an os.path.join of literals" % names)
+        parts = []
+        for arg in call.args:
+            if not (isinstance(arg, ast.Constant)
+                    and isinstance(arg.value, str)):
+                raise ValueError("%s has a non-literal component" % names)
+            parts.append(arg.value)
+        found.append("/".join(parts))
+    return sorted(found)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description=__doc__.splitlines()[0],
@@ -185,7 +236,8 @@ def main(argv=None):
     s1910 = section(text, "### 19.10 ", "### 19.11 ")
     s1912 = section(text, "### 19.12 ", "### 19.13 ")
     s1913 = section(text, "### 19.13 ", "### 19.14 ")
-    s1914 = section(text, "### 19.14 ")
+    s1914 = section(text, "### 19.14 ", "### 19.15 ")
+    s1915 = section(text, "### 19.15 ")
     s193 = section(text, "### 19.3 ", "### 19.4 ")
     s194 = section(text, "### 19.4 ", "### 19.5 ")
     s197 = section(text, "### 19.7 ", "### 19.8 ")
@@ -279,10 +331,16 @@ def main(argv=None):
             and "`R_null_sampled` is exactly **4**" in s195)
     c.check("19.5 says interleaving EXPANDED the spread",
             "Interleaving expanded the spread" in s195)
-    c.check("19.5 replaces the direction with three non-directional grounds",
-            "none of which is a direction" in s195)
-    c.check("  ... ground 3 is that the decision rule cannot cash the goal",
-            "is not a goal the decision rule can cash" in s195)
+    # Draft 34 withdraws two of those three grounds; the Draft-33 form of
+    # this check is superseded rather than deleted, and section 17 below
+    # asserts that 19.14 still records the sentence it superseded.
+    c.check("19.5 no longer offers three grounds",
+            "none of which is a direction" not in s195)
+    c.check("  ... and the cash claim it called decisive is gone",
+            "is not a goal the decision rule can cash" not in s195)
+    c.check("  ... and it is refuted by name rather than dropped",
+            "said the decision rule cannot cash a lower `R_null_sampled`.** "
+            "It can." in s195)
     c.check("19.5 declares the split rule a pinned parameter with no bound",
             "no bound is claimed on the difference between two split rules"
             in s195)
@@ -303,29 +361,61 @@ def main(argv=None):
     census_records = []
     body = section(text, "## 19. ", "### 19.13 ")
     closed = text[text.index("## 1. "):text.index("## 19. ")]
-    for value, body_n, rec32_n, rec33_n, stack_n, closed_n in CENSUS:
+    for value, body_n, r32, r33, r34, stack_n, closed_n in CENSUS:
         got = (body.count(value), s1913.count(value), s1914.count(value),
-               stack.count(value), closed.count(value))
-        ok = got == (body_n, rec32_n, rec33_n, stack_n, closed_n)
-        c.check("%s appears %d/%d/%d/%d/%d times in 19.1-19.12 / 19.13 / 19.14 "
-                "/ the stack / sections 1-18" % ((value, body_n, rec32_n,
-                                                  rec33_n, stack_n, closed_n)),
-                ok, "found %d/%d/%d/%d/%d" % got)
-        c.check("  ... and those five regions account for every occurrence",
+               s1915.count(value), stack.count(value), closed.count(value))
+        want = (body_n, r32, r33, r34, stack_n, closed_n)
+        c.check("%s appears %d/%d/%d/%d/%d/%d times in 19.1-19.12 / 19.13 / "
+                "19.14 / 19.15 / the stack / sections 1-18"
+                % ((value,) + want), got == want,
+                "found %d/%d/%d/%d/%d/%d" % got)
+        c.check("  ... and those six regions account for every occurrence",
                 sum(got) == text.count(value),
                 "%d regional vs %d in the file" % (sum(got),
                                                    text.count(value)))
         census_records.append({"value": value, "section_19_body": got[0],
                                "section_19_13": got[1],
                                "section_19_14": got[2],
-                               "status_stack": got[3],
-                               "sections_1_18": got[4]})
+                               "section_19_15": got[3],
+                               "status_stack": got[4],
+                               "sections_1_18": got[5]})
     records["census"] = census_records
 
     # -- regression against the closed card's checker -------------------------
     c.heading("8. The closed card's checker as a regression baseline")
     c.check("F4-R1: the baseline is authenticated BEFORE it is run", True,
             "%d files pinned by digest" % len(RC007_AUTHENTICATED))
+
+    # F7-R2: the completeness claim is derived from the baseline's own source
+    # rather than from the list below it.
+    legacy_path = os.path.join(root, RC007_PROBE.replace("/", os.sep))
+    pinned = set(rel for rel, _ in RC007_AUTHENTICATED)
+    try:
+        declared = baseline_inputs(io.open(legacy_path,
+                                          encoding="utf-8").read())
+        parsed = True
+    except (ValueError, SyntaxError) as exc:
+        declared, parsed = [], False
+        c.check("F7-R2: every path the baseline names is a string literal",
+                False, str(exc)[:80])
+    if parsed:
+        c.check("F7-R2: the baseline's inputs are read from its own source",
+                len(declared) >= 6, "%d _REL constants" % len(declared))
+        unpinned = [rel for rel in declared
+                    if rel != DOC_REL and rel not in pinned]
+        c.check("F7-R2: no input of the baseline is left unpinned",
+                not unpinned, ", ".join(unpinned) if unpinned else "none")
+        c.check("F7-R2: the timing index is one of them",
+                "Reproducibility Packet/results/host_timing_index.jsonl"
+                in declared and
+                "Reproducibility Packet/results/host_timing_index.jsonl"
+                in pinned)
+        unused = [rel for rel in sorted(pinned)
+                  if rel not in declared and rel != RC007_PROBE]
+        c.check("and nothing is pinned that the baseline does not read",
+                not unused, ", ".join(unused) if unused else "none")
+        records["rc007_declared_inputs"] = declared
+
     authentic = True
     digests = {}
     for rel, expected in RC007_AUTHENTICATED:
@@ -404,9 +494,17 @@ def main(argv=None):
     c.check("19.7 publishes both extrema",
             "`sigma_worst_sampled` and `sigma_quietest_sampled`, each with the "
             "window that produced it" in s197)
+    # Draft 34's C1-R3 repair names snr_p2p_max a SECOND time in 19.8, which
+    # would let a revert of the DEFINITION hide behind the other occurrence.
+    # The count is asserted, and the definition is anchored on its own clause.
     c.check("19.8 re-derives its three ratios on the right extremum",
-            "`snr_p2p_max = A_max / sigma_quietest_sampled`" in s198
+            "`snr_p2p_max = A_max / sigma_quietest_sampled` — the two "
+            "ends" in s198
             and "`snr_p2p_quiet = A_min / sigma_quietest_sampled`" in s198)
+    c.check("  ... and the loud ratio is named exactly twice in 19.8",
+            s198.count("`snr_p2p_max = A_max / sigma_quietest_sampled`") == 2,
+            "%d occurrences"
+            % s198.count("`snr_p2p_max = A_max / sigma_quietest_sampled`"))
     c.check("19.8 records that Draft 32 used one denominator for all of them",
             "Draft 32 divided every one of them by" in s198)
 
@@ -434,8 +532,8 @@ def main(argv=None):
     c.check("19.3 counts three deviations now",
             "**Three declared differences from the anchor chain" in s193)
     c.check("19.7 publishes both rates so the deviation is auditable",
-            "the nominal design rate and the candidate's own declared rate"
-            in s197)
+            "the nominal 30,000 Hz the filter is designed at and, beside it, "
+            "the candidate's own sampling rate" in s197)
 
     c.heading("11. F5-R1  the bad-channel conservatism claim is withdrawn")
     c.check("19.3 withdraws it by name",
@@ -468,8 +566,8 @@ def main(argv=None):
     c.check("T2: 19.10's stale Draft-31 sentence is gone",
             "This Draft 31 state is not approved by anyone yet" not in s1910)
     c.check("T2: 19.10 states the current state instead",
-            "Draft 33 is the owner's Round-2 response and it is unreviewed"
-            in s1910)
+            "Draft 34 is the owner's Round-3 response and it is unreviewed"
+            in " ".join(s1910.split()))
     c.check("T2: 19.10 names the clause-5 successor",
             "RC-008 is the\nsuccessor card clause 5 governs".replace("\n", " ")
             in " ".join(s1910.split()))
@@ -542,6 +640,168 @@ def main(argv=None):
         c.check("T1's dilution figures are the ones 19.9 publishes",
                 abs(r2["t1"]["dilution"]["one_chunk"] - 3.02) < 5e-3
                 and abs(r2["t1"]["dilution"]["three_chunk"] - 1.33) < 5e-3)
+
+    # -- Draft 34, the RC-008 Round-3 repairs --------------------------------
+    c.heading("15. F6-R2  the two false grounds are withdrawn, not narrowed")
+    # A withdrawal has to name what it withdraws, so the check is that the
+    # only surviving occurrence is inside the sentence doing the withdrawing.
+    c.check("19.5 carries the withdrawn independence wording exactly once",
+            s195.count("close to independent") == 1,
+            "%d occurrences" % s195.count("close to independent"))
+    c.check("  ... and that occurrence is the one being withdrawn",
+            "**The first said the two halves are close to independent"
+            in s195)
+    c.check("19.5 no longer claims the rule cannot cash the difference",
+            "buys the decision rule nothing" not in s195)
+    c.check("19.5 says two of the three grounds are withdrawn",
+            "**Two of the three grounds Draft 33 gave for the contiguous "
+            "split are withdrawn.**" in s195)
+    c.check("19.5 derives the repeating family rather than citing one value",
+            "`f = m × 30,000 / 6,510` Hz repeats" in s195)
+    c.check("19.5 names the family's lowest in-band member",
+            "**304.147465 Hz**" in s195)
+    c.check("19.5 keeps the reviewer's member beside it",
+            "**400.921659 Hz**" in s195)
+    c.check("19.5 reports the family check rather than one case",
+            "135 consecutive members were checked and all 135 are exact"
+            in s195)
+    c.check("19.5 exhibits the decision destination",
+            "the contiguous split reaches **`passes`** and the interleaved "
+            "split reaches branch 4 and **`unmeasurable`**" in s195)
+    c.check("19.5 draws the certifies/gates distinction where the slide was",
+            "so it gates without certifying" in s195)
+    c.check("19.5 states the reach, not a direction",
+            "**What bounds the choice is a reach rather than a direction, and "
+            "the reach is exact.**" in s195)
+    c.check("19.5 publishes the truth-table counts",
+            "9 state pairs moved, 6 relabelled and 57 untouched" in s195)
+    c.check("19.5 states what the split can never do",
+            "it can never turn a failure into a non-failure or a non-failure "
+            "into a failure" in s195)
+    c.check("19.5 keeps exactly one ground and says so",
+            "**The one surviving ground is a statement about the parameter "
+            "space, not about the statistic.**" in s195)
+    c.check("19.5 refuses the safer-choice reading",
+            "It is not a claim that they are the safer of the two" in s195)
+    c.check("19.5 still pins the split as an instrument parameter",
+            "no bound is claimed on the difference between two split rules"
+            in s195)
+    c.check("19.10's split bullet carries the refutation",
+            "RC-008's F6-R2 refuted it" in s1910)
+    c.check("19.10's split bullet states the reach",
+            "so it can move a candidate between `passes` and `unmeasurable` "
+            "and can relabel a homogeneity failure, and can do nothing else"
+            in s1910)
+    c.check("19.10 no longer says three grounds carry no direction",
+            "three grounds the contiguous split is kept on" not in s1910)
+    c.check("19.10 says how much is not bounded",
+            "**How much it can move a value is not bounded anywhere.**"
+            in s1910)
+
+    c.heading("16. T5-R2, T6-R2, T7-R2 and the defect found here")
+    c.check("T5-R2: 19.10 counts four sampled quantities",
+            "invisible to all four" in s1910
+            and "invisible to all three" not in s1910)
+    c.check("T6-R2: the stale no-lean clause is gone from 19.3",
+            "which is why §19.6 does not lean on the floor." not in s193)
+    c.check("T6-R2: 19.3 says the floor is leaned on now",
+            "and since Draft 33 it does lean on it:" in s193)
+    c.check("T6-R2: 19.3 states the floor's direction is permissive",
+            "makes that branch **permissive**" in s193)
+    c.check("T6-R2: 19.10 carries it as a boundary",
+            "**permissive at the floor**" in s1910)
+    c.check("T7-R2: 19.7 no longer asks for a declared rate",
+            "the candidate's own declared rate, so the §19.3 deviation"
+            not in s197)
+    c.check("T7-R2: 19.7 names the two sources and requires a label",
+            "otherwise the whole-span figure `host_timing_index.jsonl` "
+            "derives from its timestamps, labelled as which" in s197)
+    c.check("T7-R2: 19.7 records that rank 1 declares none",
+            "**Rank 1 declares no rate**" in s197)
+    c.check("C1-R3: 19.8's conditional names the reported ratios",
+            "*if* anyone reports `snr_p2p_min = A_min / sigma_worst_sampled` "
+            "and `snr_p2p_quiet = A_min / sigma_quietest_sampled`" in s198)
+    c.check("C1-R3: 19.8 says the loud end rearranges no condition",
+            "rearranges no condition at all" in s198)
+    c.check("C1-R3: the stale pair is gone from 19.8's conditional",
+            "`A_min / sigma_worst_sampled` and `A_max / sigma_worst_sampled` "
+            "under this section's own thresholds" not in s198)
+    c.check("19.7 lists all three reported ratios",
+            "`snr_p2p_min`, `snr_p2p_max` and `snr_p2p_quiet` of §19.8"
+            in s197)
+    c.check("19.7's audit paragraph lists all three too",
+            "`snr_p2p_min`, `snr_p2p_max` and `snr_p2p_quiet` carry no "
+            "threshold" in s197)
+    c.check("19.7 publishes the per-window null series",
+            "the full per-window series `ρ(k) = p90_c r_c(k) / p10_c "
+            "r_c(k)` that it is the maximum of" in s197)
+    c.check("and the series is audit-only apart from its maximum",
+            "the `ρ(k)` series apart from the maximum the rule reads"
+            in s197)
+
+    c.heading("17. Section 19.15 records the round, and 19.14 is superseded")
+    for anchor in ("F6-R2", "F7-R2", "T5-R2", "T6-R2", "T7-R2",
+                   "All five are accepted", "No threshold value moved",
+                   "304.147465 Hz", "no host is pinned",
+                   "Round 3 is the last round"):
+        c.check("19.15 records: %s" % anchor, anchor in s1915)
+    c.check("19.15 names the F7-R2 repair as derived, not a longer list",
+            "the repair is not to lengthen the list" in s1915)
+    c.check("19.15 records the defect found here",
+            "**One defect found here, and it is the same one twice.**"
+            in s1915)
+    c.check("19.15 records the unasked-for publication",
+            "**One thing is published that no finding asked for.**" in s1915)
+    c.check("19.14 carries a supersession note in 19.13's own style",
+            "superseded by §19.15" in s1914)
+    c.check("19.14's supersession names both withdrawn grounds",
+            "near-independence across the boundary" in s1914
+            and "cannot cash a lower" in s1914)
+    c.check("19.14 is otherwise unedited: it still records F1-R1's repair",
+            "F1-R1 gave that branch a statistic that can fire it" in s1914)
+    c.check("19.14 retains its own now-superseded three-grounds sentence",
+            "three grounds and none of them is a direction" in s1914)
+    c.check("the status stack carries Draft 34 above Draft 33",
+            stack.index("**Status:** Draft 34") <
+            stack.index("**Status:** Draft 33"))
+    c.check("Draft 33's retained status line keeps its own claim",
+            "the split stays **contiguous** on three grounds, none of which "
+            "is a direction" in stack)
+    c.check("19.10 records Round 2 and the last round the method allows",
+            "Round 3 is the last round the method allows" in s1910)
+
+    c.heading("18. The Round-3 evidence probe's record")
+    round3_path = os.path.join(root, ROUND3_PROBE.replace("/", os.sep))
+    c.check("the Round-3 evidence record exists", os.path.isfile(round3_path))
+    if os.path.isfile(round3_path):
+        r3 = json.loads(io.open(round3_path, encoding="utf-8").read())
+        records["round3"] = r3
+        c.check("the family's lowest in-band member is the published one",
+                r3["ground_one"]["m_min"] == 66
+                and abs(r3["ground_one"]["f_min_hz"] - 304.1474654377880)
+                < 5e-7, "%.6f Hz" % r3["ground_one"]["f_min_hz"])
+        c.check("the reviewer's frequency is the published one",
+                abs(r3["ground_one"]["f_reviewer_hz"] - 400.921659) < 5e-7)
+        c.check("all 135 members checked were exact",
+                r3["ground_one"]["members_exact"] == 135)
+        c.check("the halves' correlation is 1, not near-independent",
+                abs(r3["ground_one"]["correlation"] - 1.0) < 1e-12)
+        c.check("the decision destination is the pair 19.5 publishes",
+                r3["ground_three"]["contiguous"] == "passes"
+                and r3["ground_three"]["interleaved"] == "unmeasurable")
+        c.check("the truth-table counts are the ones 19.5 publishes",
+                (r3["reach"]["moved"], r3["reach"]["relabelled"],
+                 r3["reach"]["unchanged"], r3["reach"]["illegal"])
+                == (9, 6, 57, 0))
+        c.check("the parity fixture's R_space is the published 1.5",
+                abs(r3["parity"]["r_space"] - 1.5) < 1e-12)
+        c.check("its two R_null values are still exactly 1 and 4",
+                r3["parity"]["contiguous"] == 1.0
+                and r3["parity"]["interleaved"] == 4.0)
+        c.check("outside M the split rule changes nothing",
+                r3["parity"]["outside_M"][0] == r3["parity"]["outside_M"][1])
+        c.check("rank 1's series declares no rate",
+                r3["timing"]["timing_source"] == "timestamps")
 
     c.heading("Summary")
     total = c.passed + c.failed

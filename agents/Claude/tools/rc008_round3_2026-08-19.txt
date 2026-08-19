@@ -1,0 +1,45 @@
+
+1. F6-R2 ground 1  in-band does not imply near-independent
+PASS  the lowest in-band frequency whose period divides one half  [m=66 f=304.1474654378 Hz]
+PASS  the reviewer's frequency is a member of that family  [m=87 f=400.921658986 Hz]
+PASS  every member tested repeats bit-identically across the halves  [135 of 135 members exact]
+PASS  the two halves are bit-identical at m=87  [max |A-B| = 0.000e+00]
+PASS  their correlation is 1, not 'close to independent'  [corr = 1.000000000000]
+PASS  the half-estimates agree exactly, so r_c is exactly 1  [r_c = 1.000000000000000]
+PASS  after the pinned chain the halves still agree to r_c ~ 1  [r_c = 1.000000000000, max |A-B| = 5.386e-05]
+
+2. F6-R2 ground 3  the decision rule can cash the difference
+PASS  the contiguous split reaches a pass  [passes]
+PASS  the interleaved split reaches branch 4  [unmeasurable]
+PASS  so the split difference changes the disposition  [passes -> unmeasurable]
+
+3. The reach of the split rule, exhaustively
+PASS  no move across the null boundary leaves the two failure classes  [0 illegal transitions]
+PASS  the only disposition change is pass <-> unmeasurable  [9 of 72 state pairs]
+PASS  the only other change is branch 3's label  [6 relabellings]
+PASS  every other state pair is untouched by the null  [57 unchanged]
+PASS  a level failure is never moved by the null
+PASS  a quiet failure is never moved by the null
+PASS  a homogeneity failure is never converted to a non-failure
+
+4. The parity construction, and what the split does not reach
+PASS  contiguous halves give exactly 1  [R_null = 1.000000000000]
+PASS  even/odd interleaving gives exactly 4  [R_null = 4.000000000000]
+PASS  interleaving expands, from inside strict M to outside it  [1.0000 -> 4.0000]
+PASS  both split rules are partitions of the identical retained core  [so R_space_sampled is one number, not two]
+PASS  and that number is 1.5 on this fixture  [R_space = 1.500000000000]
+PASS  inside M the fixture passes on contiguous halves  [passes]
+PASS  inside M the same fixture is withheld on interleaved halves  [unmeasurable]
+PASS  scaling eight channels leaves both R_null values where they were  [1.000000000000 / 4.000000000000]
+PASS  but it carries R_space_sampled outside strict M  [R_space = 4.500000000000]
+PASS  outside M the split rule cannot change the disposition  [fails-homogeneity-resolved / fails-homogeneity-resolved]
+
+5. T7-R2  what 'the candidate's own declared rate' would name
+PASS  rank 1's entry is in the timing index
+PASS  rank 1's raw AP series is present
+PASS  its timing source is timestamps, not a declared rate  [timestamps]
+PASS  so `rate_hz` is this project's whole-span derivation  [30000.039869961383 Hz]
+PASS  the first 1,000 timestamps give a different figure  [30000.039893312820 Hz]
+
+Summary
+32 checks, 0 failed

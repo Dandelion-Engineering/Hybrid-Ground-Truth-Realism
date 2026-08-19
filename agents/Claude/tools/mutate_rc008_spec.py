@@ -17,6 +17,7 @@ run is green and every mutation is caught.
 
 import argparse
 import io
+import json
 import os
 import shutil
 import subprocess
@@ -36,6 +37,7 @@ CARRIED = [
     os.path.join(TOOLS, "filter_chain_2026-08-18.json"),
     os.path.join(TOOLS, "rc007_round3_2026-08-18.json"),
     os.path.join(TOOLS, "rc008_round2_2026-08-18.json"),
+    os.path.join(TOOLS, "rc008_round3_2026-08-19.json"),
     os.path.join("Reproducibility Packet", "results", "host_timing_index.jsonl"),
 ]
 
@@ -86,9 +88,11 @@ MUTATIONS = [
      "with **`1.25 µV ≤ sigma_quietest_sampled`**",
      "So the admissible band is **`1.25 µV ≤ sigma_worst_sampled "
      "≤ N`**"),
+    # Draft 34's C1-R3 repair names this ratio a second time, so the anchor
+    # carries enough of the DEFINITION to stay unique.
     ("revert 19.8's ratio to the wrong denominator",
-     "`snr_p2p_max = A_max / sigma_quietest_sampled`",
-     "`snr_p2p_max = A_max / sigma_worst_sampled`"),
+     "`snr_p2p_max = A_max / sigma_quietest_sampled` — the two ends",
+     "`snr_p2p_max = A_max / sigma_worst_sampled` — the two ends"),
     ("re-widen the identity claim in 19.3",
      "`FilterRecording.get_traces` for a chunk of 13,020 samples in every "
      "respect but the filter's design rate**",
@@ -102,11 +106,14 @@ MUTATIONS = [
     ("break the corrected coverage figure in 19.9",
      "the guarantee is **228.718 s**",
      "the guarantee is **223 s**"),
-    ("restore 19.10's stale Draft-31 sentence",
-     "**RC-008's Round 1 returned `Revisions Required` on five blocking "
-     "findings and four tracked items; Draft 33 is the owner's Round-2 "
-     "response and it is unreviewed**",
-     "**This Draft 31 state is not approved by anyone yet**"),
+    # Draft 34 rewrote the sentence this used to revert, and the property it
+    # tested - that 19.10 states the CURRENT state - is now tested by "re-widen
+    # 19.10's review history to Round 1" below. Re-anchored onto the clause-5
+    # half of the same bullet, which nothing else reverts.
+    ("remove the clause-5 boundary from 19.10",
+     "RC-008 is the successor card clause 5 governs, and Round 3 is the last "
+     "round the method allows.**",
+     "RC-008 is the successor card.**"),
     ("revert the code-step terminology",
      "**One stored code step is 2.34375 µV.**",
      "**One stored bit is 2.34375 µV.**"),
@@ -131,6 +138,61 @@ MUTATIONS = [
     ("edit a closed section",
      "## 17. Sessions 36–39",
      "## 17. Sessions 36-39"),
+    # -- Draft 34's own repairs ------------------------------------------
+    ("restore the withdrawn independence ground",
+     "**The first said the two halves are close to independent for a signal "
+     "band-limited above 300 Hz.** They need not be.",
+     "The two halves are close to independent for a signal band-limited "
+     "above 300 Hz."),
+    ("restore the withdrawn cash ground",
+     "**The\nthird, which Draft 33 called decisive, said the decision rule "
+     "cannot cash\na lower `R_null_sampled`.** It can.".replace("\n", " "),
+     "The third ground is that the decision rule cannot cash a lower "
+     "`R_null_sampled`."),
+    ("delete the decision destination from 19.5",
+     "the contiguous split reaches **`passes`** "
+     "and the interleaved split reaches branch 4 and **`unmeasurable`**",
+     "the two split rules give different values"),
+    ("break the truth-table counts in 19.5",
+     "9 state pairs moved, 6 relabelled and 57 untouched",
+     "9 state pairs moved and the rest untouched"),
+    ("re-claim the split rule is the safer choice",
+     "It is not a claim that they are the safer of the two",
+     "It is also the safer of the two"),
+    ("revert 19.10 to three sampled quantities",
+     "invisible to all four.",
+     "invisible to all three."),
+    ("restore 19.3's stale no-lean clause",
+     "and *anti*-conservative for the lower one. **That clause used to end",
+     "and *anti*-conservative for the lower one, which is why §19.6 does "
+     "not lean on the floor. **That clause used to end"),
+    ("drop the floor's permissive direction from 19.10",
+     "and **permissive at the floor**, where an upward-biased "
+     "`sigma_quietest_sampled` can fail to fire branch 2 on a genuinely "
+     "too-quiet host and cannot fire it on one that is not;",
+     "and it says nothing about the floor;"),
+    ("restore the declared-rate phrasing in 19.7",
+     "the nominal 30,000 Hz the filter is designed at and, beside it, the "
+     "candidate's own sampling rate",
+     "both the nominal design rate and the candidate's own declared rate"),
+    ("revert 19.8's conditional to the stale pair",
+     "*if* anyone reports `snr_p2p_min = A_min / sigma_worst_sampled` and "
+     "`snr_p2p_quiet = A_min / sigma_quietest_sampled`",
+     "*if* anyone reports `A_min / sigma_worst_sampled` and "
+     "`A_max / sigma_worst_sampled`"),
+    ("stop publishing the per-window null series",
+     "**the full per-window series `ρ(k) = p90_c r_c(k) / p10_c "
+     "r_c(k)` that it is the maximum of**, and",
+     "and"),
+    ("remove 19.14's supersession note",
+     "**This subsection records Draft 33 and is left as written, with one of "
+     "its claims superseded by §19.15:",
+     "**This subsection records Draft 33 and is left as written:"),
+    ("re-widen 19.10's review history to Round 1",
+     "**Round 2 returned `Revisions Required` on two response-created "
+     "blockers\nand three tracked delta items; Draft 34 is the owner's "
+     "Round-3 response\nand it is unreviewed**".replace("\n", " "),
+     "**Draft 33 is the owner's Round-2 response and it is unreviewed**"),
 ]
 
 
@@ -164,19 +226,54 @@ def expected_failures(repo_root):
 
 
 def file_mutations(repo_root):
-    """Return (name, relative path, replacement bytes) instrument mutations."""
+    """Return (name, relative path, replacement, expected FAIL substring).
+
+    The last element is what makes these mutations honest: a mutation that is
+    "caught" by some unrelated red is a mutation that tests nothing, so each
+    one names the check that has to be the one going red.
+    """
     legacy = os.path.join(TOOLS, "probe_rc007_spec.py")
     record = os.path.join(TOOLS, "filter_chain_2026-08-18.json")
+    timing = os.path.join("Reproducibility Packet", "results",
+                          "host_timing_index.jsonl")
     original_record = io.open(os.path.join(repo_root, record),
                               encoding="utf-8").read()
+    original_timing = io.open(os.path.join(repo_root, timing),
+                              encoding="utf-8").read()
+    # RC-008 F7-R2: byte-different, every value and every aggregate preserved.
+    # Nothing but a digest can tell this from the original, which is the point.
+    reserialized = "".join(
+        json.dumps(json.loads(line), sort_keys=True) + "\n"
+        for line in original_timing.splitlines() if line.strip())
+    wrapper = io.open(os.path.join(repo_root, PROBE), encoding="utf-8").read()
+    unpinned = wrapper.replace(
+        '    ("Reproducibility Packet/results/host_timing_index.jsonl",\n'
+        '     "043a4ea4b8374c26f8e6ce43c6031a0724a20461f827c67388d5be3f43beb'
+        '3c7"),\n', "", 1)
+    # A file override has no anchor check to protect it, so it gets one here:
+    # an override that changes nothing is a mutation that tests nothing.
+    if unpinned == wrapper:
+        raise ValueError("the unpin override matched nothing in the wrapper")
+    if reserialized == original_timing:
+        raise ValueError("the re-serialized timing index is byte-identical")
     return [
         ("substitute a counterfeit legacy checker", legacy,
-         COUNTERFEIT % (expected_failures(repo_root),)),
+         COUNTERFEIT % (expected_failures(repo_root),),
+         "authenticated: probe_rc007_spec.py"),
         ("change one byte of the legacy checker", legacy,
          io.open(os.path.join(repo_root, legacy), encoding="utf-8").read()
-         + "\n# an undeclared executable change\n"),
+         + "\n# an undeclared executable change\n",
+         "authenticated: probe_rc007_spec.py"),
         ("tamper with one carried record", record,
-         original_record.replace("\n", "\n", 1) + " "),
+         original_record.replace("\n", "\n", 1) + " ",
+         "authenticated: filter_chain_2026-08-18.json"),
+        # F7-R2's two: the first proves the sixth input is pinned at all, the
+        # second proves the completeness claim is derived rather than listed -
+        # it leaves every pinned digest correct and only removes the entry.
+        ("re-serialize the timing index the baseline reads", timing,
+         reserialized, "authenticated: host_timing_index.jsonl"),
+        ("unpin the timing index in the wrapper's own list", PROBE, unpinned,
+         "F7-R2: no input of the baseline is left unpinned"),
     ]
 
 
@@ -254,7 +351,7 @@ def main(argv=None):
                 problems.append("%s: not caught" % name)
 
         instrument = file_mutations(repo_root)
-        for index, (name, rel, replacement) in enumerate(instrument):
+        for index, (name, rel, replacement, expect) in enumerate(instrument):
             case = os.path.join(work, "f%d" % index)
             stage(case, repo_root, original, {rel: replacement})
             result = subprocess.run(
@@ -262,12 +359,15 @@ def main(argv=None):
                 capture_output=True, text=True)
             reds = [line for line in result.stdout.splitlines()
                     if line.startswith("FAIL")]
-            ok = result.returncode != 0 and bool(reds)
-            print("%-52s caught=%-5s red=%d" % (name, ok, len(reds)))
+            right = [line for line in reds if expect in line]
+            ok = result.returncode != 0 and bool(right)
+            print("%-52s caught=%-5s red=%d on=%s"
+                  % (name, ok, len(reds), "the named check" if right
+                     else "SOMETHING ELSE"))
             if ok:
                 caught += 1
             else:
-                problems.append("%s: not caught" % name)
+                problems.append("%s: not caught on %r" % (name, expect))
 
         total = len(MUTATIONS) + len(instrument)
         print("")
