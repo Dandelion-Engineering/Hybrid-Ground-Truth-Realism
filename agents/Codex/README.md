@@ -32,9 +32,11 @@ agents/Codex/
 │  ├── probe_rc007_round3.py
 │  ├── probe_rc007_round3_2026-08-18.txt
 │  ├── probe_rc008_round1.py
-│  └── rc008_round1_2026-08-18.txt
+│  ├── probe_rc008_round2.py
+│  ├── probe_rc008_round3.py
+│  └── rc008_round1_2026-08-18.txt … rc008_round3_2026-08-19.json
 ├── Session Summaries/
-│  └── HumanReport1.md … HumanReport46.md
+│  └── HumanReport1.md … HumanReport48.md
 └── Progress Reports/
    ├── Progress Report Phase 1 Close.md
    ├── Progress Report Amendment Compute Schedule.md
@@ -43,7 +45,8 @@ agents/Codex/
    ├── Progress Report Session 16.md
    ├── Progress Report Session 24.md
    ├── Progress Report Session 32.md
-   └── Progress Report Session 40.md
+   ├── Progress Report Session 40.md
+   └── Progress Report Session 48.md
 ```
 
 ## What each file owns
@@ -72,8 +75,9 @@ agents/Codex/
 - **`tools/probe_rc007_round3.py`** and **`tools/probe_rc007_round3_2026-08-18.txt`** — independent offline RC-007 final-delta evidence. They authenticate all eight Draft-31 files and frozen spans, reproduce the real-neighbour filter repair, tightened 170-chunk / 73.780-second coverage theorem and 957,031,364-byte transfer projection, then exercise the four-case ordered-branch truth table. They show that the high-space/high-null state is a homogeneity failure under the branches even though three live surfaces call high null sufficient to withhold the measurement. The probe passes 39/39 and reads no archive, candidate sample or network resource.
 - **`tools/probe_rc008_round1.py`** and **`tools/rc008_round1_2026-08-18.txt`** — independent offline RC-008 full-pass evidence. They authenticate the six Draft-32 files and frozen spans, invoke the owner checker, and reproduce five blockers: the lower-floor extremum counterexample, the nominal-rate filter mismatch, an interleaving-direction reversal, a counterfeit legacy regression baseline, and a bad-channel pass reversal. The probe passes 32/32 and reads no archive, candidate noise value or network resource.
 - **`tools/probe_rc008_round2.py`**, **`tools/rc008_round2_2026-08-19.txt`**, and **`tools/rc008_round2_2026-08-19.json`** — independent offline RC-008 delta evidence. They authenticate the nine Draft-33 files and frozen spans, replay the two fast owner probes, show that the split rule can change a would-be pass into `unmeasurable`, refute the claimed near-independence of contiguous halves with an above-300-Hz periodic construction, and stage a byte-different timing-index substitute that the supposedly fully authenticated regression wrapper still accepts at 168/168. The probe passes 27/27 and reads no archive, candidate noise value or network resource.
+- **`tools/probe_rc008_round3.py`**, **`tools/rc008_round3_2026-08-19.txt`**, and **`tools/rc008_round3_2026-08-19.json`** — independent offline RC-008 terminal evidence. They authenticate all nine Draft-34 files and three frozen spans, replay the owner and legacy checks, verify syntax-tree-derived legacy-input completeness, and show that the reviewed fixed even/odd split has no tunable period while moving `passes` to `unmeasurable`. The probe passes 33/33 and reads no archive, candidate noise value or network resource.
 - **`Session Summaries/HumanReport<N>.md`** — permanent detailed session reports for the director.
-- **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 40 count-based report; the next cadence report is Session 48.
+- **`Progress Reports/`** — director-facing reports triggered by phase changes, approved amendments, and the eight-session cadence. The newest is the Session 48 count-based report.
 
 ## Shared work outside this folder
 
@@ -87,12 +91,12 @@ agents/Codex/
 - `chats/Claude-Codex/Missing Depth Recovery Review/` is concluded. RC-005 closed `Approved with Follow-Ups` at Round 2 on the exact seven-file state both agents approved. The final console line now carries the reconciled decision, the point gate labels itself diagnostic, and the per-spike masks enter the resident/peak bound. Codex's independent delta probe passes 10/10; the owner suite passes 543/543 and the repair-reversion harness catches 4/4 with a green control. The implementation gate is cleared; rank-1 measurement remains a separate execution step.
 - `chats/Claude-Codex/Rank 1 Drift Result/` is concluded. RC-006 closed `Approved` at Round 2 on the exact nine-file state both agents approved. All four reporting findings are repaired, the owner checker passes 61/61, Codex's delta probe passes 48/48, and no packet or result byte moved in the response. Only rank 1's strict drift gate is discharged; no host is pinned.
 - `chats/Claude-Codex/Host Noise Gate/` is concluded. RC-007 closed `Revisions Required` by explicit two-agent consensus at the Convergence Decision; Draft 31 is frozen and unapproved.
-- `chats/Claude-Codex/Section 19 Convergence Repair/` is active. RC-008, RC-007's sole successor, returned `Revisions Required` at Rounds 1 and 2. Draft 33 is frozen and unapproved after the delta pass found two response-created blockers: its replacement split rationale conflicts with the ordered decision and its regression wrapper omits the timing-index input. Three wording items are tracked. Claude owns the final Round-3 response; no estimator exists and no candidate noise has been measured.
+- `chats/Claude-Codex/Section 19 Convergence Repair/` is active at the Convergence Decision. Draft 34 is frozen and unapproved after the terminal delta pass verified every repair but found its sole split rationale falsely assigns a tunable period to the fixed even/odd alternative. Codex proposes and approves `Split/Redesign Required`; Claude owes the other four-field statement and explicit consensus or the smallest counterproposal. No fourth repair, estimator or candidate noise read is authorized.
 - `chats/Claude-Codex-Human/Review Method Change/` is active at Randy's request. The bounded agent-only Convergence Decision, successor-card lineage, and forced redesign after repeated non-approval are agreed and written into the superseding review method. The newest exchange records two reporting safeguards: pair accessible result sentences directly with the technical boundary list rather than translating from memory, and verify prose claims against correct instrument output independently rather than treating a green owner claim checker as sufficient by itself.
 - `Claim Sheet.md` and `Accessible Claim Sheet.md` are synchronized at SHA-256 `2feda611d78684bfe522258fb2f67fecbd6fe2b6ccadb6362056c79e9aeae365` / `679918f7afc41b641530b8d26b1700da226c3f3fc62c06fee3918841c3c9b1dd`. Amendments 1–6 are `In force`. The matching-rule prose, implementation/tests, host-dependent exact configuration, and manipulation gate remain separate approvals.
 - `Study Guide/Pass 1 - Conceptual Foundation.tex` and PDF are approved Phase 1 artifacts. Pass 2 remains a Phase 3 deliverable.
 - `director_requests.md` contains one open non-blocking Phase 1 contract-review item. No new director action is needed.
-- Root `README.md` is the append-only public live-run page. Its newest heartbeat forward-corrects the claimed complete checker authentication and the replacement split rationale without presenting either as a recording result. Rank 1 has still passed only the predeclared depth-trace gate; no host or downstream execution is authorized. The project remains in progress.
+- Root `README.md` is the append-only public live-run page. Its newest heartbeat records that the host-noise specification reached its review limit without approval and must change boundary before returning. Rank 1 has still passed only the predeclared depth-trace gate; no host or downstream execution is authorized. The project remains in progress.
 - The Reproducibility Packet is co-owned. Its runbook now has eleven agreeing steps, including the independently replayed rank-1 measurement. Codex owns Rung 0, the sorter-panel decision, inference/negative-control harness, Tier A's independent balance/manipulation gate, and the two-part placement calibration.
 
 ## Current technical boundaries
@@ -103,7 +107,7 @@ agents/Codex/
 - Before T is measured or any host-specific manifest/pool is opened, an exact exposure-schedule/placement specification and synthetic tests must pin the nuisance seed, amplitude target, and commanded-placement construction. Matcher implementation/test review follows as another same-state gate.
 - The derived CCF label layer is opt-in; recognized white-matter/fibre-tract labels remain non-injectable. Any non-CA1 zone change must define the removal set across parent/descendant labels before matching.
 - RC-001 is closed `Approved` on Draft 24 `c35987fe…`, utility `eace4cd35…`, and harness `946df906…`. The gate uses eleven consecutive one-minute medians; the universal half-bin cutoff is withdrawn; within-bin transmission depends on depth ranks and episode placement; and neither missed nor transmitted sub-minute motion is treated as a one-way safety property. The owner harness passes 103 checks, Codex's probe passes thirteen checks including 93,184 exhaustive small cases, and the utility's executable AST is unchanged from Round 2.
-- RC-002 closed unapproved at its Convergence Decision; its one allowed successor RC-003 closed `Approved`; RC-004 closed `Approved` at Round 2; RC-005 closed `Approved with Follow-Ups` at Round 2; RC-006 closed `Approved` at Round 2; RC-007 closed `Revisions Required`; and its sole successor RC-008 remains open after Round-1 and Round-2 `Revisions Required` verdicts, with Draft 33 frozen and Claude's final Round-3 response due. The strict all-finite-depth confirmation is superseded only as §17 declares: NaN is bounded as missing, either infinity remains fatal, and a decision-unstable completion bound pauses the candidate.
+- RC-002 closed unapproved at its Convergence Decision; its one allowed successor RC-003 closed `Approved`; RC-004 closed `Approved` at Round 2; RC-005 closed `Approved with Follow-Ups` at Round 2; RC-006 closed `Approved` at Round 2; RC-007 closed `Revisions Required`; and its sole successor RC-008 is at the Round-3 Convergence Decision with Draft 34 frozen and unapproved. Codex proposes `Split/Redesign Required`; Claude's statement and consensus are due. The strict all-finite-depth confirmation is superseded only as §17 declares: NaN is bounded as missing, either infinity remains fatal, and a decision-unstable completion bound pauses the candidate.
 - `.gitattributes` makes repository-wide checkout bytes explicit and is same-state approved by both agents. All paths default to `-text`; 17 framework files and 11 legacy packet outputs intentionally reconstruct CRLF. A temporary `core.autocrlf=true` clone matched all 153 reviewed tracked files byte-for-byte.
 - No host is pinned. Rank 1's approved depth-trace result is `Delta_10min = 1.821 µm` with `Q95_null = 0.526 µm`; completion and reconciliation pass, discharging one of five host gates. Noise, effective SNR, joint ten-placement feasibility, and balance remain open. Rank 2 is unmeasured. No Rung 0, generation or sorter run is authorized, and the rank-5/7/9/13 declared-clock disagreements remain separately paused.
 

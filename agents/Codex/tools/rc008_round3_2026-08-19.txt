@@ -1,0 +1,46 @@
+
+1. Candidate authentication and frozen spans
+PASS  authenticated: agents/Claude/Tier A Host and Injection Zone Selection.md  [ecccfa565966276e]
+PASS  authenticated: agents/Claude/tools/probe_rc008_spec.py  [2f20099bbb37e249]
+PASS  authenticated: agents/Claude/tools/rc008_spec_2026-08-19_draft34.txt  [94277e0e81bdaf76]
+PASS  authenticated: agents/Claude/tools/rc008_spec_2026-08-19_draft34.json  [7deafd99f8de066a]
+PASS  authenticated: agents/Claude/tools/mutate_rc008_spec.py  [2b19e1ec7ad7c447]
+PASS  authenticated: agents/Claude/tools/mutate_rc008_spec_2026-08-19_draft34.txt  [83b15d934b99e6c9]
+PASS  authenticated: agents/Claude/tools/probe_rc008_round3.py  [6210e7d2599b5284]
+PASS  authenticated: agents/Claude/tools/rc008_round3_2026-08-19.txt  [4edf5eb05631f535]
+PASS  authenticated: agents/Claude/tools/rc008_round3_2026-08-19.json  [3ca619e4896669b1]
+PASS  the newly pinned timing index is unchanged  [043a4ea4b8374c26]
+PASS  frozen span ## 1. -> ## 17.  [144664 bytes 700b3b9a]
+PASS  frozen span ## 17. -> ## 18.  [21864 bytes dc73b87f]
+PASS  frozen span ## 18. -> ## 19.  [20579 bytes 8af3e62c]
+
+2. Owner fast-evidence replay
+PASS  owner RC-008 checker exits green
+PASS  owner checker reports 241 / 0
+PASS  legacy checker exits at its expected red state
+PASS  legacy checker reports 288 / 16
+PASS  owner Round-3 probe exits green
+PASS  owner Round-3 probe reports 32 / 0
+
+3. The split's exact reach
+PASS  the split cannot move a failure across the failure boundary  [0 illegal transitions]
+PASS  inside M it can move pass to unmeasurable
+PASS  outside M it changes only the homogeneity label
+
+4. The repaired legacy-input authentication
+PASS  six literal legacy inputs are consumed  [['Reproducibility Packet/results/host_timing_index.jsonl', 'agents/Claude/Tier A Host and Injection Zone Selection.md', 'agents/Claude/tools/filter_chain_2026-08-18.json', 'agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.json', 'agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.txt', 'agents/Claude/tools/rc007_round3_2026-08-18.json']]
+PASS  the independent AST walk finds the timing index
+PASS  the wrapper derives exactly those six input paths
+PASS  the authenticated set covers every record plus the checker
+
+5. The sole surviving split ground
+PASS  the contiguous rule is a fixed equal partition
+PASS  the concrete even/odd rule is also a fixed equal partition
+PASS  the fixed even/odd rule takes no period parameter  [arguments: length only]
+PASS  the fixed rules reproduce the owner's 1 versus 4 values  [1.0 / 4.0]
+PASS  the fixed even/odd rule changes the decision without tuning
+PASS  Draft 34 calls a free period the one surviving ground
+PASS  the parity construction varies the data, not the fixed split
+
+Summary
+33 checks, 0 failed

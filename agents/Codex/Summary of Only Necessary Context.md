@@ -1,152 +1,130 @@
 # Summary of Only Necessary Context — Codex
 
-**Rewritten at the end of Codex Session 47 · 2026-08-19.**
+**Rewritten at the end of Codex Session 48 · 2026-08-19.**
 
-**Next Codex session will be Session 48. A count-based director progress report
-is due in Session 48.**
+**Next Codex session will be Session 49. The Session-48 count-based director
+progress report is complete.**
 
-## Current phase and controlling boundary
+## Immediate handoff
 
-**Phase 2 — Execution and specification review.** RC-008, the sole successor to
-RC-007, remains open after **Round-1 and Round-2 `Revisions Required`** verdicts.
-Draft 33 SHA-256 `16ee8f801d0a44b99de70c12da7f7d80b32a73325e720ab0236ad2180679f56e`
-is frozen and unapproved. Claude owns the **final Round-3 response**.
+**Phase 2 — Execution and specification review. RC-008 has reached its
+Round-3 limit and the Convergence Decision is active.** Draft 34 SHA-256
+`ecccfa565966276e203efef2794f180fe73a2e1e0cbc8beff97d3bd8916a6f89`
+is frozen and unapproved.
 
-If Round 3 does not reach explicit same-state approval, the agent-only
-Convergence Decision fires. Under clause 5, a non-approval on RC-008 forbids a
-second like-for-like successor; the work must then split or redesign with the
-changed boundary named.
+Codex's terminal delta pass verified every declared repair but returned blocking
+F8-R3: Draft 34 says its whole reason for choosing midpoint-contiguous halves is
+that an interleaved split carries a free period, but the reviewed alternative
+is the fixed even/odd partition. Both are predetermined equal partitions with
+no period selected after values are visible, and the owner's fixed-parity
+fixture changes `passes` to `unmeasurable`.
 
-This remains a specification, not a recording result. No host-noise estimator
-exists, no archive sample or candidate noise value has been read, no host is
-pinned, and rank 2 is unmeasured. Rank 1 has cleared only the approved strict
-drift gate. No host-dependent manifest, donor assignment, generation, Rung 0 or
-sorter execution is authorized.
+Codex has recorded the one permitted four-field Convergence statement and
+explicitly proposes and approves **`Split/Redesign Required`**. **Claude now
+owes exactly one four-field statement and explicit consensus or the smallest
+counterproposal on terminal disposition.** This is not a fourth repair round.
+Do not edit Draft 34.
 
-## Draft-33 authentication and reproduced evidence
+The active exchange is the physical-EOF **05:25 PDT Codex entry** in
+`chats/Claude-Codex/Section 19 Convergence Repair/Section 19 Convergence Repair - Active.md`.
+Two earlier Codex entries landed above Claude's final handoff because a repeated
+footer was used as the append anchor; they were preserved under the append-only
+rule. The dated EOF correction is controlling.
 
-All nine carded files authenticated:
+## Exact reviewed state and evidence
 
-- selection document `16ee8f80…`;
-- specification checker `7574ac52…` and TXT/JSON `8f40c8cc…` / `20aea650…`;
-- mutation harness `299be141…` and record `a6c0d943…`;
-- owner Round-2 probe `aa6a4371…` and TXT/JSON `5f692ba5…` / `0d185bd3…`.
+All nine carded Draft-34 files authenticated. Key state:
 
-The frozen spans reproduce: §1–§16 144,664 bytes / `700b3b9a…`; §17 21,864 /
-`dc73b87f…`; §18 20,579 / `8af3e62c…`.
+- selection document: `ecccfa565966276e203efef2794f180fe73a2e1e0cbc8beff97d3bd8916a6f89`;
+- specification checker: `2f20099…`;
+- timing index: `043a4ea4…`;
+- §1–§16: 144,664 bytes / `700b3b9a…`;
+- §17: 21,864 bytes / `dc73b87f…`;
+- §18: 20,579 bytes / `8af3e62c…`.
 
-Owner evidence reproduced:
+Reproduced evidence:
 
-- RC-008 checker: **168 / 168**;
-- legacy RC-007 baseline: **288 checks, exactly 16 declared failures**;
-- mutation harness: **27 / 27 caught**, green control;
-- owner Round-2 evidence probe: **36 / 36**.
+- owner RC-008 checker: **241 / 241**;
+- closed RC-007 checker: **288 checks, exactly 16 expected failures**, exit 1;
+- mutation harness: **42 / 42 caught**, control green;
+- owner Round-3 probe: **32 / 32**;
+- Codex terminal probe: **33 / 33**.
 
-Codex's `agents/Codex/tools/probe_rc008_round2.py` passes **27 / 27**. Digests:
+Codex evidence is in `agents/Codex/tools/probe_rc008_round3.py` and the paired
+2026-08-19 TXT/JSON records. It authenticates the candidate and frozen spans,
+replays owner evidence, verifies AST-derived legacy-input completeness, checks
+the ordered branch reach, and demonstrates F8-R3 without archive, candidate
+noise or network access.
 
-- probe: `50a57ddb9226bfc608692c3111340671f5c51d27424acbdd180ba4bdade13bc2`;
-- text: `e721097e2eb6e8923e74fa1e6440a68af39bff569dfb05a74127171722f9b304`;
-- JSON: `06cae35207022b8d1d6d848e6c0e7c70e39f01832b9fa083084d070ede0a4019`.
+## Convergence boundary
 
-It reads no archive, candidate sample or network resource.
+Codex's recorded position:
 
-## Round-2 blocking findings
+- **Minimum claim that can ship:** Draft 34 can remain as a frozen record of
+  verified repairs, but cannot approve §19 or authorize an estimator.
+- **Remaining disagreement:** no supported basis selects midpoint-contiguous
+  over fixed even/odd for a split with a demonstrated decision destination.
+- **Strongest contrary evidence:** the split is predeclared, no safety or
+  optimality claim remains, and all sixty `rho(k)` values are published; this
+  prevents post-result tuning and makes the convention auditable.
+- **Safe disposition:** **`Split/Redesign Required`**. Change the boundary
+  around the split instrument before any new card opens.
 
-### F6-R2 — the replacement split rationale contradicts the decision
+RC-008 is RC-007's single clause-5 successor. A new like-for-like §19 card is
+forbidden after non-approval. A future card must name the changed boundary—for
+example, a separately justified split instrument or a predeclared multi-split
+decision with explicit direction and cost.
 
-Draft 33 withdraws the false claim that interleaving always compresses
-`R_null_sampled`, but its “decisive” replacement says reducing cancellation is
-not a goal the rule can cash. The response's own values refute that. At
-`R_space_sampled = 1.5`, `M = 2`:
+## Next actions for Claude
 
-- contiguous `R_null_sampled = 1` → **passes**;
-- interleaved `R_null_sampled = 4` → **unmeasurable**.
+1. Read the card's Convergence Decision section and the physical-EOF active-chat
+   entry.
+2. Record one statement in the same four fields: minimum shippable claim,
+   remaining disagreement, strongest evidence against the position, and one
+   acceptable safe disposition.
+3. Explicitly agree with `Split/Redesign Required` or give the smallest
+   counterproposal. Do not revise Draft 34 or open a successor while consensus
+   is unresolved.
+4. If consensus is reached, close RC-008 and the chat on that disposition, then
+   define a materially changed boundary before any new review card.
 
-The split difference can therefore withhold a would-be pass. The first
-replacement ground is also not bounded: a 400.921659 Hz process, wholly above
-300 Hz, can repeat exactly across both 6,510-sample halves; across phase the two
-half-estimate series have correlation 1.0. High-pass frequency support does not
-establish near-independence.
+## Execution state that must not be broadened
 
-Claude may keep contiguous halves as a predeclared instrument parameter, but
-must remove the two false grounds and state the choice at its real boundary, or
-provide a bounded rationale that survives the counterexamples.
+This is still a specification dispute, not a recording result. No host-noise
+estimator exists, no candidate noise value has been read, no host is pinned,
+and rank 2 remains unmeasured. No host-dependent manifest, donor assignment,
+Rung 0, hybrid generation or sorter run is authorized.
 
-### F7-R2 — one legacy-checker input remains unauthenticated
+Rank 1 has passed only the same-state-approved strict depth-trace statistic:
+`Delta_10min = 1.821 µm` against 20 µm and `Q95_null = 0.526 µm`. Four host
+gates remain open: noise, effective SNR, joint ten-placement feasibility and
+balance. The result concerns label-blind units or clusters under the stated
+common-movement assumption; it is not proof that the physical probe did not
+move.
 
-`probe_rc007_spec.py` consumes
-`Reproducibility Packet/results/host_timing_index.jsonl`. Draft 33's
-`RC007_AUTHENTICATED` list pins five paths and omits that file. The mutation
-harness copies it but never mutates it.
+## Durable approved foundations
 
-Codex staged a byte-different synthetic 21-series timing record preserving the
-two aggregates the legacy checker consumes. The repaired wrapper still exited
-zero at **168 checks, 0 failed**. This is the original F4-R1 defect class on an
-unlisted record. Claude must authenticate the timing-index digest and add a
-substitution mutation that reaches it.
+- Claim Sheet and Accessible Claim Sheet Amendments 1–6 are in force.
+- RC-001 closed `Approved`; RC-003 closed `Approved`; RC-004 closed `Approved`;
+  RC-005 closed `Approved with Follow-Ups`; RC-006 closed `Approved`.
+- RC-002 closed unapproved at Convergence; RC-007 closed `Revisions Required`;
+  RC-008 is now at Convergence with Draft 34 frozen and unapproved.
+- The Tier A donor matching rule Draft 6 is same-state approved only as a
+  pre-pool specification. Schedule/placement, implementation, exact host
+  configuration, pool, balance and execution are separate gates.
+- `.gitattributes` remains same-state approved and reproduces the reviewed
+  cross-platform bytes.
+- The Reproducibility Packet remains co-owned. No packet or result file changed
+  in Session 48.
 
-## Tracked non-blocking delta findings
+## Director-facing state
 
-- **T5-R2:** §19.10 lists four sampled quantities and says a short excursion is
-  invisible to “all three.”
-- **T6-R2:** §19.3 now gives the lower floor a voting minimum but retains the
-  stale sentence that §19.6 “does not lean on the floor.”
-- **T7-R2:** the raw AP series declares no sampling rate, but §19.7 asks for the
-  candidate's “own declared rate.” Name the whole-span derived timing-index
-  rate if that is the intended diagnostic.
+`agents/Codex/Progress Reports/Progress Report Session 48.md` is the newest
+count-based report. It covers the approved rank-1 result and the host-noise
+redesign stop since Session 40. No new director decision is needed for the
+immediate agent-only Convergence exchange. The older nonblocking Phase-1
+contract-review request remains open.
 
-## What verified clean in the response
-
-- F1-R1's floor now reads `sigma_quietest_sampled`; the upper ceiling remains
-  on `sigma_worst_sampled`; no threshold value moved.
-- F2-R1 is honestly declared as a nominal-rate deviation. The design
-  coefficients differ by `1.31860735664e-07`; `padlen` remains 18 and the
-  automatic margin remains 500 samples under the compared rates. Fixture sample
-  effects are explicitly diagnostics, not bounds.
-- F5-R1's bad-channel conservatism claim is withdrawn and the per-channel scale
-  series is published for every window; no post-hoc detector threshold is added.
-- T1-R1's coverage/dilution distinction and corrected 228.718-second number
-  reproduce; T2-R1 through T4-R1 are taken on their stated boundaries.
-
-## Immediate owner instructions
-
-**Immediate owner: Claude.** Read RC-008 and the active Section 19 Convergence
-Repair chat. Prepare the final Round-3 exact candidate that:
-
-1. removes or bounds the two false split grounds while keeping any parameter
-   choice at its honest boundary;
-2. authenticates `host_timing_index.jsonl` and mutation-tests its substitution;
-3. disposes of T5-R2 through T7-R2;
-4. updates candidate digests and owner evidence before handoff.
-
-Codex Session 48 should authenticate only that final delta. Approval requires
-explicit same-state approval. If a blocker remains or a new blocker appears,
-freeze the state and run the one-time Convergence Decision rather than opening
-another repair round.
-
-The Review Method Change chat remains active at Randy's request and has no
-outstanding director action.
-
-## Approved foundation and downstream gates
-
-- RC-001: drift definition and estimator closed `Approved`.
-- RC-002: closed unapproved; sole successor RC-003 closed `Approved`.
-- RC-004: session reference-instant check closed `Approved`.
-- RC-005: missing-depth recovery closed `Approved with Follow-Ups`.
-- RC-006: rank-1 drift measurement/report closed `Approved`.
-- RC-007: closed `Revisions Required`; Draft 31 frozen and unapproved.
-- RC-008: open after Round-1 and Round-2 `Revisions Required`; Draft 33 frozen
-  and unapproved; final owner response owed.
-- All six Claim Sheet amendments remain `In force`; contract hashes remain
-  `2feda611…` / `679918f7…`.
-- The real-arm donor-matching prose remains same-state approved at Draft 6
-  `51adae4b…`; implementation and host-dependent states remain separate gates.
-
-After one host passes all in-force gates, the order remains: approve the
-exposure schedule and placement specification; approve matcher implementation
-and tests; calibrate footprint/placement; freeze exact matching outputs; obtain
-independent balance/manipulation approval; then seek separate generation and
-later Rung-0/sorter authorizations.
-
-`agents/Codex/Session Summaries/HumanReport47.md` is the detailed permanent
-record. No Session-47 cadence report was due; Session 48 requires one.
+For the next Codex session, read this file, then `HumanReport48.md`, RC-008 and
+the physical tail of the active chat. Use `references.md` rather than memory for
+citations.

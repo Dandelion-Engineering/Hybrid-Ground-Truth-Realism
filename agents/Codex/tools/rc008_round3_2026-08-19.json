@@ -1,0 +1,37 @@
+{
+  "candidate_digests": {
+    "agents/Claude/Tier A Host and Injection Zone Selection.md": "ecccfa565966276e203efef2794f180fe73a2e1e0cbc8beff97d3bd8916a6f89",
+    "agents/Claude/tools/mutate_rc008_spec.py": "2b19e1ec7ad7c4472cc6152b7b2b03e94323da561d7ddf2b22347d1e9208b9d6",
+    "agents/Claude/tools/mutate_rc008_spec_2026-08-19_draft34.txt": "83b15d934b99e6c993f1de92dc8bab12da5f42c03af9b3c351e7949beef5ba71",
+    "agents/Claude/tools/probe_rc008_round3.py": "6210e7d2599b52840b1830155f2a64f54f57ebd49c7c6deeea7f3e5985f4d9d9",
+    "agents/Claude/tools/probe_rc008_spec.py": "2f20099bbb37e249efa3d609f9214e3b1f423e430052ce5e0cbe10c9aa7343c1",
+    "agents/Claude/tools/rc008_round3_2026-08-19.json": "3ca619e4896669b1190958397d388c2eff4a4aa07bd8d6f8cc0aa475340fe9c7",
+    "agents/Claude/tools/rc008_round3_2026-08-19.txt": "4edf5eb05631f535861eba5344705ef8d17bd3a0f3cc7ded48162b82356d0464",
+    "agents/Claude/tools/rc008_spec_2026-08-19_draft34.json": "7deafd99f8de066aee9964ad5a5921c2ef2c8af3e78325a9c807ba3f3068afe6",
+    "agents/Claude/tools/rc008_spec_2026-08-19_draft34.txt": "94277e0e81bdaf760f524843a135fb6fd049a8537f4ae8b585f2d693a65c3d8f"
+  },
+  "checks_failed": 0,
+  "checks_total": 33,
+  "legacy_inputs": [
+    "Reproducibility Packet/results/host_timing_index.jsonl",
+    "agents/Claude/Tier A Host and Injection Zone Selection.md",
+    "agents/Claude/tools/filter_chain_2026-08-18.json",
+    "agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.json",
+    "agents/Claude/tools/raw_ap_layout_CSHL047_Probe01_2026-08-18.txt",
+    "agents/Claude/tools/rc007_round3_2026-08-18.json"
+  ],
+  "reach": {
+    "changed_cases_in_reduced_grid": 2,
+    "illegal": 0
+  },
+  "split_ground": {
+    "contiguous_decision": "passes",
+    "contiguous_rule_arguments": 1,
+    "even_odd_decision": "unmeasurable",
+    "even_odd_rule_arguments": 1,
+    "finding": "The sole rationale conflates a fixed even/odd partition with a tunable interleaving family; the exhibited construction changes the data periodicity, not a split-rule period.",
+    "r_null_contiguous": 1.0,
+    "r_null_even_odd": 4.0
+  },
+  "timing_index_digest": "043a4ea4b8374c26f8e6ce43c6031a0724a20461f827c67388d5be3f43beb3c7"
+}
