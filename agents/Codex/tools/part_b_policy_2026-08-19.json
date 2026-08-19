@@ -1,0 +1,288 @@
+{
+  "authenticated_record_sha256": "4a86a090386bedd89f2d176abfdf0652ba3fe7f1bb3e29dd800d73b09e14b4fd",
+  "authenticated_script_sha256": "b653bc0c214f6a0c419489bafde244185d4bd61acc882b64e9edd2baa75a6f42",
+  "boundary": "constructed authenticated ramp band plus sample geometry only; no archive, candidate, frequency, power, or safety claim",
+  "geometry": [
+    {
+      "both_halves_contiguous": false,
+      "member": 1,
+      "one_samples": 6510,
+      "total_runs": 13020,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 2,
+      "one_samples": 6510,
+      "total_runs": 6510,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 3,
+      "one_samples": 6510,
+      "total_runs": 4340,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 5,
+      "one_samples": 6510,
+      "total_runs": 2604,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 6,
+      "one_samples": 6510,
+      "total_runs": 2170,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 7,
+      "one_samples": 6510,
+      "total_runs": 1860,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 10,
+      "one_samples": 6510,
+      "total_runs": 1302,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 14,
+      "one_samples": 6510,
+      "total_runs": 930,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 15,
+      "one_samples": 6510,
+      "total_runs": 868,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 21,
+      "one_samples": 6510,
+      "total_runs": 620,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 30,
+      "one_samples": 6510,
+      "total_runs": 434,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 31,
+      "one_samples": 6510,
+      "total_runs": 420,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 35,
+      "one_samples": 6510,
+      "total_runs": 372,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 42,
+      "one_samples": 6510,
+      "total_runs": 310,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 62,
+      "one_samples": 6510,
+      "total_runs": 210,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 70,
+      "one_samples": 6510,
+      "total_runs": 186,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 93,
+      "one_samples": 6510,
+      "total_runs": 140,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 105,
+      "one_samples": 6510,
+      "total_runs": 124,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 155,
+      "one_samples": 6510,
+      "total_runs": 84,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 186,
+      "one_samples": 6510,
+      "total_runs": 70,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 210,
+      "one_samples": 6510,
+      "total_runs": 62,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 217,
+      "one_samples": 6510,
+      "total_runs": 60,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 310,
+      "one_samples": 6510,
+      "total_runs": 42,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 434,
+      "one_samples": 6510,
+      "total_runs": 30,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 465,
+      "one_samples": 6510,
+      "total_runs": 28,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 651,
+      "one_samples": 6510,
+      "total_runs": 20,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 930,
+      "one_samples": 6510,
+      "total_runs": 14,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 1085,
+      "one_samples": 6510,
+      "total_runs": 12,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 1302,
+      "one_samples": 6510,
+      "total_runs": 10,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 2170,
+      "one_samples": 6510,
+      "total_runs": 6,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": false,
+      "member": 3255,
+      "one_samples": 6510,
+      "total_runs": 4,
+      "zero_samples": 6510
+    },
+    {
+      "both_halves_contiguous": true,
+      "member": 6510,
+      "one_samples": 6510,
+      "total_runs": 2,
+      "zero_samples": 6510
+    }
+  ],
+  "half_samples": 6510,
+  "ramp_policy": {
+    "existential_stands_down": true,
+    "geometry_selected_member": 6510,
+    "geometry_selected_stands_down": false,
+    "geometry_selected_value": 3.34302644573686,
+    "maximum_members": [
+      6510
+    ],
+    "maximum_value": 3.34302644573686,
+    "minimum_members": [
+      1,
+      3,
+      5,
+      7
+    ],
+    "minimum_value": 1.8,
+    "stand_down_members": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      10,
+      14,
+      15,
+      21,
+      30,
+      31,
+      35,
+      42,
+      62,
+      70,
+      93,
+      105,
+      155,
+      186,
+      210,
+      217,
+      310,
+      434,
+      465,
+      651,
+      930,
+      3255
+    ],
+    "unanimity_stands_down": false,
+    "withholding_members": [
+      1085,
+      1302,
+      2170,
+      6510
+    ]
+  },
+  "retained_samples": 13020,
+  "threshold_m": 2.0
+}

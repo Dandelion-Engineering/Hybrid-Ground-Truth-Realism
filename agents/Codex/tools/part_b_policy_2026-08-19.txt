@@ -1,0 +1,24 @@
+
+1. Family geometry and the unique contiguous member
+PASS  the independently derived family equals the authenticated 32-member record  [32 members]
+PASS  every member partitions the retained core into two disjoint equal-size halves  [6510 samples in each half]
+PASS  p = 6510 is uniquely the partition into two contiguous equal-duration epochs  [contiguous members [6510]]
+PASS  the geometry-only minimum-fragmentation selector therefore chooses p = 6510 without reading any signal value  [minimum 2 runs at [6510]]
+PASS  every other member fragments the epochs into at least four alternating runs  [next-smallest run count 4]
+
+2. Extremal data-dependent selectors on the ramp band
+PASS  all 32 ramp-band values are finite and defined  [32 values, 0 undefined]
+PASS  the authenticated dispositions are exactly the thresholded reported values  [28 stand down, 4 withhold]
+PASS  choosing the smallest observed member value is exactly the existential rule on this band  [minimum 1.800000 at [1, 3, 5, 7]]
+PASS  choosing the largest observed member value is exactly the unanimity rule on this band  [maximum 3.343026 at [6510]]
+PASS  the two outcome-reading extrema reach opposite dispositions on byte-identical fully defined data  [existential stands down; unanimity withholds]
+PASS  the geometry-only selector is p = 6510 regardless of those values and its ramp disposition is withholding  [p=6510 value 3.343026]
+
+3. Decision boundary
+NOTE  the unique contiguous member has an outcome-independent temporal meaning: early epoch versus late epoch
+NOTE  unanimity is a predeclared worst-member functional, not a partition-invariant estimate; on the ramp band its verdict is set by p = 6510
+NOTE  a selector that reads member values needs its own scientific criterion and selection-aware evidence; a selector that reads geometry alone reduces to a fixed pin
+NOTE  all ramp-band values are constructed; no real-data frequency, power, or safety claim follows
+
+Summary
+11 checks, 0 failed
