@@ -1,0 +1,89 @@
+
+1. The bound function is exact, checked by exhaustion
+PASS  the three-level enumeration equals a full exhaustive search on every small fixture, on both endpoints  [36 fixtures exhausted, 0 mismatches]
+PASS  the maximum is attained at a vertex - every unknown at 0 or at +inf  [0 of 36 fixtures disagree]
+PASS  the minimum is NOT attained at a vertex, so the obvious guess is wrong for that endpoint  [24 of 36 fixtures have an interior minimum strictly below every vertex]
+PASS  the closed form f[max(i90 - u, i10)] / f[i10] equals the exhaustive minimum wherever it applies  [30 fixtures compared, 0 mismatches]
+PASS  the lower bound is never below 1, because the p90 rank sits above the p10 rank in a sorted non-negative set  [0 fixtures below 1]
+
+2. A worked interior minimum, so the failure above is concrete
+PASS  at n = 10 the ranks are 1 and 9  [ranks 1 and 9]
+PASS  placing the unknown at +inf gives the top-rank value 9.0 over 1.0  [vertex minimum 9.000000]
+PASS  placing it at an interior value pushes the p90 rank down one finite value without moving the p10 rank  [exhaustive minimum 8.000000]
+PASS  so the interior placement strictly beats both vertices  [8.000000 < 9.000000]
+
+3. The ranks at n = 72, and an expected defect that measurement refuted
+PASS  integer arithmetic gives ranks 8 and 65 at n = 72  [ranks 8 and 65]
+PASS  section 19.4's own ceil(0.10 n) and ceil(0.90 n), evaluated in binary floating point, agree with exact integer arithmetic at every n from 1 to 200,000  [0 disagreements]
+NOTE  I wrote that check expecting it to FAIL and to yield an implementation hazard. It did not. The stated form is safe at every band size this project could use; the integer form used here is belt and braces, not a repair, and the hazard claim is withdrawn
+PASS  i10 and n - i90 + 1 coincide at n = 72, which is why one count governs both ends  [i10 = 8, n - i90 + 1 = 8]
+
+4. The count threshold at n = 72
+PASS  with 7 or fewer undefined channels the upper bound is finite  [u = 7 gives 1.570000]
+PASS  with 8 or more it is unbounded whatever the finite values are  [u = 8 gives inf]
+PASS  8 is exactly the count at which the documented zero-denominator case already reaches +inf  [the p10 rank is 8, so 8 entries at 0 reach it]
+
+5. It is a conservative extension of the frozen rule
+PASS  with no undefined channel the two bounds collapse to the single value  [24 fixtures, 0 disagreements]
+PASS  branch 4 then fires exactly when Draft 34 says it fires  [0 disagreements over 24 fixtures]
+PASS  and the third label is unreachable, so the rule reduces to Draft 34's two  [0 disagreements over 72 spatial values]
+
+6. Every scalar convention is a completion, so the bound dominates all of them
+PASS  assigning 0, 1, +inf or the finite median to every undefined channel always lands inside the enclosure  [72 assignments checked, 0 outside]
+PASS  randomly drawn completions, including mixtures of 0, +inf and interior values, all land inside the enclosure  [2400 completions drawn, 0 outside]
+PASS  no completion withholds while the bounded rule stands down, so the direction is one-way  [0 one-way violations over 2400 completions]
+
+7. It bites where the current unhandled behaviour passes
+PASS  the fixture has 65 finite ratios and 7 undefined ones  [65 finite, 7 undefined]
+PASS  NumPy's NaN placement gives a ratio at or below M, so the current unhandled behaviour passes  [NumPy ratio 1.000000, frozen disposition passes]
+PASS  the upper completion bound exceeds M, so the bounded rule withholds  [bound [1.000000, 3.000000]]
+PASS  and the disposition changes from passes to unmeasurable  [disposition unmeasurable]
+PASS  NumPy's placement IS the all-at-+inf vertex for the ranks, so the divergence is in the comparison and not in the ordering  [NumPy 1.000000, all-at-+inf vertex 1.000000]
+PASS  that vertex is one completion of many, and it is not the extreme one  [vertex 1.000000 against upper bound 3.000000]
+
+8. A seven-undefined fixture that is PROVED decision-irrelevant
+PASS  with homogeneous finite ratios the upper bound stays at or below M with 7 undefined channels  [bound [1.049652, 1.057000]]
+PASS  so branch 4 stands down and the undefined entries are proved irrelevant to the decision rather than assumed to be  [disposition passes]
+NOTE  this is the property that keeps the rule from being a blanket rejection of any candidate with one undefined channel
+
+9. The corrected rule covers an interval lying wholly above M
+PASS  the whole enclosure lies above M  [bound [5.000000, 5.000000]]
+PASS  the corrected criterion withholds it, which the first wording omitted  [disposition unmeasurable]
+PASS  the rule reads only the upper bound, so the lower bound is never consulted by branch 4  [two different lower bounds, same standing-down decision]
+
+10. The branch-3 label needs a third outcome, and all three are reachable
+PASS  a spatial value above the whole enclosure gives resolved heterogeneity  [resolved heterogeneity]
+PASS  a spatial value at or below the whole enclosure gives resolution-limited  [resolution-limited]
+PASS  a spatial value inside the enclosure gives a third outcome that Draft 34's vocabulary does not have  [unresolved]
+PASS  the three outcomes are exhaustive and mutually exclusive over a swept spatial value  [swept 99 spatial values, 3 distinct labels]
+PASS  an unbounded enclosure can never be labelled resolved  [unresolved even at a spatial value of 1e9]
+NOTE  adding a third label is a change to section 19.6's published vocabulary and any successor card must carry it explicitly
+
+11. The maximum over windows propagates exactly
+PASS  the windowwise maximum of each endpoint equals the exhaustive bound on the maximum, because placements are independent across windows  [8 two-window fixtures, 0 disagreements]
+PASS  a single unbounded window makes the whole diagnostic unbounded  [one undefined-reachable window carries the maximum]
+
+12. Both endpoints are attained; the interior is not claimed
+PASS  the upper endpoint is attained by an exhibited completion - every unknown at 0  [witness 3.000000, bound 3.000000]
+PASS  the lower endpoint is attained by an exhibited completion - every unknown tied to the p10 value  [witness 1.000000, bound 1.000000]
+PASS  the enclosure can collapse to a single point, so an undefined channel is not automatically uncertainty in the decision  [one undefined channel of 11 leaves the ratio pinned at 50.000000]
+NOTE  no claim is made that every value between the endpoints is reachable. A uniform sweep cannot separate a real gap from grid resolution, so the question is left open, and it is not load-bearing: `stands_down` reads the upper endpoint alone and `branch3_label` reads the two endpoints and the undefined flag, so no interior value enters any decision
+
+13. The band-level 0/0 case, one level up
+PASS  a window in which both selected order statistics are 0 has no ratio at all  [9 of 10 channels at exactly 0]
+PASS  at n = 72 that needs at least 65 channels at exactly 0, and it makes the upper bound unbounded rather than passing  [undefined reachable True]
+NOTE  this is a second-order undefined case that lives one level above the per-channel one and is not the subject of the Part B question; it is recorded so that a successor specification does not meet it for the first time in an implementation
+
+14. How the bound moves with the undefined count
+PASS  the u = 0 entry of the trajectory is exactly the pool's plain nearest-rank ratio, which anchors the rest of it  [u = 0 gives 3.111111]
+NOTE  measured upper bounds over u = 0..7 on one pool: [3.111111, 3.192308, 3.28, 3.375, 3.478261, 3.590909, 3.714286, 3.85]
+NOTE  on this pool the upper bound is non-decreasing in u; that is one pool and is not a general monotonicity claim
+
+15. Boundary
+NOTE  every value here is constructed; no candidate sample has ever been read for noise and no frequency claim is made about real recordings
+NOTE  the exhaustive validation is over n = 10..12 and u = 1..3; at n = 72 the enumeration is used on the strength of that validation, not on a separate exhaustion
+NOTE  this probe checks a criterion Codex constructed; it is not a Part B proposal, it selects no split member, and it opens no Review Card
+NOTE  nothing here reopens RC-008 or edits Draft 34
+
+Summary
+45 checks, 0 failed

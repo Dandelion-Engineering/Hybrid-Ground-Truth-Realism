@@ -1,0 +1,115 @@
+{
+  "band_channels": 72,
+  "biting_fixture": {
+    "all_at_inf_vertex": 1.0,
+    "bounded_disposition": "unmeasurable",
+    "frozen_disposition": "passes",
+    "hi": 3.0,
+    "lo": 1.0,
+    "numpy_ratio": 1.0
+  },
+  "boundary": "constructed values only; the claim is that the completion bounds are exact and that the criterion built on them is a conservative extension of the frozen rule",
+  "closed_form_minimum_compared": 30,
+  "collapsed_enclosure_example": 50.0,
+  "conservative_extension_failures": 0,
+  "decision_irrelevant_fixture": {
+    "hi": 1.057,
+    "lo": 1.0496524329692156
+  },
+  "endpoint_witnesses": {
+    "hi": 3.0,
+    "lo": 1.0
+  },
+  "exhaustive_mismatches": 0,
+  "fixtures_exhausted": 36,
+  "float_rank_disagreements_to_200000": 0,
+  "interior_minimum_example": {
+    "exact_lo": 8.0,
+    "finite": [
+      1.0,
+      2.0,
+      3.0,
+      4.0,
+      5.0,
+      6.0,
+      7.0,
+      8.0,
+      9.0
+    ],
+    "n": 10,
+    "u": 1,
+    "vertex_lo": 9.0
+  },
+  "ranks_at_72": [
+    8,
+    65
+  ],
+  "sampled_completion_failures": 0,
+  "sampled_completions": 2400,
+  "scalar_convention_failures": 0,
+  "threshold_m": 2.0,
+  "undefined_count_trajectory": [
+    {
+      "hi": 3.111111111111111,
+      "lo": 3.111111111111111,
+      "u": 0
+    },
+    {
+      "hi": 3.1923076923076925,
+      "lo": 3.074074074074074,
+      "u": 1
+    },
+    {
+      "hi": 3.28,
+      "lo": 3.0370370370370368,
+      "u": 2
+    },
+    {
+      "hi": 3.375000000000001,
+      "lo": 3.0000000000000004,
+      "u": 3
+    },
+    {
+      "hi": 3.4782608695652177,
+      "lo": 2.962962962962963,
+      "u": 4
+    },
+    {
+      "hi": 3.590909090909091,
+      "lo": 2.925925925925926,
+      "u": 5
+    },
+    {
+      "hi": 3.7142857142857144,
+      "lo": 2.888888888888889,
+      "u": 6
+    },
+    {
+      "hi": 3.85,
+      "lo": 2.8518518518518516,
+      "u": 7
+    }
+  ],
+  "upper_bound_by_undefined_count": {
+    "0": 1.5327102803738317,
+    "1": 1.5377358490566035,
+    "10": "inf",
+    "11": "inf",
+    "12": "inf",
+    "2": 1.542857142857143,
+    "3": 1.548076923076923,
+    "4": 1.5533980582524272,
+    "5": 1.5588235294117645,
+    "6": 1.5643564356435644,
+    "7": 1.57,
+    "8": "inf",
+    "9": "inf"
+  },
+  "upper_bound_non_decreasing_on_pool": true,
+  "vertex_minimum_failures": 24,
+  "wholly_above_fixture": {
+    "hi": 5.0,
+    "lo": 5.0
+  },
+  "window_propagation_failures": 0
+}
