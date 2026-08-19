@@ -1,0 +1,28 @@
+1. Production ranks and the direct endpoint derivation
+PASS  the declared nearest ranks at n=72 are 8 and 65  [ranks 8 and 65]
+PASS  the lower and upper tail capacities both equal seven  [seven arbitrary contacts fit below p10 or above p90]
+
+2. Full-size histogram exhaustion over rank patterns
+PASS  the closed endpoints equal exhaustive completion-multiset extrema on every n=72 discrete rank pattern  [24 fixtures, 34320 completion multisets, 0 mismatches]
+
+3. Independent endpoint witnesses on continuous pools
+PASS  the direct lower witness and all-zero/all-infinity vertex family attain the derived endpoints  [512 fixtures, 0 mismatches]
+PASS  sampled interior completions remain inside those independently derived endpoints  [16384 defined completions, 0 outside]
+
+4. The eight-contact threshold is a universal witness
+PASS  for every undefined count from 8 through 72, one explicit completion makes the band ratio infinite or undefined  [65 counts checked, 0 failures]
+PASS  the threshold is the shared p10/p90 tail capacity plus one  [8 = rank(p10) = upper-tail contacts reaching rank(p90)]
+PASS  for u=0..7, a zero or infinite rank-8 defined value is already withheld, leaving only the positive-finite case for the closed formula  [16 edge fixtures, 0 failures]
+
+5. Decision and label reach at the full band size
+PASS  seven undefined ratios can change a scalar-convention pass into a withheld state  [biting bound [1.000000, 3.000000]]
+PASS  seven undefined ratios can also be proved irrelevant to branch 4  [clean bound [1.049652, 1.057000]]
+PASS  comparison with both endpoints requires three mutually reachable branch-3 labels  [resolved above, limited below, unresolved inside]
+
+6. Scope boundary
+NOTE  the evidence independently closes the owner report's n=72 gap for the branch-4-live range u=0..7 and proves the universal u>=8 witness
+NOTE  constructed ratios only; no archive, network resource, candidate sample, packet file, host gate, or pinned order is read or moved
+NOTE  this is co-design evidence outside formal review; it selects no split member and opens no successor Review Card
+
+Summary
+11 checks, 0 failed

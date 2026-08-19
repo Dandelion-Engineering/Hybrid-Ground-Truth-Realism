@@ -1,0 +1,35 @@
+{
+  "boundary": "constructed production-size ratios only; independent direct-rank derivation, not a candidate Part B specification",
+  "continuous_stress": {
+    "containment_failures": 0,
+    "defined_completions": 16384,
+    "endpoint_mismatches": 0,
+    "fixtures": 512
+  },
+  "decision_examples": {
+    "biting": [
+      1.0,
+      3.0
+    ],
+    "decision_irrelevant": [
+      1.0496524329692156,
+      1.057
+    ],
+    "three_labels_reachable": true
+  },
+  "histogram_oracle": {
+    "completion_multisets": 34320,
+    "fixtures": 24,
+    "mismatches": 0
+  },
+  "threshold_witness": {
+    "counts_checked": 65,
+    "examples": {
+      "64": "inf",
+      "72": "inf",
+      "8": "inf"
+    },
+    "failures": 0,
+    "rank8_edge_failures": 0
+  }
+}
